@@ -1,0 +1,72 @@
+{
+    "description": "Development workspace for the MagixCache package monorepo",
+    "type": "project",
+    "license": "MIT",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/k-kinzal/php-ai-toolkit.git"
+        }
+    ],
+    "require": {
+        "php": "^8.5"
+    },
+    "require-dev": {
+        "brianium/paratest": "^7.0",
+        "deptrac/deptrac": "^4.6",
+        "friendsofphp/php-cs-fixer": "^3.87",
+        "illuminate/cache": "^12.0 || ^13.0",
+        "illuminate/container": "^12.0 || ^13.0",
+        "illuminate/support": "^12.0 || ^13.0",
+        "k-kinzal/php-ai-toolkit": "dev-main",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^12.5",
+        "psr/cache": "^3.0",
+        "psr/clock": "^1.0",
+        "psr/simple-cache": "^3.0",
+        "symfony/cache": "^7.4 || ^8.0",
+        "symfony/framework-bundle": "^7.4 || ^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Magix\\Cache\\": "packages/magix-cache/src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "packages/magix-cache/tests/",
+            "Magix\\Cache\\Laravel\\": "packages/magix-cache-laravel/src/",
+            "Magix\\Cache\\Symfony\\": "packages/magix-cache-symfony/src/",
+            "Tests\\Package\\Laravel\\": "packages/magix-cache-laravel/tests/",
+            "Tests\\Package\\Symfony\\": "packages/magix-cache-symfony/tests/"
+        }
+    },
+    "scripts": {
+        "test": "paratest --processes=auto",
+        "test:unit": "@php -d memory_limit=512M vendor/bin/phpunit --configuration phpunit.xml.dist",
+        "lint": [
+            "@format:check",
+            "@phpstan",
+            "@loc-guard",
+            "@deptrac"
+        ],
+        "phpstan": "phpstan analyse --memory-limit=512M",
+        "loc-guard": "@php bin/loc-guard --config=loc.yaml",
+        "deptrac": "@php deptrac.php analyse --config-file=deptrac.yaml",
+        "format": "php-cs-fixer fix --allow-risky=yes",
+        "format:check": "php-cs-fixer fix --dry-run --diff --allow-risky=yes",
+        "config:validate": "composer validate --strict --no-check-publish",
+        "packages:validate": [
+            "composer validate packages/magix-cache/composer.json --strict --no-check-publish",
+            "composer validate packages/magix-cache-laravel/composer.json --strict --no-check-publish",
+            "composer validate packages/magix-cache-symfony/composer.json --strict --no-check-publish"
+        ],
+        "security:audit": "composer audit --locked",
+        "toolkit:install": "php-ai-toolkit install"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

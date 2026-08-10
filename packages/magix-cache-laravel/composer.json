@@ -1,0 +1,29 @@
+{
+    "name": "k-kinzal/magix-cache-laravel",
+    "description": "Laravel integration for MagixCache",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/k-kinzal/magix-cache",
+    "support": {
+        "issues": "https://github.com/k-kinzal/magix-cache/issues",
+        "source": "https://github.com/k-kinzal/magix-cache"
+    },
+    "require": {
+        "php": "^8.5",
+        "illuminate/cache": "^12.0 || ^13.0",
+        "illuminate/support": "^12.0 || ^13.0",
+        "k-kinzal/magix-cache": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Magix\\Cache\\Laravel\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Magix\\Cache\\Laravel\\MagixCacheServiceProvider"
+            ]
+        }
+    }
+}

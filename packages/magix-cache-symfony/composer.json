@@ -1,0 +1,22 @@
+{
+    "name": "k-kinzal/magix-cache-symfony",
+    "description": "Symfony integration for MagixCache",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "homepage": "https://github.com/k-kinzal/magix-cache",
+    "support": {
+        "issues": "https://github.com/k-kinzal/magix-cache/issues",
+        "source": "https://github.com/k-kinzal/magix-cache"
+    },
+    "require": {
+        "php": "^8.5",
+        "k-kinzal/magix-cache": "^1.0",
+        "psr/cache": "^3.0",
+        "symfony/framework-bundle": "^7.4 || ^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Magix\\Cache\\Symfony\\": "src/"
+        }
+    }
+}

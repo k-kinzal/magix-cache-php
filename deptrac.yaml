@@ -1,0 +1,64 @@
+deptrac:
+  paths:
+    - ./packages/magix-cache/src
+    - ./packages/magix-cache-laravel/src
+    - ./packages/magix-cache-symfony/src
+  exclude_files: []
+  layers:
+    - name: CoreApi
+      collectors:
+        - type: directory
+          value: packages/magix-cache/src/[^/]+\.php
+    - name: Attribute
+      collectors:
+        - type: directory
+          value: packages/magix-cache/src/Attribute/.*
+    - name: Composition
+      collectors:
+        - type: directory
+          value: packages/magix-cache/src/Composition/.*
+    - name: Runtime
+      collectors:
+        - type: directory
+          value: packages/magix-cache/src/Runtime/.*
+    - name: Cache
+      collectors:
+        - type: directory
+          value: packages/magix-cache/src/Cache/.*
+    - name: Clock
+      collectors:
+        - type: directory
+          value: packages/magix-cache/src/Clock/.*
+    - name: Laravel
+      collectors:
+        - type: directory
+          value: packages/magix-cache-laravel/src/.*
+    - name: Symfony
+      collectors:
+        - type: directory
+          value: packages/magix-cache-symfony/src/.*
+  ruleset:
+    CoreApi:
+      - Composition
+      - Runtime
+      - Cache
+      - Clock
+    Attribute:
+      - CoreApi
+      - Runtime
+    Composition:
+      - CoreApi
+    Runtime:
+      - CoreApi
+      - Attribute
+      - Cache
+    Cache:
+      - Runtime
+      - Clock
+    Clock: ~
+    Laravel:
+      - CoreApi
+      - Cache
+    Symfony:
+      - CoreApi
+      - Cache

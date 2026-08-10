@@ -1,0 +1,16 @@
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/k-kinzal/php-ai-toolkit/extension.neon
+    - vendor/k-kinzal/php-ai-toolkit/error-formatter.neon
+
+parameters:
+    level: max
+    customRules:
+        restrictedTestNamespacePrefixes:
+            - 'Tests\Unit'
+            - 'Tests\Integration'
+            - 'Tests\Package\Laravel\Unit'
+            - 'Tests\Package\Symfony\Unit'
+    paths:
+        - packages
+    tmpDir: .phpstan.cache

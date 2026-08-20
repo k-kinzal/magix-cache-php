@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Package\Symfony\Unit;
 
-use LogicException;
 use Magix\Cache\Cache\PSR6\CacheItemPool;
 use Magix\Cache\CacheRuntime;
 use Magix\Cache\Symfony\MagixCacheBundle;
@@ -54,7 +53,6 @@ final class MagixCacheBundleTest extends TestCase
         CacheRuntime::setCurrent(new CacheRuntime(new MemoryCache()));
         (new MagixCacheBundle())->shutdown();
 
-        $this->expectException(LogicException::class);
-        CacheRuntime::current();
+        self::assertFalse(CacheRuntime::isInstalled());
     }
 }

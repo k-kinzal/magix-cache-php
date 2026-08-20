@@ -18,7 +18,7 @@ use Tests\Fixture\MutableClock;
 #[UsesClass(CacheStrategyMiddleware::class)]
 #[UsesClass(OriginFetch::class)]
 #[UsesClass(OriginFetchResult::class)]
-#[UsesClass(\Magix\Cache\Runtime\Operation\OriginFetchOutcome::class)]
+#[UsesClass(\Magix\Cache\Runtime\Operation\OriginFetchProvenance::class)]
 #[UsesClass(Cached::class)]
 #[UsesClass(\Magix\Cache\Runtime\Metadata\CacheMetadata::class)]
 #[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]

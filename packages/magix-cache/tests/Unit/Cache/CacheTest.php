@@ -6,13 +6,10 @@ namespace Tests\Unit\Cache;
 
 use Magix\Cache\Cache\Cache;
 use Magix\Cache\Cache\CacheEntry;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Cache::class)]
-#[UsesClass(CacheEntry::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
+#[CoversNothing]
 final class CacheTest extends TestCase
 {
     public function testGetReturnsCacheEntryFromImplementation(): void

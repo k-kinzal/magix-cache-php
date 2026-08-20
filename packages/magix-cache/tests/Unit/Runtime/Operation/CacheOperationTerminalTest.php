@@ -10,7 +10,7 @@ use Magix\Cache\Runtime\Operation\CacheGet;
 use Magix\Cache\Runtime\Operation\CacheOperationTerminal;
 use Magix\Cache\Runtime\Operation\CacheSet;
 use Magix\Cache\Runtime\Operation\OriginFetch;
-use Magix\Cache\Runtime\Operation\OriginFetchOutcome;
+use Magix\Cache\Runtime\Operation\OriginFetchProvenance;
 use Magix\Cache\Runtime\Operation\OriginFetchResult;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -23,7 +23,7 @@ use Tests\Fixture\MutableClock;
 #[UsesClass(CacheGet::class)]
 #[UsesClass(CacheSet::class)]
 #[UsesClass(OriginFetch::class)]
-#[UsesClass(OriginFetchOutcome::class)]
+#[UsesClass(OriginFetchProvenance::class)]
 #[UsesClass(OriginFetchResult::class)]
 #[UsesClass(Cached::class)]
 #[UsesClass(\Magix\Cache\Runtime\Metadata\CacheMetadata::class)]

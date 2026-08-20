@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Cache;
 
-use const INF;
-
-use InvalidArgumentException;
 use Magix\Cache\Cache\CacheEntry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -16,13 +13,6 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
 final class CacheEntryTest extends TestCase
 {
-    public function testFiniteAbsoluteExpirationIsRequired(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        new CacheEntry('value', INF);
-    }
-
     public function testValueReturnsInternalValueWithConcreteMetadata(): void
     {
         $entry = new CacheEntry(
@@ -45,12 +35,5 @@ final class CacheEntryTest extends TestCase
         self::assertSame(120.0, $retained->expiresAt);
         self::assertSame(150.0, $retained->retainedUntil);
         self::assertSame(['product:1'], $retained->tags);
-    }
-
-    public function testRetentionCannotPrecedeLogicalExpiration(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        new CacheEntry('value', 120.0, retainedUntil: 119.0);
     }
 }

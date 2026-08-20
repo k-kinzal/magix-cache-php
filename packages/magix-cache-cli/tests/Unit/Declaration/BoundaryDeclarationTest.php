@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BoundaryDeclaration::class)]
 #[UsesClass(KeyParameter::class)]
+#[UsesClass(Visibility::class)]
 final class BoundaryDeclarationTest extends TestCase
 {
     public function testIdUsesTheFullyQualifiedClassName(): void

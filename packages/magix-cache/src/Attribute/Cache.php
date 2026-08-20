@@ -18,6 +18,8 @@ final readonly class Cache
     /**
      * Creates an attribute-backed cache policy.
      *
+     * @param int|Ttl $ttl Fixed lifetime in seconds, or a lifetime derived from upstream.
+     * @param int|null $maxTtl Upper bound applied to a derived lifetime.
      * @param list<string> $tags
      */
     public function __construct(

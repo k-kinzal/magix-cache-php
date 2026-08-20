@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * PHP raises a bare \Exception when a value graph contains something it refuses
+ * to serialize, such as a Closure or an internal object like PDO. The bundled
+ * signature does not carry that, which would make the guard around it read as a
+ * dead catch.
+ *
+ * @throws Exception
+ */
+function serialize(mixed $value): string
+{
+}

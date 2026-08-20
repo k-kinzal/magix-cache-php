@@ -9,6 +9,7 @@ use function array_slice;
 use function count;
 use function implode;
 
+use JsonException;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\CacheTree;
@@ -42,6 +43,7 @@ final readonly class AnalyzeCommand
      * Renders the cache tree of the referenced boundary.
      *
      * @param array<array-key, mixed> $path
+     * @throws JsonException when the tree cannot be encoded as JSON
      */
     public function __invoke(
         SymfonyStyle $io,

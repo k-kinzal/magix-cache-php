@@ -15,12 +15,12 @@ use function json_encode;
 
 use JsonException;
 use Magix\Cache\Cli\Key\CacheKeyResolver;
+use Magix\Cache\Cli\Key\CacheKeyUnresolvable;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Throwable;
 
 /**
  * Prints the cache key that one call to a boundary produces.
@@ -43,6 +43,10 @@ final readonly class KeyCommand
 
     /**
      * Resolves and prints the key of one call.
+     *
+     * A boundary the catalog names but this process cannot key is bad input and
+     * is reported as such. Anything else reaches the console application, which
+     * is already the boundary that renders a failure and sets the exit code.
      *
      * @param array<array-key, mixed> $arguments
      * @param array<array-key, mixed> $path
@@ -72,7 +76,7 @@ final readonly class KeyCommand
         try {
             $bound = $this->keys->arguments($found->class, $found->method, $values);
             $key = $this->keys->resolve($found->class, $found->method, $found->policy->version ?? '1', $values);
-        } catch (Throwable $failure) {
+        } catch (CacheKeyUnresolvable $failure) {
             $io->error($failure->getMessage());
 
             return Command::FAILURE;

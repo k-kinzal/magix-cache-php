@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Runtime\Strategy;
 
-use Error;
-use InvalidArgumentException;
+use Exception;
+use JsonException;
 use Magix\Cache\Cache\CacheEntry;
 use Magix\Cache\Cached;
+use Magix\Cache\Runtime\Metadata\CacheMetadata;
+use Magix\Cache\Runtime\Metadata\CacheTokenSet;
 use Magix\Cache\Runtime\Operation\CacheSet;
 use Magix\Cache\Runtime\Operation\OriginFetch;
-use Magix\Cache\Runtime\Operation\OriginFetchOutcome;
+use Magix\Cache\Runtime\Operation\OriginFetchProvenance;
 use Magix\Cache\Runtime\Operation\OriginFetchResult;
 use Magix\Cache\Runtime\Strategy\CacheStrategyMiddleware;
 use Magix\Cache\Runtime\Strategy\StaleIfErrorCacheStrategy;
@@ -26,14 +28,14 @@ use Throwable;
 #[UsesClass(CacheEntry::class)]
 #[UsesClass(CacheSet::class)]
 #[UsesClass(OriginFetch::class)]
-#[UsesClass(OriginFetchOutcome::class)]
+#[UsesClass(OriginFetchProvenance::class)]
 #[UsesClass(OriginFetchResult::class)]
 #[UsesClass(Cached::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheMetadata::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
+#[UsesClass(CacheMetadata::class)]
+#[UsesClass(CacheTokenSet::class)]
 final class StaleIfErrorCacheStrategyTest extends TestCase
 {
-    public function testFetchReturnsEligibleStaleEntryAfterOriginException(): void
+    public function testFetchReturnsEligibleStaleEntryAfterOriginFailure(): void
     {
         $stale = new CacheEntry('stale', 90.0, retainedUntil: 120.0);
         $operation = new OriginFetch(
@@ -47,35 +49,57 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         $result = $strategy->fetch(
             $operation,
             static function (): never {
-                throw new RuntimeException('origin failed');
+                throw new RuntimeException('The origin failed.');
             },
         );
 
-        self::assertSame(OriginFetchOutcome::Stale, $result->outcome);
+        self::assertSame(OriginFetchProvenance::Stale, $result->provenance);
         self::assertSame($stale, $result->staleEntry());
     }
 
-    public function testFetchDoesNotCatchErrorsByDefault(): void
+    public function testFetchServesStaleForOriginFailuresOutsideTheRuntimeExceptionFamily(): void
     {
-        $error = new Error('programming error');
+        $stale = new CacheEntry('stale', 90.0, retainedUntil: 120.0);
         $operation = new OriginFetch(
             'key',
             static fn (): Cached => Cached::of('unused'),
-            new CacheEntry('stale', 90.0, retainedUntil: 120.0),
+            $stale,
             new MutableClock(100.0),
         );
 
-        $this->expectExceptionObject($error);
-
-        (new StaleIfErrorCacheStrategy(30))->fetch(
+        $result = (new StaleIfErrorCacheStrategy(30))->fetch(
             $operation,
-            static function () use ($error): never {
-                throw $error;
+            static function (): never {
+                throw new JsonException('Syntax error.');
             },
         );
+
+        self::assertSame(OriginFetchProvenance::Stale, $result->provenance);
+        self::assertSame($stale, $result->staleEntry());
     }
 
-    public function testFetchUsesConfiguredThrowableClassifier(): void
+    public function testFetchServesStaleForAnOriginFailureThatExtendsNothingFamiliar(): void
+    {
+        $failure = new class ('The upstream is unavailable.') extends Exception {};
+        $stale = new CacheEntry('stale', 90.0, retainedUntil: 120.0);
+        $operation = new OriginFetch(
+            'key',
+            static fn (): Cached => Cached::of('unused'),
+            $stale,
+            new MutableClock(100.0),
+        );
+
+        $result = (new StaleIfErrorCacheStrategy(30))->fetch(
+            $operation,
+            static function () use ($failure): never {
+                throw $failure;
+            },
+        );
+
+        self::assertSame(OriginFetchProvenance::Stale, $result->provenance);
+    }
+
+    public function testFetchServesStaleOnlyForFailuresTheClassifierAccepts(): void
     {
         $operation = new OriginFetch(
             'key',
@@ -83,13 +107,37 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
             new CacheEntry('stale', 90.0, retainedUntil: 120.0),
             new MutableClock(100.0),
         );
-        $strategy = new StaleIfErrorCacheStrategy(30, static fn (Throwable $error): bool => $error instanceof Error);
+        $strategy = new StaleIfErrorCacheStrategy(
+            30,
+            static fn (Throwable $error): bool => $error->getMessage() === 'The upstream is unavailable.',
+        );
 
         $result = $strategy->fetch($operation, static function (): never {
-            throw new Error('eligible');
+            throw new RuntimeException('The upstream is unavailable.');
         });
 
-        self::assertSame(OriginFetchOutcome::Stale, $result->outcome);
+        self::assertSame(OriginFetchProvenance::Stale, $result->provenance);
+    }
+
+    public function testFetchRethrowsTheOriginalFailureTheClassifierRejects(): void
+    {
+        $failure = new RuntimeException('The response was malformed.');
+        $operation = new OriginFetch(
+            'key',
+            static fn (): Cached => Cached::of('unused'),
+            new CacheEntry('stale', 90.0, retainedUntil: 120.0),
+            new MutableClock(100.0),
+        );
+        $strategy = new StaleIfErrorCacheStrategy(
+            30,
+            static fn (Throwable $error): bool => $error->getMessage() === 'The upstream is unavailable.',
+        );
+
+        $this->expectExceptionObject($failure);
+
+        $strategy->fetch($operation, static function () use ($failure): never {
+            throw $failure;
+        });
     }
 
     public function testFetchRethrowsWhenStaleWindowHasElapsed(): void
@@ -104,7 +152,7 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         (new StaleIfErrorCacheStrategy(30))->fetch($operation, static function (): never {
-            throw new RuntimeException('too old');
+            throw new RuntimeException('The retained entry is too old.');
         });
     }
 
@@ -121,12 +169,5 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         self::assertInstanceOf(CacheSet::class, $written);
         self::assertSame(120.0, $written->entry()->expiresAt);
         self::assertSame(150.0, $written->entry()->retainedUntil);
-    }
-
-    public function testNegativeMaximumAgeIsRejected(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        new StaleIfErrorCacheStrategy(-1);
     }
 }

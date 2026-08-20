@@ -43,6 +43,8 @@ final class MagixCacheBundle extends AbstractBundle
 
     /**
      * Installs the container-managed runtime for Cacheable.
+     *
+     * @throws LogicException when the bundle was booted without a container holding a runtime
      */
     #[Override]
     public function boot(): void

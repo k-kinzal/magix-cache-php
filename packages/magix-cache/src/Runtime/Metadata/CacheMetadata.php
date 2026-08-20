@@ -56,6 +56,7 @@ final readonly class CacheMetadata
      *
      * @param list<string> $tags
      * @param list<string> $reasons
+     * @throws InvalidArgumentException when the expiration is not a finite Unix timestamp
      */
     public function __construct(
         ?float $expiresAt = null,
@@ -88,6 +89,7 @@ final readonly class CacheMetadata
      * Creates metadata with a TTL relative to the supplied time.
      *
      * @param list<string> $tags
+     * @throws InvalidArgumentException when the lifetime is negative
      */
     public static function forTtl(int $ttl, float $now, array $tags = []): self
     {
@@ -131,6 +133,8 @@ final readonly class CacheMetadata
 
     /**
      * Applies a cache boundary's declared policy to these constraints.
+     *
+     * @throws LogicException when a derived lifetime has no finite upstream expiration to derive from
      */
     public function applyPolicy(CachePolicy $policy, float $now): self
     {

@@ -25,7 +25,10 @@ final readonly class StaleIfErrorCacheStrategy extends CacheStrategyMiddleware
     private ?Closure $accepts;
 
     /**
+     * Creates a stale-if-error strategy.
+     *
      * @param Closure(Throwable): bool|null $accepts Optional error classifier; exceptions are accepted by default.
+     * @throws InvalidArgumentException when the maximum stale age is negative
      */
     public function __construct(
         public int $maxAge,
@@ -39,10 +42,17 @@ final readonly class StaleIfErrorCacheStrategy extends CacheStrategyMiddleware
     }
 
     /**
+     * The origin is arbitrary caller code, so this strategy cannot know which
+     * exception hierarchy a failure arrives in: a PSR-18 client, Doctrine DBAL,
+     * and a bare JsonException all sit outside RuntimeException. It therefore
+     * intercepts every origin failure and delegates the decision to the
+     * classifier, which by default accepts Exception and leaves Error alone.
+     *
      * @template T
      * @param OriginFetch<T> $operation
      * @param Closure(OriginFetch<T>): OriginFetchResult<T> $next
      * @return OriginFetchResult<T>
+     * @throws Throwable when the failure is not eligible, or no retained entry may stand in for it
      */
     #[Override]
     public function fetch(OriginFetch $operation, Closure $next): OriginFetchResult

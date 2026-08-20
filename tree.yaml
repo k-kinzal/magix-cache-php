@@ -1,0 +1,61 @@
+paths:
+  - '.'
+
+exclude:
+  - '.deptrac.cache'
+  - '.git'
+  - '.idea'
+  - '.php-cs-fixer.cache'
+  - '.phpstan.cache'
+  - '.phpunit.cache'
+  - 'vendor'
+
+rules:
+  - path: '**'
+    deny_dirs: ['scripts', 'Scripts']
+
+  - path: 'packages/*/src'
+    max_total_files: 250
+    max_depth: 3
+
+  - path: 'packages/*/src/**'
+    forbid_empty: true
+    allow: ['*.php']
+    deny:
+      - '*Helper.php'
+      - '*Helpers.php'
+      - '*Manager.php'
+      - '*Util.php'
+      - '*Utils.php'
+      - '*Utility.php'
+      - '*Service.php'
+      - '*Evidence.php'
+      - '*Evidences.php'
+      - '*Outcome.php'
+      - '*Outcomes.php'
+      - '*Probe.php'
+      - '*Probes.php'
+    file_case: pascal
+    dir_case: pascal
+    max_files: 30
+    max_dirs: 20
+
+  - path: 'packages/*/tests/Unit/**'
+    forbid_empty: true
+    allow: ['*Test.php']
+    file_case: pascal
+    dir_case: pascal
+    max_files: 30
+    max_dirs: 20
+
+  - path: 'packages/*/tests/Fixture/**'
+    forbid_empty: true
+    allow: ['*.php']
+    file_case: pascal
+    dir_case: pascal
+
+report:
+  reporter: ai
+  order_by:
+    - path
+    - rule

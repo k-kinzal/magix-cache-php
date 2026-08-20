@@ -92,7 +92,7 @@ With this configuration:
 4. If an eligible exception occurs, the retained entry is returned.
 5. After the stale window ends, the origin exception is rethrown.
 
-By default, the strategy accepts `Exception` instances and does not catch PHP `Error` instances. Supply a classifier to select failures explicitly:
+The origin is your code, so the strategy cannot predict which hierarchy a failure arrives in: a PSR-18 client, `Doctrine\DBAL\Exception`, and a plain `JsonException` all sit outside `RuntimeException`. It therefore intercepts every origin failure and asks a classifier. By default it accepts `Exception` instances and leaves PHP `Error` instances alone, so a broken origin still fails loudly. Supply a classifier to select failures explicitly:
 
 ```php
 $strategy = new StaleIfErrorCacheStrategy(
@@ -102,7 +102,7 @@ $strategy = new StaleIfErrorCacheStrategy(
 );
 ```
 
-The returned stale value keeps its original logical expiration. `maxAge` must be zero or greater.
+A failure the classifier rejects, and a failure with no eligible retained entry, are rethrown unchanged — the caller still catches the exact exception its own origin raised. The returned stale value keeps its original logical expiration. `maxAge` must be zero or greater.
 
 ## Bypass Cache Backend Errors
 
@@ -119,7 +119,7 @@ For accepted failures:
 - A cache read failure becomes a miss, so the origin is fetched.
 - A cache write failure is ignored, so the origin result is still returned.
 
-By default, it accepts PSR-6 and PSR-16 `CacheException` implementations. Other throwables are rethrown. Supply a classifier for a non-PSR backend:
+By default it accepts `CacheBackendFailure`, which the bundled adapters raise, and PSR-6 and PSR-16 `CacheException` implementations, which a backend used directly still reports. Everything else is rethrown unchanged. A `Cache` implementation may come from anywhere and is under no obligation to use either, so supply a classifier for such a backend:
 
 ```php
 $strategy = new BypassCacheErrorsStrategy(
@@ -128,7 +128,7 @@ $strategy = new BypassCacheErrorsStrategy(
 );
 ```
 
-This strategy does not suppress origin failures.
+`accepts()` is public, so the classification can be checked directly in a test. This strategy does not suppress origin failures.
 
 ## Compose Strategies
 
@@ -147,7 +147,7 @@ $strategy = new CompositeCacheStrategy(
 
 Strategies are ordered from outermost to innermost, like HTTP middleware. For each operation, the first strategy receives the operation first and decides whether and how to call the next strategy.
 
-Order matters when strategies transform the same operation or catch the same throwable. Keep classifiers narrow so backend errors and origin errors are handled by the intended strategy.
+Order matters when strategies transform the same operation or intercept the same throwable. Both shipped strategies see every failure that passes through them and decide with a classifier, so keep those classifiers narrow: `BypassCacheErrorsStrategy` should accept only storage failures, and `StaleIfErrorCacheStrategy` only the origin failures worth serving stale for.
 
 ## Write a Custom Strategy
 
@@ -202,4 +202,4 @@ Each phase receives an immutable operation object:
 
 Always call the supplied `$next` closure unless the strategy intentionally short-circuits that phase. Pass a modified immutable operation to `$next` rather than mutating the original.
 
-An origin fetch returns `OriginFetchResult`, whose outcome is either `Origin` or `Stale`. Use `originValue()` only for an origin outcome and `staleEntry()` only for a stale outcome.
+An origin fetch returns `OriginFetchResult`, whose `provenance` is either `Origin` or `Stale`. Use `originValue()` only when the provenance is `Origin` and `staleEntry()` only when it is `Stale`; the other call is a programmer error and raises a `LogicException`.

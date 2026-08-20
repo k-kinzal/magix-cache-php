@@ -7,12 +7,15 @@ namespace Tests\Package\Cli\Unit\Console;
 use Magix\Cache\Cli\Console\Application;
 use Magix\Cache\Cli\Console\BoundariesCommand;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[CoversClass(BoundariesCommand::class)]
 #[UsesNamespace('Magix\Cache\Cli')]
+#[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
+#[UsesClass(\Magix\Cache\Runtime\Metadata\Visibility::class)]
 final class BoundariesCommandTest extends TestCase
 {
     public function testBoundariesListEveryDeclaredCache(): void

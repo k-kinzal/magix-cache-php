@@ -8,7 +8,7 @@ use Closure;
 use InvalidArgumentException;
 use Magix\Cache\Cached;
 use Magix\Cache\Runtime\Operation\OriginFetch;
-use Magix\Cache\Runtime\Operation\OriginFetchOutcome;
+use Magix\Cache\Runtime\Operation\OriginFetchProvenance;
 use Magix\Cache\Runtime\Operation\OriginFetchResult;
 
 use function min;
@@ -24,7 +24,7 @@ final readonly class DynamicTtlCacheStrategy extends CacheStrategyMiddleware
     private Closure $resolve;
 
     /**
-     * @param Closure(DynamicTtlContext): int $resolve
+     * @param Closure(DynamicTtlContext): int $resolve Returns the lifetime in seconds this result may keep.
      */
     public function __construct(Closure $resolve)
     {
@@ -36,13 +36,14 @@ final readonly class DynamicTtlCacheStrategy extends CacheStrategyMiddleware
      * @param OriginFetch<T> $operation
      * @param Closure(OriginFetch<T>): OriginFetchResult<T> $next
      * @return OriginFetchResult<T>
+     * @throws InvalidArgumentException when the resolver returns a negative lifetime
      */
     #[Override]
     public function fetch(OriginFetch $operation, Closure $next): OriginFetchResult
     {
         $fetched = $next($operation);
 
-        if ($fetched->outcome !== OriginFetchOutcome::Origin) {
+        if ($fetched->provenance !== OriginFetchProvenance::Origin) {
             return $fetched;
         }
 

@@ -23,20 +23,21 @@ final readonly class OriginFetchResult
     public function __construct(
         private Cached|CacheEntry $value,
     ) {
-        $this->outcome = $value instanceof Cached
-            ? OriginFetchOutcome::Origin
-            : OriginFetchOutcome::Stale;
+        $this->provenance = $value instanceof Cached
+            ? OriginFetchProvenance::Origin
+            : OriginFetchProvenance::Stale;
     }
 
     /**
      * Indicates whether this result came from the origin or retained stale data.
      */
-    public OriginFetchOutcome $outcome;
+    public OriginFetchProvenance $provenance;
 
     /**
-     * Returns the origin value for an origin outcome.
+     * Returns the origin value when the fetch reached the origin.
      *
      * @return Cached<covariant T>
+     * @throws LogicException when this result retained stale data instead
      */
     public function originValue(): Cached
     {
@@ -46,9 +47,10 @@ final readonly class OriginFetchResult
     }
 
     /**
-     * Returns the retained entry for a stale outcome.
+     * Returns the retained entry when the fetch served stale data.
      *
      * @return CacheEntry<T>
+     * @throws LogicException when this result came from the origin instead
      */
     public function staleEntry(): CacheEntry
     {

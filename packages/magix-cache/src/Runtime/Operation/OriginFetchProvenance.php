@@ -7,7 +7,7 @@ namespace Magix\Cache\Runtime\Operation;
 /**
  * Identifies whether a fetch resolved from the origin or retained stale data.
  */
-enum OriginFetchOutcome
+enum OriginFetchProvenance
 {
     case Origin;
     case Stale;

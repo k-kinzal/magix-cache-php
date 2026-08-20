@@ -126,6 +126,8 @@ final readonly class Cached
 
     /**
      * Forwards inaccessible property reads to an object or string-keyed array.
+     *
+     * @throws LogicException when the wrapped value exposes no such property
      */
     public function __get(string $name): mixed
     {
@@ -162,6 +164,7 @@ final readonly class Cached
      * Forwards unknown method calls to the wrapped object.
      *
      * @param list<mixed> $arguments
+     * @throws BadMethodCallException when the wrapped value exposes no such method
      */
     public function __call(string $name, array $arguments): mixed
     {
@@ -174,6 +177,8 @@ final readonly class Cached
 
     /**
      * Forwards string conversion to a string or Stringable wrapped value.
+     *
+     * @throws LogicException when the wrapped value has no string representation
      */
     public function __toString(): string
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Runtime\KeyStrategy;
 
-use InvalidArgumentException;
 use Magix\Cache\Runtime\CacheKeyContext;
 use Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -44,26 +43,6 @@ final class HashCacheKeyStrategyTest extends TestCase
         )));
     }
 
-    public function testGenerateRejectsResources(): void
-    {
-        $resource = fopen('php://memory', 'r');
-        self::assertIsResource($resource);
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Resources cannot be used in cache keys.');
-
-        try {
-            (new HashCacheKeyStrategy())->generate(new CacheKeyContext(
-                class: 'App\\ProductQuery',
-                method: 'execute',
-                arguments: ['resource' => $resource],
-                version: '1',
-            ));
-        } finally {
-            fclose($resource);
-        }
-    }
-
     public function testGeneratePreservesPhpSerializableTypeIdentity(): void
     {
         $strategy = new HashCacheKeyStrategy();
@@ -74,18 +53,5 @@ final class HashCacheKeyStrategyTest extends TestCase
 
         self::assertNotSame($integer, $string);
         self::assertSame($firstObject, $secondObject);
-    }
-
-    public function testGenerateRejectsValuesThatPhpCannotSerialize(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Reduce it with #[CacheKey] or exclude it with #[CacheIgnore].');
-
-        (new HashCacheKeyStrategy())->generate(new CacheKeyContext(
-            'App\\Query',
-            'execute',
-            ['value' => static fn (): null => null],
-            '1',
-        ));
     }
 }

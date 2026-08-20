@@ -29,6 +29,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DependencyConstraint::class)]
 #[UsesClass(EffectCalculator::class)]
 #[UsesClass(PolicyDeclaration::class)]
+#[UsesClass(\Magix\Cache\Runtime\Metadata\Visibility::class)]
 final class CacheTreeTest extends TestCase
 {
     public function testBuildComposesTheEffectOfEveryDependency(): void

@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Magix\Cache;
 
 use InvalidArgumentException;
+
+use function is_int;
+
+use Magix\Cache\Runtime\Metadata\CacheTokenSet;
 use Magix\Cache\Runtime\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 
@@ -16,7 +20,10 @@ final readonly class CachePolicy
     /**
      * Creates an explicit cache policy.
      *
+     * @param int|Ttl $ttl Fixed lifetime in seconds, or a lifetime derived from upstream.
+     * @param int|null $maxTtl Upper bound applied to a derived lifetime.
      * @param list<string> $tags
+     * @throws InvalidArgumentException when a lifetime is negative, a derived lifetime has no upper bound, the version is empty, or a tag is unusable
      */
     public function __construct(
         public int|Ttl $ttl = Ttl::Auto,
@@ -41,6 +48,8 @@ final readonly class CachePolicy
         if ($version === '') {
             throw new InvalidArgumentException('Cache version must not be empty.');
         }
+
+        (new CacheTokenSet())->tags($tags);
     }
 
     /**

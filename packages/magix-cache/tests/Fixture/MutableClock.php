@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Fixture;
 
 use DateTimeImmutable;
+use LogicException;
 use Psr\Clock\ClockInterface;
 
 use function sprintf;
@@ -23,10 +24,18 @@ final class MutableClock implements ClockInterface
 
     /**
      * Returns the configured Unix time.
+     *
+     * @throws LogicException when the configured time is not a representable instant
      */
     public function now(): DateTimeImmutable
     {
-        return new DateTimeImmutable('@'.sprintf('%.6F', $this->time));
+        $now = DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $this->time));
+
+        if ($now === false) {
+            throw new LogicException('The configured time is not a representable instant.');
+        }
+
+        return $now;
     }
 
     /**

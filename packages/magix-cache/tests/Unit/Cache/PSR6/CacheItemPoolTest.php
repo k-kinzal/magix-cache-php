@@ -9,6 +9,7 @@ use Magix\Cache\Cache\PSR6\CacheItemPool;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 #[CoversClass(CacheItemPool::class)]
@@ -16,6 +17,9 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 #[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
 final class CacheItemPoolTest extends TestCase
 {
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testGetReturnsCacheEntry(): void
     {
         $pool = new ArrayAdapter();
@@ -30,6 +34,9 @@ final class CacheItemPoolTest extends TestCase
         self::assertEquals($entry, $cache->get('generated-key', $typeWitness));
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testSetPersistsCacheEntry(): void
     {
         $pool = new ArrayAdapter();
@@ -41,6 +48,9 @@ final class CacheItemPoolTest extends TestCase
         self::assertEquals($entry, $pool->getItem('generated-key')->get());
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testSetRetainsEntryAfterItsLogicalExpiration(): void
     {
         $now = time();

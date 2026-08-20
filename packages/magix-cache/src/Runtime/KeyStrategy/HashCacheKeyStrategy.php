@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Runtime\KeyStrategy;
 
+use Exception;
+
 use function hash;
 
 use InvalidArgumentException;
@@ -15,8 +17,6 @@ use Magix\Cache\Runtime\CacheKeyStrategy;
 
 use function serialize;
 
-use Throwable;
-
 /**
  * Hashes the class, method, normalized arguments, and cache version with SHA-256.
  */
@@ -24,6 +24,13 @@ final readonly class HashCacheKeyStrategy implements CacheKeyStrategy
 {
     /**
      * Returns an opaque SHA-256 cache key.
+     *
+     * PHP refuses to serialize a Closure or an internal object such as PDO, and
+     * reports that refusal as a bare \Exception. That refusal is what this
+     * catch is for. An Error raised by the caller's own __serialize() is a bug
+     * in that method, and relabelling it as an unusable key would hide it.
+     *
+     * @throws InvalidArgumentException when an argument cannot be represented in a key
      */
     public function generate(CacheKeyContext $context): string
     {
@@ -40,7 +47,7 @@ final readonly class HashCacheKeyStrategy implements CacheKeyStrategy
                 'arguments' => $context->arguments,
                 'version' => $context->version,
             ]);
-        } catch (Throwable $exception) {
+        } catch (Exception $exception) {
             throw new InvalidArgumentException(
                 'The argument cannot be represented in a cache key. Reduce it with #[CacheKey] or exclude it with #[CacheIgnore].',
                 previous: $exception,

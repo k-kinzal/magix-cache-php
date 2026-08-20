@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Magix\Cache\Runtime\Strategy;
 
 use Closure;
+use Magix\Cache\Cache\CacheBackendFailure;
 use Magix\Cache\Cache\CacheEntry;
 use Magix\Cache\Runtime\Operation\CacheGet;
 use Magix\Cache\Runtime\Operation\CacheSet;
@@ -30,9 +31,29 @@ final readonly class BypassCacheErrorsStrategy extends CacheStrategyMiddleware
     }
 
     /**
+     * Reports whether a failure is one this strategy may bypass.
+     *
+     * A Cache implementation may come from anywhere and is under no obligation
+     * to report failures as CacheBackendFailure, so the decision cannot be made
+     * by the catch type alone. The bundled adapters raise CacheBackendFailure;
+     * a backend used directly still reports through the PSR interfaces.
+     */
+    public function accepts(Throwable $error): bool
+    {
+        if ($this->accepts !== null) {
+            return ($this->accepts)($error);
+        }
+
+        return $error instanceof CacheBackendFailure
+            || $error instanceof Psr6CacheException
+            || $error instanceof Psr16CacheException;
+    }
+
+    /**
      * @template T
      * @param Closure(CacheGet): (CacheEntry<T>|null) $next
      * @return CacheEntry<T>|null
+     * @throws Throwable when the failure is not one this strategy bypasses
      */
     #[Override]
     public function get(CacheGet $operation, Closure $next): ?CacheEntry
@@ -40,11 +61,7 @@ final readonly class BypassCacheErrorsStrategy extends CacheStrategyMiddleware
         try {
             return $next($operation);
         } catch (Throwable $error) {
-            $accepted = $this->accepts !== null
-                ? ($this->accepts)($error)
-                : $error instanceof Psr6CacheException || $error instanceof Psr16CacheException;
-
-            if (!$accepted) {
+            if (!$this->accepts($error)) {
                 throw $error;
             }
 
@@ -56,6 +73,7 @@ final readonly class BypassCacheErrorsStrategy extends CacheStrategyMiddleware
      * @template T
      * @param CacheSet<T> $operation
      * @param Closure(CacheSet<T>): void $next
+     * @throws Throwable when the failure is not one this strategy bypasses
      */
     #[Override]
     public function set(CacheSet $operation, Closure $next): void
@@ -63,11 +81,7 @@ final readonly class BypassCacheErrorsStrategy extends CacheStrategyMiddleware
         try {
             $next($operation);
         } catch (Throwable $error) {
-            $accepted = $this->accepts !== null
-                ? ($this->accepts)($error)
-                : $error instanceof Psr6CacheException || $error instanceof Psr16CacheException;
-
-            if (!$accepted) {
+            if (!$this->accepts($error)) {
                 throw $error;
             }
         }

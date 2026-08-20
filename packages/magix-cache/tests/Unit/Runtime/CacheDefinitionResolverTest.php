@@ -19,6 +19,7 @@ use Tests\Fixture\PlainQuery;
 #[UsesClass(\Magix\Cache\Attribute\CacheScope::class)]
 #[UsesClass(\Magix\Cache\CachePolicy::class)]
 #[UsesClass(\Magix\Cache\Runtime\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
 final class CacheDefinitionResolverTest extends TestCase
 {
     public function testResolveReturnsAndMemoizesMethodPolicy(): void

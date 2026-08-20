@@ -27,6 +27,7 @@ trait Cacheable
      * @param Closure(): Cached<T> $compute
      * @param CacheStrategy $strategy Per-boundary cache-operation strategy.
      * @return Cached<T>
+     * @throws LogicException when the calling boundary cannot be identified or declares no policy
      */
     final protected function cached(
         Closure $compute,

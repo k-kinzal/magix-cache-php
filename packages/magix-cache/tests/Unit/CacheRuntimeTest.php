@@ -17,7 +17,7 @@ use Magix\Cache\Runtime\Operation\CacheGet;
 use Magix\Cache\Runtime\Operation\CacheOperationTerminal;
 use Magix\Cache\Runtime\Operation\CacheSet;
 use Magix\Cache\Runtime\Operation\OriginFetch;
-use Magix\Cache\Runtime\Operation\OriginFetchOutcome;
+use Magix\Cache\Runtime\Operation\OriginFetchProvenance;
 use Magix\Cache\Runtime\Operation\OriginFetchResult;
 use Magix\Cache\Runtime\Policy\Ttl;
 use Magix\Cache\Runtime\Strategy\CacheStrategyMiddleware;
@@ -44,12 +44,13 @@ use Tests\Fixture\MutableClock;
 #[UsesClass(CacheOperationTerminal::class)]
 #[UsesClass(CacheSet::class)]
 #[UsesClass(OriginFetch::class)]
-#[UsesClass(OriginFetchOutcome::class)]
+#[UsesClass(OriginFetchProvenance::class)]
 #[UsesClass(OriginFetchResult::class)]
 #[UsesClass(CacheStrategyMiddleware::class)]
 #[UsesClass(DynamicTtlCacheStrategy::class)]
 #[UsesClass(DynamicTtlContext::class)]
 #[UsesClass(StaleIfErrorCacheStrategy::class)]
+#[UsesClass(\Magix\Cache\Clock\SystemClock::class)]
 final class CacheRuntimeTest extends TestCase
 {
     public function testKeyStrategyReturnsConfiguredStrategy(): void
@@ -87,6 +88,15 @@ final class CacheRuntimeTest extends TestCase
 
         self::assertSame($runtime, CacheRuntime::current());
         CacheRuntime::setCurrent(null);
+    }
+
+    public function testIsInstalledReportsTheLifecycleState(): void
+    {
+        CacheRuntime::setCurrent(new CacheRuntime(new MemoryCache()));
+        self::assertTrue(CacheRuntime::isInstalled());
+
+        CacheRuntime::setCurrent(null);
+        self::assertFalse(CacheRuntime::isInstalled());
     }
 
     public function testCurrentReturnsInstalledRuntime(): void

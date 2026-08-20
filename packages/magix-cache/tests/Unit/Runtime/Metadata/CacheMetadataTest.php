@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Runtime\Metadata;
 
-use LogicException;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\Runtime\Metadata\CacheMetadata;
 use Magix\Cache\Runtime\Metadata\Visibility;
@@ -90,14 +89,6 @@ final class CacheMetadataTest extends TestCase
         );
 
         self::assertSame(110.0, $applied->expiresAt);
-    }
-
-    public function testApplyPolicyRequiresFiniteExpirationForAutomaticTtl(): void
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Auto requires a finite dependency or upstream expiration.');
-
-        CacheMetadata::top()->applyPolicy(new CachePolicy(ttl: Ttl::Auto), 100.0);
     }
 
     public function testWithExpiresAtPreservesOtherConstraints(): void

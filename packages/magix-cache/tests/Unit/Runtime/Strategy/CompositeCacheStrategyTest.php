@@ -23,10 +23,13 @@ use Tests\Fixture\RecordingCacheStrategy;
 #[UsesClass(CacheSet::class)]
 #[UsesClass(OriginFetch::class)]
 #[UsesClass(OriginFetchResult::class)]
-#[UsesClass(\Magix\Cache\Runtime\Operation\OriginFetchOutcome::class)]
+#[UsesClass(\Magix\Cache\Runtime\Operation\OriginFetchProvenance::class)]
 #[UsesClass(Cached::class)]
 #[UsesClass(\Magix\Cache\Runtime\Metadata\CacheMetadata::class)]
 #[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
+#[UsesClass(\Magix\Cache\Runtime\Strategy\CacheGetStrategyHandler::class)]
+#[UsesClass(\Magix\Cache\Runtime\Strategy\CacheSetStrategyHandler::class)]
+#[UsesClass(\Magix\Cache\Runtime\Strategy\OriginFetchStrategyHandler::class)]
 final class CompositeCacheStrategyTest extends TestCase
 {
     public function testGetComposesInMiddlewareOrder(): void

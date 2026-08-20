@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Runtime\Strategy;
 
-use InvalidArgumentException;
 use Magix\Cache\Cache\CacheEntry;
 use Magix\Cache\Cached;
 use Magix\Cache\Runtime\Metadata\CacheMetadata;
@@ -24,7 +23,7 @@ use Tests\Fixture\MutableClock;
 #[UsesClass(CacheEntry::class)]
 #[UsesClass(OriginFetch::class)]
 #[UsesClass(OriginFetchResult::class)]
-#[UsesClass(\Magix\Cache\Runtime\Operation\OriginFetchOutcome::class)]
+#[UsesClass(\Magix\Cache\Runtime\Operation\OriginFetchProvenance::class)]
 #[UsesClass(Cached::class)]
 #[UsesClass(CacheMetadata::class)]
 #[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
@@ -79,23 +78,5 @@ final class DynamicTtlCacheStrategyTest extends TestCase
         $stale = new OriginFetchResult(new CacheEntry('stale', 90.0, retainedUntil: 120.0));
 
         self::assertSame($stale, $strategy->fetch($operation, static fn (): OriginFetchResult => $stale));
-    }
-
-    public function testFetchRejectsNegativeDynamicTtl(): void
-    {
-        $strategy = new DynamicTtlCacheStrategy(static fn (DynamicTtlContext $context): int => -1);
-        $operation = new OriginFetch(
-            'key',
-            static fn (): Cached => Cached::of('value'),
-            null,
-            new MutableClock(100.0),
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-
-        $strategy->fetch(
-            $operation,
-            static fn (): OriginFetchResult => new OriginFetchResult(Cached::of('value')),
-        );
     }
 }

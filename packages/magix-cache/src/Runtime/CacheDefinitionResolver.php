@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Runtime;
 
+use InvalidArgumentException;
+use LogicException;
 use Magix\Cache\Attribute\Cache;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -24,6 +27,9 @@ final class CacheDefinitionResolver
 
     /**
      * Returns the resolved method and effective method-or-class cache policy.
+     *
+     * @throws LogicException when the boundary that called cached() cannot be reflected
+     * @throws InvalidArgumentException when a parameter is both scoped and ignored
      */
     public function resolve(object $service, string $methodName): CacheDefinition
     {
@@ -33,7 +39,12 @@ final class CacheDefinitionResolver
             return $this->definitions[$key];
         }
 
-        $method = new ReflectionMethod($service, $methodName);
+        try {
+            $method = new ReflectionMethod($service, $methodName);
+        } catch (ReflectionException $missing) {
+            throw new LogicException($service::class.'::'.$methodName.' is not a method that can be reflected.', previous: $missing);
+        }
+
         $attributes = $method->getAttributes(Cache::class);
 
         if ($attributes === []) {

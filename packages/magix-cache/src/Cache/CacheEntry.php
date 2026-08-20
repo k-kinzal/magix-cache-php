@@ -57,6 +57,7 @@ final readonly class CacheEntry
      * @param T $value
      * @param list<string> $tags
      * @param list<string> $reasons
+     * @throws InvalidArgumentException when the timestamps are not finite and ordered, or the visibility forbids storage
      */
     public function __construct(
         mixed $value,

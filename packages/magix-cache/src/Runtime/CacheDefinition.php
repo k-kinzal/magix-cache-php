@@ -22,6 +22,8 @@ final readonly class CacheDefinition
 
     /**
      * Creates a definition from one reflected method and its optional declared policy.
+     *
+     * @throws InvalidArgumentException when a parameter is both scoped and ignored
      */
     public function __construct(
         private ReflectionMethod $method,

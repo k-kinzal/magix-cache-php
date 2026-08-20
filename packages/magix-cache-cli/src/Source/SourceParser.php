@@ -36,6 +36,7 @@ final readonly class SourceParser
      *
      * @param string|null $display Path recorded in the declarations, defaulting to the read path.
      * @return list<ClassDeclaration>
+     * @throws RuntimeException when the file cannot be read
      */
     public function parse(string $file, ?string $display = null): array
     {

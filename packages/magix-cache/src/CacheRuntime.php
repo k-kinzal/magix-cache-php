@@ -17,7 +17,7 @@ use Magix\Cache\Runtime\Operation\CacheGet;
 use Magix\Cache\Runtime\Operation\CacheOperationTerminal;
 use Magix\Cache\Runtime\Operation\CacheSet;
 use Magix\Cache\Runtime\Operation\OriginFetch;
-use Magix\Cache\Runtime\Operation\OriginFetchOutcome;
+use Magix\Cache\Runtime\Operation\OriginFetchProvenance;
 use Magix\Cache\Runtime\Strategy\PassThroughCacheStrategy;
 use Psr\Clock\ClockInterface;
 
@@ -55,7 +55,20 @@ final class CacheRuntime
     }
 
     /**
+     * Reports whether a process-local runtime is installed.
+     *
+     * Framework integrations use this to observe the bootstrap lifecycle without
+     * calling current(), which treats a missing runtime as a programmer error.
+     */
+    public static function isInstalled(): bool
+    {
+        return self::$current !== null;
+    }
+
+    /**
      * Returns the installed process-local runtime.
+     *
+     * @throws LogicException when no runtime has been installed
      */
     public static function current(): self
     {
@@ -105,7 +118,7 @@ final class CacheRuntime
         );
         $fetched = $strategy->fetch($fetch, $terminal->fetch(...));
 
-        if ($fetched->outcome === OriginFetchOutcome::Stale) {
+        if ($fetched->provenance === OriginFetchProvenance::Stale) {
             return $entries->toCached($fetched->staleEntry());
         }
 

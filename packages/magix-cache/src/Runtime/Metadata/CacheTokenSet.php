@@ -24,6 +24,7 @@ final readonly class CacheTokenSet
      *
      * @param list<string> $tokens
      * @return list<non-empty-string>
+     * @throws InvalidArgumentException when a tag is empty or cannot be carried in an HTTP header
      */
     public function tags(array $tokens): array
     {
@@ -48,6 +49,7 @@ final readonly class CacheTokenSet
      *
      * @param list<string> $tokens
      * @return list<non-empty-string>
+     * @throws InvalidArgumentException when a reason is empty
      */
     public function reasons(array $tokens): array
     {

@@ -26,6 +26,7 @@ use Tests\Fixture\KeyQuery;
 #[UsesClass(\Magix\Cache\Attribute\CacheScope::class)]
 #[UsesClass(\Magix\Cache\CachePolicy::class)]
 #[UsesClass(Visibility::class)]
+#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
 final class CacheDefinitionTest extends TestCase
 {
     public function testKeyContextNormalizesIgnoredReducedAndVariadicArguments(): void

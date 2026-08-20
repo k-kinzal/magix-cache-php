@@ -143,13 +143,13 @@ final readonly class ApplicationCache implements Cache
 
 The `typeWitness` closure communicates the expected generic value type to static analysis and specialized implementations. A normal storage adapter does not invoke it.
 
-Custom implementations must preserve the complete entry, retain it no later than `retainedUntil`, and return `null` for misses or incompatible values.
+Custom implementations must preserve the complete entry, retain it no later than `retainedUntil`, and return `null` for misses or incompatible values. When the backend itself fails, raise `CacheBackendFailure` with the original failure as `previous`: that is the failure `Cache` declares, and `BypassCacheErrorsStrategy` accepts it without any configuration. An implementation that reports failures its own way still works, but a caller who wants them bypassed has to say so with a classifier.
 
 Use a `Cache` decorator for storage topology such as namespacing, metrics, encryption, or multiple tiers. Use `CacheKeyStrategy` when only the generated key format needs to change.
 
 ## Backend Failures
 
-Cache backend failures are propagated by default. To treat eligible read failures as misses and eligible write failures as skipped writes, add `BypassCacheErrorsStrategy` to that cache boundary:
+The bundled PSR-6 and PSR-16 adapters translate `Psr\Cache\CacheException` and `Psr\SimpleCache\CacheException` into `CacheBackendFailure`, and propagate it by default. To treat read failures as misses and write failures as skipped writes, add `BypassCacheErrorsStrategy` to that cache boundary:
 
 ```php
 $this->cached(

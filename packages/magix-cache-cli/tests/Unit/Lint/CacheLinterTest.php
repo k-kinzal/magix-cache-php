@@ -43,6 +43,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ScopedIgnoreConflictRule::class)]
 #[UsesClass(UnscopedPrivateKeyRule::class)]
 #[UsesClass(UnstableKeyArgumentRule::class)]
+#[UsesClass(\Magix\Cache\Runtime\Metadata\Visibility::class)]
 final class CacheLinterTest extends TestCase
 {
     public function testInspectAppliesEveryRuleToEveryBoundary(): void

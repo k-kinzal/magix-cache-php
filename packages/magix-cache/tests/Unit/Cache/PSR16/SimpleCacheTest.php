@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use Tests\Fixture\MutableClock;
@@ -19,6 +20,9 @@ use Tests\Fixture\MutableClock;
 #[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
 final class SimpleCacheTest extends TestCase
 {
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testGetReturnsCacheEntry(): void
     {
         $psr16 = new Psr16Cache(new ArrayAdapter());
@@ -30,6 +34,9 @@ final class SimpleCacheTest extends TestCase
         self::assertEquals($entry, $cache->get('generated-key', $typeWitness));
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testSetPersistsCacheEntry(): void
     {
         $psr16 = new Psr16Cache(new ArrayAdapter());

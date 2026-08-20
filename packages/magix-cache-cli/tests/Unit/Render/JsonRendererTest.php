@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Render;
 
+use JsonException;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\KeyParameter;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
@@ -24,6 +25,9 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PolicyDeclaration::class)]
 final class JsonRendererTest extends TestCase
 {
+    /**
+     * @throws JsonException
+     */
     public function testRenderEncodesASingleTreeAsAnObject(): void
     {
         $node = new CacheNode(
@@ -37,6 +41,9 @@ final class JsonRendererTest extends TestCase
         self::assertStringContainsString('"boundary": "App\\\\ProductQuery::execute"', $json);
     }
 
+    /**
+     * @throws JsonException
+     */
     public function testTreeDescribesPolicyKeyAndDependencies(): void
     {
         $child = new CacheNode(

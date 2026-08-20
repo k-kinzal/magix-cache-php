@@ -25,6 +25,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DependencyConstraint::class)]
 #[UsesClass(KeyParameter::class)]
 #[UsesClass(PolicyDeclaration::class)]
+#[UsesClass(Visibility::class)]
 final class EffectCalculatorTest extends TestCase
 {
     public function testConstrainSelectsTheEarliestExpirationAndStrictestVisibility(): void

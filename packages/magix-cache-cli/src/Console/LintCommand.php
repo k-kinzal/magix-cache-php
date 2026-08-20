@@ -8,6 +8,7 @@ use function array_filter;
 use function count;
 use function json_encode;
 
+use JsonException;
 use Magix\Cache\Cli\Lint\CacheLinter;
 use Magix\Cache\Cli\Lint\Diagnostic;
 use Magix\Cache\Cli\Lint\Severity;
@@ -39,6 +40,7 @@ final readonly class LintCommand
      * Reports every finding and returns a failure when the run is not clean.
      *
      * @param array<array-key, mixed> $path
+     * @throws JsonException when the findings cannot be encoded as JSON
      */
     public function __invoke(
         SymfonyStyle $io,
@@ -92,6 +94,7 @@ final readonly class LintCommand
      * Returns every finding encoded as JSON.
      *
      * @param list<Diagnostic> $diagnostics
+     * @throws JsonException when a finding cannot be encoded
      */
     public function encode(array $diagnostics): string
     {

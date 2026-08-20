@@ -48,15 +48,34 @@
     "scripts": {
         "test": "paratest --processes=auto",
         "test:unit": "@php -d memory_limit=512M vendor/bin/phpunit --configuration phpunit.xml.dist",
+        "test:coverage": "@php -d memory_limit=1G -d xdebug.mode=coverage vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-xml build/coverage-xml",
         "lint": [
             "@format:check",
             "@phpstan",
             "@loc-guard",
+            "@tree-guard",
             "@deptrac"
         ],
         "phpstan": "phpstan analyse --memory-limit=512M",
         "loc-guard": "@php bin/loc-guard --config=loc.yaml",
+        "tree-guard": "@php vendor/bin/tree-guard --config=tree.yaml",
         "deptrac": "@php deptrac.php analyse --config-file=deptrac.yaml",
+        "doc-gen": [
+            "@test:coverage",
+            "@php -d memory_limit=1G vendor/bin/doc-gen --config=doc.yaml"
+        ],
+        "doc-gen:serve": [
+            "@test:coverage",
+            "@php -d memory_limit=1G vendor/bin/doc-gen --config=doc.yaml --serve"
+        ],
+        "doc-gen:diff": [
+            "@test:coverage",
+            "@php -d memory_limit=1G vendor/bin/doc-gen --config=doc.yaml --diff=main --serve"
+        ],
+        "doc-gen:fresh": [
+            "@test:coverage",
+            "@php -d memory_limit=1G vendor/bin/doc-gen --config=doc.yaml --no-cache"
+        ],
         "format": "php-cs-fixer fix --allow-risky=yes",
         "format:check": "php-cs-fixer fix --dry-run --diff --allow-risky=yes",
         "config:validate": "composer validate --strict --no-check-publish",

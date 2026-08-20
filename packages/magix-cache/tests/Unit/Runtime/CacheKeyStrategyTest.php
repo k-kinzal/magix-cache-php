@@ -6,12 +6,10 @@ namespace Tests\Unit\Runtime;
 
 use Magix\Cache\Runtime\CacheKeyContext;
 use Magix\Cache\Runtime\CacheKeyStrategy;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(CacheKeyStrategy::class)]
-#[UsesClass(CacheKeyContext::class)]
+#[CoversNothing]
 final class CacheKeyStrategyTest extends TestCase
 {
     public function testGenerateReturnsKeyFromImplementation(): void

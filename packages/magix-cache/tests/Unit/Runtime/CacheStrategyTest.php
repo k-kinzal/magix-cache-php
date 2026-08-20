@@ -12,21 +12,11 @@ use Magix\Cache\Runtime\Operation\CacheGet;
 use Magix\Cache\Runtime\Operation\CacheSet;
 use Magix\Cache\Runtime\Operation\OriginFetch;
 use Magix\Cache\Runtime\Operation\OriginFetchResult;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixture\MutableClock;
 
-#[CoversClass(CacheStrategy::class)]
-#[UsesClass(CacheEntry::class)]
-#[UsesClass(CacheGet::class)]
-#[UsesClass(CacheSet::class)]
-#[UsesClass(OriginFetch::class)]
-#[UsesClass(OriginFetchResult::class)]
-#[UsesClass(\Magix\Cache\Runtime\Operation\OriginFetchOutcome::class)]
-#[UsesClass(Cached::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheMetadata::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
+#[CoversNothing]
 final class CacheStrategyTest extends TestCase
 {
     public function testGetCanDelegateToTheNextHandler(): void

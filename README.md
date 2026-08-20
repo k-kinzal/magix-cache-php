@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PHP Version](https://img.shields.io/badge/PHP-8.5%2B-blue.svg)](https://www.php.net/)
+[![docs](https://img.shields.io/badge/docs-magix--cache-0969da?logo=php&logoColor=white)](https://k-kinzal.github.io/magix-cache-php/)
 
 > [!CAUTION]
 > This project has not been published on Packagist yet.

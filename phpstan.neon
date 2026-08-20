@@ -11,6 +11,7 @@ parameters:
             - 'Tests\Integration'
             - 'Tests\Package\Laravel\Unit'
             - 'Tests\Package\Symfony\Unit'
+            - 'Tests\Package\Cli\Unit'
     paths:
         - packages
     tmpDir: .phpstan.cache

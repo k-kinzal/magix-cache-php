@@ -19,6 +19,7 @@ This repository is a Composer monorepo with a framework-independent core and sep
 
 - `packages/magix-cache` contains the core and depends only on PSR contracts.
 - `packages/magix-cache-laravel` and `packages/magix-cache-symfony` are framework adapters that connect each framework's cache service to Magix Cache.
+- `packages/magix-cache-cli` is a development tool that reads a project statically and reports its cache boundaries; it depends on the core but nothing depends on it.
 - The root `Magix\Cache` namespace is reserved for `Cacheable`, `Cached`, `CachePolicy`, and `CacheRuntime`.
 - `Attribute` declares optional policy/key metadata, `Composition` combines cached values, `Runtime` owns execution and metadata rules, and `Cache` owns storage contracts and PSR adapters.
 - Use `CacheKeyStrategy` for key formats, `CacheStrategyMiddleware` for get/fetch/set behavior, and the `Cache` port or a decorator for storage topology.
@@ -44,5 +45,9 @@ query -> Cacheable -> key/policy resolution -> CacheRuntime
 - union tags and diagnostic reasons.
 
 `CachePolicy` declares constraints; `CacheStrategy` controls operations. Fixed TTLs are clamped to upstream expiration by default, and `Ttl::Auto` inherits a finite upstream constraint. Store only cacheable results with permitted visibility and a future finite expiration.
+
+### Static analysis
+
+`packages/magix-cache-cli` reproduces these rules without executing code. `Reader` turns syntax into declarations, `Graph` applies the composition invariants above, `Lint` reports declarations that cannot hold, and `Render` formats the result. Any change to policy resolution, key derivation, or composition must be mirrored in `EffectCalculator` and covered by a lint rule when it can fail at runtime.
 
 Keep PSR/backend details in adapters, preserve these monotone rules, and add tests beside the owning package. Before completing a change, run `composer config:validate`, `composer packages:validate`, `composer security:audit`, `composer lint`, and `composer test`.

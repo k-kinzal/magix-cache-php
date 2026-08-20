@@ -1,0 +1,40 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Magix\Cache\Cli\Console\Application;
+
+if (PHP_VERSION_ID < 80500) {
+    fwrite(STDERR, 'magix requires PHP 8.5 or later.' . PHP_EOL);
+
+    exit(1);
+}
+
+$autoloadPaths = [];
+
+if (isset($GLOBALS['_composer_autoload_path'])) {
+    $autoloadPaths[] = $GLOBALS['_composer_autoload_path'];
+}
+
+$autoloadPaths[] = __DIR__ . '/../vendor/autoload.php';
+$autoloadPaths[] = __DIR__ . '/../../../autoload.php';
+$autoloadPaths[] = __DIR__ . '/../../../vendor/autoload.php';
+
+$autoloaderFound = false;
+
+foreach ($autoloadPaths as $autoloadPath) {
+    if (file_exists($autoloadPath)) {
+        require_once $autoloadPath;
+        $autoloaderFound = true;
+        break;
+    }
+}
+
+if (!$autoloaderFound) {
+    fwrite(STDERR, 'Could not find Composer autoloader. Run "composer install" first.' . PHP_EOL);
+
+    exit(1);
+}
+
+exit((new Application())->console()->run());

@@ -3,6 +3,7 @@ deptrac:
     - ./packages/magix-cache/src
     - ./packages/magix-cache-laravel/src
     - ./packages/magix-cache-symfony/src
+    - ./packages/magix-cache-cli/src
   exclude_files: []
   layers:
     - name: CoreApi
@@ -37,6 +38,38 @@ deptrac:
       collectors:
         - type: directory
           value: packages/magix-cache-symfony/src/.*
+    - name: CliConsole
+      collectors:
+        - type: directory
+          value: packages/magix-cache-cli/src/Console/.*
+    - name: CliSource
+      collectors:
+        - type: directory
+          value: packages/magix-cache-cli/src/Source/.*
+    - name: CliReader
+      collectors:
+        - type: directory
+          value: packages/magix-cache-cli/src/Reader/.*
+    - name: CliDeclaration
+      collectors:
+        - type: directory
+          value: packages/magix-cache-cli/src/Declaration/.*
+    - name: CliGraph
+      collectors:
+        - type: directory
+          value: packages/magix-cache-cli/src/Graph/.*
+    - name: CliRender
+      collectors:
+        - type: directory
+          value: packages/magix-cache-cli/src/Render/.*
+    - name: CliLint
+      collectors:
+        - type: directory
+          value: packages/magix-cache-cli/src/Lint/.*
+    - name: CliKey
+      collectors:
+        - type: directory
+          value: packages/magix-cache-cli/src/Key/.*
   ruleset:
     CoreApi:
       - Composition
@@ -62,3 +95,33 @@ deptrac:
     Symfony:
       - CoreApi
       - Cache
+    CliConsole:
+      - CliDeclaration
+      - CliGraph
+      - CliKey
+      - CliLint
+      - CliRender
+      - CliSource
+    CliSource:
+      - CliDeclaration
+      - CliReader
+    CliReader:
+      - CliDeclaration
+      - CoreApi
+      - Attribute
+      - Runtime
+    CliDeclaration:
+      - Runtime
+    CliGraph:
+      - CliDeclaration
+      - Runtime
+    CliRender:
+      - CliDeclaration
+      - CliGraph
+      - Runtime
+    CliLint:
+      - CliDeclaration
+      - CliGraph
+      - Runtime
+    CliKey:
+      - Runtime

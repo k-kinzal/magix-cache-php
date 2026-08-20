@@ -22,6 +22,7 @@
             <directory>packages/magix-cache/tests/Unit</directory>
             <directory>packages/magix-cache-laravel/tests</directory>
             <directory>packages/magix-cache-symfony/tests</directory>
+            <directory>packages/magix-cache-cli/tests/Unit</directory>
         </testsuite>
     </testsuites>
     <extensions>
@@ -40,6 +41,7 @@
             <directory>packages/magix-cache/src</directory>
             <directory>packages/magix-cache-laravel/src</directory>
             <directory>packages/magix-cache-symfony/src</directory>
+            <directory>packages/magix-cache-cli/src</directory>
         </include>
     </source>
 </phpunit>

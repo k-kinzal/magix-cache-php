@@ -19,12 +19,14 @@
         "illuminate/container": "^12.0 || ^13.0",
         "illuminate/support": "^12.0 || ^13.0",
         "k-kinzal/php-ai-toolkit": "dev-main",
+        "nikic/php-parser": "^5.4",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^12.5",
         "psr/cache": "^3.0",
         "psr/clock": "^1.0",
         "psr/simple-cache": "^3.0",
         "symfony/cache": "^7.4 || ^8.0",
+        "symfony/console": "^7.4 || ^8.0",
         "symfony/framework-bundle": "^7.4 || ^8.0"
     },
     "autoload": {
@@ -38,7 +40,9 @@
             "Magix\\Cache\\Laravel\\": "packages/magix-cache-laravel/src/",
             "Magix\\Cache\\Symfony\\": "packages/magix-cache-symfony/src/",
             "Tests\\Package\\Laravel\\": "packages/magix-cache-laravel/tests/",
-            "Tests\\Package\\Symfony\\": "packages/magix-cache-symfony/tests/"
+            "Tests\\Package\\Symfony\\": "packages/magix-cache-symfony/tests/",
+            "Magix\\Cache\\Cli\\": "packages/magix-cache-cli/src/",
+            "Tests\\Package\\Cli\\": "packages/magix-cache-cli/tests/"
         }
     },
     "scripts": {
@@ -59,7 +63,8 @@
         "packages:validate": [
             "composer validate packages/magix-cache/composer.json --strict --no-check-publish",
             "composer validate packages/magix-cache-laravel/composer.json --strict --no-check-publish",
-            "composer validate packages/magix-cache-symfony/composer.json --strict --no-check-publish"
+            "composer validate packages/magix-cache-symfony/composer.json --strict --no-check-publish",
+            "composer validate packages/magix-cache-cli/composer.json --strict --no-check-publish"
         ],
         "security:audit": "composer audit --locked",
         "toolkit:install": "php-ai-toolkit install"

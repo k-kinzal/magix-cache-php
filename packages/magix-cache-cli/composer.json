@@ -1,0 +1,38 @@
+{
+    "name": "k-kinzal/magix-cache-cli",
+    "description": "Command line tools that make MagixCache cache boundaries visible",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/k-kinzal/magix-cache",
+    "authors": [
+        {
+            "name": "k-kinzal",
+            "homepage": "https://github.com/k-kinzal"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/k-kinzal/magix-cache/issues",
+        "source": "https://github.com/k-kinzal/magix-cache"
+    },
+    "keywords": [
+        "cache",
+        "cacheability",
+        "cli",
+        "php-8.5",
+        "static-analysis"
+    ],
+    "require": {
+        "php": "^8.5",
+        "k-kinzal/magix-cache": "^1.0",
+        "nikic/php-parser": "^5.4",
+        "symfony/console": "^7.4 || ^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Magix\\Cache\\Cli\\": "src/"
+        }
+    },
+    "bin": [
+        "bin/magix"
+    ]
+}

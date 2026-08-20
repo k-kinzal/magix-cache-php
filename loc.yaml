@@ -2,6 +2,7 @@ paths:
   - packages/magix-cache/src
   - packages/magix-cache-laravel/src
   - packages/magix-cache-symfony/src
+  - packages/magix-cache-cli/src
 
 exclude: []
 

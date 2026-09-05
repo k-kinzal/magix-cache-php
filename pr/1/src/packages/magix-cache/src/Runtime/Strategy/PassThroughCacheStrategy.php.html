@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>packages/magix-cache/src/Runtime/Strategy/PassThroughCacheStrategy.php — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/pr/1/src/packages/magix-cache/src/Runtime/Strategy/PassThroughCacheStrategy.php.html">
+<meta name="description" content="The source of packages/magix-cache/src/Runtime/Strategy/PassThroughCacheStrategy.php.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="packages/magix-cache/src/Runtime/Strategy/PassThroughCacheStrategy.php — magix-cache-php">
+<meta property="og:description" content="The source of packages/magix-cache/src/Runtime/Strategy/PassThroughCacheStrategy.php.">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/pr/1/src/packages/magix-cache/src/Runtime/Strategy/PassThroughCacheStrategy.php.html">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/pr/1/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../../../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}document.documentElement.dataset.diffMode=localStorage.getItem("docgen-diff-mode")||"inline"}catch(e){}</script>
+</head>
+<body data-root="../../../../../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li data-diff="modified"><a href="../../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li data-diff="modified"><a href="../../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li data-diff="modified"><a href="../../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li data-diff="same"><a href="../../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li data-diff="same"><a href="../../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li data-diff="same"><a href="../../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><a href="../../../../../../index.html">src</a><span class="crumb-sep">::</span><span class="crumb-current">packages/magix-cache/src/Runtime/Strategy/PassThroughCacheStrategy.php</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<span class="diff-range" title="Comparing 6b24b79 to working tree">6b24b79 <span class="diff-arrow">→</span> working tree</span><div class="diff-modes" id="diff-modes" role="group" aria-label="Diff display mode"><button type="button" class="diff-mode" data-diff-mode="off" title="Documentation of the head revision, without diff marks">Off</button><button type="button" class="diff-mode" data-diff-mode="inline" title="Every page with additions and removals marked">Diff</button><button type="button" class="diff-mode" data-diff-mode="changes" title="Only what the head revision added, changed, or removed">Changes</button></div><a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<p class="diff-empty" id="diff-empty" data-changes="Nothing on this page changed between 6b24b79 and working tree." data-off="This page documents what 6b24b79 had and working tree no longer has. Switch to Diff to read it." hidden></p>
+<div class="symbol-head"><h1 class="source-title">packages/magix-cache/src/Runtime/Strategy/PassThroughCacheStrategy.php</h1></div>
+<div class="notice diff-banner" data-diff="removed">Removed in working tree, compared to 6b24b79.</div>
+<pre class="source" data-diff="removed"><code><span class="src-line" data-diff="removed"><span class="ln">1</span>&lt;?php</span>
+<span class="src-line" data-diff="removed"><span class="ln">2</span></span>
+<span class="src-line" data-diff="removed"><span class="ln">3</span><span class="tok-kw">declare</span>(<span class="tok-id">strict_types</span>=<span class="tok-num">1</span>);</span>
+<span class="src-line" data-diff="removed"><span class="ln">4</span></span>
+<span class="src-line" data-diff="removed"><span class="ln">5</span><span class="tok-kw">namespace</span> <span class="tok-id">Magix\Cache\Runtime\Strategy</span>;</span>
+<span class="src-line" data-diff="removed"><span class="ln">6</span></span>
+<span class="src-line" data-diff="removed"><span class="ln">7</span><span class="tok-com">/**</span></span>
+<span class="src-line" data-diff="removed"><span class="ln">8</span><span class="tok-com"> * Delegates every cache-runtime phase without changing its operation or result.</span></span>
+<span class="src-line" data-diff="removed"><span class="ln">9</span><span class="tok-com"> */</span></span>
+<span class="src-line" data-diff="removed"><span class="ln">10</span><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">PassThroughCacheStrategy</span> <span class="tok-kw">extends</span> <span class="tok-id">CacheStrategyMiddleware</span></span>
+<span class="src-line" data-diff="removed"><span class="ln">11</span>{</span>
+<span class="src-line" data-diff="removed"><span class="ln">12</span>}</span>
+<span class="src-line" data-diff="removed"><span class="ln">13</span></span>
+</code></pre>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../../../../../assets/search-index.js" defer></script>
+<script src="../../../../../../assets/app.js" defer></script>
+</body>
+</html>

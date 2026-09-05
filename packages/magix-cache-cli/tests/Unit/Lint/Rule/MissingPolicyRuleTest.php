@@ -21,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
 #[UsesClass(CacheNode::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlEstimate::class)]
 #[UsesClass(Catalog::class)]
 #[UsesClass(Diagnostic::class)]
 #[UsesClass(PolicyDeclaration::class)]
@@ -51,7 +52,7 @@ final class MissingPolicyRuleTest extends TestCase
                 line: 31,
                 policy: new PolicyDeclaration(PolicySource::MethodAttribute, 20),
             ),
-            new CacheEffect(ttl: 20),
+            new CacheEffect(),
         );
 
         self::assertSame([], (new MissingPolicyRule())->check($node, new Catalog([])));

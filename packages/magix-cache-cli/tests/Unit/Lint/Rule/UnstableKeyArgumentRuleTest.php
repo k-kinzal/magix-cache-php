@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
 #[UsesClass(CacheNode::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlEstimate::class)]
 #[UsesClass(Catalog::class)]
 #[UsesClass(Diagnostic::class)]
 #[UsesClass(KeyParameter::class)]

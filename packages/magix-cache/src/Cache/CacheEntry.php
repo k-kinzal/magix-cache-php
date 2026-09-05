@@ -8,22 +8,36 @@ use InvalidArgumentException;
 
 use function is_finite;
 
-use Magix\Cache\Runtime\Metadata\CacheTokenSet;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\CacheMetadata;
+use Magix\Cache\Metadata\Visibility;
 
 /**
- * Carries one internal storage value with concrete cache metadata.
+ * Carries one internal storage value with its metadata and physical retention.
+ *
+ * expiresAt bounds fresh reuse; retainedUntil bounds physical retention for
+ * stale handling. Extending retention never changes the expiration. The
+ * format version guards stored payloads across incompatible layout changes.
  *
  * @template-covariant T
  * @internal
  */
 final readonly class CacheEntry
 {
+    /**
+     * Storage format version persisted with every entry.
+     */
+    public const int FORMAT_VERSION = 1;
+
     /** @var T */
     private mixed $value;
 
     /**
-     * Finite absolute Unix expiration time.
+     * Constraints the stored value carries back into composition.
+     */
+    public CacheMetadata $metadata;
+
+    /**
+     * Finite absolute Unix expiration time for fresh reuse.
      */
     public float $expiresAt;
 
@@ -33,41 +47,26 @@ final readonly class CacheEntry
     public float $retainedUntil;
 
     /**
-     * Tags persisted with the internal entry.
-     *
-     * @var list<non-empty-string>
+     * Format version this entry was written with.
      */
-    public array $tags;
+    public int $formatVersion;
 
     /**
-     * Storage visibility persisted with the internal entry.
-     */
-    public Visibility $visibility;
-
-    /**
-     * Diagnostic reasons persisted with the internal entry.
-     *
-     * @var list<non-empty-string>
-     */
-    public array $reasons;
-
-    /**
-     * Creates an internal entry from concrete storage metadata.
+     * Creates an internal entry from storable metadata.
      *
      * @param T $value
-     * @param list<string> $tags
-     * @param list<string> $reasons
+     * @throws InvalidArgumentException when the metadata lacks a finite expiration or forbids storage, or the retention precedes the expiration
      */
     public function __construct(
         mixed $value,
-        float $expiresAt,
-        array $tags = [],
-        Visibility $visibility = Visibility::Shared,
-        array $reasons = [],
+        CacheMetadata $metadata,
         ?float $retainedUntil = null,
     ) {
-        if (!is_finite($expiresAt)) {
-            throw new InvalidArgumentException('Cache entry expiration must be a finite Unix timestamp.');
+        $expiresAt = $metadata->expiresAt
+            ?? throw new InvalidArgumentException('Cache entry metadata must carry a finite expiration.');
+
+        if (!$metadata->cacheable || $metadata->visibility === Visibility::NoStore) {
+            throw new InvalidArgumentException('Cache entry metadata must permit storage.');
         }
 
         $retainedUntil ??= $expiresAt;
@@ -76,17 +75,11 @@ final readonly class CacheEntry
             throw new InvalidArgumentException('Cache entry retention must be finite and no earlier than expiration.');
         }
 
-        if ($visibility === Visibility::NoStore) {
-            throw new InvalidArgumentException('Cache entry visibility must permit storage.');
-        }
-
-        $tokens = new CacheTokenSet();
         $this->value = $value;
+        $this->metadata = $metadata;
         $this->expiresAt = $expiresAt;
         $this->retainedUntil = $retainedUntil;
-        $this->tags = $tokens->tags($tags);
-        $this->visibility = $visibility;
-        $this->reasons = $tokens->reasons($reasons);
+        $this->formatVersion = self::FORMAT_VERSION;
     }
 
     /**
@@ -108,10 +101,7 @@ final readonly class CacheEntry
     {
         return new self(
             value: $this->value,
-            expiresAt: $this->expiresAt,
-            tags: $this->tags,
-            visibility: $this->visibility,
-            reasons: $this->reasons,
+            metadata: $this->metadata,
             retainedUntil: $retainedUntil,
         );
     }

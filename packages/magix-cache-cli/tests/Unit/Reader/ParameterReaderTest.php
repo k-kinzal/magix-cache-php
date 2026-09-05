@@ -11,7 +11,7 @@ use Magix\Cache\Cli\Reader\AttributeReader;
 use Magix\Cache\Cli\Reader\LiteralReader;
 use Magix\Cache\Cli\Reader\ParameterReader;
 use Magix\Cache\Cli\Reader\TypeReader;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Attribute;
 use PhpParser\Node\AttributeGroup;

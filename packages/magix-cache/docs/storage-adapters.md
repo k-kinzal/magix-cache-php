@@ -19,19 +19,21 @@ Application code works with public `Cached<T>` values. Only the runtime and stor
 
 ## PSR-16
 
-Wrap any PSR-16 implementation with `SimpleCache`:
+Wrap any PSR-16 implementation with `SimpleCache` and register the runtime under the `default` name:
 
 ```php
 <?php
 
 use Magix\Cache\Cache\PSR16\SimpleCache as MagixSimpleCache;
 use Magix\Cache\CacheRuntime;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Psr\SimpleCache\CacheInterface;
 
 /** @var CacheInterface $cache */
 $cache = $container->get(CacheInterface::class);
 
-CacheRuntime::setCurrent(
+CacheRuntimeRegistry::register(
+    'default',
     new CacheRuntime(new MagixSimpleCache($cache)),
 );
 ```
@@ -47,30 +49,32 @@ Wrap any PSR-6 pool with `CacheItemPool`:
 
 use Magix\Cache\Cache\PSR6\CacheItemPool;
 use Magix\Cache\CacheRuntime;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Psr\Cache\CacheItemPoolInterface;
 
 /** @var CacheItemPoolInterface $pool */
 $pool = $container->get(CacheItemPoolInterface::class);
 
-CacheRuntime::setCurrent(
+CacheRuntimeRegistry::register(
+    'default',
     new CacheRuntime(new CacheItemPool($pool)),
 );
 ```
 
 The adapter sets the PSR-6 item's absolute expiration to the entry's physical retention deadline.
 
-Both adapters treat a backend hit containing something other than a Magix `CacheEntry` as a cache miss. Use a dedicated namespace or pool when other application features could write the same key.
+Both adapters treat a backend hit containing something other than a Magix `CacheEntry` as a cache miss, and an entry written under a different storage format version is diagnosed as a miss rather than served. Use a dedicated namespace or pool when other application features could write the same key.
 
 ## Framework Integrations
 
-The dedicated adapters connect the framework's default cache service and install the runtime:
+The dedicated adapters connect the framework's default cache service and register the `default` runtime reference:
 
 | Framework | Package | Backend |
 |---|---|---|
 | Laravel 12 / 13 | [`k-kinzal/magix-cache-laravel`](../../magix-cache-laravel/README.md) | Default `cache.store` through PSR-16 |
 | Symfony 7.4 / 8 | [`k-kinzal/magix-cache-symfony`](../../magix-cache-symfony/README.md) | `cache.app` through PSR-6 |
 
-Laravel package discovery performs setup automatically. Symfony applications enable `MagixCacheBundle` in `config/bundles.php`.
+Laravel package discovery performs setup automatically. Symfony applications enable `MagixCacheBundle` in `config/bundles.php`. Both register a container-backed provider closure, so the registry never holds a runtime instance across requests.
 
 ## Logical Expiration and Physical Retention
 
@@ -81,9 +85,9 @@ Each stored entry has two deadlines:
 | `expiresAt` | Logical freshness deadline; normal reads stop returning the entry after this time |
 | `retainedUntil` | Physical storage deadline; the backend may retain the entry until this time |
 
-They are equal by default. `StaleIfErrorCacheStrategy` extends `retainedUntil` without changing `expiresAt`, allowing an expired entry to remain available only as a stale fallback.
+They are equal by default. `#[StaleIfError(maxAge: ...)]` extends `retainedUntil` to `expiresAt + maxAge` without changing `expiresAt`, allowing an expired entry to remain available only as a stale fallback. Extending retention never changes the expiration itself.
 
-The PSR adapters use `retainedUntil` for backend expiration. The runtime still checks both deadlines, so a physically present but logically expired entry is never returned as a fresh hit.
+The PSR adapters use `retainedUntil` for backend expiration. The runtime still checks both deadlines, so a physically present but logically expired entry is never returned as a fresh hit, and a fresh hit never re-bases the stored expiration.
 
 ## Stored Metadata
 
@@ -95,8 +99,9 @@ A `CacheEntry` preserves:
 - Tags
 - Visibility
 - Diagnostic reasons
+- The storage format version
 
-Only results with all of the following properties are written:
+Only results with all of the following properties are written, and the judgement is repeated immediately before the write:
 
 - `cacheable` is `true`
 - Visibility is not `NoStore`
@@ -143,20 +148,24 @@ final readonly class ApplicationCache implements Cache
 
 The `typeWitness` closure communicates the expected generic value type to static analysis and specialized implementations. A normal storage adapter does not invoke it.
 
-Custom implementations must preserve the complete entry, retain it no later than `retainedUntil`, and return `null` for misses or incompatible values.
+Custom implementations must preserve the complete entry, retain it no later than `retainedUntil`, and return `null` for misses or incompatible values. When the backend itself fails, raise `CacheBackendFailure` with the original failure as `previous`: that is the failure `Cache` declares, and the default `#[BypassCacheErrors]` classifier accepts it without any configuration. An implementation that reports failures its own way still works, but a caller who wants them bypassed has to say so with a registered classifier.
 
 Use a `Cache` decorator for storage topology such as namespacing, metrics, encryption, or multiple tiers. Use `CacheKeyStrategy` when only the generated key format needs to change.
 
 ## Backend Failures
 
-Cache backend failures are propagated by default. To treat eligible read failures as misses and eligible write failures as skipped writes, add `BypassCacheErrorsStrategy` to that cache boundary:
+The bundled PSR-6 and PSR-16 adapters translate `Psr\Cache\CacheException` and `Psr\SimpleCache\CacheException` into `CacheBackendFailure`, and the runtime propagates it by default. To treat classified read failures as misses and write failures as skipped writes, declare `#[BypassCacheErrors]` on that cache boundary:
 
 ```php
-$this->cached(
-    compute: fn (): Cached => Cached::of($this->origin->fetch()),
-    policy: new CachePolicy(ttl: 30),
-    strategy: new BypassCacheErrorsStrategy(),
-);
+use Magix\Cache\Attribute\BypassCacheErrors;
+use Magix\Cache\Attribute\Cache;
+
+#[Cache(ttl: 30)]
+#[BypassCacheErrors]
+public function execute(): Cached
+{
+    return $this->cached(fn (): Cached => Cached::of($this->origin->fetch()));
+}
 ```
 
-See [Cache Strategies](cache-strategies.md#bypass-cache-backend-errors) for classification and composition details.
+Origin failures always propagate; only cache reads and writes are inside the bypass range. See [Cache Behaviors](cache-behaviors.md#bypass-cache-backend-errors) for classification details and custom classifiers.

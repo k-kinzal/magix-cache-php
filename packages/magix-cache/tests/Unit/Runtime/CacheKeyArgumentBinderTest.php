@@ -17,6 +17,8 @@ use Tests\Fixture\KeyQuery;
 #[CoversClass(CacheKeyArgumentBinder::class)]
 #[UsesClass(CacheDefinition::class)]
 #[UsesClass(CacheDefinitionResolver::class)]
+#[UsesClass(\Magix\Cache\Runtime\CacheAttributeReader::class)]
+#[UsesClass(\Magix\Cache\Runtime\DeclarationFingerprint::class)]
 #[UsesClass(CacheKeyContext::class)]
 #[UsesClass(CacheKeyReducer::class)]
 #[UsesClass(\Magix\Cache\Attribute\Cache::class)]
@@ -24,7 +26,8 @@ use Tests\Fixture\KeyQuery;
 #[UsesClass(\Magix\Cache\Attribute\CacheKey::class)]
 #[UsesClass(\Magix\Cache\Attribute\CacheScope::class)]
 #[UsesClass(\Magix\Cache\CachePolicy::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 final class CacheKeyArgumentBinderTest extends TestCase
 {
     public function testBindNormalizesIgnoredReducedAndVariadicArguments(): void
@@ -34,6 +37,6 @@ final class CacheKeyArgumentBinderTest extends TestCase
         self::assertSame([
             'viewer' => 'even',
             'rest[2]' => 'extra',
-        ], $definition->keyContext([2, 'trace', 'extra'], 'version')->arguments);
+        ], $definition->keyContext([2, 'trace', 'extra'])->arguments);
     }
 }

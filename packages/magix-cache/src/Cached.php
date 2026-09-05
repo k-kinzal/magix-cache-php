@@ -20,11 +20,17 @@ use Magix\Cache\Composition\Capability2;
 use Magix\Cache\Composition\Capability3;
 use Magix\Cache\Composition\Capability4;
 use Magix\Cache\Composition\Capability5;
-use Magix\Cache\Runtime\Metadata\CacheMetadata;
+use Magix\Cache\Metadata\CacheMetadata;
 use Stringable;
 
 /**
- * Carries a transparently accessible value together with its cache constraints.
+ * Carries an evaluated value together with its cache constraints.
+ *
+ * The composition API preserves the constraints of every dependency it is
+ * given: map keeps this value's metadata, flatMap and combineN meet the
+ * metadata of all inputs. Extracting a value with value() detaches it from
+ * its constraints, so a dependency obtained inside map must be chained with
+ * flatMap or combineN instead.
  *
  * @template T
  * @mixin T
@@ -43,7 +49,10 @@ final readonly class Cached
     }
 
     /**
-     * Wraps a value and optional metadata.
+     * Wraps an evaluated value and the constraints its producer declares.
+     *
+     * Omitting the metadata declares no additional constraints; storage
+     * eligibility is still judged after policy application.
      *
      * @template V
      * @param V $value
@@ -57,11 +66,42 @@ final readonly class Cached
     /**
      * Returns the wrapped value for scalar operations or typed arguments.
      *
+     * The returned value no longer carries these constraints.
+     *
      * @return T
      */
     public function value(): mixed
     {
         return $this->value;
+    }
+
+    /**
+     * Transforms the value once, in place, and keeps these constraints.
+     *
+     * The result of the transform is treated as a plain value: a Cached
+     * returned from it is not flattened. Use flatMap for a new dependency.
+     *
+     * @template U
+     * @param Closure(T): U $transform
+     * @return self<U>
+     */
+    public function map(Closure $transform): self
+    {
+        return new self($transform($this->value), $this->metadata);
+    }
+
+    /**
+     * Obtains the next result now and composes both sets of constraints.
+     *
+     * @template U
+     * @param Closure(T): self<U> $transform
+     * @return self<U>
+     */
+    public function flatMap(Closure $transform): self
+    {
+        $next = $transform($this->value);
+
+        return new self($next->value, $this->metadata->meet($next->metadata));
     }
 
     /**
@@ -126,6 +166,11 @@ final readonly class Cached
 
     /**
      * Forwards inaccessible property reads to an object or string-keyed array.
+     *
+     * Forwarding is for final observation only: the value it reaches no longer
+     * carries these constraints. Cached's own members take precedence.
+     *
+     * @throws LogicException when the wrapped value exposes no such property
      */
     public function __get(string $name): mixed
     {
@@ -162,6 +207,7 @@ final readonly class Cached
      * Forwards unknown method calls to the wrapped object.
      *
      * @param list<mixed> $arguments
+     * @throws BadMethodCallException when the wrapped value exposes no such method
      */
     public function __call(string $name, array $arguments): mixed
     {
@@ -174,6 +220,8 @@ final readonly class Cached
 
     /**
      * Forwards string conversion to a string or Stringable wrapped value.
+     *
+     * @throws LogicException when the wrapped value has no string representation
      */
     public function __toString(): string
     {

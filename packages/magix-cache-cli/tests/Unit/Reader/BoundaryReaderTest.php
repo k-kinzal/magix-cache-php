@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Reader;
 
+use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\DependencyCall;
 use Magix\Cache\Cli\Declaration\KeyParameter;
@@ -18,12 +19,11 @@ use Magix\Cache\Cli\Reader\ParameterReader;
 use Magix\Cache\Cli\Reader\PolicyReader;
 use Magix\Cache\Cli\Reader\TypeReader;
 use PhpParser\Node\Arg;
-use PhpParser\Node\Expr\MethodCall;
-use PhpParser\Node\Expr\New_;
-use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Attribute;
+use PhpParser\Node\AttributeGroup;
+use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
-use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeFinder;
@@ -54,7 +54,8 @@ final class BoundaryReaderTest extends TestCase
             <?php
             final class ProductQuery
             {
-                #[\Magix\Cache\Attribute\Cache(ttl: 20, tags: ['product'])]
+                #[\Magix\Cache\Attribute\Cache(ttl: 20, tags: ['product'], runtime: 'edge')]
+                #[\Magix\Cache\Attribute\DynamicTtl(resolver: \App\RateTtlResolver::class)]
                 public function execute(int $productId): \Magix\Cache\Cached
                 {
                     return $this->cached(fn () => \Magix\Cache\Cached::of($productId));
@@ -73,7 +74,9 @@ final class BoundaryReaderTest extends TestCase
         self::assertSame('App\ProductQuery::execute', $boundary->id());
         self::assertSame(20, $boundary->policy?->ttl);
         self::assertSame(['product'], $boundary->policy->tags);
-        self::assertFalse($boundary->hasStrategy);
+        self::assertSame('edge', $boundary->policy->runtime);
+        self::assertTrue($boundary->hasDynamicTtl);
+        self::assertFalse($boundary->suppliesMetadata);
     }
 
     public function testReadSkipsMethodsThatDoNotCache(): void
@@ -84,18 +87,6 @@ final class BoundaryReaderTest extends TestCase
         self::assertInstanceOf(ClassMethod::class, $method);
 
         self::assertNull((new BoundaryReader())->read($method, 'App\ProductQuery', 'src/ProductQuery.php', [], null));
-    }
-
-    public function testArgumentsBindPositionalAndNamedCachedArguments(): void
-    {
-        $call = new MethodCall(new Variable('this'), 'cached', [
-            new Arg(new Variable('compute')),
-            new Arg(new Variable('custom'), name: new Identifier('strategy')),
-        ]);
-
-        $arguments = (new BoundaryReader())->arguments($call);
-
-        self::assertSame(['compute', 'strategy'], array_keys($arguments));
     }
 
     public function testClassPolicyReadsTheAttributeOfTheDeclaringClass(): void
@@ -120,23 +111,81 @@ final class BoundaryReaderTest extends TestCase
         self::assertSame(PolicySource::ClassAttribute, $policy->source);
     }
 
-    public function testPolicyPrefersTheExplicitArgumentOverAttributes(): void
+    public function testClassDynamicTtlReadsTheClassLevelDefault(): void
+    {
+        $code = <<<'SOURCE'
+            <?php
+            #[\Magix\Cache\Attribute\DynamicTtl(resolver: \App\RateTtlResolver::class)]
+            final class RateQuery
+            {
+            }
+            SOURCE;
+        $statements = (new NodeTraverser(new NameResolver()))->traverse(
+            (new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? [],
+        );
+        $class = (new NodeFinder())->findFirstInstanceOf($statements, Class_::class);
+        self::assertInstanceOf(Class_::class, $class);
+        $bare = new Class_('BareQuery');
+
+        self::assertTrue((new BoundaryReader())->classDynamicTtl($class));
+        self::assertFalse((new BoundaryReader())->classDynamicTtl($bare));
+    }
+
+    public function testPolicyPrefersTheMethodAttributeOverTheClassOne(): void
     {
         $reader = new BoundaryReader();
-        $method = new ClassMethod(new Identifier('execute'));
-        $explicit = new New_(new Name(\Magix\Cache\CachePolicy::class), [new Arg(new Int_(15))]);
         $inherited = new PolicyDeclaration(PolicySource::ClassAttribute, 90);
+        $bare = new ClassMethod(new Identifier('execute'));
+        $declared = new ClassMethod(new Identifier('execute'), [
+            'attrGroups' => [new AttributeGroup([new Attribute(
+                new Name(\Magix\Cache\Attribute\Cache::class),
+                [new Arg(new \PhpParser\Node\Scalar\Int_(15), name: new Identifier('ttl'))],
+            )])],
+        ]);
 
-        $declared = $reader->policy(['policy' => $explicit], $method, $inherited);
-        $dynamic = $reader->policy(['policy' => new Variable('policy')], $method, $inherited);
-        $fallback = $reader->policy([], $method, $inherited);
+        $method = $reader->policy($declared, $inherited);
 
-        self::assertInstanceOf(PolicyDeclaration::class, $declared);
-        self::assertInstanceOf(PolicyDeclaration::class, $dynamic);
-        self::assertSame(15, $declared->ttl);
-        self::assertSame(PolicySource::ExplicitPolicy, $declared->source);
-        self::assertNull($dynamic->ttl);
-        self::assertSame(PolicySource::Unresolved, $dynamic->source);
-        self::assertSame($inherited, $fallback);
+        self::assertInstanceOf(PolicyDeclaration::class, $method);
+        self::assertSame(15, $method->ttl);
+        self::assertSame(PolicySource::MethodAttribute, $method->source);
+        self::assertSame($inherited, $reader->policy($bare, $inherited));
+        self::assertNull($reader->policy($bare, null));
+    }
+
+    public function testDynamicTtlLetsAMethodDeclarationReplaceTheClassDefault(): void
+    {
+        $reader = new BoundaryReader();
+        $bare = new ClassMethod(new Identifier('execute'));
+        $disabled = new ClassMethod(new Identifier('execute'), [
+            'attrGroups' => [new AttributeGroup([new Attribute(
+                new Name(DynamicTtl::class),
+                [new Arg(new ConstFetch(new Name('false')), name: new Identifier('enabled'))],
+            )])],
+        ]);
+        $declared = new ClassMethod(new Identifier('execute'), [
+            'attrGroups' => [new AttributeGroup([new Attribute(new Name(DynamicTtl::class))])],
+        ]);
+
+        self::assertTrue($reader->dynamicTtl($bare, true));
+        self::assertFalse($reader->dynamicTtl($bare, false));
+        self::assertFalse($reader->dynamicTtl($disabled, true));
+        self::assertTrue($reader->dynamicTtl($declared, false));
+    }
+
+    public function testEnabledTreatsOnlyAnExplicitFalseAsDisabled(): void
+    {
+        $reader = new BoundaryReader();
+        $bare = new Attribute(new Name(DynamicTtl::class));
+        $disabled = new Attribute(new Name(DynamicTtl::class), [
+            new Arg(new ConstFetch(new Name('false')), name: new Identifier('enabled')),
+        ]);
+        $positional = new Attribute(new Name(DynamicTtl::class), [
+            new Arg(new \PhpParser\Node\Scalar\String_('App\RateTtlResolver')),
+            new Arg(new ConstFetch(new Name('true'))),
+        ]);
+
+        self::assertTrue($reader->enabled($bare));
+        self::assertFalse($reader->enabled($disabled));
+        self::assertTrue($reader->enabled($positional));
     }
 }

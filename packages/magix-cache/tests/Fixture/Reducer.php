@@ -13,6 +13,8 @@ final readonly class Reducer
 {
     /**
      * Returns a stable even-or-odd partition.
+     *
+     * @throws InvalidArgumentException when the fixture is used with a non-integer
      */
     public static function parity(mixed $value): string
     {

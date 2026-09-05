@@ -10,11 +10,19 @@ use function debug_backtrace;
 
 use LogicException;
 use Magix\Cache\Runtime\CacheDefinitionResolver;
-use Magix\Cache\Runtime\CacheStrategy;
-use Magix\Cache\Runtime\Strategy\PassThroughCacheStrategy;
+use Magix\Cache\Runtime\CacheInvocation;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
+use RuntimeException;
+
+use function str_contains;
 
 /**
- * Adds a structurally safe cache boundary with explicit or attributed policy.
+ * Adds a declarative cache boundary around one method.
+ *
+ * cached() is the anti-corruption layer between PHP and the internal model:
+ * it captures the call site, resolves the static declaration, and delegates
+ * to the runtime the declaration references. Policy, behaviors, and runtime
+ * come from attributes alone; there is no per-call override path.
  */
 trait Cacheable
 {
@@ -25,31 +33,29 @@ trait Cacheable
      *
      * @template T
      * @param Closure(): Cached<T> $compute
-     * @param CacheStrategy $strategy Per-boundary cache-operation strategy.
      * @return Cached<T>
+     * @throws LogicException when the calling boundary cannot be identified or declares no #[Cache]
+     * @throws RuntimeException when the origin computation fails without an eligible stale fallback
      */
-    final protected function cached(
-        Closure $compute,
-        ?CachePolicy $policy = null,
-        CacheStrategy $strategy = new PassThroughCacheStrategy(),
-    ): Cached {
+    final protected function cached(Closure $compute): Cached
+    {
         $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
         $caller = $trace[1] ?? throw new LogicException('Unable to identify the method that called cached().');
-        $arguments = $caller['args'] ?? [];
+
+        if (($caller['object'] ?? null) !== $this || str_contains($caller['function'], '{closure')) {
+            throw new LogicException('cached() must be called directly from the boundary method, not through a helper or closure.');
+        }
+
         $definitions = self::$magixCacheDefinitions ??= new CacheDefinitionResolver();
-        $runtime = CacheRuntime::current();
-
         $definition = $definitions->resolve($this, $caller['function']);
-        $policy ??= $definition->policy()
-            ?? throw new LogicException($this::class.'::'.$caller['function'].' requires an explicit CachePolicy or #[Cache].');
-        $policy = $policy->restrictVisibility($definition->visibility());
-        $context = $definition->keyContext($arguments, $policy->version);
 
-        return $runtime->execute(
-            $runtime->keyStrategy()->generate($context),
-            $policy,
-            $compute,
-            $strategy,
-        );
+        return CacheRuntimeRegistry::resolve($definition->runtime)->execute(new CacheInvocation(
+            context: $definition->keyContext($caller['args'] ?? []),
+            policy: $definition->policy,
+            origin: $compute,
+            staleIfError: $definition->staleIfError,
+            dynamicTtl: $definition->dynamicTtl,
+            bypassCacheErrors: $definition->bypassCacheErrors,
+        ));
     }
 }

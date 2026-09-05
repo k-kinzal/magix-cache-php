@@ -1,0 +1,29 @@
+packages:
+  - 'packages/*'
+
+vendor: []
+
+# The PSR contracts appear throughout the public API, so documenting them makes
+# them link targets in signatures. They sit under vendor_dev because this root
+# manifest is a development workspace: each package requires them at runtime.
+vendor_dev:
+  - 'psr/cache'
+  - 'psr/simple-cache'
+  - 'psr/clock'
+
+exclude: []
+
+output: build/docs
+
+cache: build/doc-gen-cache
+
+# Links every documented method to the test cases that cover it. This makes a
+# coverage run a precondition of a build, which is why the doc-gen Composer
+# scripts run test:coverage first.
+coverage: build/coverage-xml
+
+base_url: 'https://k-kinzal.github.io/magix-cache-php'
+
+# The package manifests declare github.com/k-kinzal/magix-cache, which is not
+# the repository this code is in; the pages link back to where it actually is.
+repository: 'https://github.com/k-kinzal/magix-cache-php'

@@ -6,10 +6,14 @@ namespace Magix\Cache\Cli\Reader;
 
 use function array_filter;
 use function array_values;
+use function is_array;
+use function is_int;
+use function is_string;
 
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Magix\Cache\Runtime\Policy\Ttl;
 use PhpParser\Node\Arg;
 use PhpParser\Node\VariadicPlaceholder;
@@ -20,9 +24,9 @@ use PhpParser\Node\VariadicPlaceholder;
 final readonly class PolicyReader
 {
     /**
-     * Parameter order shared by #[Cache] and CachePolicy.
+     * Parameter order of the #[Cache] attribute.
      */
-    private const array OPTIONS = ['ttl', 'maxTtl', 'tags', 'visibility', 'clamp', 'version'];
+    private const array OPTIONS = ['ttl', 'maxTtl', 'tags', 'visibility', 'version', 'runtime'];
 
     /**
      * Creates a policy reader.
@@ -32,7 +36,7 @@ final readonly class PolicyReader
     }
 
     /**
-     * Returns the policy declared by the given attribute or constructor call.
+     * Returns the policy declared by the given attribute arguments.
      *
      * @param array<Arg|VariadicPlaceholder> $arguments
      */
@@ -43,8 +47,8 @@ final readonly class PolicyReader
         $maxTtl = $values['maxTtl'] ?? null;
         $tags = $values['tags'] ?? [];
         $visibility = $values['visibility'] ?? Visibility::Shared;
-        $clamp = $values['clamp'] ?? true;
         $version = $values['version'] ?? '1';
+        $runtime = $values['runtime'] ?? CacheRuntimeRegistry::DEFAULT_NAME;
 
         return new PolicyDeclaration(
             source: $source,
@@ -52,8 +56,8 @@ final readonly class PolicyReader
             maxTtl: is_int($maxTtl) ? $maxTtl : null,
             tags: is_array($tags) ? array_values(array_filter($tags, is_string(...))) : [],
             visibility: $visibility instanceof Visibility ? $visibility : Visibility::Shared,
-            clamp: is_bool($clamp) ? $clamp : true,
-            version: is_string($version) ? $version : '1',
+            version: is_string($version) && $version !== LiteralReader::UNRESOLVED ? $version : '1',
+            runtime: is_string($runtime) && $runtime !== LiteralReader::UNRESOLVED ? $runtime : CacheRuntimeRegistry::DEFAULT_NAME,
         );
     }
 }

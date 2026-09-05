@@ -4,18 +4,17 @@ This guide documents the rules `magix lint` applies to every cache boundary.
 
 | Rule | Severity | Reports |
 |---|---|---|
-| [`missing-policy`](#missing-policy) | error | `cached()` without any policy |
-| [`auto-ttl-without-upstream`](#auto-ttl-without-upstream) | error | `Ttl::Auto` with nothing to inherit |
+| [`missing-policy`](#missing-policy) | error | `cached()` without any `#[Cache]` declaration |
+| [`auto-ttl-without-upstream`](#auto-ttl-without-upstream) | error / notice | A derived TTL with nothing to derive from |
 | [`scoped-ignore-conflict`](#scoped-ignore-conflict) | error | A parameter that is ignored and scoped |
 | [`unscoped-private-key`](#unscoped-private-key) | warning | A private dependency the caller key cannot separate |
 | [`unstable-key-argument`](#unstable-key-argument) | warning | A key parameter that cannot be hashed reliably |
-| [`clamped-ttl`](#clamped-ttl) | notice | A fixed TTL that is always shortened |
 
 Errors and warnings fail the command; see [Commands](commands.md#magix-lint).
 
 ## missing-policy
 
-`cached()` resolves its policy from the explicit `CachePolicy` argument, the method attribute, and then the class attribute. When none exists, the call throws a `LogicException` the first time it runs.
+`cached()` resolves its policy from the `#[Cache]` attribute on the method, and then on the concrete class. When neither exists, the call throws a `LogicException` the first time it runs.
 
 ```php
 public function execute(int $id): Cached
@@ -24,11 +23,11 @@ public function execute(int $id): Cached
 }
 ```
 
-Add `#[Cache(...)]` to the method or its class, or pass a `CachePolicy` to `cached()`.
+Add `#[Cache(...)]` to the method or its concrete class.
 
 ## auto-ttl-without-upstream
 
-`Ttl::Auto` inherits the expiration carried by the result. When no dependency constrains it and the boundary neither builds `CacheMetadata` nor installs a `CacheStrategy` that supplies one, applying the policy throws a `LogicException`.
+`Ttl::Auto` and `Ttl::FromUpstream` derive their expiration from the result. When the analyzer can prove that no dependency ever constrains it, and the boundary neither builds `CacheMetadata` itself nor declares `#[DynamicTtl]`, applying the policy throws a `LogicException`, and the rule reports an error.
 
 ```php
 #[Cache(ttl: Ttl::Auto)]
@@ -39,6 +38,8 @@ public function execute(int $id): Cached
 ```
 
 Declare a fixed TTL, depend on a cached query, or supply `CacheMetadata` with an expiration.
+
+When the upstream expiration cannot be decided statically, the requirement is only conditional: the rule reports a notice instead of an error, because whether a finite expiration exists is known only at runtime. Notices never fail the run.
 
 ## scoped-ignore-conflict
 
@@ -102,17 +103,3 @@ public function execute(object $filter): Cached
 ```
 
 Reduce the value with `#[CacheKey]` to the part that determines the output, or exclude it with `#[CacheIgnore]` when it cannot change the result.
-
-## clamped-ttl
-
-A fixed TTL is clamped to the earliest dependency expiration by default. When a dependency always expires earlier, the declared value never applies and the declaration is misleading.
-
-```php
-#[Cache(ttl: 120)]
-public function execute(int $productId): Cached
-{
-    // Depends on a query that expires after 20 seconds.
-}
-```
-
-Declare the value that is reached, use `Ttl::Auto` to inherit it explicitly, or set `clamp: false` when the boundary may intentionally outlive its dependency.

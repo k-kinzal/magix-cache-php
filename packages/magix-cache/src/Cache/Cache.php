@@ -17,6 +17,7 @@ interface Cache
      * @template T
      * @param Closure(): T $typeWitness
      * @return CacheEntry<T>|null
+     * @throws CacheBackendFailure when the storage backend cannot answer the read
      */
     public function get(string $key, Closure $typeWitness): ?CacheEntry;
 
@@ -25,6 +26,7 @@ interface Cache
      *
      * @template T
      * @param CacheEntry<T> $entry
+     * @throws CacheBackendFailure when the storage backend cannot accept the write
      */
     public function set(string $key, CacheEntry $entry): void;
 }

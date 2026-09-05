@@ -11,7 +11,7 @@ use function is_int;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 
 use function min;
@@ -19,6 +19,9 @@ use function sort;
 
 /**
  * Applies the composition rules of MagixCache to a statically read boundary.
+ *
+ * The calculator works on TtlEstimate values, so "no constraint" and "not
+ * statically decidable" stay separate all the way to the output.
  */
 final readonly class EffectCalculator
 {
@@ -29,7 +32,7 @@ final readonly class EffectCalculator
      */
     public function constrain(array $children): DependencyConstraint
     {
-        $ttl = null;
+        $ttl = TtlEstimate::unconstrained();
         $ttlSource = null;
         $visibility = Visibility::Shared;
         $visibilitySource = null;
@@ -38,11 +41,13 @@ final readonly class EffectCalculator
         foreach ($children as $child) {
             $effect = $child->effect;
             $tags = array_merge($tags, $effect->tags);
+            $met = $ttl->meet($effect->ttl);
 
-            if ($effect->ttl !== null && ($ttl === null || $effect->ttl < $ttl)) {
-                $ttl = $effect->ttl;
+            if (!$met->equals($ttl)) {
                 $ttlSource = $child->boundary->shortId();
             }
+
+            $ttl = $met;
 
             if ($effect->visibility->meet($visibility) !== $visibility) {
                 $visibility = $effect->visibility->meet($visibility);
@@ -70,11 +75,14 @@ final readonly class EffectCalculator
         $policy = $boundary->policy;
 
         if ($policy === null) {
+            $problem = 'no #[Cache] attribute on the method or its concrete class, so cached() throws a LogicException';
+
             return new CacheEffect(
+                ttl: TtlEstimate::invalid($problem),
                 visibility: $visibility,
                 tags: $constraint->tags,
                 visibilityReason: $reason,
-                problems: ['no #[Cache] attribute and no CachePolicy argument, so cached() throws a LogicException'],
+                problems: [$problem],
             );
         }
 
@@ -83,66 +91,118 @@ final readonly class EffectCalculator
             $reason = 'declared by the policy';
         }
 
-        $lifetime = $this->lifetime($boundary, $policy, $constraint);
+        $estimate = $this->lifetime($boundary, $policy, $constraint);
+        $problems = $estimate->state === TtlEstimateState::Invalid && $estimate->reason !== null
+            ? [$estimate->reason]
+            : [];
 
         return new CacheEffect(
-            ttl: $lifetime->ttl,
+            ttl: $estimate,
             visibility: $visibility,
-            storable: $lifetime->ttl !== null
-                && $lifetime->ttl > 0
+            storable: $estimate->state === TtlEstimateState::Known
+                && $estimate->seconds !== null
+                && $estimate->seconds > 0
                 && $visibility !== Visibility::NoStore
-                && $lifetime->problems === [],
+                && $problems === [],
             tags: $this->tags(array_merge($constraint->tags, $policy->tags)),
-            ttlReason: $lifetime->ttlReason,
             visibilityReason: $reason,
-            problems: $lifetime->problems,
+            problems: $problems,
         );
     }
 
     /**
-     * Returns an effect that carries only the lifetime a policy resolves to.
+     * Returns the lifetime estimate a policy resolves to for one boundary.
      */
-    public function lifetime(BoundaryDeclaration $boundary, PolicyDeclaration $policy, DependencyConstraint $constraint): CacheEffect
+    public function lifetime(BoundaryDeclaration $boundary, PolicyDeclaration $policy, DependencyConstraint $constraint): TtlEstimate
     {
         $declared = $policy->ttl;
-        $inherited = $constraint->ttl;
-        $source = $constraint->ttlSource ?? 'a dependency';
+        $upstream = $constraint->ttl;
 
-        if (is_int($declared)) {
-            $clamped = $policy->clamp && $inherited !== null && $inherited < $declared;
-
-            return new CacheEffect(
-                ttl: $clamped ? $inherited : $declared,
-                ttlReason: $clamped ? 'declared '.$declared.'s, clamped by '.$source : null,
-            );
+        if ($upstream->state === TtlEstimateState::Invalid) {
+            $estimate = $upstream;
+        } elseif ($declared === null) {
+            $estimate = TtlEstimate::unknown(condition: 'the declared ttl cannot be read statically');
+        } elseif (is_int($declared)) {
+            $estimate = $this->fixed($declared, $upstream, $constraint->ttlSource ?? 'a dependency');
+        } else {
+            $estimate = $this->derived($declared, $policy->maxTtl, $boundary, $upstream, $constraint->ttlSource ?? 'a dependency');
         }
 
-        if ($declared === Ttl::FromUpstream) {
-            $maximum = $policy->maxTtl;
+        if ($boundary->hasDynamicTtl) {
+            return $estimate->meet(TtlEstimate::unknown(
+                condition: 'a #[DynamicTtl] resolver decides the final lifetime at runtime',
+            ));
+        }
 
-            if ($maximum === null) {
-                return new CacheEffect(problems: ['Ttl::FromUpstream requires maxTtl']);
+        return $estimate;
+    }
+
+    /**
+     * Returns the estimate of a fixed lifetime bounded by its upstream.
+     *
+     * A fixed lifetime is always capped by the upstream expiration and never
+     * fails: with no upstream constraint the declared value stands, and with
+     * an unknown upstream only the declared value remains as an upper bound.
+     */
+    public function fixed(int $declared, TtlEstimate $upstream, string $source): TtlEstimate
+    {
+        if ($upstream->seconds !== null) {
+            if ($upstream->seconds < $declared) {
+                return TtlEstimate::known($upstream->seconds, 'declared '.$declared.'s, capped by '.$source);
             }
 
-            return new CacheEffect(
-                ttl: $inherited === null ? $maximum : min($inherited, $maximum),
-                ttlReason: 'upstream expiration capped at '.$maximum.'s',
+            return TtlEstimate::known($declared);
+        }
+
+        if ($upstream->state === TtlEstimateState::Unconstrained) {
+            return TtlEstimate::known($declared);
+        }
+
+        return TtlEstimate::unknown(
+            upperBound: min($upstream->upperBound ?? $declared, $declared),
+            condition: 'an upstream expiration may shorten the declared '.$declared.'s',
+        );
+    }
+
+    /**
+     * Returns the estimate of a lifetime derived from the upstream expiration.
+     *
+     * Ttl::Auto and Ttl::FromUpstream require a finite upstream expiration:
+     * a confirmed missing one is an error unless the boundary itself supplies
+     * metadata or resolves a lifetime at runtime, and an unknown one keeps
+     * the requirement as a runtime condition.
+     */
+    public function derived(Ttl $declared, ?int $maxTtl, BoundaryDeclaration $boundary, TtlEstimate $upstream, string $source): TtlEstimate
+    {
+        if ($declared === Ttl::FromUpstream && $maxTtl === null) {
+            return TtlEstimate::invalid('Ttl::FromUpstream requires maxTtl, so the declaration cannot be constructed');
+        }
+
+        $cap = $declared === Ttl::FromUpstream ? $maxTtl : null;
+
+        if ($upstream->seconds !== null) {
+            return $cap === null
+                ? TtlEstimate::known($upstream->seconds, 'inherited from '.$source)
+                : TtlEstimate::known(min($upstream->seconds, $cap), 'upstream expiration capped at '.$cap.'s');
+        }
+
+        if ($upstream->state === TtlEstimateState::Unknown) {
+            return TtlEstimate::unknown(
+                upperBound: $cap === null ? $upstream->upperBound : min($upstream->upperBound ?? $cap, $cap),
+                condition: 'requires a finite upstream expiration at runtime',
             );
         }
 
-        if ($declared === null) {
-            return new CacheEffect(problems: ['the policy is created at runtime and cannot be read from the source']);
+        if ($boundary->suppliesMetadata || $boundary->hasDynamicTtl) {
+            return TtlEstimate::unknown(
+                upperBound: $cap,
+                condition: 'requires the boundary to supply a finite expiration at runtime',
+            );
         }
 
-        if ($inherited !== null) {
-            return new CacheEffect(ttl: $inherited, ttlReason: 'inherited from '.$source);
-        }
-
-        if ($boundary->hasStrategy || $boundary->suppliesMetadata) {
-            return new CacheEffect(ttlReason: 'supplied at runtime by the boundary itself');
-        }
-
-        return new CacheEffect(problems: ['Ttl::Auto without a dependency or upstream expiration, so applying the policy throws a LogicException']);
+        return TtlEstimate::invalid(
+            'Ttl::'.$declared->name.' has no dependency with a finite expiration, so applying the policy throws a LogicException',
+        );
     }
 
     /**

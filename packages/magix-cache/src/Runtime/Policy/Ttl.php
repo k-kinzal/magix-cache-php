@@ -15,7 +15,7 @@ enum Ttl
     case Auto;
 
     /**
-     * Inherit an upstream expiration and clamp it to CachePolicy::$maxTtl.
+     * Inherit an upstream expiration bounded by CachePolicy::$maxTtl.
      */
     case FromUpstream;
 }

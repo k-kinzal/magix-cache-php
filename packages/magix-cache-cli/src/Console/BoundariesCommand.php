@@ -9,6 +9,7 @@ use function array_map;
 use function array_values;
 use function count;
 
+use JsonException;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\CacheTree;
@@ -44,6 +45,7 @@ final readonly class BoundariesCommand
      * Renders the boundary inventory.
      *
      * @param array<array-key, mixed> $path
+     * @throws JsonException when the boundaries cannot be encoded as JSON
      */
     public function __invoke(
         SymfonyStyle $io,

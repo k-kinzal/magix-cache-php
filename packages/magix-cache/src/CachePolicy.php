@@ -5,25 +5,35 @@ declare(strict_types=1);
 namespace Magix\Cache;
 
 use InvalidArgumentException;
-use Magix\Cache\Runtime\Metadata\Visibility;
+
+use function is_int;
+
+use Magix\Cache\Metadata\CacheTokenSet;
+use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 
 /**
  * Declares how a cache boundary constrains and stores its result.
+ *
+ * A policy only ever adds constraints: a fixed lifetime is always bounded by
+ * the upstream expiration, and no policy setting can extend an expiration a
+ * dependency already imposed.
  */
 final readonly class CachePolicy
 {
     /**
      * Creates an explicit cache policy.
      *
+     * @param int|Ttl $ttl Fixed lifetime in seconds, or a lifetime derived from upstream.
+     * @param int|null $maxTtl Upper bound applied to a derived lifetime.
      * @param list<string> $tags
+     * @throws InvalidArgumentException when a lifetime is negative, a derived lifetime has no upper bound, the version is empty, or a tag is unusable
      */
     public function __construct(
         public int|Ttl $ttl = Ttl::Auto,
         public ?int $maxTtl = null,
         public array $tags = [],
         public Visibility $visibility = Visibility::Shared,
-        public bool $clamp = true,
         public string $version = '1',
     ) {
         if (is_int($ttl) && $ttl < 0) {
@@ -41,6 +51,8 @@ final readonly class CachePolicy
         if ($version === '') {
             throw new InvalidArgumentException('Cache version must not be empty.');
         }
+
+        (new CacheTokenSet())->tags($tags);
     }
 
     /**
@@ -59,7 +71,6 @@ final readonly class CachePolicy
             maxTtl: $this->maxTtl,
             tags: $this->tags,
             visibility: $visibility,
-            clamp: $this->clamp,
             version: $this->version,
         );
     }

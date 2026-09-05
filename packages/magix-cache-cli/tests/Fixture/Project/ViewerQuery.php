@@ -8,7 +8,7 @@ use Magix\Cache\Attribute\Cache;
 use Magix\Cache\Attribute\CacheScope;
 use Magix\Cache\Cacheable;
 use Magix\Cache\Cached;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 
 /**
  * Loads the personalized part of a page.

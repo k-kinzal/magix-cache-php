@@ -39,7 +39,7 @@ final readonly class Capability3
     {
         return Cached::of(
             $transform($this->first->value(), $this->second->value(), $this->third->value()),
-            $this->first->metadata->merge($this->second->metadata, $this->third->metadata),
+            $this->first->metadata->meet($this->second->metadata, $this->third->metadata),
         );
     }
 }

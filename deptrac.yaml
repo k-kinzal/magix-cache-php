@@ -14,6 +14,10 @@ deptrac:
       collectors:
         - type: directory
           value: packages/magix-cache/src/Attribute/.*
+    - name: Metadata
+      collectors:
+        - type: directory
+          value: packages/magix-cache/src/Metadata/.*
     - name: Composition
       collectors:
         - type: directory
@@ -73,28 +77,35 @@ deptrac:
   ruleset:
     CoreApi:
       - Composition
+      - Metadata
       - Runtime
       - Cache
       - Clock
     Attribute:
       - CoreApi
+      - Metadata
       - Runtime
     Composition:
       - CoreApi
+      - Metadata
+    Metadata: ~
     Runtime:
       - CoreApi
       - Attribute
       - Cache
+      - Metadata
     Cache:
-      - Runtime
+      - Metadata
       - Clock
     Clock: ~
     Laravel:
       - CoreApi
       - Cache
+      - Runtime
     Symfony:
       - CoreApi
       - Cache
+      - Runtime
     CliConsole:
       - CliDeclaration
       - CliGraph
@@ -109,19 +120,24 @@ deptrac:
       - CliDeclaration
       - CoreApi
       - Attribute
+      - Metadata
       - Runtime
     CliDeclaration:
+      - Metadata
       - Runtime
     CliGraph:
       - CliDeclaration
+      - Metadata
       - Runtime
     CliRender:
       - CliDeclaration
       - CliGraph
+      - Metadata
       - Runtime
     CliLint:
       - CliDeclaration
       - CliGraph
+      - Metadata
       - Runtime
     CliKey:
       - Runtime

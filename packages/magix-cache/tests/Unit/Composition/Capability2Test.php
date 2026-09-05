@@ -6,7 +6,7 @@ namespace Tests\Unit\Composition;
 
 use Magix\Cache\Cached;
 use Magix\Cache\Composition\Capability2;
-use Magix\Cache\Runtime\Metadata\CacheMetadata;
+use Magix\Cache\Metadata\CacheMetadata;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -14,9 +14,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Capability2::class)]
 #[UsesClass(Cached::class)]
 #[UsesClass(CacheMetadata::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\ConstraintMeet::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
+#[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 final class Capability2Test extends TestCase
 {
     public function testMapTransformsTypedValuesAndMergesMetadata(): void

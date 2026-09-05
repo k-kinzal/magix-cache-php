@@ -1521,16 +1521,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/k-kinzal/php-ai-toolkit.git",
-                "reference": "cacb719bbd686ea4f6d9f8b81d0fe22e91e2a755"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/k-kinzal/php-ai-toolkit/zipball/cacb719bbd686ea4f6d9f8b81d0fe22e91e2a755",
-                "reference": "cacb719bbd686ea4f6d9f8b81d0fe22e91e2a755",
-                "shasum": ""
+                "reference": "7e622b719174a3e6333f718f080fdeaafcee34ff"
             },
             "require": {
+                "nikic/php-parser": "^4.19 || ^5.0",
                 "php": "^8.0",
+                "phpstan/phpdoc-parser": "^1.33 || ^2.0",
                 "phpstan/phpstan": "^1.12 || ^2.0",
                 "symfony/yaml": "^5.4 || ^6.4 || ^7.4 || ^8.0"
             },
@@ -1539,14 +1535,19 @@
                 "deptrac/deptrac": "^0.24 || ^1.0 || ^2.0 || ^3.0 || ^4.6",
                 "friendsofphp/php-cs-fixer": "^3.4",
                 "phpcompatibility/php-compatibility": "^10.0@alpha",
-                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^1.6 || ^2.0",
                 "phpunit/phpunit": "^9.6 || ^10.5 || ^11 || ^12 || ^13",
                 "squizlabs/php_codesniffer": "^4.0"
+            },
+            "suggest": {
+                "ext-gd": "Draws the social preview image of a generated documentation site (needs FreeType support)"
             },
             "default-branch": true,
             "bin": [
                 "bin/php-ai-toolkit",
-                "bin/loc-guard"
+                "bin/loc-guard",
+                "bin/tree-guard",
+                "bin/doc-gen"
             ],
             "type": "phpstan-extension",
             "extra": {
@@ -1579,11 +1580,15 @@
                 "test:unit:legacy": [
                     "@php -d memory_limit=512M vendor/bin/phpunit --configuration phpunit9.xml.dist"
                 ],
+                "test:coverage": [
+                    "@php -d memory_limit=1G -d xdebug.mode=coverage vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-xml build/coverage-xml"
+                ],
                 "lint": [
                     "@format:check",
                     "@phpstan",
                     "@compat",
                     "@loc-guard",
+                    "@tree-guard",
                     "@deptrac"
                 ],
                 "phpstan": [
@@ -1594,6 +1599,12 @@
                 ],
                 "loc-guard": [
                     "@php bin/loc-guard --config=loc.yaml"
+                ],
+                "tree-guard": [
+                    "@php bin/tree-guard --config=tree.yaml"
+                ],
+                "doc-gen": [
+                    "@php bin/doc-gen"
                 ],
                 "deptrac": [
                     "@php deptrac.php analyse --config-file=deptrac.yaml"
@@ -1609,6 +1620,7 @@
                 "MIT"
             ],
             "description": "A comprehensive toolkit for AI-assisted PHP development — PHPStan rules, PHPUnit reporters, config templates, and more",
+            "homepage": "https://k-kinzal.github.io/php-ai-toolkit/",
             "keywords": [
                 "ai",
                 "custom rules",
@@ -1619,9 +1631,11 @@
                 "toolkit"
             ],
             "support": {
-                "source": "https://github.com/k-kinzal/php-ai-toolkit/tree/main"
+                "source": "https://github.com/k-kinzal/php-ai-toolkit",
+                "issues": "https://github.com/k-kinzal/php-ai-toolkit/issues",
+                "docs": "https://k-kinzal.github.io/php-ai-toolkit/"
             },
-            "time": "2026-07-05T15:42:04+00:00"
+            "time": "2026-08-16T11:17:59+00:00"
         },
         {
             "name": "myclabs/deep-copy",

@@ -12,7 +12,7 @@ use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Lint\Diagnostic;
 use Magix\Cache\Cli\Lint\Rule\ScopedIgnoreConflictRule;
 use Magix\Cache\Cli\Lint\Severity;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -21,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
 #[UsesClass(CacheNode::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlEstimate::class)]
 #[UsesClass(Catalog::class)]
 #[UsesClass(Diagnostic::class)]
 #[UsesClass(KeyParameter::class)]

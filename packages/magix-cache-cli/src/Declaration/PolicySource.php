@@ -18,14 +18,4 @@ enum PolicySource
      * The policy comes from a #[Cache] attribute on the declaring class.
      */
     case ClassAttribute;
-
-    /**
-     * The policy comes from a CachePolicy passed to cached().
-     */
-    case ExplicitPolicy;
-
-    /**
-     * The policy exists but could not be read without executing the code.
-     */
-    case Unresolved;
 }

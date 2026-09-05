@@ -7,7 +7,8 @@ namespace Magix\Cache\Cli\Declaration;
 use function implode;
 use function is_int;
 
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Magix\Cache\Runtime\Policy\Ttl;
 
 /**
@@ -20,6 +21,7 @@ final readonly class PolicyDeclaration
      *
      * @param int|Ttl|null $ttl Null when the declared expression cannot be read statically.
      * @param list<string> $tags
+     * @param string $runtime Name of the runtime the declaration references.
      */
     public function __construct(
         public PolicySource $source,
@@ -27,8 +29,8 @@ final readonly class PolicyDeclaration
         public ?int $maxTtl = null,
         public array $tags = [],
         public Visibility $visibility = Visibility::Shared,
-        public bool $clamp = true,
         public string $version = '1',
+        public string $runtime = CacheRuntimeRegistry::DEFAULT_NAME,
     ) {
     }
 
@@ -51,12 +53,12 @@ final readonly class PolicyDeclaration
             $options[] = 'visibility: '.$this->visibility->name;
         }
 
-        if (!$this->clamp) {
-            $options[] = 'clamp: false';
-        }
-
         if ($this->version !== '1') {
             $options[] = 'version: '.$this->version;
+        }
+
+        if ($this->runtime !== CacheRuntimeRegistry::DEFAULT_NAME) {
+            $options[] = 'runtime: '.$this->runtime;
         }
 
         return '#[Cache('.implode(', ', $options).')]';

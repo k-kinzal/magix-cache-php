@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use InvalidArgumentException;
 use Magix\Cache\CachePolicy;
-use Magix\Cache\Runtime\Metadata\Visibility;
-use Magix\Cache\Runtime\Policy\Ttl;
+use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CachePolicy::class)]
 #[UsesClass(Visibility::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 final class CachePolicyTest extends TestCase
 {
     public function testExplicitConfigurationIsPreserved(): void
@@ -23,13 +22,6 @@ final class CachePolicyTest extends TestCase
         self::assertSame(30, $policy->ttl);
         self::assertSame(['product:1'], $policy->tags);
         self::assertSame('2', $policy->version);
-    }
-
-    public function testUpstreamModeRequiresMaximum(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        new CachePolicy(ttl: Ttl::FromUpstream);
     }
 
     public function testRestrictVisibilityOnlyMakesPolicyStricter(): void

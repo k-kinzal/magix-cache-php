@@ -5,18 +5,23 @@ declare(strict_types=1);
 namespace Tests\Package\Cli\Unit\Graph;
 
 use Magix\Cache\Cli\Graph\DependencyConstraint;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Cli\Graph\TtlEstimate;
+use Magix\Cache\Cli\Graph\TtlEstimateState;
+use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DependencyConstraint::class)]
+#[UsesClass(TtlEstimate::class)]
 final class DependencyConstraintTest extends TestCase
 {
     public function testConstraintNamesTheDependencyItComesFrom(): void
     {
-        $constraint = new DependencyConstraint(20, 'ProductQuery::execute', Visibility::Private, 'ViewerQuery::execute', ['product']);
+        $estimate = TtlEstimate::known(20);
+        $constraint = new DependencyConstraint($estimate, 'ProductQuery::execute', Visibility::Private, 'ViewerQuery::execute', ['product']);
 
-        self::assertSame(20, $constraint->ttl);
+        self::assertSame($estimate, $constraint->ttl);
         self::assertSame('ProductQuery::execute', $constraint->ttlSource);
         self::assertSame(Visibility::Private, $constraint->visibility);
         self::assertSame('ViewerQuery::execute', $constraint->visibilitySource);
@@ -27,7 +32,7 @@ final class DependencyConstraintTest extends TestCase
     {
         $constraint = new DependencyConstraint();
 
-        self::assertNull($constraint->ttl);
+        self::assertSame(TtlEstimateState::Unconstrained, $constraint->ttl->state);
         self::assertSame(Visibility::Shared, $constraint->visibility);
         self::assertSame([], $constraint->tags);
     }

@@ -5,7 +5,29 @@ includes:
 
 parameters:
     level: max
+    exceptions:
+        implicitThrows: false
+        check:
+            missingCheckedExceptionInThrows: true
+            tooWideThrowType: true
+        uncheckedExceptionClasses:
+            - LogicException
+            - RuntimeException
+            - Error
+            - Random\RandomException
+            - PHPUnit\Framework\MockObject\Exception
+    stubFiles:
+        - phpstan-stubs/serialize.stub
     customRules:
+        broadCatchAllowedPaths:
+            # Boundaries where the failure arrives from code this library does
+            # not own, so its hierarchy cannot be constrained. Each one hands
+            # the failure to an explicit classifier instead of deciding alone.
+            #
+            # serialize() reports an argument it refuses with a bare \Exception,
+            # which this adapter turns into the concrete type its key contract
+            # declares. An Error still escapes: that is the caller's bug.
+            - '*/packages/magix-cache/src/Runtime/KeyStrategy/HashCacheKeyStrategy.php'
         restrictedTestNamespacePrefixes:
             - 'Tests\Unit'
             - 'Tests\Integration'

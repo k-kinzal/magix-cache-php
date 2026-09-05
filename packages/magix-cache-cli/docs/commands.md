@@ -36,7 +36,7 @@ vendor/bin/magix analyze ProductPageQuery::execute
 App\Query\ProductPageQuery::execute
   src/Query/ProductPageQuery.php:34
 
-  ttl          20s (declared 120s, clamped by ProductQuery::execute)
+  ttl          20s (declared 120s, capped by ProductQuery::execute)
   visibility   private (restricted by ViewerQuery::execute)
   storable     yes
   tags         inventory, page, product, viewer
@@ -53,7 +53,7 @@ The header block describes the boundary itself:
 
 | Field | Meaning |
 |---|---|
-| `ttl` | Expiration after composition, followed by the reason it differs from the declaration |
+| `ttl` | Expiration after composition, followed by the reason it differs from the declaration. A number appears only when it is statically determined; otherwise the estimate is `unconstrained` (provably no expiration), `unknown` with the tightest provable upper bound such as `unknown (≤30s)` and the runtime condition, or `invalid` when the declaration throws at runtime |
 | `visibility` | `shared`, `private`, or `nostore` after composition, followed by what restricted it |
 | `storable` | Whether the runtime writes an entry for this boundary at all |
 | `tags` | Policy tags unioned with the tags of every dependency |

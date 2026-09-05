@@ -36,8 +36,8 @@ final readonly class MissingPolicyRule implements LintRule
             boundary: $node->boundary->id(),
             file: $node->boundary->file,
             line: $node->boundary->line,
-            message: 'cached() is called without a policy, so the call throws a LogicException.',
-            hint: 'Add #[Cache(...)] to the method or its class, or pass a CachePolicy to cached().',
+            message: 'cached() is called without a #[Cache] declaration, so the call throws a LogicException.',
+            hint: 'Add #[Cache(...)] to the method or its concrete class.',
         )];
     }
 }

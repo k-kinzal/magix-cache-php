@@ -6,11 +6,13 @@ namespace Tests\Package\Cli\Unit\Console;
 
 use Magix\Cache\Cli\Console\Application;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Application::class)]
 #[UsesNamespace('Magix\Cache\Cli')]
+#[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
 final class ApplicationTest extends TestCase
 {
     public function testConsoleRegistersEveryMagixCommand(): void

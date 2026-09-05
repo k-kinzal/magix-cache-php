@@ -4,18 +4,22 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Console;
 
+use JsonException;
 use Magix\Cache\Cli\Console\Application;
 use Magix\Cache\Cli\Console\CatalogLoader;
 use Magix\Cache\Cli\Console\LintCommand;
 use Magix\Cache\Cli\Lint\Diagnostic;
 use Magix\Cache\Cli\Lint\Severity;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[CoversClass(LintCommand::class)]
 #[UsesNamespace('Magix\Cache\Cli')]
+#[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
+#[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 final class LintCommandTest extends TestCase
 {
     public function testLintFailsWhenABoundaryCannotWork(): void
@@ -62,22 +66,25 @@ final class LintCommandTest extends TestCase
         self::assertStringContainsString('hint: Add #[Cache].', $described);
     }
 
+    /**
+     * @throws JsonException
+     */
     public function testEncodeReturnsOneEntryPerFinding(): void
     {
         $command = new LintCommand(new CatalogLoader(dirname(__DIR__, 5)));
         $diagnostic = new Diagnostic(
-            rule: 'clamped-ttl',
+            rule: 'auto-ttl-without-upstream',
             severity: Severity::Notice,
             boundary: 'App\PageQuery::execute',
             file: 'src/PageQuery.php',
             line: 31,
-            message: 'The declared ttl is always clamped.',
+            message: 'Ttl::Auto requires a finite upstream expiration at runtime.',
         );
 
         $encoded = $command->encode([$diagnostic]);
 
         self::assertJson($encoded);
-        self::assertStringContainsString('"rule": "clamped-ttl"', $encoded);
+        self::assertStringContainsString('"rule": "auto-ttl-without-upstream"', $encoded);
         self::assertStringContainsString('"severity": "notice"', $encoded);
     }
 }

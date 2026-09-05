@@ -18,7 +18,7 @@ public function execute(int $productId): Cached
 }
 ```
 
-The attribute can also be placed on a class as a fallback for every method that calls `cached()`:
+The attribute can also be placed on the concrete class as a default for every method that calls `cached()`:
 
 ```php
 #[Cache(ttl: 30, tags: ['catalog'])]
@@ -26,48 +26,36 @@ final class CatalogQueries
 {
     use Cacheable;
 
-    // The class policy applies unless this method declares its own #[Cache].
+    // The class policy applies unless a method declares its own #[Cache].
 }
 ```
 
-Resolution order is:
+A method-level `#[Cache]` wins over the class-level one as a whole; the two are never mixed per option. Attributes on a parent class are never inherited implicitly, and declarations are static — there is no per-call override path. If neither the method nor its concrete class declares `#[Cache]`, `cached()` throws a `LogicException`.
 
-1. The explicit `CachePolicy` passed to `cached()`
-2. The method's `#[Cache]` attribute
-3. The class's `#[Cache]` attribute
-
-If none is available, `cached()` throws a `LogicException`.
-
-`CachePolicy` and `#[Cache]` accept the same options:
+`#[Cache]` accepts these options:
 
 | Option | Type | Default | Purpose |
 |---|---|---|---|
 | `ttl` | `int\|Ttl` | `Ttl::Auto` | Selects the boundary expiration |
-| `maxTtl` | `?int` | `null` | Caps `Ttl::FromUpstream` |
+| `maxTtl` | `?int` | `null` | Upper bound for `Ttl::FromUpstream` (required in that mode) |
 | `tags` | `list<string>` | `[]` | Adds cache invalidation or response tags |
 | `visibility` | `Visibility` | `Visibility::Shared` | Restricts where the result may be stored |
-| `clamp` | `bool` | `true` | Prevents a fixed TTL from extending dependency freshness |
-| `version` | `string` | `'1'` | Changes the generated cache-key namespace |
+| `version` | `string` | `'1'` | Changes the generated cache key |
+| `runtime` | `string` | `'default'` | Name of a runtime registered at bootstrap |
+
+The same constraint options are carried by the shared `CachePolicy` value type, which `#[Cache]` converts to internally. A policy only ever adds constraints: no setting can extend an expiration a dependency already imposed, or relax cacheability, visibility, tags, or reasons.
 
 ## Fixed TTL
 
-An integer TTL is relative to the time at which the origin result is produced:
+An integer TTL is relative to the base time taken right after the origin result is produced:
 
 ```php
 #[Cache(ttl: 60)]
 ```
 
-By default, a fixed TTL is clamped to the earliest dependency expiration. If a dependency has 20 seconds left, a 60-second boundary still expires after 20 seconds.
+A fixed TTL is always bounded by the upstream expiration; there is no opt-out. If a dependency has 20 seconds left, a 60-second boundary still expires after 20 seconds.
 
-Set `clamp: false` only when the boundary intentionally replaces the dependency expiration:
-
-```php
-#[Cache(ttl: 60, clamp: false)]
-```
-
-This changes expiration only. Cacheability, visibility, tags, and reasons remain monotone and cannot be relaxed by the policy.
-
-A TTL of `0` is valid, but its expiration is not in the future, so the result is returned without being stored.
+A TTL of `0` is valid, but its expiration is not in the future, so the result is returned without being stored and the next call executes the origin again.
 
 ## Automatic TTL
 
@@ -93,16 +81,16 @@ public function execute(int $productId): Cached
 }
 ```
 
-`Ttl::Auto` requires the returned `Cached` value to already have a finite expiration. A value created with `Cached::of($value)` has unconstrained metadata until a policy is applied, so using it directly with `Ttl::Auto` throws a `LogicException`.
+`Ttl::Auto` requires the returned `Cached` value to already carry a finite expiration. A value created with `Cached::of($value)` has unconstrained metadata until a policy is applied, so returning it directly under `Ttl::Auto` is a definition error and the runtime throws a `LogicException`.
 
-A `DynamicTtlCacheStrategy` can supply the finite expiration before the automatic policy is applied. See [Cache Strategies](cache-strategies.md#dynamic-ttl).
+A `#[DynamicTtl]` resolver can supply the finite expiration before the automatic policy is applied. See [Cache Behaviors](cache-behaviors.md#dynamic-ttl).
 
 ## Upstream TTL
 
 `Ttl::FromUpstream` inherits an absolute expiration supplied in the returned metadata and caps it with `maxTtl`:
 
 ```php
-use Magix\Cache\Runtime\Metadata\CacheMetadata;
+use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Runtime\Policy\Ttl;
 
 #[Cache(ttl: Ttl::FromUpstream, maxTtl: 300)]
@@ -119,7 +107,7 @@ public function execute(): Cached
 }
 ```
 
-The effective expiration is the earlier of the upstream expiration and `now + maxTtl`. `maxTtl` is required for this mode.
+The effective expiration is the earlier of the upstream expiration and `now + maxTtl`. `maxTtl` is required for this mode, and like `Ttl::Auto`, a missing finite upstream expiration is a definition error at runtime.
 
 ## Tags
 
@@ -143,21 +131,21 @@ Visibility becomes more restrictive as results are composed:
 | `Visibility::Private` | May be stored when the key identifies the private variant |
 | `Visibility::NoStore` | Must not be read from or written to storage |
 
-The order is `Shared < Private < NoStore`; a parent boundary cannot loosen a dependency's visibility.
+The order is `Shared < Private < NoStore`; a parent boundary cannot loosen a dependency's visibility. A boundary whose effective visibility is `NoStore` skips the cache lookup entirely and always executes the origin.
 
 Declare a boundary-wide restriction in the policy:
 
 ```php
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 
 #[Cache(ttl: 30, visibility: Visibility::Private)]
 ```
 
-Use `#[CacheScope]` when a parameter introduces the restriction. The parameter remains part of the key by default:
+Use `#[CacheScope]` when a parameter introduces the restriction. The parameter remains part of the key, so entries stay separated per principal:
 
 ```php
 use Magix\Cache\Attribute\CacheScope;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 
 #[Cache(ttl: 30)]
 public function execute(
@@ -168,7 +156,7 @@ public function execute(
 }
 ```
 
-`#[CacheScope]` defaults to `Visibility::Private`.
+`#[CacheScope]` defaults to `Visibility::Private`. The visibility a scoped parameter imposes is folded into the policy with the meet, so the method declaration cannot relax it.
 
 An ignored parameter cannot also be scoped unless its scope is `NoStore`. This special combination lets an unkeyable value force execution without storage:
 
@@ -176,7 +164,7 @@ An ignored parameter cannot also be scoped unless its scope is `NoStore`. This s
 use Closure;
 use Magix\Cache\Attribute\CacheIgnore;
 use Magix\Cache\Attribute\CacheScope;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 
 public function execute(
     #[CacheIgnore]
@@ -192,7 +180,7 @@ public function execute(
 An origin or dependency can explicitly prohibit storage and record a diagnostic reason:
 
 ```php
-use Magix\Cache\Runtime\Metadata\CacheMetadata;
+use Magix\Cache\Metadata\CacheMetadata;
 
 return Cached::of(
     $value,
@@ -204,7 +192,7 @@ Uncacheable metadata sets `cacheable` to `false`, visibility to `NoStore`, and r
 
 ## Cache Version
 
-The version is part of the default cache key. Change it when a deployment changes the meaning or serialized shape of an entry and old entries must no longer be read:
+The version is part of the default cache key. A fingerprint of the effective declaration is also part of the key, so changing the TTL, tags, visibility, behaviors, or key attributes already moves the boundary to new entries. Change the version when the declaration is unchanged but a deployment changes the meaning or serialized shape of the value:
 
 ```php
 #[Cache(ttl: 300, version: 'product-v3')]

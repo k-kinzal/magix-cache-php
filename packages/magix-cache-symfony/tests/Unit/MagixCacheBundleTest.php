@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Package\Symfony\Unit;
 
-use LogicException;
 use Magix\Cache\Cache\PSR6\CacheItemPool;
 use Magix\Cache\CacheRuntime;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Magix\Cache\Symfony\MagixCacheBundle;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -19,8 +20,22 @@ use Tests\Fixture\MemoryCache;
 #[CoversClass(MagixCacheBundle::class)]
 #[UsesClass(CacheItemPool::class)]
 #[UsesClass(CacheRuntime::class)]
+#[UsesClass(CacheRuntimeRegistry::class)]
+#[UsesClass(\Magix\Cache\Runtime\Extension\RegisteredExtensions::class)]
 final class MagixCacheBundleTest extends TestCase
 {
+    #[Override]
+    protected function setUp(): void
+    {
+        CacheRuntimeRegistry::reset();
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        CacheRuntimeRegistry::reset();
+    }
+
     public function testLoadExtensionRegistersStoreAndRuntime(): void
     {
         $container = new ContainerBuilder();
@@ -35,7 +50,7 @@ final class MagixCacheBundleTest extends TestCase
         self::assertTrue($container->hasDefinition(CacheRuntime::class));
     }
 
-    public function testBootInstallsContainerRuntime(): void
+    public function testBootFixesTheDefaultRuntimeReferenceToAContainerProvider(): void
     {
         $container = new ContainerBuilder();
         $runtime = new CacheRuntime(new MemoryCache());
@@ -45,16 +60,19 @@ final class MagixCacheBundleTest extends TestCase
 
         $bundle->boot();
 
-        self::assertSame($runtime, CacheRuntime::current());
-        CacheRuntime::setCurrent(null);
+        self::assertTrue(CacheRuntimeRegistry::isRegistered(CacheRuntimeRegistry::DEFAULT_NAME));
+        self::assertSame($runtime, CacheRuntimeRegistry::resolve(CacheRuntimeRegistry::DEFAULT_NAME));
     }
 
-    public function testShutdownRemovesRuntime(): void
+    public function testBootLeavesAnAlreadyFixedDefaultReferenceUntouched(): void
     {
-        CacheRuntime::setCurrent(new CacheRuntime(new MemoryCache()));
-        (new MagixCacheBundle())->shutdown();
+        $fixed = new CacheRuntime(new MemoryCache());
+        CacheRuntimeRegistry::register(CacheRuntimeRegistry::DEFAULT_NAME, $fixed);
+        $bundle = new MagixCacheBundle();
+        $bundle->setContainer(new ContainerBuilder());
 
-        $this->expectException(LogicException::class);
-        CacheRuntime::current();
+        $bundle->boot();
+
+        self::assertSame($fixed, CacheRuntimeRegistry::resolve(CacheRuntimeRegistry::DEFAULT_NAME));
     }
 }

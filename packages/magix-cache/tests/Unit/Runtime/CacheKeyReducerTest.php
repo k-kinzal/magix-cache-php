@@ -17,6 +17,8 @@ use Tests\Fixture\KeyQuery;
 #[CoversClass(CacheKeyReducer::class)]
 #[UsesClass(CacheDefinition::class)]
 #[UsesClass(CacheDefinitionResolver::class)]
+#[UsesClass(\Magix\Cache\Runtime\CacheAttributeReader::class)]
+#[UsesClass(\Magix\Cache\Runtime\DeclarationFingerprint::class)]
 #[UsesClass(CacheKeyArgumentBinder::class)]
 #[UsesClass(CacheKeyContext::class)]
 #[UsesClass(\Magix\Cache\Attribute\Cache::class)]
@@ -24,13 +26,14 @@ use Tests\Fixture\KeyQuery;
 #[UsesClass(\Magix\Cache\Attribute\CacheKey::class)]
 #[UsesClass(\Magix\Cache\Attribute\CacheScope::class)]
 #[UsesClass(\Magix\Cache\CachePolicy::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 final class CacheKeyReducerTest extends TestCase
 {
     public function testReduceAppliesTheDeclaredReducer(): void
     {
         $definition = (new CacheDefinitionResolver())->resolve(new KeyQuery(), 'execute');
 
-        self::assertSame('even', $definition->keyContext([2], 'version')->arguments['viewer']);
+        self::assertSame('even', $definition->keyContext([2])->arguments['viewer']);
     }
 }

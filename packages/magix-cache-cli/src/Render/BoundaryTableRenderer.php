@@ -68,7 +68,7 @@ final readonly class BoundaryTableRenderer
 
         return [
             $node->boundary->id(),
-            $effect->ttl === null ? '-' : $effect->ttl.'s',
+            $effect->ttl->label(),
             strtolower($effect->visibility->name),
             $effect->storable ? 'yes' : 'no',
             $effect->tags === [] ? '-' : implode(',', $effect->tags),

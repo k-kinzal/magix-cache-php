@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Magix\Cache\Attribute;
 
 use Attribute;
+use InvalidArgumentException;
 use Magix\Cache\CachePolicy;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Magix\Cache\Runtime\Policy\Ttl;
 
 /**
- * Provides attribute syntax for an otherwise explicit cache policy.
+ * Declares the cache policy and runtime reference of a boundary.
+ *
+ * A method-level declaration takes precedence over the concrete class
+ * declaration as a whole; the two are never mixed per option.
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 final readonly class Cache
@@ -18,16 +23,24 @@ final readonly class Cache
     /**
      * Creates an attribute-backed cache policy.
      *
+     * @param int|Ttl $ttl Fixed lifetime in seconds, or a lifetime derived from upstream.
+     * @param int|null $maxTtl Upper bound applied to a derived lifetime.
      * @param list<string> $tags
+     * @param string $runtime Name of a runtime registered at bootstrap.
+     * @throws InvalidArgumentException when a lifetime is negative, a derived lifetime has no upper bound, the version is empty, a tag is unusable, or the runtime reference is empty
      */
     public function __construct(
         public int|Ttl $ttl = Ttl::Auto,
         public ?int $maxTtl = null,
         public array $tags = [],
         public Visibility $visibility = Visibility::Shared,
-        public bool $clamp = true,
         public string $version = '1',
+        public string $runtime = CacheRuntimeRegistry::DEFAULT_NAME,
     ) {
+        if ($runtime === '') {
+            throw new InvalidArgumentException('Cache runtime reference must not be empty.');
+        }
+
         $this->policy();
     }
 
@@ -41,7 +54,6 @@ final readonly class Cache
             maxTtl: $this->maxTtl,
             tags: $this->tags,
             visibility: $this->visibility,
-            clamp: $this->clamp,
             version: $this->version,
         );
     }

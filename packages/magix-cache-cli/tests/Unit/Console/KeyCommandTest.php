@@ -7,19 +7,24 @@ namespace Tests\Package\Cli\Unit\Console;
 use Magix\Cache\Cli\Console\Application;
 use Magix\Cache\Cli\Console\CatalogLoader;
 use Magix\Cache\Cli\Console\KeyCommand;
+use Magix\Cache\Runtime\CacheDefinitionResolver;
+use Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Tests\Package\Cli\Fixture\Project\ProductQuery;
 
 #[CoversClass(KeyCommand::class)]
-#[UsesNamespace('Magix\Cache\Cli')]
-#[UsesNamespace('Magix\Cache\Runtime')]
+#[UsesNamespace('Magix\Cache')]
 final class KeyCommandTest extends TestCase
 {
     public function testKeyPrintsTheHashOfOneCall(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('key'));
+        $expected = (new HashCacheKeyStrategy())->generate(
+            (new CacheDefinitionResolver())->resolve(new ProductQuery(), 'execute')->keyContext([42]),
+        );
 
         $tester->execute([
             'boundary' => 'ProductQuery::execute',
@@ -29,7 +34,7 @@ final class KeyCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         self::assertStringContainsString('productId=42', $tester->getDisplay());
-        self::assertStringContainsString('bfc136b0201bb228f9340e6eb474254677bb24f1037a4912ef0f74463ef8173a', $tester->getDisplay());
+        self::assertStringContainsString($expected, $tester->getDisplay());
     }
 
     public function testKeyFailsForAnUnknownBoundary(): void
@@ -43,6 +48,20 @@ final class KeyCommandTest extends TestCase
 
         self::assertSame(1, $status);
         self::assertStringContainsString('No cache boundary matches', $tester->getDisplay());
+    }
+
+    public function testKeyReportsABoundaryWithoutAnyDeclaration(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('key'));
+
+        $status = $tester->execute([
+            'boundary' => 'BrokenQuery::undeclared',
+            'arguments' => ['1'],
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
+        ]);
+
+        self::assertSame(1, $status);
+        self::assertStringContainsString('so it has no key', $tester->getDisplay());
     }
 
     public function testDecodeReadsJsonValuesAndPlainStrings(): void

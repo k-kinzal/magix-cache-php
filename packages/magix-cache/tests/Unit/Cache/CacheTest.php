@@ -6,18 +6,16 @@ namespace Tests\Unit\Cache;
 
 use Magix\Cache\Cache\Cache;
 use Magix\Cache\Cache\CacheEntry;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\UsesClass;
+use Magix\Cache\Metadata\CacheMetadata;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Cache::class)]
-#[UsesClass(CacheEntry::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
+#[CoversNothing]
 final class CacheTest extends TestCase
 {
     public function testGetReturnsCacheEntryFromImplementation(): void
     {
-        $entry = new CacheEntry('value', 120.0);
+        $entry = new CacheEntry('value', new CacheMetadata(expiresAt: 120.0));
         $typeWitness = static fn (): string => '';
         $cache = $this->createMock(Cache::class);
         $cache
@@ -31,7 +29,7 @@ final class CacheTest extends TestCase
 
     public function testSetPassesCompleteCacheEntryToImplementation(): void
     {
-        $entry = new CacheEntry('value', 120.0);
+        $entry = new CacheEntry('value', new CacheMetadata(expiresAt: 120.0));
         $cache = $this->createMock(Cache::class);
         $cache
             ->expects(self::once())

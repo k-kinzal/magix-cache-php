@@ -6,7 +6,7 @@ namespace Tests\Package\Cli\Unit\Declaration;
 
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -22,12 +22,12 @@ final class PolicyDeclarationTest extends TestCase
             maxTtl: 60,
             tags: ['product'],
             visibility: Visibility::Private,
-            clamp: false,
             version: '2',
+            runtime: 'edge',
         );
 
         self::assertSame(
-            '#[Cache(ttl: 30s, maxTtl: 60, tags: [product], visibility: Private, clamp: false, version: 2)]',
+            '#[Cache(ttl: 30s, maxTtl: 60, tags: [product], visibility: Private, version: 2, runtime: edge)]',
             $policy->label(),
         );
     }
@@ -36,13 +36,14 @@ final class PolicyDeclarationTest extends TestCase
     {
         $policy = new PolicyDeclaration(source: PolicySource::ClassAttribute, ttl: 10);
 
+        self::assertSame('default', $policy->runtime);
         self::assertSame('#[Cache(ttl: 10s)]', $policy->label());
     }
 
     public function testTtlLabelDescribesInheritedAndUnreadableModes(): void
     {
         $auto = new PolicyDeclaration(source: PolicySource::MethodAttribute, ttl: Ttl::Auto);
-        $unresolved = new PolicyDeclaration(source: PolicySource::Unresolved, ttl: null);
+        $unresolved = new PolicyDeclaration(source: PolicySource::MethodAttribute, ttl: null);
 
         self::assertSame('Ttl::Auto', $auto->ttlLabel());
         self::assertSame('unresolved', $unresolved->ttlLabel());

@@ -4,53 +4,39 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Cache;
 
-use const INF;
-
-use InvalidArgumentException;
 use Magix\Cache\Cache\CacheEntry;
+use Magix\Cache\Metadata\CacheMetadata;
+use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CacheEntry::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
+#[UsesClass(CacheMetadata::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
+#[UsesClass(Visibility::class)]
 final class CacheEntryTest extends TestCase
 {
-    public function testFiniteAbsoluteExpirationIsRequired(): void
+    public function testValueReturnsInternalValueWithItsMetadata(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $metadata = new CacheMetadata(expiresAt: 120.0, tags: ['product:1']);
+        $entry = new CacheEntry('value', $metadata);
 
-        new CacheEntry('value', INF);
-    }
-
-    public function testValueReturnsInternalValueWithConcreteMetadata(): void
-    {
-        $entry = new CacheEntry(
-            'value',
-            120.0,
-            tags: ['product:1'],
-        );
-
-        self::assertSame(120.0, $entry->expiresAt);
         self::assertSame('value', $entry->value());
-        self::assertSame(['product:1'], $entry->tags);
+        self::assertSame($metadata, $entry->metadata);
+        self::assertSame(120.0, $entry->expiresAt);
+        self::assertSame(120.0, $entry->retainedUntil);
+        self::assertSame(CacheEntry::FORMAT_VERSION, $entry->formatVersion);
     }
 
-    public function testWithRetainedUntilPreservesValueAndLogicalMetadata(): void
+    public function testWithRetainedUntilPreservesValueAndExpiration(): void
     {
-        $entry = new CacheEntry('value', 120.0, tags: ['product:1']);
+        $entry = new CacheEntry('value', new CacheMetadata(expiresAt: 120.0, tags: ['product:1']));
         $retained = $entry->withRetainedUntil(150.0);
 
         self::assertSame('value', $retained->value());
         self::assertSame(120.0, $retained->expiresAt);
         self::assertSame(150.0, $retained->retainedUntil);
-        self::assertSame(['product:1'], $retained->tags);
-    }
-
-    public function testRetentionCannotPrecedeLogicalExpiration(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        new CacheEntry('value', 120.0, retainedUntil: 119.0);
+        self::assertSame(['product:1'], $retained->metadata->tags);
     }
 }

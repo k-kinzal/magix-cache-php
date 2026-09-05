@@ -49,11 +49,12 @@ final class ClassVisitor extends NodeVisitorAbstract
 
         $name = $node->namespacedName?->toString() ?? $node->name->toString();
         $classPolicy = $this->boundaries->classPolicy($node);
+        $classDynamicTtl = $this->boundaries->classDynamicTtl($node);
         $propertyTypes = $this->propertyTypes($node);
         $boundaries = [];
 
         foreach ($node->getMethods() as $method) {
-            $boundary = $this->boundaries->read($method, $name, $this->file, $propertyTypes, $classPolicy);
+            $boundary = $this->boundaries->read($method, $name, $this->file, $propertyTypes, $classPolicy, $classDynamicTtl);
 
             if ($boundary !== null) {
                 $boundaries[] = $boundary;

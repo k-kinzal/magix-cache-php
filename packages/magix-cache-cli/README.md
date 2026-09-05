@@ -10,7 +10,7 @@ The result answers the questions that are otherwise only observable in productio
 ## Features
 
 - Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node
-- The reason behind each effective value, such as which dependency clamped a TTL or made a result private
+- The reason behind each effective value, such as which dependency capped a TTL or made a result private
 - An inventory of every boundary in a project as a table or as JSON
 - Static rules that report boundaries that throw, never store, or share a private entry between viewers
 - The exact cache key of a call, so an entry can be found in the backend
@@ -38,7 +38,7 @@ vendor/bin/magix analyze ProductPageQuery::execute
 App\Query\ProductPageQuery::execute
   src/Query/ProductPageQuery.php:34
 
-  ttl          20s (declared 120s, clamped by ProductQuery::execute)
+  ttl          20s (declared 120s, capped by ProductQuery::execute)
   visibility   private (restricted by ViewerQuery::execute)
   storable     yes
   tags         inventory, page, product, viewer
@@ -81,11 +81,11 @@ See [Commands](docs/commands.md) for every option and [Lint Rules](docs/lint-rul
 
 ## How It Works
 
-The commands never execute application code. Each PHP file below the scanned paths is parsed, and every method that calls `$this->cached()` becomes a boundary. Attributes, explicit `CachePolicy` arguments, and parameter attributes are read from the syntax tree, and calls to other boundaries are resolved through the declared types of properties, local variables, and interfaces.
+The commands never execute application code. Each PHP file below the scanned paths is parsed, and every method that calls `$this->cached()` becomes a boundary. The `#[Cache]` declaration, behavior attributes such as `#[DynamicTtl]`, and parameter attributes are read from the syntax tree, and calls to other boundaries are resolved through the declared types of properties, local variables, and interfaces.
 
-The composition rules are the ones the runtime applies: the earliest expiration wins, cacheability is combined with logical AND, the strictest visibility wins, and tags are unioned. A fixed TTL is clamped by its dependencies unless the policy sets `clamp: false`.
+The composition rules are the ones the runtime applies: the earliest expiration wins, cacheability is combined with logical AND, the strictest visibility wins, and tags are unioned. A fixed TTL is always bounded by the expiration its dependencies impose.
 
-Because the analysis is static, values that only exist at runtime are reported instead of guessed. A policy built from a variable is shown as `unresolved`, an expiration supplied by a `CacheStrategy` is shown as `supplied at runtime`, and a call that resolves to several implementations expands into all of them.
+Because the analysis is static, the effective TTL is an honest estimate rather than a guess. A lifetime is reported as a number only when it is statically determined; a boundary that is provably without expiration is `unconstrained`; anything that depends on runtime values, such as a `#[DynamicTtl]` resolver or an upstream the analyzer cannot see, is `unknown`, together with the tightest provable upper bound such as `unknown (≤30s)`; and a declaration that throws at runtime is `invalid`. A call that resolves to several implementations expands into all of them.
 
 `magix key` is the one exception: it loads the referenced class through the Composer autoloader so that `#[CacheKey]` reducers produce the same key as the runtime.
 

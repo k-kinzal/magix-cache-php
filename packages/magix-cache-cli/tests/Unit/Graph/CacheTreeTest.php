@@ -15,6 +15,8 @@ use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\CacheTree;
 use Magix\Cache\Cli\Graph\DependencyConstraint;
 use Magix\Cache\Cli\Graph\EffectCalculator;
+use Magix\Cache\Cli\Graph\TtlEstimate;
+use Magix\Cache\Cli\Graph\TtlEstimateState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +31,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DependencyConstraint::class)]
 #[UsesClass(EffectCalculator::class)]
 #[UsesClass(PolicyDeclaration::class)]
+#[UsesClass(TtlEstimate::class)]
+#[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 final class CacheTreeTest extends TestCase
 {
     public function testBuildComposesTheEffectOfEveryDependency(): void
@@ -55,7 +59,7 @@ final class CacheTreeTest extends TestCase
 
         $node = (new CacheTree($catalog))->build($page);
 
-        self::assertSame(20, $node->effect->ttl);
+        self::assertSame(20, $node->effect->ttl->seconds);
         self::assertCount(1, $node->children);
         self::assertSame('App\ProductQuery::execute', $node->children[0]->boundary->id());
     }
@@ -77,8 +81,11 @@ final class CacheTreeTest extends TestCase
         $limited = $tree->build($boundary, 0);
 
         self::assertSame(['recursive dependency, not expanded again'], $recursive->children[0]->notes);
+        self::assertSame(TtlEstimateState::Unknown, $recursive->children[0]->effect->ttl->state);
         self::assertSame([], $limited->children);
         self::assertSame(['depth limit reached, dependencies not expanded'], $limited->notes);
+        self::assertSame(TtlEstimateState::Unknown, $limited->effect->ttl->state);
+        self::assertSame(20, $limited->effect->ttl->upperBound);
     }
 
     public function testBuildNotesWhenACallHasSeveralImplementations(): void
@@ -103,6 +110,6 @@ final class CacheTreeTest extends TestCase
         $node = (new CacheTree($catalog))->build($home);
 
         self::assertSame(['App\FeedQuery::execute resolves to 2 implementations'], $node->notes);
-        self::assertSame(5, $node->effect->ttl);
+        self::assertSame(5, $node->effect->ttl->seconds);
     }
 }

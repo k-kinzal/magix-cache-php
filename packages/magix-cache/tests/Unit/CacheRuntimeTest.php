@@ -4,216 +4,321 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use Closure;
-use Magix\Cache\Cache\CacheEntry;
+use Magix\Cache\Attribute\BypassCacheErrors;
+use Magix\Cache\Attribute\DynamicTtl;
+use Magix\Cache\Attribute\StaleIfError;
+use Magix\Cache\Cache\CacheBackendFailure;
 use Magix\Cache\Cached;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\CacheRuntime;
-use Magix\Cache\Runtime\CacheEntryConverter;
-use Magix\Cache\Runtime\CacheKeyStrategy;
-use Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy;
-use Magix\Cache\Runtime\Metadata\Visibility;
-use Magix\Cache\Runtime\Operation\CacheGet;
-use Magix\Cache\Runtime\Operation\CacheOperationTerminal;
-use Magix\Cache\Runtime\Operation\CacheSet;
-use Magix\Cache\Runtime\Operation\OriginFetch;
-use Magix\Cache\Runtime\Operation\OriginFetchOutcome;
-use Magix\Cache\Runtime\Operation\OriginFetchResult;
+use Magix\Cache\Metadata\CacheMetadata;
+use Magix\Cache\Metadata\Visibility;
+use Magix\Cache\Runtime\CacheInvocation;
+use Magix\Cache\Runtime\CacheKeyContext;
+use Magix\Cache\Runtime\Extension\CacheEvent;
+use Magix\Cache\Runtime\Extension\CacheTtlResolver;
+use Magix\Cache\Runtime\Extension\DynamicTtlContext;
 use Magix\Cache\Runtime\Policy\Ttl;
-use Magix\Cache\Runtime\Strategy\CacheStrategyMiddleware;
-use Magix\Cache\Runtime\Strategy\DynamicTtlCacheStrategy;
-use Magix\Cache\Runtime\Strategy\DynamicTtlContext;
-use Magix\Cache\Runtime\Strategy\StaleIfErrorCacheStrategy;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Tests\Fixture\FailingCache;
+use Tests\Fixture\FixedTtlResolver;
 use Tests\Fixture\MemoryCache;
 use Tests\Fixture\MutableClock;
+use Tests\Fixture\RecordingObserver;
+use Tests\Fixture\UpstreamUnavailable;
 
 #[CoversClass(CacheRuntime::class)]
-#[UsesClass(CacheEntry::class)]
-#[UsesClass(CacheEntryConverter::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheMetadata::class)]
-#[UsesClass(CachePolicy::class)]
-#[UsesClass(Cached::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\ConstraintMeet::class)]
-#[UsesClass(Visibility::class)]
-#[UsesClass(CacheGet::class)]
-#[UsesClass(CacheOperationTerminal::class)]
-#[UsesClass(CacheSet::class)]
-#[UsesClass(OriginFetch::class)]
-#[UsesClass(OriginFetchOutcome::class)]
-#[UsesClass(OriginFetchResult::class)]
-#[UsesClass(CacheStrategyMiddleware::class)]
-#[UsesClass(DynamicTtlCacheStrategy::class)]
-#[UsesClass(DynamicTtlContext::class)]
-#[UsesClass(StaleIfErrorCacheStrategy::class)]
+#[UsesNamespace('Magix\Cache')]
 final class CacheRuntimeTest extends TestCase
 {
-    public function testKeyStrategyReturnsConfiguredStrategy(): void
-    {
-        $strategy = self::createStub(CacheKeyStrategy::class);
-        $runtime = new CacheRuntime(new MemoryCache(), keyStrategy: $strategy);
-
-        self::assertSame($strategy, $runtime->keyStrategy());
-        self::assertInstanceOf(HashCacheKeyStrategy::class, (new CacheRuntime(new MemoryCache()))->keyStrategy());
-    }
-
-    public function testExecuteUsesMagixCache(): void
+    public function testExecuteServesAFreshHitWithoutReExecutingTheOrigin(): void
     {
         $calls = 0;
-        $runtime = new CacheRuntime(new MemoryCache());
-        /** @var Closure(): Cached<string> $compute */
-        $compute = static function () use (&$calls): Cached {
-            ++$calls;
+        $clock = new MutableClock(100.0);
+        $runtime = new CacheRuntime(new MemoryCache(), $clock);
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', ['id' => 1], '1', 'f'),
+            policy: new CachePolicy(ttl: 20),
+            origin: static function () use (&$calls): Cached {
+                ++$calls;
 
-            return Cached::of('value');
-        };
-        $policy = new CachePolicy(ttl: 20);
+                return Cached::of('value');
+            },
+        );
 
-        $first = $runtime->execute('key', $policy, $compute);
-        $second = $runtime->execute('key', $policy, $compute);
+        $first = $runtime->execute($invocation);
+        $clock->advance(5.0);
+        $second = $runtime->execute($invocation);
 
-        self::assertEquals($first, $second);
+        self::assertSame('value', $second->value());
+        self::assertSame(120.0, $first->metadata->expiresAt);
+        self::assertSame(120.0, $second->metadata->expiresAt);
         self::assertSame(1, $calls);
     }
 
-    public function testSetCurrentInstallsRuntime(): void
+    public function testExecuteNeverExtendsAnUpstreamExpiration(): void
     {
         $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
-        CacheRuntime::setCurrent($runtime);
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: 20),
+            origin: static fn (): Cached => Cached::of(
+                'value',
+                new CacheMetadata(expiresAt: 105.0),
+            ),
+        );
 
-        self::assertSame($runtime, CacheRuntime::current());
-        CacheRuntime::setCurrent(null);
+        self::assertSame(105.0, $runtime->execute($invocation)->metadata->expiresAt);
     }
 
-    public function testCurrentReturnsInstalledRuntime(): void
-    {
-        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
-        CacheRuntime::setCurrent($runtime);
-
-        self::assertSame($runtime, CacheRuntime::current());
-        CacheRuntime::setCurrent(null);
-    }
-
-    public function testExecuteAppliesPolicyAndPreservesAbsoluteExpiration(): void
-    {
-        $now = 4_000_000_000.0;
-        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock($now));
-        $policy = new CachePolicy(ttl: 15, tags: ['explicit']);
-
-        $result = $runtime->execute('key', $policy, static fn (): Cached => Cached::of('value'));
-
-        self::assertSame('value', $result->value());
-        self::assertSame($now + 15.0, $result->metadata->expiresAt);
-        self::assertSame(['explicit'], $result->metadata->tags);
-    }
-
-    public function testExecuteDoesNotStoreNoStorePolicy(): void
+    public function testExecuteReturnsATtlZeroResultWithoutStoringIt(): void
     {
         $calls = 0;
         $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
-        $policy = new CachePolicy(ttl: 10, visibility: Visibility::NoStore);
-        /** @var Closure(): Cached<string> $compute */
-        $compute = static function () use (&$calls): Cached {
-            ++$calls;
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: 0),
+            origin: static function () use (&$calls): Cached {
+                ++$calls;
 
-            return Cached::of('value');
-        };
+                return Cached::of('value');
+            },
+        );
 
-        $first = $runtime->execute('key', $policy, $compute);
-        $second = $runtime->execute('key', $policy, $compute);
+        $runtime->execute($invocation);
+        $result = $runtime->execute($invocation);
 
+        self::assertSame('value', $result->value());
         self::assertSame(2, $calls);
-        self::assertSame(Visibility::NoStore, $first->metadata->visibility);
-        self::assertSame(Visibility::NoStore, $second->metadata->visibility);
     }
 
-    public function testExecuteServesRetainedStaleEntryWhenOriginFails(): void
+    public function testExecuteSkipsLookupAndStorageForNoStore(): void
+    {
+        $calls = 0;
+        $runtime = new CacheRuntime(new FailingCache(), new MutableClock(100.0));
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: 10, visibility: Visibility::NoStore),
+            origin: static function () use (&$calls): Cached {
+                ++$calls;
+
+                return Cached::of('value');
+            },
+        );
+
+        $runtime->execute($invocation);
+        $result = $runtime->execute($invocation);
+
+        self::assertSame(Visibility::NoStore, $result->metadata->visibility);
+        self::assertSame(2, $calls);
+    }
+
+    public function testExecuteServesAnEligibleStaleCandidateAndKeepsItExpired(): void
     {
         $clock = new MutableClock(100.0);
         $runtime = new CacheRuntime(new MemoryCache(), $clock);
+        $behavior = new StaleIfError(maxAge: 30, exceptions: [RuntimeException::class]);
+        $context = new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f');
         $policy = new CachePolicy(ttl: 10);
-        $strategy = new StaleIfErrorCacheStrategy(30);
 
-        $fresh = $runtime->execute(
-            'key',
-            $policy,
-            static fn (): Cached => Cached::of('fresh'),
-            $strategy,
-        );
+        $runtime->execute(new CacheInvocation(
+            context: $context,
+            policy: $policy,
+            origin: static fn (): Cached => Cached::of('fresh'),
+            staleIfError: $behavior,
+        ));
         $clock->advance(11.0);
-        $failure = static function () use ($clock): Cached {
-            if ($clock->time < 0.0) {
-                return Cached::of('type-witness');
-            }
+        $stale = $runtime->execute(new CacheInvocation(
+            context: $context,
+            policy: $policy,
+            origin: static fn (): Cached => throw new RuntimeException('origin failed'),
+            staleIfError: $behavior,
+        ));
 
-            throw new RuntimeException('origin failed');
-        };
-        $stale = $runtime->execute(
-            'key',
-            $policy,
-            $failure,
-            $strategy,
-        );
-
-        self::assertSame('fresh', $fresh->value());
         self::assertSame('fresh', $stale->value());
         self::assertSame(110.0, $stale->metadata->expiresAt);
+        self::assertFalse($stale->metadata->isStorable($clock->time));
     }
 
-    public function testExecuteRethrowsOriginFailureAfterStaleRetentionEnds(): void
+    public function testExecuteRethrowsUndeclaredOriginFailures(): void
     {
         $clock = new MutableClock(100.0);
         $runtime = new CacheRuntime(new MemoryCache(), $clock);
+        $behavior = new StaleIfError(maxAge: 30, exceptions: [UpstreamUnavailable::class]);
+        $context = new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f');
         $policy = new CachePolicy(ttl: 10);
-        $strategy = new StaleIfErrorCacheStrategy(30);
-        $runtime->execute('key', $policy, static fn (): Cached => Cached::of('fresh'), $strategy);
-        $clock->advance(41.0);
-        $failure = static function () use ($clock): Cached {
-            if ($clock->time < 0.0) {
-                return Cached::of('type-witness');
-            }
 
-            throw new RuntimeException('origin failed');
-        };
+        $runtime->execute(new CacheInvocation(
+            context: $context,
+            policy: $policy,
+            origin: static fn (): Cached => Cached::of('fresh'),
+            staleIfError: $behavior,
+        ));
+        $clock->advance(11.0);
 
         $this->expectException(RuntimeException::class);
 
-        $runtime->execute(
-            'key',
-            $policy,
-            $failure,
-            $strategy,
-        );
+        $runtime->execute(new CacheInvocation(
+            context: $context,
+            policy: $policy,
+            origin: static fn (): Cached => throw new RuntimeException('an undeclared failure'),
+            staleIfError: $behavior,
+        ));
     }
 
-    public function testExecuteAppliesDynamicTtlBeforeAutomaticPolicy(): void
+    public function testExecuteRethrowsOriginFailuresAfterTheRetentionEnds(): void
     {
         $clock = new MutableClock(100.0);
         $runtime = new CacheRuntime(new MemoryCache(), $clock);
-        $strategy = new DynamicTtlCacheStrategy(static fn (DynamicTtlContext $context): int => match (
-            $context->result->value()
-        ) {
-            'short' => 5,
-            default => 30,
-        });
-        $calls = 0;
-        $compute = static function () use (&$calls): Cached {
-            ++$calls;
+        $behavior = new StaleIfError(maxAge: 30, exceptions: [RuntimeException::class]);
+        $context = new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f');
+        $policy = new CachePolicy(ttl: 10);
 
-            return Cached::of('short');
+        $runtime->execute(new CacheInvocation(
+            context: $context,
+            policy: $policy,
+            origin: static fn (): Cached => Cached::of('fresh'),
+            staleIfError: $behavior,
+        ));
+        $clock->advance(41.0);
+
+        $this->expectException(RuntimeException::class);
+
+        $runtime->execute(new CacheInvocation(
+            context: $context,
+            policy: $policy,
+            origin: static fn (): Cached => throw new RuntimeException('origin failed'),
+            staleIfError: $behavior,
+        ));
+    }
+
+    public function testExecuteDoesNotHideAResolverFailureBehindStale(): void
+    {
+        $clock = new MutableClock(100.0);
+        $resolver = new class () implements CacheTtlResolver {
+            /**
+             * @throws RuntimeException always, to prove stale cannot hide it
+             */
+            #[Override]
+            public function resolve(DynamicTtlContext $context): int
+            {
+                unset($context);
+
+                throw new RuntimeException('resolver failed');
+            }
         };
+        $runtime = new CacheRuntime(new MemoryCache(), $clock, ttlResolvers: [$resolver]);
+        $behavior = new StaleIfError(maxAge: 30, exceptions: [RuntimeException::class]);
+        $context = new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f');
 
-        $first = $runtime->execute('key', new CachePolicy(ttl: Ttl::Auto), $compute, $strategy);
+        $runtime->execute(new CacheInvocation(
+            context: $context,
+            policy: new CachePolicy(ttl: 10),
+            origin: static fn (): Cached => Cached::of('fresh'),
+            staleIfError: $behavior,
+        ));
+        $clock->advance(11.0);
+
+        $this->expectException(RuntimeException::class);
+
+        $runtime->execute(new CacheInvocation(
+            context: $context,
+            policy: new CachePolicy(ttl: 10),
+            origin: static fn (): Cached => Cached::of('recomputed'),
+            staleIfError: $behavior,
+            dynamicTtl: new DynamicTtl(resolver: $resolver::class),
+        ));
+    }
+
+    public function testExecuteBypassesOnlyClassifiedBackendFailures(): void
+    {
+        $observer = new RecordingObserver();
+        $runtime = new CacheRuntime(new FailingCache(), new MutableClock(100.0), observer: $observer);
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: 10),
+            origin: static fn (): Cached => Cached::of('value'),
+            bypassCacheErrors: new BypassCacheErrors(),
+        );
+
+        $result = $runtime->execute($invocation);
+
+        self::assertSame('value', $result->value());
+        self::assertSame(
+            [CacheEvent::BackendBypassed, CacheEvent::Miss, CacheEvent::BackendBypassed],
+            $observer->events,
+        );
+    }
+
+    public function testExecutePropagatesBackendFailuresWithoutTheBypassBehavior(): void
+    {
+        $runtime = new CacheRuntime(new FailingCache(), new MutableClock(100.0));
+
+        $this->expectException(CacheBackendFailure::class);
+
+        $runtime->execute(new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: 10),
+            origin: static fn (): Cached => Cached::of('value'),
+        ));
+    }
+
+    public function testExecuteNeverClassifiesAnOriginFailureAsABackendFailure(): void
+    {
+        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
+
+        $this->expectException(CacheBackendFailure::class);
+
+        $runtime->execute(new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: 10),
+            origin: static fn (): Cached => throw new CacheBackendFailure('raised by the origin'),
+            bypassCacheErrors: new BypassCacheErrors(),
+        ));
+    }
+
+    public function testExecuteAppliesDynamicTtlBeforeTheAutomaticPolicy(): void
+    {
+        $calls = 0;
+        $clock = new MutableClock(100.0);
+        $runtime = new CacheRuntime(new MemoryCache(), $clock, ttlResolvers: [new FixedTtlResolver(5)]);
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: Ttl::Auto),
+            origin: static function () use (&$calls): Cached {
+                ++$calls;
+
+                return Cached::of('short');
+            },
+            dynamicTtl: new DynamicTtl(resolver: FixedTtlResolver::class),
+        );
+
+        $first = $runtime->execute($invocation);
         $clock->advance(4.0);
-        $second = $runtime->execute('key', new CachePolicy(ttl: Ttl::Auto), $compute, $strategy);
+        $second = $runtime->execute($invocation);
 
         self::assertSame(105.0, $first->metadata->expiresAt);
         self::assertSame('short', $second->value());
         self::assertSame(1, $calls);
     }
 
+    public function testExecuteReportsTheFixedStageEventsInOrder(): void
+    {
+        $observer = new RecordingObserver();
+        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0), observer: $observer);
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: 20),
+            origin: static fn (): Cached => Cached::of('value'),
+        );
+
+        $runtime->execute($invocation);
+        $runtime->execute($invocation);
+
+        self::assertSame([CacheEvent::Miss, CacheEvent::Stored, CacheEvent::FreshHit], $observer->events);
+    }
 }

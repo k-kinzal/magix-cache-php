@@ -1,7 +1,9 @@
 /vendor/
+/build/
 /.phpunit.cache/
 /.php-cs-fixer.cache
 /.deptrac.cache
 /.phpstan.cache/
 /.idea/
+/.claude/skills/
 /.DS_Store

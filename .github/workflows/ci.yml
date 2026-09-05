@@ -82,5 +82,8 @@ jobs:
       - name: Check source metrics
         run: composer loc-guard
 
+      - name: Check directory and file structure
+        run: composer tree-guard
+
       - name: Check architecture dependencies
         run: composer deptrac

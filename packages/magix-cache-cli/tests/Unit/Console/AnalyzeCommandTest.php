@@ -9,12 +9,15 @@ use Magix\Cache\Cli\Console\Application;
 use Magix\Cache\Cli\Console\CatalogLoader;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[CoversClass(AnalyzeCommand::class)]
 #[UsesNamespace('Magix\Cache\Cli')]
+#[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
+#[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 final class AnalyzeCommandTest extends TestCase
 {
     public function testAnalyzeRendersTheComposedTreeOfABoundary(): void
@@ -28,7 +31,7 @@ final class AnalyzeCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         self::assertStringContainsString('ProductPageQuery::execute', $tester->getDisplay());
-        self::assertStringContainsString('20s (declared 120s, clamped by ProductQuery::execute)', $tester->getDisplay());
+        self::assertStringContainsString('20s (declared 120s, capped by ProductQuery::execute)', $tester->getDisplay());
         self::assertStringContainsString('private (restricted by ViewerQuery::execute)', $tester->getDisplay());
         self::assertStringContainsString('$productId, $viewerId (ignored: $trace)', $tester->getDisplay());
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());

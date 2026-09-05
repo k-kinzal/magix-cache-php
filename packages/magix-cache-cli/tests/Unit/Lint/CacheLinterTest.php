@@ -17,7 +17,6 @@ use Magix\Cache\Cli\Graph\EffectCalculator;
 use Magix\Cache\Cli\Lint\CacheLinter;
 use Magix\Cache\Cli\Lint\Diagnostic;
 use Magix\Cache\Cli\Lint\Rule\AutoTtlWithoutUpstreamRule;
-use Magix\Cache\Cli\Lint\Rule\ClampedTtlRule;
 use Magix\Cache\Cli\Lint\Rule\MissingPolicyRule;
 use Magix\Cache\Cli\Lint\Rule\ScopedIgnoreConflictRule;
 use Magix\Cache\Cli\Lint\Rule\UnscopedPrivateKeyRule;
@@ -33,7 +32,6 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CacheNode::class)]
 #[UsesClass(CacheTree::class)]
 #[UsesClass(Catalog::class)]
-#[UsesClass(ClampedTtlRule::class)]
 #[UsesClass(ClassDeclaration::class)]
 #[UsesClass(DependencyConstraint::class)]
 #[UsesClass(Diagnostic::class)]
@@ -43,6 +41,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ScopedIgnoreConflictRule::class)]
 #[UsesClass(UnscopedPrivateKeyRule::class)]
 #[UsesClass(UnstableKeyArgumentRule::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlEstimate::class)]
+#[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 final class CacheLinterTest extends TestCase
 {
     public function testInspectAppliesEveryRuleToEveryBoundary(): void
@@ -76,6 +76,6 @@ final class CacheLinterTest extends TestCase
             ]),
         ]);
 
-        self::assertSame([], (new CacheLinter([new ClampedTtlRule()]))->inspect($catalog));
+        self::assertSame([], (new CacheLinter([new UnstableKeyArgumentRule()]))->inspect($catalog));
     }
 }

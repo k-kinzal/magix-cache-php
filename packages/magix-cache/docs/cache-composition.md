@@ -6,7 +6,50 @@ This guide explains how `Cached<T>` propagates cache constraints through multi-s
 
 A query result is only as cacheable as the data used to build it. If a page combines a product that expires in 20 seconds with inventory that expires in 60 seconds, caching the page for 60 seconds would allow stale product data to survive too long.
 
-MagixCache keeps the value and its constraints together in `Cached<T>`. Composition merges those constraints conservatively, so a parent result cannot become less restricted than a dependency.
+MagixCache keeps the value and its constraints together in `Cached<T>`. Composition merges those constraints with a fixed meet law, so a parent result cannot become less restricted than a dependency.
+
+## Transform One Value
+
+`map()` transforms the value in place and keeps this value's metadata:
+
+```php
+/** @var Cached<Product> $product */
+$product = $productQuery->execute($productId);
+
+/** @var Cached<string> $name */
+$name = $product->map(static fn (Product $product): string => $product->name);
+```
+
+The transform result is treated as a plain value: a `Cached` returned from it is not flattened. Use `flatMap()` when the transform obtains a new dependency:
+
+```php
+/** @var Cached<ProductPage> $page */
+$page = $productQuery->execute($productId)->flatMap(
+    fn (Product $product): Cached => $this->inventory
+        ->execute($product->id)
+        ->map(
+            static fn (Inventory $inventory): ProductPage =>
+                new ProductPage($product, $inventory),
+        ),
+);
+```
+
+`flatMap()` meets the metadata of both values, so the inventory constraints survive into the page.
+
+> [!WARNING]
+> `value()` detaches a value from its constraints. Calling another cached query inside `map()` and using only its `value()` silently drops that query's constraints:
+>
+> ```php
+> // WRONG: the inventory expiration, visibility, and tags are lost.
+> $page = $productQuery->execute($productId)->map(
+>     fn (Product $product): ProductPage => new ProductPage(
+>         $product,
+>         $this->inventory->execute($product->id)->value(),
+>     ),
+> );
+> ```
+>
+> A dependency obtained inside `map()` must be chained with `flatMap()` or `combineN()` instead.
 
 ## Combine Two Values
 
@@ -28,7 +71,7 @@ $page = $product
     );
 ```
 
-The mapping closure receives the unwrapped values. Its return value is wrapped in a new `Cached` carrying the merged metadata.
+The mapping closure receives the unwrapped values. Its return value is wrapped in a new `Cached` carrying the met metadata of every input.
 
 ## Combine Three to Five Values
 
@@ -54,17 +97,19 @@ Use `combine4()` and `combine5()` for four and five values respectively. Each me
 
 For more than five inputs, compose intermediate domain values and combine those results in another step. The constraints remain monotone at each step.
 
-## Merge Rules
+## The Meet Law
 
-Composition applies these rules:
+`CacheMetadata::meet()` is the only way to add constraints to existing metadata, and it is a fixed law:
 
-| Constraint | Merge rule |
+| Constraint | Meet rule |
 |---|---|
 | Expiration | Earliest finite absolute expiration; `null` is unconstrained |
 | Cacheability | Logical AND |
-| Visibility | Most restrictive: `Shared < Private < NoStore` |
+| Visibility | Stricter of the two: `Shared < Private < NoStore` |
 | Tags | Deduplicated, sorted union |
 | Reasons | Deduplicated, sorted union |
+
+`CacheMetadata::top()` — no declared constraints — is the identity element: meeting with it changes nothing. Every composition is as strict as or stricter than each input.
 
 For example:
 
@@ -97,14 +142,14 @@ public function execute(int $productId): Cached
 }
 ```
 
-`Ttl::Auto` retains the composed expiration. A fixed parent TTL with the default `clamp: true` chooses the earlier of its own expiration and the composed expiration.
+`Ttl::Auto` retains the composed expiration. A fixed parent TTL is met with the composed metadata, so the earlier of its own expiration and the composed expiration always wins — a parent can never extend what a dependency imposed.
 
 ## Create Source Metadata
 
 Most dependencies receive metadata when their own cache boundary applies a policy. A source can also attach constraints directly:
 
 ```php
-use Magix\Cache\Runtime\Metadata\CacheMetadata;
+use Magix\Cache\Metadata\CacheMetadata;
 
 $result = Cached::of(
     $response->value,
@@ -133,7 +178,7 @@ $result = Cached::of(
 );
 ```
 
-`CacheMetadata` is immutable. Its `merge()`, `withExpiresAt()`, `withTags()`, and `withVisibility()` methods return new instances.
+`CacheMetadata` is immutable and composes only through `meet()`; there are no setters that could relax a constraint.
 
 ## Access Wrapped Values
 
@@ -151,7 +196,7 @@ For convenience, `Cached` forwards:
 - Callable public object methods
 - String conversion for strings and `Stringable` objects
 
-These forwarded operations return ordinary PHP values. Use `combineN()->map()` when producing a new cached result, so the dependency metadata is not lost.
+These forwarded operations return ordinary PHP values that no longer carry constraints, so they are for final observation only. Use `map()`, `flatMap()`, or `combineN()->map()` when producing a new cached result, so the dependency metadata is not lost.
 
 ## Use Metadata at the Response Boundary
 

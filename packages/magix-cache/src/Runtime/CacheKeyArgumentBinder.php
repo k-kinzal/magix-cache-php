@@ -11,7 +11,9 @@ use InvalidArgumentException;
 
 use function is_int;
 
+use LogicException;
 use Magix\Cache\Attribute\CacheIgnore;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -31,6 +33,8 @@ final readonly class CacheKeyArgumentBinder
     /**
      * @param array<array-key, mixed> $arguments
      * @return array<string, mixed>
+     * @throws InvalidArgumentException when the arguments do not match the declared parameters
+     * @throws LogicException when a declared default value cannot be read
      */
     public function bind(ReflectionMethod $method, array $arguments): array
     {
@@ -58,7 +62,11 @@ final readonly class CacheKeyArgumentBinder
                 $value = $arguments[$position];
                 ++$position;
             } elseif ($parameter->isDefaultValueAvailable()) {
-                $value = $parameter->getDefaultValue();
+                try {
+                    $value = $parameter->getDefaultValue();
+                } catch (ReflectionException $unavailable) {
+                    throw new LogicException('The declared default of $'.$parameter->getName().' cannot be read.', previous: $unavailable);
+                }
             } else {
                 throw new InvalidArgumentException('Cannot bind cache-key argument $'.$parameter->getName().'.');
             }

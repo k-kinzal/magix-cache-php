@@ -20,6 +20,8 @@ final readonly class CacheKeyReducer
 {
     /**
      * Applies the parameter's reducer or returns the original value.
+     *
+     * @throws InvalidArgumentException when the declared reducer is not callable
      */
     public function reduce(ReflectionParameter $parameter, mixed $value): mixed
     {

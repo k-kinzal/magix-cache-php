@@ -72,7 +72,7 @@ With this declaration:
 
 At judgement time `s`, a retained entry is eligible only while `expiresAt <= s` and `s < min(retainedUntil, expiresAt + maxAge)`. An entry exactly at its retention or age limit is rejected.
 
-The exception list is the whole contract. An empty list and a blanket `Throwable::class` are both rejected when the behavior is enabled, and a PHP `Error` never triggers the fallback implicitly. A failure that matches no declared type propagates unchanged — the caller still catches the exact exception its origin raised.
+The exception list is the whole contract, and it only accepts declared behavior: every declared type must be a `RuntimeException` subtype, and an empty list is rejected when the behavior is enabled. Bugs — the `LogicException` family and PHP `Error`s — are never `RuntimeException`, so they can never be answered with stale data. When an origin meets an expected outage in a foreign exception hierarchy (an HTTP client failure, a database driver exception), it translates that failure into its own declared type, the way `UpstreamUnavailable extends RuntimeException` does above. A failure that matches no declared type propagates unchanged — the caller still catches the exact exception its origin raised.
 
 A served stale value keeps its expired expiration. A parent that composes it inherits the expired constraint through the metadata meet, so the parent cannot re-store the result as fresh. Extending retention never changes the expiration itself; see [Storage Adapters](storage-adapters.md#logical-expiration-and-physical-retention).
 
@@ -164,7 +164,7 @@ For classified failures:
 
 Origin failures and definition errors are never classified; they always propagate.
 
-Without an explicit classifier the runtime uses `DefaultBackendErrorClassifier`, which accepts `CacheBackendFailure` — the failure the bundled PSR adapters raise — and the PSR-6 and PSR-16 `CacheException` interfaces. A `Cache` implementation may come from anywhere and report failures its own way; classify those by implementing `BackendErrorClassifier`:
+The `Cache` port declares its failures as `CacheBackendFailure`, a `RuntimeException`, so the bypass only ever judges the `RuntimeException` family; a backend that throws outside it violates the port contract and propagates as a bug. Without an explicit classifier the runtime uses `DefaultBackendErrorClassifier`, which accepts `CacheBackendFailure` — the failure the bundled PSR adapters raise — and the PSR-6 and PSR-16 `CacheException` interfaces. A hand-written `Cache` implementation that reports failures with its own `RuntimeException` subtypes classifies them by implementing `BackendErrorClassifier`:
 
 ```php
 <?php
@@ -172,12 +172,12 @@ Without an explicit classifier the runtime uses `DefaultBackendErrorClassifier`,
 use Magix\Cache\Runtime\Extension\BackendErrorClassifier;
 use Magix\Cache\Runtime\Extension\CacheAccess;
 use Override;
-use Throwable;
+use RuntimeException;
 
 final readonly class RedisFailureClassifier implements BackendErrorClassifier
 {
     #[Override]
-    public function isBackendFailure(Throwable $error, CacheAccess $access): bool
+    public function isBackendFailure(RuntimeException $error, CacheAccess $access): bool
     {
         return $error instanceof RedisClusterUnavailable;
     }

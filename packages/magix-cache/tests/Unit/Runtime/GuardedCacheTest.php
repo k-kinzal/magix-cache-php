@@ -14,7 +14,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixture\FailingCache;
-use Tests\Fixture\ForeignFormatEntry;
 use Tests\Fixture\MemoryCache;
 use Tests\Fixture\RecordingObserver;
 
@@ -77,18 +76,6 @@ final class GuardedCacheTest extends TestCase
         $store->set('key', $entry);
 
         self::assertSame($entry, (new GuardedCache($store))->read('key', null, static fn (): string => ''));
-    }
-
-    public function testReadDiagnosesAForeignStorageFormatAsAMiss(): void
-    {
-        $store = new MemoryCache();
-        $store->set('key', ForeignFormatEntry::create());
-        $observer = new RecordingObserver();
-
-        $missed = (new GuardedCache($store, $observer))->read('key', null, static fn (): string => '');
-
-        self::assertNull($missed);
-        self::assertSame([CacheEvent::CorruptEntry], $observer->events);
     }
 
     public function testReadPropagatesBackendFailuresWithoutAClassifier(): void

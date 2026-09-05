@@ -28,17 +28,6 @@ parameters:
             # which this adapter turns into the concrete type its key contract
             # declares. An Error still escapes: that is the caller's bug.
             - '*/packages/magix-cache/src/Runtime/KeyStrategy/HashCacheKeyStrategy.php'
-            # The origin closure is caller code and a Cache implementation may
-            # be third party: a PSR-18 client, Doctrine DBAL, or a JsonException
-            # all sit outside the RuntimeException family, and a backend is not
-            # obliged to report failures as CacheBackendFailure. The runtime
-            # filters each catch through the declared exception types or a
-            # replaceable classifier and rethrows everything else unchanged.
-            - '*/packages/magix-cache/src/CacheRuntime.php'
-            - '*/packages/magix-cache/src/Runtime/GuardedCache.php'
-            # serialize() reports a value it refuses with a bare \Exception;
-            # the fixture turns that refusal into the LogicException it is.
-            - '*/packages/magix-cache/tests/Fixture/ForeignFormatEntry.php'
         restrictedTestNamespacePrefixes:
             - 'Tests\Unit'
             - 'Tests\Integration'
@@ -48,18 +37,3 @@ parameters:
     paths:
         - packages
     tmpDir: .phpstan.cache
-    ignoreErrors:
-        # A pass-through boundary rethrows the caller's own exception unchanged;
-        # that is its specification, because wrapping would take away the type
-        # the caller wants to catch. The only honest tag for that is
-        # "@throws \Throwable", so customRules.genericThrowsTag cannot hold
-        # here. The catch itself stays declared in broadCatchAllowedPaths.
-        -
-            identifier: customRules.genericThrowsTag
-            path: packages/magix-cache/src/CacheRuntime.php
-        -
-            identifier: customRules.genericThrowsTag
-            path: packages/magix-cache/src/Runtime/GuardedCache.php
-        -
-            identifier: customRules.genericThrowsTag
-            path: packages/magix-cache/src/Cacheable.php

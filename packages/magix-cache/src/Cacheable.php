@@ -12,10 +12,9 @@ use LogicException;
 use Magix\Cache\Runtime\CacheDefinitionResolver;
 use Magix\Cache\Runtime\CacheInvocation;
 use Magix\Cache\Runtime\CacheRuntimeRegistry;
+use RuntimeException;
 
 use function str_contains;
-
-use Throwable;
 
 /**
  * Adds a declarative cache boundary around one method.
@@ -36,7 +35,7 @@ trait Cacheable
      * @param Closure(): Cached<T> $compute
      * @return Cached<T>
      * @throws LogicException when the calling boundary cannot be identified or declares no #[Cache]
-     * @throws Throwable when the origin computation fails without an eligible stale fallback
+     * @throws RuntimeException when the origin computation fails without an eligible stale fallback
      */
     final protected function cached(Closure $compute): Cached
     {

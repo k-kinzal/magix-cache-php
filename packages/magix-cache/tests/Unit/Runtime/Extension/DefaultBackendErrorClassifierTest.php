@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Runtime\Extension;
 
-use Exception;
 use Magix\Cache\Cache\CacheBackendFailure;
 use Magix\Cache\Runtime\Extension\CacheAccess;
 use Magix\Cache\Runtime\Extension\DefaultBackendErrorClassifier;
@@ -19,7 +18,7 @@ final class DefaultBackendErrorClassifierTest extends TestCase
     public function testIsBackendFailureAcceptsDeclaredBackendFailures(): void
     {
         $classifier = new DefaultBackendErrorClassifier();
-        $psr16 = new class () extends Exception implements Psr16CacheException {
+        $psr16 = new class () extends RuntimeException implements Psr16CacheException {
         };
 
         self::assertTrue($classifier->isBackendFailure(new CacheBackendFailure('down'), CacheAccess::Read));

@@ -11,17 +11,19 @@ use Magix\Cache\Runtime\Extension\BackendErrorClassifier;
 use Magix\Cache\Runtime\Extension\CacheAccess;
 use Magix\Cache\Runtime\Extension\CacheEvent;
 use Magix\Cache\Runtime\Extension\CacheObserver;
-use Throwable;
+use RuntimeException;
 
 /**
  * Reads and writes storage, bypassing only classified backend failures.
  *
- * A Cache implementation is caller-supplied code, so its failures can arrive
- * in any exception hierarchy. Each catch hands the failure to the classifier
- * the boundary declared and rethrows everything the classifier does not
- * accept; without a classifier every failure propagates unchanged. Entries
- * written under a different storage format are diagnosed as misses, never
- * served as hits.
+ * The Cache port declares its failures as CacheBackendFailure, so a storage
+ * fault always arrives in the RuntimeException family. Each catch takes only
+ * that family and hands the failure to the classifier the boundary declared,
+ * rethrowing everything the classifier does not accept; without a classifier
+ * every failure propagates unchanged. A backend that reports outside the
+ * declared family violates the port contract and propagates as the bug it is.
+ * Entries written under a different storage format are diagnosed as misses,
+ * never served as hits.
  *
  * @internal
  */
@@ -46,7 +48,7 @@ final readonly class GuardedCache
      * @template T
      * @param Closure(): T $typeWitness
      * @return array{CacheEntry<T>|null, CacheEntry<T>|null} Fresh entry and stale candidate.
-     * @throws Throwable when the read fails and no classifier accepts the failure
+     * @throws RuntimeException when the read fails and no classifier accepts the failure
      */
     public function lookup(string $key, ?BackendErrorClassifier $classifier, Closure $typeWitness, float $now): array
     {
@@ -74,13 +76,13 @@ final readonly class GuardedCache
      * @template T
      * @param Closure(): T $typeWitness
      * @return CacheEntry<T>|null
-     * @throws Throwable when the read fails and no classifier accepts the failure
+     * @throws RuntimeException when the read fails and no classifier accepts the failure
      */
     public function read(string $key, ?BackendErrorClassifier $classifier, Closure $typeWitness): ?CacheEntry
     {
         try {
             $entry = $this->cache->get($key, $typeWitness);
-        } catch (Throwable $error) {
+        } catch (RuntimeException $error) {
             if ($classifier?->isBackendFailure($error, CacheAccess::Read) !== true) {
                 throw $error;
             }
@@ -104,13 +106,13 @@ final readonly class GuardedCache
      *
      * @template T
      * @param CacheEntry<T> $entry
-     * @throws Throwable when the write fails and no classifier accepts the failure
+     * @throws RuntimeException when the write fails and no classifier accepts the failure
      */
     public function write(string $key, CacheEntry $entry, ?BackendErrorClassifier $classifier): void
     {
         try {
             $this->cache->set($key, $entry);
-        } catch (Throwable $error) {
+        } catch (RuntimeException $error) {
             if ($classifier?->isBackendFailure($error, CacheAccess::Write) !== true) {
                 throw $error;
             }

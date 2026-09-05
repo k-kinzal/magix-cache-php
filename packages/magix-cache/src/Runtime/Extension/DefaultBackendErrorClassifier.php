@@ -8,15 +8,15 @@ use Magix\Cache\Cache\CacheBackendFailure;
 use Override;
 use Psr\Cache\CacheException as Psr6CacheException;
 use Psr\SimpleCache\CacheException as Psr16CacheException;
-use Throwable;
+use RuntimeException;
 
 /**
  * Accepts the failures the bundled adapters and the PSR interfaces declare.
  *
- * A Cache implementation may come from anywhere and is under no obligation to
- * report failures as CacheBackendFailure, so the decision cannot be made by a
- * catch type alone. The bundled adapters raise CacheBackendFailure; a backend
- * used directly still reports through the PSR cache exception interfaces.
+ * The Cache port declares CacheBackendFailure, which is what the bundled
+ * adapters raise. A hand-written adapter may report through the PSR cache
+ * exception interfaces instead; those are accepted when they arrive in the
+ * declared RuntimeException family.
  */
 final readonly class DefaultBackendErrorClassifier implements BackendErrorClassifier
 {
@@ -24,7 +24,7 @@ final readonly class DefaultBackendErrorClassifier implements BackendErrorClassi
      * Reports whether the failure is a declared cache backend fault.
      */
     #[Override]
-    public function isBackendFailure(Throwable $error, CacheAccess $access): bool
+    public function isBackendFailure(RuntimeException $error, CacheAccess $access): bool
     {
         unset($access);
 

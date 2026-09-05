@@ -20,7 +20,7 @@ use Magix\Cache\Runtime\OriginConstraints;
 use Magix\Cache\Runtime\StaleReuse;
 use Magix\Cache\Runtime\UnixClock;
 use Psr\Clock\ClockInterface;
-use Throwable;
+use RuntimeException;
 
 /**
  * Executes cache boundaries through a fixed sequence of stages.
@@ -28,7 +28,9 @@ use Throwable;
  * The order never depends on how attributes are written: lookup, fresh-hit
  * judgement, origin execution, constraint application at one base time, and a
  * re-judged store. Only the origin call sits inside the stale-if-error capture
- * range, and only cache reads and writes sit inside the backend bypass range.
+ * range, and the capture takes only the RuntimeException family — failures the
+ * origin declares as behavior. Bugs from the origin propagate untouched, and
+ * only cache reads and writes sit inside the backend bypass range.
  */
 final readonly class CacheRuntime
 {
@@ -59,7 +61,7 @@ final readonly class CacheRuntime
      * @template T
      * @param CacheInvocation<T> $invocation
      * @return Cached<T>
-     * @throws Throwable when the origin fails without an eligible stale fallback
+     * @throws RuntimeException when the origin fails without an eligible stale fallback
      * @throws LogicException when a referenced extension is not registered or a derived lifetime cannot be derived
      */
     public function execute(CacheInvocation $invocation): Cached
@@ -85,7 +87,7 @@ final readonly class CacheRuntime
 
         try {
             $result = ($invocation->origin)();
-        } catch (Throwable $error) {
+        } catch (RuntimeException $error) {
             $served = $reuse->candidate($invocation->staleIfError, $stale, $error, $clock->now());
 
             if ($served === null) {

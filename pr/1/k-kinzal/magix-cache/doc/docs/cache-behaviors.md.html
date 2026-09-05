@@ -85,7 +85,7 @@
 </div><div class="doc-block" data-diff="added"><p>With this declaration:</p>
 </div><div class="doc-block" data-diff="added"><ol><li>A successful result is fresh for 30 seconds (<code>expiresAt</code>).</li><li>Storage physically retains it for another 300 seconds (<code>retainedUntil = expiresAt + maxAge</code>).</li><li>After expiration, the boundary tries the origin normally.</li><li>When the origin fails with a declared exception type, the retained entry stands in.</li><li>Outside the stale window, the origin exception propagates unchanged.</li></ol>
 </div><div class="doc-block" data-diff="added"><p>At judgement time <code>s</code>, a retained entry is eligible only while <code>expiresAt &lt;= s</code> and <code>s &lt; min(retainedUntil, expiresAt + maxAge)</code>. An entry exactly at its retention or age limit is rejected.</p>
-</div><div class="doc-block" data-diff="added"><p>The exception list is the whole contract. An empty list and a blanket <code>Throwable::class</code> are both rejected when the behavior is enabled, and a PHP <code>Error</code> never triggers the fallback implicitly. A failure that matches no declared type propagates unchanged — the caller still catches the exact exception its origin raised.</p>
+</div><div class="doc-block" data-diff="added"><p>The exception list is the whole contract, and it only accepts declared behavior: every declared type must be a <code>RuntimeException</code> subtype, and an empty list is rejected when the behavior is enabled. Bugs — the <code>LogicException</code> family and PHP <code>Error</code>s — are never <code>RuntimeException</code>, so they can never be answered with stale data. When an origin meets an expected outage in a foreign exception hierarchy (an HTTP client failure, a database driver exception), it translates that failure into its own declared type, the way <code>UpstreamUnavailable extends RuntimeException</code> does above. A failure that matches no declared type propagates unchanged — the caller still catches the exact exception its origin raised.</p>
 </div><div class="doc-block" data-diff="added"><p>A served stale value keeps its expired expiration. A parent that composes it inherits the expired constraint through the metadata meet, so the parent cannot re-store the result as fresh. Extending retention never changes the expiration itself; see <a href="../../../../k-kinzal/magix-cache/doc/docs/storage-adapters.md.html#logical-expiration-and-physical-retention">Storage Adapters</a>.</p>
 </div><div class="doc-block" data-diff="added"><p><code>maxAge</code> must be zero or greater. Only the origin call is inside the capture range: a failure while reading or writing the cache never produces a stale fallback.</p>
 </div><div class="doc-block" data-diff="added"><h3>Dynamic TTL</h3>
@@ -144,18 +144,18 @@
 </div><div class="doc-block" data-diff="added"><p>For classified failures:</p>
 </div><div class="doc-block" data-diff="added"><ul><li>A cache read failure becomes a miss, so the origin runs.</li><li>A cache write failure becomes a skipped write, so the origin result is still returned.</li></ul>
 </div><div class="doc-block" data-diff="added"><p>Origin failures and definition errors are never classified; they always propagate.</p>
-</div><div class="doc-block" data-diff="added"><p>Without an explicit classifier the runtime uses <code>DefaultBackendErrorClassifier</code>, which accepts <code>CacheBackendFailure</code> — the failure the bundled PSR adapters raise — and the PSR-6 and PSR-16 <code>CacheException</code> interfaces. A <code>Cache</code> implementation may come from anywhere and report failures its own way; classify those by implementing <code>BackendErrorClassifier</code>:</p>
+</div><div class="doc-block" data-diff="added"><p>The <code>Cache</code> port declares its failures as <code>CacheBackendFailure</code>, a <code>RuntimeException</code>, so the bypass only ever judges the <code>RuntimeException</code> family; a backend that throws outside it violates the port contract and propagates as a bug. Without an explicit classifier the runtime uses <code>DefaultBackendErrorClassifier</code>, which accepts <code>CacheBackendFailure</code> — the failure the bundled PSR adapters raise — and the PSR-6 and PSR-16 <code>CacheException</code> interfaces. A hand-written <code>Cache</code> implementation that reports failures with its own <code>RuntimeException</code> subtypes classifies them by implementing <code>BackendErrorClassifier</code>:</p>
 </div><div class="doc-block" data-diff="added"><pre class="code-block"><code>&lt;?<span class="tok-id">php</span>
 
 <span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\BackendErrorClassifier</span>;
 <span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\CacheAccess</span>;
 <span class="tok-kw">use</span> <span class="tok-id">Override</span>;
-<span class="tok-kw">use</span> <span class="tok-id">Throwable</span>;
+<span class="tok-kw">use</span> <span class="tok-id">RuntimeException</span>;
 
 <span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">RedisFailureClassifier</span> <span class="tok-kw">implements</span> <span class="tok-id">BackendErrorClassifier</span>
 {
     #[<span class="tok-id">Override</span>]
-    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">isBackendFailure</span>(<span class="tok-id">Throwable</span> <span class="tok-var">$error</span>, <span class="tok-id">CacheAccess</span> <span class="tok-var">$access</span>): <span class="tok-id">bool</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">isBackendFailure</span>(<span class="tok-id">RuntimeException</span> <span class="tok-var">$error</span>, <span class="tok-id">CacheAccess</span> <span class="tok-var">$access</span>): <span class="tok-id">bool</span>
     {
         <span class="tok-kw">return</span> <span class="tok-var">$error</span> <span class="tok-kw">instanceof</span> <span class="tok-id">RedisClusterUnavailable</span>;
     }

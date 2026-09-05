@@ -46,15 +46,15 @@
 <span class="src-line" id="L8" data-diff="added"><a class="ln" href="#L8">8</a><span class="tok-kw">use</span> <span class="tok-id">Override</span>;</span>
 <span class="src-line" id="L9" data-diff="added"><a class="ln" href="#L9">9</a><span class="tok-kw">use</span> <span class="tok-id">Psr\Cache\CacheException</span> <span class="tok-kw">as</span> <span class="tok-id">Psr6CacheException</span>;</span>
 <span class="src-line" id="L10" data-diff="added"><a class="ln" href="#L10">10</a><span class="tok-kw">use</span> <span class="tok-id">Psr\SimpleCache\CacheException</span> <span class="tok-kw">as</span> <span class="tok-id">Psr16CacheException</span>;</span>
-<span class="src-line" id="L11" data-diff="added"><a class="ln" href="#L11">11</a><span class="tok-kw">use</span> <span class="tok-id">Throwable</span>;</span>
+<span class="src-line" id="L11" data-diff="added"><a class="ln" href="#L11">11</a><span class="tok-kw">use</span> <span class="tok-id">RuntimeException</span>;</span>
 <span class="src-line" id="L12" data-diff="added"><a class="ln" href="#L12">12</a></span>
 <span class="src-line" id="L13" data-diff="added"><a class="ln" href="#L13">13</a><span class="tok-com">/**</span></span>
 <span class="src-line" id="L14" data-diff="added"><a class="ln" href="#L14">14</a><span class="tok-com"> * Accepts the failures the bundled adapters and the PSR interfaces declare.</span></span>
 <span class="src-line" id="L15" data-diff="added"><a class="ln" href="#L15">15</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L16" data-diff="added"><a class="ln" href="#L16">16</a><span class="tok-com"> * A Cache implementation may come from anywhere and is under no obligation to</span></span>
-<span class="src-line" id="L17" data-diff="added"><a class="ln" href="#L17">17</a><span class="tok-com"> * report failures as CacheBackendFailure, so the decision cannot be made by a</span></span>
-<span class="src-line" id="L18" data-diff="added"><a class="ln" href="#L18">18</a><span class="tok-com"> * catch type alone. The bundled adapters raise CacheBackendFailure; a backend</span></span>
-<span class="src-line" id="L19" data-diff="added"><a class="ln" href="#L19">19</a><span class="tok-com"> * used directly still reports through the PSR cache exception interfaces.</span></span>
+<span class="src-line" id="L16" data-diff="added"><a class="ln" href="#L16">16</a><span class="tok-com"> * The Cache port declares CacheBackendFailure, which is what the bundled</span></span>
+<span class="src-line" id="L17" data-diff="added"><a class="ln" href="#L17">17</a><span class="tok-com"> * adapters raise. A hand-written adapter may report through the PSR cache</span></span>
+<span class="src-line" id="L18" data-diff="added"><a class="ln" href="#L18">18</a><span class="tok-com"> * exception interfaces instead; those are accepted when they arrive in the</span></span>
+<span class="src-line" id="L19" data-diff="added"><a class="ln" href="#L19">19</a><span class="tok-com"> * declared RuntimeException family.</span></span>
 <span class="src-line" id="L20" data-diff="added"><a class="ln" href="#L20">20</a><span class="tok-com"> */</span></span>
 <span class="src-line" id="L21" data-diff="added"><a class="ln" href="#L21">21</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">DefaultBackendErrorClassifier</span> <span class="tok-kw">implements</span> <span class="tok-id">BackendErrorClassifier</span></span>
 <span class="src-line" id="L22" data-diff="added"><a class="ln" href="#L22">22</a>{</span>
@@ -62,7 +62,7 @@
 <span class="src-line" id="L24" data-diff="added"><a class="ln" href="#L24">24</a><span class="tok-com">     * Reports whether the failure is a declared cache backend fault.</span></span>
 <span class="src-line" id="L25" data-diff="added"><a class="ln" href="#L25">25</a><span class="tok-com">     */</span></span>
 <span class="src-line" id="L26" data-diff="added"><a class="ln" href="#L26">26</a>    #[<span class="tok-id">Override</span>]</span>
-<span class="src-line" id="L27" data-diff="added"><a class="ln" href="#L27">27</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">isBackendFailure</span>(<span class="tok-id">Throwable</span> <span class="tok-var">$error</span>, <span class="tok-id">CacheAccess</span> <span class="tok-var">$access</span>): <span class="tok-id">bool</span></span>
+<span class="src-line" id="L27" data-diff="added"><a class="ln" href="#L27">27</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">isBackendFailure</span>(<span class="tok-id">RuntimeException</span> <span class="tok-var">$error</span>, <span class="tok-id">CacheAccess</span> <span class="tok-var">$access</span>): <span class="tok-id">bool</span></span>
 <span class="src-line" id="L28" data-diff="added"><a class="ln" href="#L28">28</a>    {</span>
 <span class="src-line" id="L29" data-diff="added"><a class="ln" href="#L29">29</a>        <span class="tok-kw">unset</span>(<span class="tok-var">$access</span>);</span>
 <span class="src-line" id="L30" data-diff="added"><a class="ln" href="#L30">30</a></span>

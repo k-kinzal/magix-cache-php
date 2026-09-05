@@ -42,24 +42,25 @@
 <span class="src-line" id="L4" data-diff="added"><a class="ln" href="#L4">4</a></span>
 <span class="src-line" id="L5" data-diff="added"><a class="ln" href="#L5">5</a><span class="tok-kw">namespace</span> <span class="tok-id">Magix\Cache\Runtime\Extension</span>;</span>
 <span class="src-line" id="L6" data-diff="added"><a class="ln" href="#L6">6</a></span>
-<span class="src-line" id="L7" data-diff="added"><a class="ln" href="#L7">7</a><span class="tok-kw">use</span> <span class="tok-id">Throwable</span>;</span>
+<span class="src-line" id="L7" data-diff="added"><a class="ln" href="#L7">7</a><span class="tok-kw">use</span> <span class="tok-id">RuntimeException</span>;</span>
 <span class="src-line" id="L8" data-diff="added"><a class="ln" href="#L8">8</a></span>
 <span class="src-line" id="L9" data-diff="added"><a class="ln" href="#L9">9</a><span class="tok-com">/**</span></span>
 <span class="src-line" id="L10" data-diff="added"><a class="ln" href="#L10">10</a><span class="tok-com"> * Classifies storage failures for the #[BypassCacheErrors] behavior.</span></span>
 <span class="src-line" id="L11" data-diff="added"><a class="ln" href="#L11">11</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L12" data-diff="added"><a class="ln" href="#L12">12</a><span class="tok-com"> * The runtime consults a classifier only around cache reads and writes; origin</span></span>
-<span class="src-line" id="L13" data-diff="added"><a class="ln" href="#L13">13</a><span class="tok-com"> * failures and definition errors never reach it. A classified read failure</span></span>
-<span class="src-line" id="L14" data-diff="added"><a class="ln" href="#L14">14</a><span class="tok-com"> * becomes a miss and a classified write failure becomes a skipped write, while</span></span>
-<span class="src-line" id="L15" data-diff="added"><a class="ln" href="#L15">15</a><span class="tok-com"> * everything else propagates unchanged.</span></span>
-<span class="src-line" id="L16" data-diff="added"><a class="ln" href="#L16">16</a><span class="tok-com"> */</span></span>
-<span class="src-line" id="L17" data-diff="added"><a class="ln" href="#L17">17</a><span class="tok-kw">interface</span> <span class="tok-id">BackendErrorClassifier</span></span>
-<span class="src-line" id="L18" data-diff="added"><a class="ln" href="#L18">18</a>{</span>
-<span class="src-line" id="L19" data-diff="added"><a class="ln" href="#L19">19</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L20" data-diff="added"><a class="ln" href="#L20">20</a><span class="tok-com">     * Reports whether the failure is a backend fault the runtime may bypass.</span></span>
-<span class="src-line" id="L21" data-diff="added"><a class="ln" href="#L21">21</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L22" data-diff="added"><a class="ln" href="#L22">22</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">isBackendFailure</span>(<span class="tok-id">Throwable</span> <span class="tok-var">$error</span>, <span class="tok-id">CacheAccess</span> <span class="tok-var">$access</span>): <span class="tok-id">bool</span>;</span>
-<span class="src-line" id="L23" data-diff="added"><a class="ln" href="#L23">23</a>}</span>
-<span class="src-line" id="L24" data-diff="added"><a class="ln" href="#L24">24</a></span>
+<span class="src-line" id="L12" data-diff="added"><a class="ln" href="#L12">12</a><span class="tok-com"> * The runtime consults a classifier only around cache reads and writes, and</span></span>
+<span class="src-line" id="L13" data-diff="added"><a class="ln" href="#L13">13</a><span class="tok-com"> * only for the RuntimeException family the Cache port declares its failures</span></span>
+<span class="src-line" id="L14" data-diff="added"><a class="ln" href="#L14">14</a><span class="tok-com"> * in; origin failures, definition errors, and bugs never reach it. A</span></span>
+<span class="src-line" id="L15" data-diff="added"><a class="ln" href="#L15">15</a><span class="tok-com"> * classified read failure becomes a miss and a classified write failure</span></span>
+<span class="src-line" id="L16" data-diff="added"><a class="ln" href="#L16">16</a><span class="tok-com"> * becomes a skipped write, while everything else propagates unchanged.</span></span>
+<span class="src-line" id="L17" data-diff="added"><a class="ln" href="#L17">17</a><span class="tok-com"> */</span></span>
+<span class="src-line" id="L18" data-diff="added"><a class="ln" href="#L18">18</a><span class="tok-kw">interface</span> <span class="tok-id">BackendErrorClassifier</span></span>
+<span class="src-line" id="L19" data-diff="added"><a class="ln" href="#L19">19</a>{</span>
+<span class="src-line" id="L20" data-diff="added"><a class="ln" href="#L20">20</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L21" data-diff="added"><a class="ln" href="#L21">21</a><span class="tok-com">     * Reports whether the failure is a backend fault the runtime may bypass.</span></span>
+<span class="src-line" id="L22" data-diff="added"><a class="ln" href="#L22">22</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L23" data-diff="added"><a class="ln" href="#L23">23</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">isBackendFailure</span>(<span class="tok-id">RuntimeException</span> <span class="tok-var">$error</span>, <span class="tok-id">CacheAccess</span> <span class="tok-var">$access</span>): <span class="tok-id">bool</span>;</span>
+<span class="src-line" id="L24" data-diff="added"><a class="ln" href="#L24">24</a>}</span>
+<span class="src-line" id="L25" data-diff="added"><a class="ln" href="#L25">25</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

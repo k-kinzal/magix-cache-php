@@ -47,50 +47,50 @@
 <span class="src-line" id="L9" data-diff="added"><a class="ln" href="#L9">9</a></span>
 <span class="src-line" id="L10" data-diff="added"><a class="ln" href="#L10">10</a><span class="tok-kw">use</span> <span class="tok-kw">function</span> <span class="tok-id">is_a</span>;</span>
 <span class="src-line" id="L11" data-diff="added"><a class="ln" href="#L11">11</a></span>
-<span class="src-line" id="L12" data-diff="added"><a class="ln" href="#L12">12</a><span class="tok-kw">use</span> <span class="tok-id">Throwable</span>;</span>
-<span class="src-line" id="L13" data-diff="added"><a class="ln" href="#L13">13</a></span>
-<span class="src-line" id="L14" data-diff="added"><a class="ln" href="#L14">14</a><span class="tok-com">/**</span></span>
-<span class="src-line" id="L15" data-diff="added"><a class="ln" href="#L15">15</a><span class="tok-com"> * Serves a retained expired entry when the origin fails with a declared exception.</span></span>
-<span class="src-line" id="L16" data-diff="added"><a class="ln" href="#L16">16</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L17" data-diff="added"><a class="ln" href="#L17">17</a><span class="tok-com"> * Only the origin call is inside the capture range, and only the exception</span></span>
-<span class="src-line" id="L18" data-diff="added"><a class="ln" href="#L18">18</a><span class="tok-com"> * types declared here are eligible: an empty list and a blanket Throwable are</span></span>
-<span class="src-line" id="L19" data-diff="added"><a class="ln" href="#L19">19</a><span class="tok-com"> * both rejected, and a PHP Error never triggers the fallback implicitly.</span></span>
-<span class="src-line" id="L20" data-diff="added"><a class="ln" href="#L20">20</a><span class="tok-com"> */</span></span>
-<span class="src-line" id="L21" data-diff="added"><a class="ln" href="#L21">21</a>#[<span class="tok-id">Attribute</span>(<span class="tok-id">Attribute</span>::<span class="tok-id">TARGET_CLASS</span> | <span class="tok-id">Attribute</span>::<span class="tok-id">TARGET_METHOD</span>)]</span>
-<span class="src-line" id="L22" data-diff="added"><a class="ln" href="#L22">22</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">StaleIfError</span></span>
-<span class="src-line" id="L23" data-diff="added"><a class="ln" href="#L23">23</a>{</span>
-<span class="src-line" id="L24" data-diff="added"><a class="ln" href="#L24">24</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L25" data-diff="added"><a class="ln" href="#L25">25</a><span class="tok-com">     * Declares the stale-if-error behavior for a boundary.</span></span>
-<span class="src-line" id="L26" data-diff="added"><a class="ln" href="#L26">26</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L27" data-diff="added"><a class="ln" href="#L27">27</a><span class="tok-com">     * @param int $maxAge Maximum seconds past expiration a retained value may still stand in.</span></span>
-<span class="src-line" id="L28" data-diff="added"><a class="ln" href="#L28">28</a><span class="tok-com">     * @param list&lt;string&gt; $exceptions Throwable class names eligible for the fallback.</span></span>
-<span class="src-line" id="L29" data-diff="added"><a class="ln" href="#L29">29</a><span class="tok-com">     * @param bool $enabled Explicit false disables a class-level declaration.</span></span>
-<span class="src-line" id="L30" data-diff="added"><a class="ln" href="#L30">30</a><span class="tok-com">     * @throws InvalidArgumentException when the maximum age is negative, the enabled declaration captures nothing, or a declared type is Throwable itself or not a Throwable</span></span>
-<span class="src-line" id="L31" data-diff="added"><a class="ln" href="#L31">31</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L32" data-diff="added"><a class="ln" href="#L32">32</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(</span>
-<span class="src-line" id="L33" data-diff="added"><a class="ln" href="#L33">33</a>        <span class="tok-kw">public</span> <span class="tok-id">int</span> <span class="tok-var">$maxAge</span> = <span class="tok-num">0</span>,</span>
-<span class="src-line" id="L34" data-diff="added"><a class="ln" href="#L34">34</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$exceptions</span> = [],</span>
-<span class="src-line" id="L35" data-diff="added"><a class="ln" href="#L35">35</a>        <span class="tok-kw">public</span> <span class="tok-id">bool</span> <span class="tok-var">$enabled</span> = <span class="tok-id">true</span>,</span>
-<span class="src-line" id="L36" data-diff="added"><a class="ln" href="#L36">36</a>    ) {</span>
-<span class="src-line" id="L37" data-diff="added"><a class="ln" href="#L37">37</a>        <span class="tok-kw">if</span> (<span class="tok-var">$maxAge</span> &lt; <span class="tok-num">0</span>) {</span>
-<span class="src-line" id="L38" data-diff="added"><a class="ln" href="#L38">38</a>            <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-id">InvalidArgumentException</span>(<span class="tok-str">&#039;Stale maximum age must be zero or greater.&#039;</span>);</span>
-<span class="src-line" id="L39" data-diff="added"><a class="ln" href="#L39">39</a>        }</span>
-<span class="src-line" id="L40" data-diff="added"><a class="ln" href="#L40">40</a></span>
-<span class="src-line" id="L41" data-diff="added"><a class="ln" href="#L41">41</a>        <span class="tok-kw">if</span> (!<span class="tok-var">$enabled</span>) {</span>
-<span class="src-line" id="L42" data-diff="added"><a class="ln" href="#L42">42</a>            <span class="tok-kw">return</span>;</span>
+<span class="src-line" id="L12" data-diff="added"><a class="ln" href="#L12">12</a><span class="tok-kw">use</span> <span class="tok-id">RuntimeException</span>;</span>
+<span class="src-line" id="L13" data-diff="added"><a class="ln" href="#L13">13</a><span class="tok-kw">use</span> <span class="tok-id">Throwable</span>;</span>
+<span class="src-line" id="L14" data-diff="added"><a class="ln" href="#L14">14</a></span>
+<span class="src-line" id="L15" data-diff="added"><a class="ln" href="#L15">15</a><span class="tok-com">/**</span></span>
+<span class="src-line" id="L16" data-diff="added"><a class="ln" href="#L16">16</a><span class="tok-com"> * Serves a retained expired entry when the origin fails with a declared exception.</span></span>
+<span class="src-line" id="L17" data-diff="added"><a class="ln" href="#L17">17</a><span class="tok-com"> *</span></span>
+<span class="src-line" id="L18" data-diff="added"><a class="ln" href="#L18">18</a><span class="tok-com"> * Only the origin call is inside the capture range, and only failures the</span></span>
+<span class="src-line" id="L19" data-diff="added"><a class="ln" href="#L19">19</a><span class="tok-com"> * origin declares as behavior are eligible: every declared type must be a</span></span>
+<span class="src-line" id="L20" data-diff="added"><a class="ln" href="#L20">20</a><span class="tok-com"> * RuntimeException subtype, and an empty list is rejected. Bugs — the</span></span>
+<span class="src-line" id="L21" data-diff="added"><a class="ln" href="#L21">21</a><span class="tok-com"> * LogicException family and PHP Errors — are never RuntimeException, so they</span></span>
+<span class="src-line" id="L22" data-diff="added"><a class="ln" href="#L22">22</a><span class="tok-com"> * can never trigger the fallback; an origin that meets an expected outage in</span></span>
+<span class="src-line" id="L23" data-diff="added"><a class="ln" href="#L23">23</a><span class="tok-com"> * a foreign exception hierarchy translates it into its own declared type.</span></span>
+<span class="src-line" id="L24" data-diff="added"><a class="ln" href="#L24">24</a><span class="tok-com"> */</span></span>
+<span class="src-line" id="L25" data-diff="added"><a class="ln" href="#L25">25</a>#[<span class="tok-id">Attribute</span>(<span class="tok-id">Attribute</span>::<span class="tok-id">TARGET_CLASS</span> | <span class="tok-id">Attribute</span>::<span class="tok-id">TARGET_METHOD</span>)]</span>
+<span class="src-line" id="L26" data-diff="added"><a class="ln" href="#L26">26</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">StaleIfError</span></span>
+<span class="src-line" id="L27" data-diff="added"><a class="ln" href="#L27">27</a>{</span>
+<span class="src-line" id="L28" data-diff="added"><a class="ln" href="#L28">28</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L29" data-diff="added"><a class="ln" href="#L29">29</a><span class="tok-com">     * Declares the stale-if-error behavior for a boundary.</span></span>
+<span class="src-line" id="L30" data-diff="added"><a class="ln" href="#L30">30</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L31" data-diff="added"><a class="ln" href="#L31">31</a><span class="tok-com">     * @param int $maxAge Maximum seconds past expiration a retained value may still stand in.</span></span>
+<span class="src-line" id="L32" data-diff="added"><a class="ln" href="#L32">32</a><span class="tok-com">     * @param list&lt;string&gt; $exceptions RuntimeException subtype names eligible for the fallback.</span></span>
+<span class="src-line" id="L33" data-diff="added"><a class="ln" href="#L33">33</a><span class="tok-com">     * @param bool $enabled Explicit false disables a class-level declaration.</span></span>
+<span class="src-line" id="L34" data-diff="added"><a class="ln" href="#L34">34</a><span class="tok-com">     * @throws InvalidArgumentException when the maximum age is negative, the enabled declaration captures nothing, or a declared type is not a RuntimeException subtype</span></span>
+<span class="src-line" id="L35" data-diff="added"><a class="ln" href="#L35">35</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L36" data-diff="added"><a class="ln" href="#L36">36</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(</span>
+<span class="src-line" id="L37" data-diff="added"><a class="ln" href="#L37">37</a>        <span class="tok-kw">public</span> <span class="tok-id">int</span> <span class="tok-var">$maxAge</span> = <span class="tok-num">0</span>,</span>
+<span class="src-line" id="L38" data-diff="added"><a class="ln" href="#L38">38</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$exceptions</span> = [],</span>
+<span class="src-line" id="L39" data-diff="added"><a class="ln" href="#L39">39</a>        <span class="tok-kw">public</span> <span class="tok-id">bool</span> <span class="tok-var">$enabled</span> = <span class="tok-id">true</span>,</span>
+<span class="src-line" id="L40" data-diff="added"><a class="ln" href="#L40">40</a>    ) {</span>
+<span class="src-line" id="L41" data-diff="added"><a class="ln" href="#L41">41</a>        <span class="tok-kw">if</span> (<span class="tok-var">$maxAge</span> &lt; <span class="tok-num">0</span>) {</span>
+<span class="src-line" id="L42" data-diff="added"><a class="ln" href="#L42">42</a>            <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-id">InvalidArgumentException</span>(<span class="tok-str">&#039;Stale maximum age must be zero or greater.&#039;</span>);</span>
 <span class="src-line" id="L43" data-diff="added"><a class="ln" href="#L43">43</a>        }</span>
 <span class="src-line" id="L44" data-diff="added"><a class="ln" href="#L44">44</a></span>
-<span class="src-line" id="L45" data-diff="added"><a class="ln" href="#L45">45</a>        <span class="tok-kw">if</span> (<span class="tok-var">$exceptions</span> === []) {</span>
-<span class="src-line" id="L46" data-diff="added"><a class="ln" href="#L46">46</a>            <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-id">InvalidArgumentException</span>(<span class="tok-str">&#039;StaleIfError requires at least one declared exception type.&#039;</span>);</span>
+<span class="src-line" id="L45" data-diff="added"><a class="ln" href="#L45">45</a>        <span class="tok-kw">if</span> (!<span class="tok-var">$enabled</span>) {</span>
+<span class="src-line" id="L46" data-diff="added"><a class="ln" href="#L46">46</a>            <span class="tok-kw">return</span>;</span>
 <span class="src-line" id="L47" data-diff="added"><a class="ln" href="#L47">47</a>        }</span>
 <span class="src-line" id="L48" data-diff="added"><a class="ln" href="#L48">48</a></span>
-<span class="src-line" id="L49" data-diff="added"><a class="ln" href="#L49">49</a>        <span class="tok-kw">foreach</span> (<span class="tok-var">$exceptions</span> <span class="tok-kw">as</span> <span class="tok-var">$type</span>) {</span>
-<span class="src-line" id="L50" data-diff="added"><a class="ln" href="#L50">50</a>            <span class="tok-kw">if</span> (<span class="tok-var">$type</span> === <span class="tok-id">Throwable</span>::<span class="tok-kw">class</span>) {</span>
-<span class="src-line" id="L51" data-diff="added"><a class="ln" href="#L51">51</a>                <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-id">InvalidArgumentException</span>(<span class="tok-str">&#039;StaleIfError must declare concrete exception types, not Throwable itself.&#039;</span>);</span>
-<span class="src-line" id="L52" data-diff="added"><a class="ln" href="#L52">52</a>            }</span>
-<span class="src-line" id="L53" data-diff="added"><a class="ln" href="#L53">53</a></span>
-<span class="src-line" id="L54" data-diff="added"><a class="ln" href="#L54">54</a>            <span class="tok-kw">if</span> (!<span class="tok-id">is_a</span>(<span class="tok-var">$type</span>, <span class="tok-id">Throwable</span>::<span class="tok-kw">class</span>, <span class="tok-id">true</span>)) {</span>
-<span class="src-line" id="L55" data-diff="added"><a class="ln" href="#L55">55</a>                <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-id">InvalidArgumentException</span>(<span class="tok-str">&#039;StaleIfError can only declare Throwable types, got &quot;&#039;</span>.<span class="tok-var">$type</span>.<span class="tok-str">&#039;&quot;.&#039;</span>);</span>
+<span class="src-line" id="L49" data-diff="added"><a class="ln" href="#L49">49</a>        <span class="tok-kw">if</span> (<span class="tok-var">$exceptions</span> === []) {</span>
+<span class="src-line" id="L50" data-diff="added"><a class="ln" href="#L50">50</a>            <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-id">InvalidArgumentException</span>(<span class="tok-str">&#039;StaleIfError requires at least one declared exception type.&#039;</span>);</span>
+<span class="src-line" id="L51" data-diff="added"><a class="ln" href="#L51">51</a>        }</span>
+<span class="src-line" id="L52" data-diff="added"><a class="ln" href="#L52">52</a></span>
+<span class="src-line" id="L53" data-diff="added"><a class="ln" href="#L53">53</a>        <span class="tok-kw">foreach</span> (<span class="tok-var">$exceptions</span> <span class="tok-kw">as</span> <span class="tok-var">$type</span>) {</span>
+<span class="src-line" id="L54" data-diff="added"><a class="ln" href="#L54">54</a>            <span class="tok-kw">if</span> (!<span class="tok-id">is_a</span>(<span class="tok-var">$type</span>, <span class="tok-id">RuntimeException</span>::<span class="tok-kw">class</span>, <span class="tok-id">true</span>)) {</span>
+<span class="src-line" id="L55" data-diff="added"><a class="ln" href="#L55">55</a>                <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-id">InvalidArgumentException</span>(<span class="tok-str">&#039;StaleIfError can only declare RuntimeException subtypes, got &quot;&#039;</span>.<span class="tok-var">$type</span>.<span class="tok-str">&#039;&quot;; translate an expected outage into a declared RuntimeException at the origin.&#039;</span>);</span>
 <span class="src-line" id="L56" data-diff="added"><a class="ln" href="#L56">56</a>            }</span>
 <span class="src-line" id="L57" data-diff="added"><a class="ln" href="#L57">57</a>        }</span>
 <span class="src-line" id="L58" data-diff="added"><a class="ln" href="#L58">58</a>    }</span>

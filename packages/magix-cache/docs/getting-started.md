@@ -18,21 +18,23 @@ Install the framework-independent package with Composer:
 composer require k-kinzal/magix-cache
 ```
 
-## Configure the Runtime
+## Register a Runtime
 
-MagixCache needs one process-local `CacheRuntime`. Connect an existing PSR-16 cache with the included adapter:
+Cache boundaries reference runtimes by name. Register a `CacheRuntime` under the `default` name at bootstrap, before any cached query executes. Connect an existing PSR-16 cache with the included adapter:
 
 ```php
 <?php
 
 use Magix\Cache\Cache\PSR16\SimpleCache as MagixSimpleCache;
 use Magix\Cache\CacheRuntime;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Psr\SimpleCache\CacheInterface;
 
 /** @var CacheInterface $cache */
 $cache = $container->get(CacheInterface::class);
 
-CacheRuntime::setCurrent(
+CacheRuntimeRegistry::register(
+    'default',
     new CacheRuntime(new MagixSimpleCache($cache)),
 );
 ```
@@ -44,17 +46,27 @@ For a PSR-6 pool, use `CacheItemPool` instead:
 
 use Magix\Cache\Cache\PSR6\CacheItemPool;
 use Magix\Cache\CacheRuntime;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Psr\Cache\CacheItemPoolInterface;
 
 /** @var CacheItemPoolInterface $pool */
 $pool = $container->get(CacheItemPoolInterface::class);
 
-CacheRuntime::setCurrent(new CacheRuntime(new CacheItemPool($pool)));
+CacheRuntimeRegistry::register('default', new CacheRuntime(new CacheItemPool($pool)));
 ```
 
-Install the runtime during application bootstrap, before any cached query is executed. In tests or application lifecycles that replace the runtime, remove it with `CacheRuntime::setCurrent(null)` during cleanup.
+A registered name is fixed once and never rebound; a boundary that references an unregistered name is a definition error, not a fallback. For request-scoped integrations, register a provider closure instead of an instance — it is invoked on every resolution and its result is never memoized by the registry:
 
-The framework adapters perform this setup for you:
+```php
+CacheRuntimeRegistry::register(
+    'default',
+    static fn (): CacheRuntime => $container->get(CacheRuntime::class),
+);
+```
+
+In tests, clear all registrations with `CacheRuntimeRegistry::reset()` during cleanup.
+
+The framework adapters register the `default` runtime for you:
 
 - [Laravel integration](../../magix-cache-laravel/README.md)
 - [Symfony integration](../../magix-cache-symfony/README.md)
@@ -91,9 +103,11 @@ final class ProductQuery
 }
 ```
 
-The closure must return a `Cached` value. On the first call, MagixCache runs the closure, applies the 20-second policy, and stores the value together with its cache metadata. A second call with the same argument returns the stored result without running the closure.
+`cached()` takes exactly one closure, and the closure must return a `Cached` value — wrap even a plain leaf value explicitly with `Cached::of()`. On the first call, MagixCache runs the closure, applies the 20-second policy, and stores the value together with its cache metadata. A second call with the same argument returns the stored result without running the closure.
 
-The cache key includes the declaring class, method, arguments, and policy version. See [Cache Keys](cache-keys.md) for key reduction, ignored arguments, and custom key strategies.
+Policy and behaviors come from attributes alone: `#[Cache]` on the method wins over the concrete class as a whole, and there is no per-call override argument. A method without any `#[Cache]` on itself or its concrete class throws a `LogicException`. `cached()` must also be called directly from the boundary method, not through a helper or closure.
+
+The cache key includes the runtime namespace, the concrete class, the declaring method, the arguments, the policy version, and a fingerprint of the effective declaration. See [Cache Keys](cache-keys.md) for key reduction, ignored arguments, and custom key strategies.
 
 ## Read the Result
 
@@ -164,22 +178,23 @@ final class ProductPageQuery
 }
 ```
 
-If the product expires in 20 seconds and inventory expires in 60 seconds, the composed page expires in 20 seconds. Cacheability, visibility, tags, and diagnostic reasons are also combined conservatively. See [Cache Composition](cache-composition.md) for all composition rules.
+If the product expires in 20 seconds and inventory expires in 60 seconds, the composed page expires in 20 seconds. Cacheability, visibility, tags, and diagnostic reasons are also combined conservatively — a declared TTL can shorten the result's lifetime but never extend what a dependency imposed. See [Cache Composition](cache-composition.md) for all composition rules, including the `value()` pitfall.
 
-## Use an Explicit Policy
+## Select a Runtime per Boundary
 
-Attributes are optional. Pass a `CachePolicy` as the second argument to `cached()` when a policy must be selected in code:
+Applications with more than one cache backend register additional runtimes under their own names and reference them from the declaration:
 
 ```php
-use Magix\Cache\CachePolicy;
-
-return $this->cached(
-    fn (): Cached => Cached::of($this->products->find($productId)),
-    new CachePolicy(ttl: 20, tags: ['products']),
-);
+CacheRuntimeRegistry::register('reporting', new CacheRuntime(new CacheItemPool($reportingPool)));
 ```
 
-An explicit policy takes precedence over `#[Cache]`. Every call to `cached()` requires either an explicit policy or a cache attribute on the method or class.
+```php
+#[Cache(ttl: 300, runtime: 'reporting')]
+public function execute(): Cached
+{
+    return $this->cached(fn (): Cached => Cached::of($this->report->build()));
+}
+```
 
 ## Next Steps
 
@@ -187,4 +202,4 @@ An explicit policy takes precedence over `#[Cache]`. Every call to `cached()` re
 - [Cache Keys](cache-keys.md): Default key behavior and argument attributes
 - [Cache Composition](cache-composition.md): Combine nested query values without losing constraints
 - [Storage Adapters](storage-adapters.md): PSR-6, PSR-16, and custom cache implementations
-- [Cache Strategies](cache-strategies.md): Dynamic TTL, stale-if-error, backend failures, and custom middleware
+- [Cache Behaviors](cache-behaviors.md): Stale-if-error, dynamic TTL, backend-failure bypass, and observation

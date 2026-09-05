@@ -6,13 +6,14 @@ namespace Tests\Unit\Attribute;
 
 use Magix\Cache\Attribute\Cache;
 use Magix\Cache\CachePolicy;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Cache::class)]
 #[UsesClass(CachePolicy::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 final class CacheTest extends TestCase
 {
     public function testPolicyPreservesConfiguration(): void
@@ -23,5 +24,11 @@ final class CacheTest extends TestCase
         self::assertSame(30, $policy->ttl);
         self::assertSame(['product:1'], $policy->tags);
         self::assertSame('2', $policy->version);
+    }
+
+    public function testRuntimeReferenceDefaultsToTheRegistryDefault(): void
+    {
+        self::assertSame(CacheRuntimeRegistry::DEFAULT_NAME, (new Cache(ttl: 10))->runtime);
+        self::assertSame('replica', (new Cache(ttl: 10, runtime: 'replica'))->runtime);
     }
 }

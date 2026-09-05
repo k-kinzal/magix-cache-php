@@ -7,6 +7,7 @@ namespace Magix\Cache\Symfony;
 use LogicException;
 use Magix\Cache\Cache\PSR6\CacheItemPool;
 use Magix\Cache\CacheRuntime;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Override;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -42,7 +43,10 @@ final class MagixCacheBundle extends AbstractBundle
     }
 
     /**
-     * Installs the container-managed runtime for Cacheable.
+     * Fixes the default runtime reference to the container-managed runtime.
+     *
+     * The provider closure resolves through the container on every lookup, so
+     * the registry never holds a runtime instance across kernel reboots.
      *
      * @throws LogicException when the bundle was booted without a container holding a runtime
      */
@@ -53,21 +57,23 @@ final class MagixCacheBundle extends AbstractBundle
             throw new LogicException('The Symfony container has not been installed on MagixCacheBundle.');
         }
 
-        $runtime = $this->container->get(CacheRuntime::class);
-
-        if (!$runtime instanceof CacheRuntime) {
-            throw new LogicException('The Symfony container returned an invalid MagixCache runtime.');
+        if (CacheRuntimeRegistry::isRegistered(CacheRuntimeRegistry::DEFAULT_NAME)) {
+            return;
         }
 
-        CacheRuntime::setCurrent($runtime);
-    }
+        $container = $this->container;
 
-    /**
-     * Removes the process-local runtime during kernel shutdown.
-     */
-    #[Override]
-    public function shutdown(): void
-    {
-        CacheRuntime::setCurrent(null);
+        CacheRuntimeRegistry::register(
+            CacheRuntimeRegistry::DEFAULT_NAME,
+            static function () use ($container): CacheRuntime {
+                $runtime = $container->get(CacheRuntime::class);
+
+                if (!$runtime instanceof CacheRuntime) {
+                    throw new LogicException('The Symfony container returned an invalid MagixCache runtime.');
+                }
+
+                return $runtime;
+            },
+        );
     }
 }

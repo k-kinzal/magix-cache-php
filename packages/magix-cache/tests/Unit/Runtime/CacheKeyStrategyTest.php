@@ -14,7 +14,7 @@ final class CacheKeyStrategyTest extends TestCase
 {
     public function testGenerateReturnsKeyFromImplementation(): void
     {
-        $context = new CacheKeyContext('App\\Query', 'execute', ['id' => 1], '1');
+        $context = new CacheKeyContext('magix', 'App\\Query', 'App\\Query', 'execute', ['id' => 1], '1', 'digest');
         $strategy = $this->createMock(CacheKeyStrategy::class);
         $strategy
             ->expects(self::once())

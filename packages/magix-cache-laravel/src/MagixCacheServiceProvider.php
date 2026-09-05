@@ -10,6 +10,7 @@ use Illuminate\Support\ServiceProvider;
 use LogicException;
 use Magix\Cache\Cache\PSR16\SimpleCache;
 use Magix\Cache\CacheRuntime;
+use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Override;
 
 /**
@@ -35,10 +36,22 @@ final class MagixCacheServiceProvider extends ServiceProvider
     }
 
     /**
-     * Installs the container-managed runtime for Cacheable.
+     * Fixes the default runtime reference to the container-managed runtime.
+     *
+     * The provider closure resolves through the container on every lookup, so
+     * the registry never holds a runtime instance across requests.
      */
-    public function boot(CacheRuntime $runtime): void
+    public function boot(): void
     {
-        CacheRuntime::setCurrent($runtime);
+        if (CacheRuntimeRegistry::isRegistered(CacheRuntimeRegistry::DEFAULT_NAME)) {
+            return;
+        }
+
+        $app = $this->app;
+
+        CacheRuntimeRegistry::register(
+            CacheRuntimeRegistry::DEFAULT_NAME,
+            static fn (): CacheRuntime => $app->make(CacheRuntime::class),
+        );
     }
 }

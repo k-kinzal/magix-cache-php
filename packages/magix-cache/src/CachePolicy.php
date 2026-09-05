@@ -8,12 +8,16 @@ use InvalidArgumentException;
 
 use function is_int;
 
-use Magix\Cache\Runtime\Metadata\CacheTokenSet;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\CacheTokenSet;
+use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 
 /**
  * Declares how a cache boundary constrains and stores its result.
+ *
+ * A policy only ever adds constraints: a fixed lifetime is always bounded by
+ * the upstream expiration, and no policy setting can extend an expiration a
+ * dependency already imposed.
  */
 final readonly class CachePolicy
 {
@@ -30,7 +34,6 @@ final readonly class CachePolicy
         public ?int $maxTtl = null,
         public array $tags = [],
         public Visibility $visibility = Visibility::Shared,
-        public bool $clamp = true,
         public string $version = '1',
     ) {
         if (is_int($ttl) && $ttl < 0) {
@@ -68,7 +71,6 @@ final readonly class CachePolicy
             maxTtl: $this->maxTtl,
             tags: $this->tags,
             visibility: $visibility,
-            clamp: $this->clamp,
             version: $this->version,
         );
     }

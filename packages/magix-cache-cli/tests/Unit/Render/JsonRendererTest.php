@@ -11,8 +11,9 @@ use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\JsonRenderer;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CacheNode::class)]
 #[UsesClass(KeyParameter::class)]
 #[UsesClass(PolicyDeclaration::class)]
+#[UsesClass(TtlEstimate::class)]
 final class JsonRendererTest extends TestCase
 {
     /**
@@ -32,23 +34,22 @@ final class JsonRendererTest extends TestCase
     {
         $node = new CacheNode(
             new BoundaryDeclaration('App\ProductQuery', 'execute', 'src/ProductQuery.php', 12),
-            new CacheEffect(ttl: 20, storable: true),
+            new CacheEffect(ttl: TtlEstimate::known(20), storable: true),
         );
 
         $json = (new JsonRenderer())->render([$node]);
 
         self::assertJson($json);
         self::assertStringContainsString('"boundary": "App\\\\ProductQuery::execute"', $json);
+        self::assertStringContainsString('"state": "known"', $json);
+        self::assertStringContainsString('"seconds": 20', $json);
     }
 
-    /**
-     * @throws JsonException
-     */
     public function testTreeDescribesPolicyKeyAndDependencies(): void
     {
         $child = new CacheNode(
             new BoundaryDeclaration('App\ProductQuery', 'execute', 'src/ProductQuery.php', 12),
-            new CacheEffect(ttl: 20, storable: true),
+            new CacheEffect(ttl: TtlEstimate::known(20), storable: true),
         );
         $node = new CacheNode(
             new BoundaryDeclaration(
@@ -59,17 +60,45 @@ final class JsonRendererTest extends TestCase
                 policy: new PolicyDeclaration(PolicySource::MethodAttribute, 120, tags: ['page']),
                 parameters: [new KeyParameter('viewerId', type: 'int', scope: Visibility::Private)],
             ),
-            new CacheEffect(ttl: 20, visibility: Visibility::Private, storable: true, tags: ['page']),
+            new CacheEffect(
+                ttl: TtlEstimate::known(20, 'declared 120s, capped by ProductQuery::execute'),
+                visibility: Visibility::Private,
+                storable: true,
+                tags: ['page'],
+            ),
             [$child],
         );
 
         $tree = (new JsonRenderer())->tree($node);
 
         self::assertSame('App\PageQuery::execute', $tree['boundary']);
-        self::assertSame(['source' => 'MethodAttribute', 'ttl' => '120s', 'maxTtl' => null, 'tags' => ['page'], 'visibility' => 'shared', 'clamp' => true, 'version' => '1'], $tree['policy']);
+        self::assertSame(
+            ['source' => 'MethodAttribute', 'ttl' => '120s', 'maxTtl' => null, 'tags' => ['page'], 'visibility' => 'shared', 'version' => '1', 'runtime' => 'default'],
+            $tree['policy'],
+        );
         self::assertSame([['name' => 'viewerId', 'type' => 'int', 'ignored' => false, 'scope' => 'private', 'reducer' => null]], $tree['key']);
         self::assertArrayHasKey('effective', $tree);
         self::assertArrayHasKey('dependencies', $tree);
-        self::assertStringContainsString('"ttl": 20', (new JsonRenderer())->render([$node]));
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testTreeEncodesTheEstimateAsAStructuredObject(): void
+    {
+        $node = new CacheNode(
+            new BoundaryDeclaration('App\RateQuery', 'execute', 'src/RateQuery.php', 12),
+            new CacheEffect(ttl: TtlEstimate::unknown(30, 'requires a finite upstream expiration at runtime')),
+        );
+
+        $tree = (new JsonRenderer())->tree($node);
+        $effective = $tree['effective'];
+
+        self::assertIsArray($effective);
+        self::assertSame(
+            ['state' => 'unknown', 'seconds' => null, 'upperBound' => 30, 'reason' => 'requires a finite upstream expiration at runtime'],
+            $effective['ttl'] ?? null,
+        );
+        self::assertStringContainsString('"upperBound": 30', (new JsonRenderer())->render([$node]));
     }
 }

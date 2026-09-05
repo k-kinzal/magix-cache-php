@@ -10,8 +10,9 @@ use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\TreeRenderer;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CacheNode::class)]
 #[UsesClass(KeyParameter::class)]
 #[UsesClass(PolicyDeclaration::class)]
+#[UsesClass(TtlEstimate::class)]
 final class TreeRendererTest extends TestCase
 {
     public function testRenderShowsTheEffectiveValuesOfTheRootBoundary(): void
@@ -36,11 +38,10 @@ final class TreeRendererTest extends TestCase
                 parameters: [new KeyParameter('productId'), new KeyParameter('trace', ignored: true)],
             ),
             new CacheEffect(
-                ttl: 20,
+                ttl: TtlEstimate::known(20, 'declared 120s, capped by ProductQuery::execute'),
                 visibility: Visibility::Private,
                 storable: true,
                 tags: ['page', 'product'],
-                ttlReason: 'declared 120s, clamped by ProductQuery::execute',
             ),
         );
 
@@ -48,7 +49,7 @@ final class TreeRendererTest extends TestCase
 
         self::assertStringContainsString('App\PageQuery::execute', $report);
         self::assertStringContainsString('src/PageQuery.php:31', $report);
-        self::assertStringContainsString('declared 120s, clamped by ProductQuery::execute', $report);
+        self::assertStringContainsString('declared 120s, capped by ProductQuery::execute', $report);
         self::assertStringContainsString('private', $report);
         self::assertStringContainsString('storable     yes', $report);
         self::assertStringContainsString('page, product', $report);
@@ -58,13 +59,13 @@ final class TreeRendererTest extends TestCase
     {
         $child = new CacheNode(
             new BoundaryDeclaration('App\ProductQuery', 'execute', 'src/ProductQuery.php', 12),
-            new CacheEffect(ttl: 20, storable: true),
+            new CacheEffect(ttl: TtlEstimate::known(20), storable: true),
             [],
             ['recursive dependency, not expanded again'],
         );
         $node = new CacheNode(
             new BoundaryDeclaration('App\PageQuery', 'execute', 'src/PageQuery.php', 31),
-            new CacheEffect(problems: ['no #[Cache] attribute']),
+            new CacheEffect(ttl: TtlEstimate::invalid('no #[Cache] attribute'), problems: ['no #[Cache] attribute']),
             [$child],
         );
 
@@ -86,7 +87,7 @@ final class TreeRendererTest extends TestCase
                 line: 31,
                 policy: new PolicyDeclaration(PolicySource::MethodAttribute, 120),
             ),
-            new CacheEffect(ttl: 20, tags: ['page']),
+            new CacheEffect(ttl: TtlEstimate::known(20), tags: ['page']),
         );
 
         $summary = (new TreeRenderer())->summary($node);
@@ -97,13 +98,29 @@ final class TreeRendererTest extends TestCase
         self::assertStringContainsString('tags page', $summary);
     }
 
-    public function testTtlDescribesMissingExpirations(): void
+    public function testTtlDescribesEveryEstimateState(): void
     {
         $renderer = new TreeRenderer();
 
-        self::assertStringContainsString('none', $renderer->ttl(new CacheEffect()));
-        self::assertStringContainsString('30s', $renderer->ttl(new CacheEffect(ttl: 30)));
-        self::assertStringContainsString('(inherited from A::b)', $renderer->ttl(new CacheEffect(ttl: 30, ttlReason: 'inherited from A::b')));
+        self::assertStringContainsString('unconstrained', $renderer->ttl(new CacheEffect(ttl: TtlEstimate::unconstrained())));
+        self::assertStringContainsString('30s', $renderer->ttl(new CacheEffect(ttl: TtlEstimate::known(30))));
+        self::assertStringContainsString(
+            '(inherited from A::b)',
+            $renderer->ttl(new CacheEffect(ttl: TtlEstimate::known(30, 'inherited from A::b'))),
+        );
+        self::assertSame(
+            'unknown (≤30s) (requires a finite upstream expiration at runtime)',
+            $renderer->ttl(new CacheEffect(ttl: TtlEstimate::unknown(30, 'requires a finite upstream expiration at runtime'))),
+        );
+    }
+
+    public function testEstimateColorsKnownAndInvalidLifetimes(): void
+    {
+        $renderer = new TreeRenderer();
+
+        self::assertSame('<fg=green>30s</>', $renderer->estimate(TtlEstimate::known(30)));
+        self::assertSame('<fg=red>invalid</>', $renderer->estimate(TtlEstimate::invalid('broken')));
+        self::assertSame('unknown', $renderer->estimate(TtlEstimate::unknown()));
     }
 
     public function testKeyListsKeyedAndIgnoredParameters(): void

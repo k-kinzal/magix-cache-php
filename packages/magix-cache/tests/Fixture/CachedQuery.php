@@ -8,16 +8,14 @@ use Closure;
 use Magix\Cache\Attribute\Cache;
 use Magix\Cache\Attribute\CacheIgnore;
 use Magix\Cache\Attribute\CacheScope;
+use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Cacheable;
 use Magix\Cache\Cached;
-use Magix\Cache\CachePolicy;
-use Magix\Cache\Runtime\Metadata\CacheMetadata;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
-use Magix\Cache\Runtime\Strategy\DynamicTtlCacheStrategy;
 
 /**
- * Exercises Cacheable through a representative query method.
+ * Exercises Cacheable through representative attribute-declared boundaries.
  */
 final class CachedQuery
 {
@@ -56,51 +54,19 @@ final class CachedQuery
     }
 
     /**
-     * Returns a value with upstream cache metadata.
-     *
-     * @return Cached<string>
-     */
-    #[Cache(ttl: Ttl::FromUpstream, maxTtl: 10)]
-    public function upstream(float $expiresAt): Cached
-    {
-        return $this->cached(
-            fn (): Cached => Cached::of('upstream', new CacheMetadata(expiresAt: $expiresAt)),
-        );
-    }
-
-    /**
-     * Returns a value configured without a cache attribute.
+     * Returns a value constrained by a declared dynamic-TTL resolver.
      *
      * @return Cached<lowercase-string&non-falsy-string>
      */
-    public function explicit(int $id): Cached
-    {
-        return $this->cached(
-            function () use ($id): Cached {
-                ++$this->calls;
-
-                return Cached::of('explicit:'.$id);
-            },
-            new CachePolicy(ttl: 15, tags: ['explicit']),
-        );
-    }
-
-    /**
-     * Returns a value with a strategy configured for this cache boundary.
-     *
-     * @return Cached<lowercase-string&non-falsy-string>
-     */
+    #[Cache(ttl: Ttl::Auto)]
+    #[DynamicTtl(resolver: FixedTtlResolver::class)]
     public function dynamic(int $id): Cached
     {
-        return $this->cached(
-            function () use ($id): Cached {
-                ++$this->calls;
+        return $this->cached(function () use ($id): Cached {
+            ++$this->calls;
 
-                return Cached::of('dynamic:'.$id);
-            },
-            new CachePolicy(ttl: Ttl::Auto),
-            new DynamicTtlCacheStrategy(static fn (): int => 7),
-        );
+            return Cached::of('dynamic:'.$id);
+        });
     }
 
     /**
@@ -121,4 +87,20 @@ final class CachedQuery
             return Cached::of($value());
         });
     }
+
+    /**
+     * Returns a personalized value separated by its scoped parameter.
+     *
+     * @return Cached<lowercase-string&non-falsy-string>
+     */
+    #[Cache(ttl: 10)]
+    public function personal(#[CacheScope] int $userId): Cached
+    {
+        return $this->cached(function () use ($userId): Cached {
+            ++$this->calls;
+
+            return Cached::of('personal:'.$userId);
+        });
+    }
+
 }

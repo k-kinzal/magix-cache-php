@@ -6,7 +6,7 @@ namespace Tests\Package\Cli\Unit\Declaration;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\KeyParameter;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;

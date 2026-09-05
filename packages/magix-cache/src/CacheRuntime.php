@@ -4,132 +4,110 @@ declare(strict_types=1);
 
 namespace Magix\Cache;
 
-use Closure;
 use LogicException;
 use Magix\Cache\Cache\Cache;
 use Magix\Cache\Clock\SystemClock;
+use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\CacheEntryConverter;
+use Magix\Cache\Runtime\CacheInvocation;
 use Magix\Cache\Runtime\CacheKeyStrategy;
-use Magix\Cache\Runtime\CacheStrategy;
+use Magix\Cache\Runtime\Extension\CacheEvent;
+use Magix\Cache\Runtime\Extension\CacheObserver;
+use Magix\Cache\Runtime\Extension\RegisteredExtensions;
+use Magix\Cache\Runtime\GuardedCache;
 use Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy;
-use Magix\Cache\Runtime\Metadata\Visibility;
-use Magix\Cache\Runtime\Operation\CacheGet;
-use Magix\Cache\Runtime\Operation\CacheOperationTerminal;
-use Magix\Cache\Runtime\Operation\CacheSet;
-use Magix\Cache\Runtime\Operation\OriginFetch;
-use Magix\Cache\Runtime\Operation\OriginFetchProvenance;
-use Magix\Cache\Runtime\Strategy\PassThroughCacheStrategy;
+use Magix\Cache\Runtime\OriginConstraints;
+use Magix\Cache\Runtime\StaleReuse;
+use Magix\Cache\Runtime\UnixClock;
 use Psr\Clock\ClockInterface;
+use Throwable;
 
 /**
- * Applies cache policies, performs lookups, and persists complete result entries.
+ * Executes cache boundaries through a fixed sequence of stages.
+ *
+ * The order never depends on how attributes are written: lookup, fresh-hit
+ * judgement, origin execution, constraint application at one base time, and a
+ * re-judged store. Only the origin call sits inside the stale-if-error capture
+ * range, and only cache reads and writes sit inside the backend bypass range.
  */
-final class CacheRuntime
+final readonly class CacheRuntime
 {
-    private static ?self $current = null;
+    private RegisteredExtensions $extensions;
 
     /**
      * Creates a cache runtime using a Magix cache implementation.
+     *
+     * @param string $namespace Key namespace that separates this runtime's entries.
+     * @param list<Runtime\Extension\CacheTtlResolver> $ttlResolvers Resolvers referenced by #[DynamicTtl].
+     * @param list<Runtime\Extension\BackendErrorClassifier> $errorClassifiers Classifiers referenced by #[BypassCacheErrors].
      */
     public function __construct(
-        private readonly Cache $cache,
-        private readonly ClockInterface $clock = new SystemClock(),
-        private readonly CacheKeyStrategy $keyStrategy = new HashCacheKeyStrategy(),
+        private Cache $cache,
+        private ClockInterface $clock = new SystemClock(),
+        private CacheKeyStrategy $keyStrategy = new HashCacheKeyStrategy(),
+        private string $namespace = 'magix',
+        array $ttlResolvers = [],
+        array $errorClassifiers = [],
+        private ?CacheObserver $observer = null,
     ) {
+        $this->extensions = new RegisteredExtensions($ttlResolvers, $errorClassifiers);
     }
 
     /**
-     * Returns the strategy used by Cacheable to derive cache keys.
-     */
-    public function keyStrategy(): CacheKeyStrategy
-    {
-        return $this->keyStrategy;
-    }
-
-    /**
-     * Installs or removes the process-local runtime used by Cacheable.
-     */
-    public static function setCurrent(?self $runtime): void
-    {
-        self::$current = $runtime;
-    }
-
-    /**
-     * Reports whether a process-local runtime is installed.
-     *
-     * Framework integrations use this to observe the bootstrap lifecycle without
-     * calling current(), which treats a missing runtime as a programmer error.
-     */
-    public static function isInstalled(): bool
-    {
-        return self::$current !== null;
-    }
-
-    /**
-     * Returns the installed process-local runtime.
-     *
-     * @throws LogicException when no runtime has been installed
-     */
-    public static function current(): self
-    {
-        return self::$current ?? throw new LogicException('No CacheRuntime has been installed.');
-    }
-
-    /**
-     * Resolves one cache entry using an already determined key and policy.
+     * Resolves one cache boundary through the fixed execution stages.
      *
      * @template T
-     * @param Closure(): Cached<T> $compute
-     * @param CacheStrategy $strategy Per-boundary cache-operation strategy.
+     * @param CacheInvocation<T> $invocation
      * @return Cached<T>
+     * @throws Throwable when the origin fails without an eligible stale fallback
+     * @throws LogicException when a referenced extension is not registered or a derived lifetime cannot be derived
      */
-    public function execute(
-        string $key,
-        CachePolicy $policy,
-        Closure $compute,
-        CacheStrategy $strategy = new PassThroughCacheStrategy(),
-    ): Cached {
+    public function execute(CacheInvocation $invocation): Cached
+    {
+        $converter = new CacheEntryConverter();
+        $reuse = new StaleReuse();
+        $clock = new UnixClock($this->clock);
+        $key = $this->keyStrategy->generate($invocation->context->withNamespace($this->namespace));
+        $classifier = $this->extensions->classifier($invocation->bypassCacheErrors);
+        $resolver = $this->extensions->ttlResolver($invocation->dynamicTtl);
+        $cache = new GuardedCache($this->cache, $this->observer);
+        $fresh = null;
         $stale = null;
-        $entries = new CacheEntryConverter();
-        $terminal = new CacheOperationTerminal(
-            $this->cache,
-            static fn () => $compute()->value(),
-        );
 
-        if ($policy->visibility !== Visibility::NoStore) {
-            $get = new CacheGet(key: $key, clock: $this->clock);
-            $entry = $strategy->get($get, $terminal->get(...));
-            $now = (float) $this->clock->now()->format('U.u');
+        if ($invocation->policy->visibility !== Visibility::NoStore) {
+            $witness = static fn (): mixed => ($invocation->origin)()->value();
+            [$fresh, $stale] = $cache->lookup($key, $classifier, $witness, $clock->now());
+        }
 
-            if ($entry !== null && $entry->retainedUntil > $now) {
-                if ($entry->expiresAt > $now) {
-                    return $entries->toCached($entry);
-                }
+        if ($fresh !== null) {
+            return $converter->toCached($fresh);
+        }
 
-                $stale = $entry;
+        try {
+            $result = ($invocation->origin)();
+        } catch (Throwable $error) {
+            $served = $reuse->candidate($invocation->staleIfError, $stale, $error, $clock->now());
+
+            if ($served === null) {
+                throw $error;
             }
+
+            $this->observer?->observe(CacheEvent::StaleServed, $key);
+
+            return $converter->toCached($served);
         }
 
-        $fetch = new OriginFetch(
-            key: $key,
-            origin: $compute,
-            stale: $stale,
-            clock: $this->clock,
-        );
-        $fetched = $strategy->fetch($fetch, $terminal->fetch(...));
+        $metadata = (new OriginConstraints())->apply($invocation->policy, $resolver, $result, $key, $clock->now());
+        $result = Cached::of($result->value(), $metadata);
+        $entry = $converter->toEntry($result, $clock->now(), $reuse->retention($invocation->staleIfError, $metadata));
 
-        if ($fetched->provenance === OriginFetchProvenance::Stale) {
-            return $entries->toCached($fetched->staleEntry());
+        if ($entry === null) {
+            $this->observer?->observe(CacheEvent::StoreSkipped, $key);
+
+            return $result;
         }
 
-        $now = (float) $this->clock->now()->format('U.u');
-        $origin = $fetched->originValue();
-        $result = Cached::of($origin->value(), $origin->metadata->applyPolicy($policy, $now));
-        $entry = $entries->toEntry($result, $now);
-
-        if ($entry !== null) {
-            $strategy->set(new CacheSet($key, $entry), $terminal->set(...));
-        }
+        $cache->write($key, $entry, $classifier);
 
         return $result;
     }

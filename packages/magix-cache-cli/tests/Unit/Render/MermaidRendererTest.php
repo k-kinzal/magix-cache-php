@@ -7,8 +7,9 @@ namespace Tests\Package\Cli\Unit\Render;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\MermaidRenderer;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -17,13 +18,14 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
 #[UsesClass(CacheNode::class)]
+#[UsesClass(TtlEstimate::class)]
 final class MermaidRendererTest extends TestCase
 {
     public function testRenderStartsAFlowchart(): void
     {
         $node = new CacheNode(
             new BoundaryDeclaration('App\ProductQuery', 'execute', 'src/ProductQuery.php', 12),
-            new CacheEffect(ttl: 20),
+            new CacheEffect(ttl: TtlEstimate::known(20)),
         );
 
         $chart = (new MermaidRenderer())->render($node);
@@ -36,17 +38,29 @@ final class MermaidRendererTest extends TestCase
     {
         $child = new CacheNode(
             new BoundaryDeclaration('App\ViewerQuery', 'execute', 'src/ViewerQuery.php', 12),
-            new CacheEffect(visibility: Visibility::Private),
+            new CacheEffect(ttl: TtlEstimate::unconstrained(), visibility: Visibility::Private),
         );
         $node = new CacheNode(
             new BoundaryDeclaration('App\PageQuery', 'execute', 'src/PageQuery.php', 31),
-            new CacheEffect(ttl: 20),
+            new CacheEffect(ttl: TtlEstimate::known(20)),
             [$child],
         );
 
         $statements = (new MermaidRenderer())->statements($node, 'n0');
 
-        self::assertSame('    n0_0["ViewerQuery::execute<br/>no expiration - private"]', $statements[1]);
+        self::assertSame('    n0_0["ViewerQuery::execute<br/>unconstrained - private"]', $statements[1]);
         self::assertSame('    n0 --> n0_0', $statements[2]);
+    }
+
+    public function testStatementsShowConditionalUpperBounds(): void
+    {
+        $node = new CacheNode(
+            new BoundaryDeclaration('App\RateQuery', 'execute', 'src/RateQuery.php', 12),
+            new CacheEffect(ttl: TtlEstimate::unknown(30)),
+        );
+
+        $statements = (new MermaidRenderer())->statements($node, 'n0');
+
+        self::assertSame('    n0["RateQuery::execute<br/>unknown (≤30s) - shared"]', $statements[0]);
     }
 }

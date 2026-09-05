@@ -18,6 +18,7 @@ use Tests\Package\Cli\Fixture\Project\ProductQuery;
 #[UsesClass(CacheKeyUnresolvable::class)]
 #[UsesNamespace('Magix\Cache\Runtime')]
 #[UsesNamespace('Magix\Cache\Attribute')]
+#[UsesNamespace('Magix\Cache\Metadata')]
 #[UsesClass(\Magix\Cache\CachePolicy::class)]
 final class CacheKeyResolverTest extends TestCase
 {
@@ -34,6 +35,22 @@ final class CacheKeyResolverTest extends TestCase
         $this->expectException(CacheKeyUnresolvable::class);
 
         (new CacheKeyResolver())->reflect('App\\NoSuchQuery', 'execute');
+    }
+
+    public function testDefinitionResolvesTheDeclarationTheRuntimeWouldUse(): void
+    {
+        $definition = (new CacheKeyResolver())->definition(ProductQuery::class, 'execute');
+
+        self::assertSame('1', $definition->policy->version);
+        self::assertSame(['product'], $definition->policy->tags);
+        self::assertSame('default', $definition->runtime);
+    }
+
+    public function testDefinitionReportsAClassThisProcessCannotLoad(): void
+    {
+        $this->expectException(CacheKeyUnresolvable::class);
+
+        (new CacheKeyResolver())->definition('App\\NoSuchQuery', 'execute');
     }
 
     public function testArgumentsReportACallThatOmitsARequiredParameter(): void
@@ -60,10 +77,10 @@ final class CacheKeyResolverTest extends TestCase
     public function testResolveMatchesTheKeyTheRuntimeDerives(): void
     {
         $expected = (new HashCacheKeyStrategy())->generate(
-            (new CacheDefinitionResolver())->resolve(new ProductQuery(), 'execute')->keyContext([42], '1'),
+            (new CacheDefinitionResolver())->resolve(new ProductQuery(), 'execute')->keyContext([42]),
         );
 
-        $key = (new CacheKeyResolver())->resolve(ProductQuery::class, 'execute', '1', [42]);
+        $key = (new CacheKeyResolver())->resolve(ProductQuery::class, 'execute', [42]);
 
         self::assertSame($expected, $key);
     }

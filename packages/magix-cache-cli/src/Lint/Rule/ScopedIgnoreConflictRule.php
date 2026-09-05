@@ -9,7 +9,7 @@ use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Lint\Diagnostic;
 use Magix\Cache\Cli\Lint\LintRule;
 use Magix\Cache\Cli\Lint\Severity;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use Override;
 
 /**

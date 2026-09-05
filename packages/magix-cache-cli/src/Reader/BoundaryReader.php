@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace Magix\Cache\Cli\Reader;
 
 use Magix\Cache\Attribute\Cache;
-use Magix\Cache\CachePolicy;
+use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
-use Magix\Cache\Runtime\Metadata\CacheMetadata;
+use Magix\Cache\Metadata\CacheMetadata;
 use PhpParser\Node;
-use PhpParser\Node\Arg;
-use PhpParser\Node\Expr;
-use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Attribute;
 use PhpParser\Node\Expr\MethodCall;
-use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
@@ -23,17 +20,18 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeFinder;
 
-use function strtolower;
-
 /**
  * Reads one cached() call site as a complete boundary declaration.
+ *
+ * cached() takes only the computation: the policy, the runtime reference,
+ * and every behavior come from attributes on the method or its class.
  */
 final readonly class BoundaryReader
 {
     /**
-     * Parameter order of the cached() method provided by Cacheable.
+     * Parameter order of the #[DynamicTtl] attribute.
      */
-    private const array PARAMETERS = ['compute', 'policy', 'strategy'];
+    private const array DYNAMIC_TTL_OPTIONS = ['resolver', 'enabled'];
 
     /**
      * Creates a boundary reader.
@@ -43,6 +41,7 @@ final readonly class BoundaryReader
         private PolicyReader $policies = new PolicyReader(),
         private ParameterReader $parameters = new ParameterReader(),
         private DependencyReader $dependencies = new DependencyReader(),
+        private ArgumentReader $arguments = new ArgumentReader(),
         private NodeFinder $finder = new NodeFinder(),
     ) {
     }
@@ -58,6 +57,7 @@ final readonly class BoundaryReader
         string $file,
         array $propertyTypes,
         ?PolicyDeclaration $classPolicy,
+        bool $classDynamicTtl = false,
     ): ?BoundaryDeclaration {
         $statements = $method->stmts ?? [];
 
@@ -75,7 +75,6 @@ final readonly class BoundaryReader
             return null;
         }
 
-        $expressions = $this->arguments($call);
         $parameters = $this->parameters->read($method);
 
         return new BoundaryDeclaration(
@@ -83,10 +82,10 @@ final readonly class BoundaryReader
             method: $method->name->toString(),
             file: $file,
             line: $method->getStartLine(),
-            policy: $this->policy($expressions, $method, $classPolicy),
+            policy: $this->policy($method, $classPolicy),
             parameters: $parameters,
             dependencies: $this->dependencies->read($method, $class, $propertyTypes, $parameters),
-            hasStrategy: isset($expressions['strategy']),
+            hasDynamicTtl: $this->dynamicTtl($method, $classDynamicTtl),
             suppliesMetadata: $this->finder->findFirst(
                 $statements,
                 static fn (Node $node): bool => $node instanceof Name && $node->toString() === CacheMetadata::class,
@@ -105,51 +104,20 @@ final readonly class BoundaryReader
     }
 
     /**
-     * Returns the expression written for each cached() parameter.
-     *
-     * @return array<string, Expr>
+     * Reports whether the class declares an enabled #[DynamicTtl] default.
      */
-    public function arguments(MethodCall $call): array
+    public function classDynamicTtl(Class_ $class): bool
     {
-        $expressions = [];
-        $position = 0;
+        $attribute = $this->attributes->find($class->attrGroups, DynamicTtl::class);
 
-        foreach ($call->args as $argument) {
-            if (!$argument instanceof Arg || $argument->unpack) {
-                continue;
-            }
-
-            $name = $argument->name?->toString() ?? (self::PARAMETERS[$position] ?? null);
-
-            if ($argument->name === null) {
-                ++$position;
-            }
-
-            if ($name !== null) {
-                $expressions[$name] = $argument->value;
-            }
-        }
-
-        return $expressions;
+        return $attribute !== null && $this->enabled($attribute);
     }
 
     /**
-     * Returns the policy that applies to a cached() call.
-     *
-     * @param array<string, Expr> $expressions
+     * Returns the policy that applies to a cache boundary method.
      */
-    public function policy(array $expressions, ClassMethod $method, ?PolicyDeclaration $classPolicy): ?PolicyDeclaration
+    public function policy(ClassMethod $method, ?PolicyDeclaration $classPolicy): ?PolicyDeclaration
     {
-        $declared = $expressions['policy'] ?? null;
-
-        if ($declared instanceof New_ && $declared->class instanceof Name && $declared->class->toString() === CachePolicy::class) {
-            return $this->policies->read($declared->args, PolicySource::ExplicitPolicy);
-        }
-
-        if ($declared !== null && !($declared instanceof ConstFetch && strtolower($declared->name->toString()) === 'null')) {
-            return new PolicyDeclaration(source: PolicySource::Unresolved, ttl: null);
-        }
-
         $attribute = $this->attributes->find($method->attrGroups, Cache::class);
 
         if ($attribute !== null) {
@@ -157,5 +125,31 @@ final readonly class BoundaryReader
         }
 
         return $classPolicy;
+    }
+
+    /**
+     * Reports whether an enabled #[DynamicTtl] applies to a boundary method.
+     *
+     * A method-level declaration replaces the class-level default as a whole.
+     */
+    public function dynamicTtl(ClassMethod $method, bool $classDynamicTtl): bool
+    {
+        $attribute = $this->attributes->find($method->attrGroups, DynamicTtl::class);
+
+        if ($attribute === null) {
+            return $classDynamicTtl;
+        }
+
+        return $this->enabled($attribute);
+    }
+
+    /**
+     * Reports whether a #[DynamicTtl] declaration is not explicitly disabled.
+     */
+    public function enabled(Attribute $attribute): bool
+    {
+        $values = $this->arguments->values($attribute->args, self::DYNAMIC_TTL_OPTIONS);
+
+        return ($values['enabled'] ?? true) !== false;
     }
 }

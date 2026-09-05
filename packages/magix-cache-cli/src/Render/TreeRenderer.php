@@ -11,6 +11,8 @@ use function implode;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\TtlEstimate;
+use Magix\Cache\Cli\Graph\TtlEstimateState;
 
 use function strtolower;
 
@@ -79,9 +81,9 @@ final readonly class TreeRenderer
     {
         $effect = $node->effect;
         $declared = $node->boundary->policy;
-        $ttl = 'ttl '.($effect->ttl === null ? 'none' : '<fg=green>'.$effect->ttl.'s</>');
+        $ttl = 'ttl '.$this->estimate($effect->ttl);
 
-        if ($declared !== null && $declared->ttlLabel() !== ($effect->ttl === null ? '' : $effect->ttl.'s')) {
+        if ($declared !== null && $declared->ttlLabel() !== $effect->ttl->label()) {
             $ttl .= ' (declared '.$declared->ttlLabel().')';
         }
 
@@ -99,13 +101,25 @@ final readonly class TreeRenderer
     }
 
     /**
-     * Returns the effective lifetime with the reason it was chosen.
+     * Returns the effective lifetime with the reason or condition behind it.
      */
     public function ttl(CacheEffect $effect): string
     {
-        $ttl = $effect->ttl === null ? 'none' : '<fg=green>'.$effect->ttl.'s</>';
+        $ttl = $this->estimate($effect->ttl);
 
-        return $effect->ttlReason === null ? $ttl : $ttl.' ('.$effect->ttlReason.')';
+        return $effect->ttl->reason === null ? $ttl : $ttl.' ('.$effect->ttl->reason.')';
+    }
+
+    /**
+     * Returns one lifetime estimate rendered for the terminal.
+     */
+    public function estimate(TtlEstimate $estimate): string
+    {
+        return match ($estimate->state) {
+            TtlEstimateState::Known => '<fg=green>'.$estimate->label().'</>',
+            TtlEstimateState::Invalid => '<fg=red>invalid</>',
+            default => $estimate->label(),
+        };
     }
 
     /**

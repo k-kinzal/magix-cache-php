@@ -6,6 +6,7 @@ namespace Tests\Unit\Cache\PSR6;
 
 use Magix\Cache\Cache\CacheEntry;
 use Magix\Cache\Cache\PSR6\CacheItemPool;
+use Magix\Cache\Metadata\CacheMetadata;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +15,8 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 #[CoversClass(CacheItemPool::class)]
 #[UsesClass(CacheEntry::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
+#[UsesClass(CacheMetadata::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 final class CacheItemPoolTest extends TestCase
 {
     /**
@@ -24,7 +26,7 @@ final class CacheItemPoolTest extends TestCase
     {
         $pool = new ArrayAdapter();
         $cache = new CacheItemPool($pool);
-        $entry = new CacheEntry('value', 4_000_000_020.0);
+        $entry = new CacheEntry('value', new CacheMetadata(expiresAt: 4_000_000_020.0));
         $typeWitness = static fn (): string => '';
         $item = $pool->getItem('generated-key');
         $item->set($entry);
@@ -41,7 +43,7 @@ final class CacheItemPoolTest extends TestCase
     {
         $pool = new ArrayAdapter();
         $cache = new CacheItemPool($pool);
-        $entry = new CacheEntry('value', 4_000_000_020.0);
+        $entry = new CacheEntry('value', new CacheMetadata(expiresAt: 4_000_000_020.0));
 
         $cache->set('generated-key', $entry);
 
@@ -57,7 +59,7 @@ final class CacheItemPoolTest extends TestCase
         $pool = new ArrayAdapter();
         $entry = new CacheEntry(
             value: 'value',
-            expiresAt: $now - 10.0,
+            metadata: new CacheMetadata(expiresAt: $now - 10.0),
             retainedUntil: $now + 60.0,
         );
 

@@ -3,7 +3,7 @@
 [![GitHub Actions](https://github.com/k-kinzal/magix-cache/actions/workflows/ci.yml/badge.svg)](https://github.com/k-kinzal/magix-cache/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-The Laravel integration connects MagixCache to Laravel 12 and 13. It installs a `CacheRuntime` backed by Laravel's default cache store, allowing cached queries to work without manual runtime configuration.
+The Laravel integration connects MagixCache to Laravel 12 and 13. It registers a `CacheRuntime` backed by Laravel's default cache store as the `default` runtime reference, allowing cached queries to work without manual runtime configuration.
 
 Laravel continues to own the storage backend and its configuration.
 
@@ -14,6 +14,7 @@ Laravel continues to own the storage backend and its configuration.
 - Uses Laravel's default `cache.store`
 - Adapts the store through the MagixCache PSR-16 adapter
 - Registers `CacheRuntime` as a container singleton
+- Fixes the `default` reference in `CacheRuntimeRegistry` with a container-backed provider
 - Supports every cache backend exposed by Laravel's cache configuration
 
 ## Requirements
@@ -30,7 +31,7 @@ composer require k-kinzal/magix-cache-laravel
 
 ## Quick Start
 
-Package Discovery installs the runtime automatically. Add `Cacheable` to a query and return a `Cached` value.
+Package Discovery registers the runtime automatically. Add `Cacheable` to a query and return a `Cached` value.
 
 ```php
 <?php
@@ -55,12 +56,16 @@ final class ProductQuery
 
 The query uses the application's configured `cache.store`, including Redis, Memcached, database, and other Laravel cache drivers.
 
+## How Registration Works
+
+At boot the service provider fixes the `default` runtime reference in `CacheRuntimeRegistry` to a provider closure that resolves `CacheRuntime` through the container on every lookup, so the registry never holds a runtime instance across requests. Runtime names are registered once per process and never rebound; if the application has already registered `default` during bootstrap — for example to add TTL resolvers, error classifiers, or an observer — the provider leaves that registration in place.
+
 ## Documentation
 
 For more detailed information, check out the documentation:
 
 - [MagixCache Core](../magix-cache/README.md): Policies, cache keys, composition, and PSR adapters
-- [Cache Strategies](../magix-cache/docs/cache-strategies.md): Per-boundary cache behavior and custom strategies
+- [Cache Behaviors](../magix-cache/docs/cache-behaviors.md): Stale-if-error, dynamic TTL, and backend-failure bypass
 - [Package Overview](../../README.md): View every package in this monorepo
 
 ## License

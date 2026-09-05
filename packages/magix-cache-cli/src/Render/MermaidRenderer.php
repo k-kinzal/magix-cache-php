@@ -32,8 +32,7 @@ final readonly class MermaidRenderer
     public function statements(CacheNode $node, string $id): array
     {
         $effect = $node->effect;
-        $ttl = $effect->ttl === null ? 'no expiration' : $effect->ttl.'s';
-        $label = $node->boundary->shortId().'<br/>'.$ttl.' - '.strtolower($effect->visibility->name);
+        $label = $node->boundary->shortId().'<br/>'.$effect->ttl->label().' - '.strtolower($effect->visibility->name);
         $statements = ['    '.$id.'["'.$label.'"]'];
         $position = 0;
 

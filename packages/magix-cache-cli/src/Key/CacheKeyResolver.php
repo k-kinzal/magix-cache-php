@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Key;
 
+use function class_exists;
 use function count;
 
+use Magix\Cache\Runtime\CacheDefinition;
+use Magix\Cache\Runtime\CacheDefinitionResolver;
 use Magix\Cache\Runtime\CacheKeyArgumentBinder;
-use Magix\Cache\Runtime\CacheKeyContext;
 use Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -22,6 +25,7 @@ final readonly class CacheKeyResolver
      */
     public function __construct(
         private CacheKeyArgumentBinder $binder = new CacheKeyArgumentBinder(),
+        private CacheDefinitionResolver $definitions = new CacheDefinitionResolver(),
         private HashCacheKeyStrategy $strategy = new HashCacheKeyStrategy(),
     ) {
     }
@@ -41,6 +45,29 @@ final readonly class CacheKeyResolver
                 previous: $missing,
             );
         }
+    }
+
+    /**
+     * Returns the resolved declaration the runtime would derive the key from.
+     *
+     * The declaration is resolved exactly like at runtime, on an instance
+     * created without its constructor, so the key carries the same version
+     * and declaration fingerprint the runtime stores entries under. A
+     * boundary that declares no #[Cache] is the caller's mistake and is
+     * checked before this method runs; here it surfaces as the same
+     * LogicException the runtime raises.
+     *
+     * @throws CacheKeyUnresolvable when the class cannot be loaded in this process
+     */
+    public function definition(string $class, string $method): CacheDefinition
+    {
+        if (!class_exists($class)) {
+            throw new CacheKeyUnresolvable(
+                'The class '.$class.' cannot be loaded. Run magix where the project autoloader can reach it.',
+            );
+        }
+
+        return $this->definitions->resolve(new ReflectionClass($class)->newInstanceWithoutConstructor(), $method);
     }
 
     /**
@@ -77,15 +104,10 @@ final readonly class CacheKeyResolver
      * @param list<mixed> $arguments
      * @throws CacheKeyUnresolvable when the boundary cannot be loaded or the call does not match its parameters
      */
-    public function resolve(string $class, string $method, string $version, array $arguments): string
+    public function resolve(string $class, string $method, array $arguments): string
     {
-        $reflection = $this->reflect($class, $method);
+        $this->arguments($class, $method, $arguments);
 
-        return $this->strategy->generate(new CacheKeyContext(
-            class: $reflection->getDeclaringClass()->getName(),
-            method: $reflection->getName(),
-            arguments: $this->arguments($class, $method, $arguments),
-            version: $version,
-        ));
+        return $this->strategy->generate($this->definition($class, $method)->keyContext($arguments));
     }
 }

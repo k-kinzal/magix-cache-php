@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Graph;
 
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 
 /**
  * Holds the constraints that the dependencies of a boundary impose on it.
@@ -12,16 +12,23 @@ use Magix\Cache\Runtime\Metadata\Visibility;
 final readonly class DependencyConstraint
 {
     /**
+     * The lifetime constraint the dependencies combine to.
+     */
+    public TtlEstimate $ttl;
+
+    /**
      * Creates a dependency constraint.
      *
+     * @param TtlEstimate|null $ttl Defaults to Unconstrained: no dependency imposes an expiration.
      * @param list<string> $tags
      */
     public function __construct(
-        public ?int $ttl = null,
+        ?TtlEstimate $ttl = null,
         public ?string $ttlSource = null,
         public Visibility $visibility = Visibility::Shared,
         public ?string $visibilitySource = null,
         public array $tags = [],
     ) {
+        $this->ttl = $ttl ?? TtlEstimate::unconstrained();
     }
 }

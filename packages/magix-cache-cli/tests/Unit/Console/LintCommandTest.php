@@ -19,7 +19,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(LintCommand::class)]
 #[UsesNamespace('Magix\Cache\Cli')]
 #[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 final class LintCommandTest extends TestCase
 {
     public function testLintFailsWhenABoundaryCannotWork(): void
@@ -73,18 +73,18 @@ final class LintCommandTest extends TestCase
     {
         $command = new LintCommand(new CatalogLoader(dirname(__DIR__, 5)));
         $diagnostic = new Diagnostic(
-            rule: 'clamped-ttl',
+            rule: 'auto-ttl-without-upstream',
             severity: Severity::Notice,
             boundary: 'App\PageQuery::execute',
             file: 'src/PageQuery.php',
             line: 31,
-            message: 'The declared ttl is always clamped.',
+            message: 'Ttl::Auto requires a finite upstream expiration at runtime.',
         );
 
         $encoded = $command->encode([$diagnostic]);
 
         self::assertJson($encoded);
-        self::assertStringContainsString('"rule": "clamped-ttl"', $encoded);
+        self::assertStringContainsString('"rule": "auto-ttl-without-upstream"', $encoded);
         self::assertStringContainsString('"severity": "notice"', $encoded);
     }
 }

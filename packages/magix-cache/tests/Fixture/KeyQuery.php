@@ -9,7 +9,7 @@ use Magix\Cache\Attribute\CacheIgnore;
 use Magix\Cache\Attribute\CacheKey;
 use Magix\Cache\Attribute\CacheScope;
 use Magix\Cache\Cached;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 
 /**
  * Declares representative argument attributes for key tests.

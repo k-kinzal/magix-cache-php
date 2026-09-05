@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use Magix\Cache\CachePolicy;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CachePolicy::class)]
 #[UsesClass(Visibility::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\CacheTokenSet::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 final class CachePolicyTest extends TestCase
 {
     public function testExplicitConfigurationIsPreserved(): void

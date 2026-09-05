@@ -71,11 +71,18 @@ final readonly class KeyCommand
         }
 
         $found = $matches[0];
+
+        if ($found->policy === null) {
+            $io->error($found->id().' declares no #[Cache] on the method or its concrete class, so it has no key.');
+
+            return Command::FAILURE;
+        }
+
         $values = $this->decode($arguments);
 
         try {
             $bound = $this->keys->arguments($found->class, $found->method, $values);
-            $key = $this->keys->resolve($found->class, $found->method, $found->policy->version ?? '1', $values);
+            $key = $this->keys->resolve($found->class, $found->method, $values);
         } catch (CacheKeyUnresolvable $failure) {
             $io->error($failure->getMessage());
 
@@ -83,7 +90,7 @@ final readonly class KeyCommand
         }
 
         $io->writeln($found->id());
-        $io->writeln('  version    '.($found->policy->version ?? '1'));
+        $io->writeln('  version    '.$found->policy->version);
         $io->writeln('  arguments  '.($bound === [] ? 'none' : implode(', ', array_map(
             static fn (string $name, mixed $value): string => $name.'='.json_encode($value, JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR),
             array_keys($bound),

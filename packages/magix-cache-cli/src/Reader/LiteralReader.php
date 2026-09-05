@@ -7,7 +7,7 @@ namespace Magix\Cache\Cli\Reader;
 use function is_float;
 use function is_int;
 
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Array_;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Magix\Cache\Attribute;
 
 use Attribute;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 
 /**
  * Restricts cache visibility when the annotated parameter is present.

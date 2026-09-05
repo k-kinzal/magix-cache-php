@@ -34,13 +34,18 @@ final readonly class CacheTree
         $id = $boundary->id();
 
         if (in_array($id, $visited, true)) {
-            return new CacheNode($boundary, new CacheEffect(visibility: $boundary->scope()), [], ['recursive dependency, not expanded again']);
+            $effect = new CacheEffect(TtlEstimate::unknown(condition: 'recursive dependency, not analyzed'), $boundary->scope());
+
+            return new CacheNode($boundary, $effect, [], ['recursive dependency, not expanded again']);
         }
 
         if ($depth < 1) {
+            $constraint = $boundary->dependencies === []
+                ? new DependencyConstraint()
+                : new DependencyConstraint(TtlEstimate::unknown(condition: 'dependencies beyond the depth limit were not analyzed'));
             $notes = $boundary->dependencies === [] ? [] : ['depth limit reached, dependencies not expanded'];
 
-            return new CacheNode($boundary, $this->effects->calculate($boundary, new DependencyConstraint()), [], $notes);
+            return new CacheNode($boundary, $this->effects->calculate($boundary, $constraint), [], $notes);
         }
 
         $children = [];

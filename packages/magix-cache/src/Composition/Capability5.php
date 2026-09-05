@@ -51,7 +51,7 @@ final readonly class Capability5
                 $this->fourth->value(),
                 $this->fifth->value(),
             ),
-            $this->first->metadata->merge(
+            $this->first->metadata->meet(
                 $this->second->metadata,
                 $this->third->metadata,
                 $this->fourth->metadata,

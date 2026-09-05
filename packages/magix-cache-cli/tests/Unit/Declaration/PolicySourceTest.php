@@ -14,6 +14,5 @@ final class PolicySourceTest extends TestCase
     public function testSourcesAreDistinct(): void
     {
         self::assertNotSame(PolicySource::MethodAttribute, PolicySource::ClassAttribute);
-        self::assertNotSame(PolicySource::ExplicitPolicy, PolicySource::Unresolved);
     }
 }

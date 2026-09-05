@@ -18,7 +18,7 @@ use Magix\Cache\Runtime\CacheKeyStrategy;
 use function serialize;
 
 /**
- * Hashes the class, method, normalized arguments, and cache version with SHA-256.
+ * Hashes every identity field of the key context with SHA-256.
  */
 final readonly class HashCacheKeyStrategy implements CacheKeyStrategy
 {
@@ -42,10 +42,13 @@ final readonly class HashCacheKeyStrategy implements CacheKeyStrategy
 
         try {
             $serialized = serialize([
+                'namespace' => $context->namespace,
                 'class' => $context->class,
+                'declaringClass' => $context->declaringClass,
                 'method' => $context->method,
                 'arguments' => $context->arguments,
                 'version' => $context->version,
+                'fingerprint' => $context->fingerprint,
             ]);
         } catch (Exception $exception) {
             throw new InvalidArgumentException(

@@ -13,7 +13,7 @@ use Magix\Cache\Attribute\CacheIgnore;
 use Magix\Cache\Attribute\CacheKey;
 use Magix\Cache\Attribute\CacheScope;
 use Magix\Cache\Cli\Declaration\KeyParameter;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use PhpParser\Node\Arg;
 use PhpParser\Node\AttributeGroup;
 use PhpParser\Node\Expr\Variable;

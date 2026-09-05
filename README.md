@@ -45,6 +45,8 @@ final class ProductQuery
 }
 ```
 
+Register a `CacheRuntime` under the `default` name in `CacheRuntimeRegistry` at bootstrap; the Laravel and Symfony packages do this automatically.
+
 See [packages/magix-cache/README.md](packages/magix-cache/README.md) for full documentation.
 
 ## Seeing What Is Cached
@@ -57,26 +59,29 @@ composer require --dev k-kinzal/magix-cache-cli
 vendor/bin/magix analyze ProductPageQuery::execute
 ```
 
+The output looks along these lines:
+
 ```text
 App\Query\ProductPageQuery::execute
   src/Query/ProductPageQuery.php:34
 
-  ttl          20s (declared 120s, clamped by ProductQuery::execute)
+  ttl          20s (declared 120s, capped by ProductQuery::execute)
   visibility   private (restricted by ViewerQuery::execute)
   storable     yes
   tags         inventory, page, product, viewer
   key          $productId, $viewerId (ignored: $trace)  version 1
-  policy       #[Cache(ttl: 120s, tags: [page])]
+  policy       #[Cache(ttl: 120, tags: ['page'])]
 
 ProductPageQuery::execute  ttl 20s (declared 120s)  private  tags inventory,page,product,viewer
 |-- ProductQuery::execute  ttl 20s  shared  tags product
 |-- InventoryQuery::execute  ttl 60s  shared  tags inventory
-`-- ViewerQuery::execute  ttl 30s  private  tags viewer
+`-- ViewerQuery::execute  ttl ≤30s, requires finite upstream  private  tags viewer
 ```
 
-`magix boundaries` lists every boundary of a project, `magix lint` fails a build when a boundary throws, never stores, or shares a private entry between viewers, and `magix key` prints the key of one call so an entry can be found in the backend. See [packages/magix-cache-cli/README.md](packages/magix-cache-cli/README.md).
+Because the analysis is static, a TTL is not always a single number: it may be reported as a known value, as unconstrained, or as a conditional upper bound such as "≤30s, requires a finite upstream expiration at runtime".
+
+`magix boundaries` lists every boundary of a project, `magix lint` fails a build when a declaration cannot hold at runtime — for example a derived TTL with no upstream expiration, or a private entry shared between viewers — and `magix key` prints the key of one call so an entry can be found in the backend. See [packages/magix-cache-cli/README.md](packages/magix-cache-cli/README.md).
 
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
-

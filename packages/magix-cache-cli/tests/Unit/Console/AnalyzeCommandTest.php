@@ -17,7 +17,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(AnalyzeCommand::class)]
 #[UsesNamespace('Magix\Cache\Cli')]
 #[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
-#[UsesClass(\Magix\Cache\Runtime\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 final class AnalyzeCommandTest extends TestCase
 {
     public function testAnalyzeRendersTheComposedTreeOfABoundary(): void
@@ -31,7 +31,7 @@ final class AnalyzeCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         self::assertStringContainsString('ProductPageQuery::execute', $tester->getDisplay());
-        self::assertStringContainsString('20s (declared 120s, clamped by ProductQuery::execute)', $tester->getDisplay());
+        self::assertStringContainsString('20s (declared 120s, capped by ProductQuery::execute)', $tester->getDisplay());
         self::assertStringContainsString('private (restricted by ViewerQuery::execute)', $tester->getDisplay());
         self::assertStringContainsString('$productId, $viewerId (ignored: $trace)', $tester->getDisplay());
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());

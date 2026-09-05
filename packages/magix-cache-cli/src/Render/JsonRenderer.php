@@ -54,8 +54,8 @@ final readonly class JsonRenderer
                 'maxTtl' => $policy->maxTtl,
                 'tags' => $policy->tags,
                 'visibility' => strtolower($policy->visibility->name),
-                'clamp' => $policy->clamp,
                 'version' => $policy->version,
+                'runtime' => $policy->runtime,
             ],
             'key' => array_map(
                 static fn ($parameter): array => [
@@ -68,8 +68,7 @@ final readonly class JsonRenderer
                 $boundary->parameters,
             ),
             'effective' => [
-                'ttl' => $effect->ttl,
-                'ttlReason' => $effect->ttlReason,
+                'ttl' => $effect->ttl->jsonSerialize(),
                 'visibility' => strtolower($effect->visibility->name),
                 'visibilityReason' => $effect->visibilityReason,
                 'storable' => $effect->storable,

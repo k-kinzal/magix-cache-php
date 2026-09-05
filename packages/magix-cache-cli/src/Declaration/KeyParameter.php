@@ -6,7 +6,7 @@ namespace Magix\Cache\Cli\Declaration;
 
 use function implode;
 
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 
 use function strtolower;
 

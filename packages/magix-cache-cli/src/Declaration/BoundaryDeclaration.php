@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Declaration;
 
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 
 use function strrpos;
 use function substr;
@@ -19,7 +19,7 @@ final readonly class BoundaryDeclaration
      *
      * @param list<KeyParameter> $parameters
      * @param list<DependencyCall> $dependencies
-     * @param bool $hasStrategy Whether a CacheStrategy is passed to cached().
+     * @param bool $hasDynamicTtl Whether an enabled #[DynamicTtl] applies to the boundary.
      * @param bool $suppliesMetadata Whether the boundary builds CacheMetadata itself.
      */
     public function __construct(
@@ -30,7 +30,7 @@ final readonly class BoundaryDeclaration
         public ?PolicyDeclaration $policy = null,
         public array $parameters = [],
         public array $dependencies = [],
-        public bool $hasStrategy = false,
+        public bool $hasDynamicTtl = false,
         public bool $suppliesMetadata = false,
     ) {
     }

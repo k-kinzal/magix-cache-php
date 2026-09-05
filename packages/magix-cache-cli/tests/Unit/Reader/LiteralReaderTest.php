@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Package\Cli\Unit\Reader;
 
 use Magix\Cache\Cli\Reader\LiteralReader;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ArrayItem;

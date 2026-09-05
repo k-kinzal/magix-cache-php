@@ -9,13 +9,12 @@ use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Reader\ArgumentReader;
 use Magix\Cache\Cli\Reader\LiteralReader;
 use Magix\Cache\Cli\Reader\PolicyReader;
-use Magix\Cache\Runtime\Metadata\Visibility;
+use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Expr\ClassConstFetch;
-use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
@@ -38,16 +37,16 @@ final class PolicyReaderTest extends TestCase
             new Arg(new Int_(60)),
             new Arg(new Array_([new ArrayItem(new String_('page'))])),
             new Arg(new ClassConstFetch(new Name(Visibility::class), 'Private')),
-            new Arg(new ConstFetch(new Name('false'))),
             new Arg(new String_('v2')),
+            new Arg(new String_('edge')),
         ], PolicySource::MethodAttribute);
 
         self::assertSame(30, $policy->ttl);
         self::assertSame(60, $policy->maxTtl);
         self::assertSame(['page'], $policy->tags);
         self::assertSame(Visibility::Private, $policy->visibility);
-        self::assertFalse($policy->clamp);
         self::assertSame('v2', $policy->version);
+        self::assertSame('edge', $policy->runtime);
         self::assertSame(PolicySource::MethodAttribute, $policy->source);
     }
 
@@ -59,17 +58,21 @@ final class PolicyReaderTest extends TestCase
         self::assertNull($policy->maxTtl);
         self::assertSame([], $policy->tags);
         self::assertSame(Visibility::Shared, $policy->visibility);
-        self::assertTrue($policy->clamp);
         self::assertSame('1', $policy->version);
+        self::assertSame('default', $policy->runtime);
     }
 
     public function testReadKeepsAnUnreadableTtlUnresolved(): void
     {
         $policy = (new PolicyReader())->read(
-            [new Arg(new Variable('ttl'), name: new Identifier('ttl'))],
-            PolicySource::ExplicitPolicy,
+            [
+                new Arg(new Variable('ttl'), name: new Identifier('ttl')),
+                new Arg(new Variable('runtime'), name: new Identifier('runtime')),
+            ],
+            PolicySource::MethodAttribute,
         );
 
         self::assertNull($policy->ttl);
+        self::assertSame('default', $policy->runtime);
     }
 }

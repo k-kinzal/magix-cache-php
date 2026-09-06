@@ -6,9 +6,11 @@ namespace Magix\Cache\Cli\Reader;
 
 use Magix\Cache\Attribute\Cache;
 use Magix\Cache\Attribute\DynamicTtl;
+use Magix\Cache\Attribute\UseStrategy;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
+use Magix\Cache\Cli\Declaration\UseStrategyDeclaration;
 use Magix\Cache\Metadata\CacheMetadata;
 use PhpParser\Node;
 use PhpParser\Node\Attribute;
@@ -42,6 +44,7 @@ final readonly class BoundaryReader
         private ParameterReader $parameters = new ParameterReader(),
         private DependencyReader $dependencies = new DependencyReader(),
         private ArgumentReader $arguments = new ArgumentReader(),
+        private UseStrategyReader $useStrategies = new UseStrategyReader(),
         private NodeFinder $finder = new NodeFinder(),
     ) {
     }
@@ -58,6 +61,7 @@ final readonly class BoundaryReader
         array $propertyTypes,
         ?PolicyDeclaration $classPolicy,
         bool $classDynamicTtl = false,
+        ?UseStrategyDeclaration $classUseStrategy = null,
     ): ?BoundaryDeclaration {
         $statements = $method->stmts ?? [];
 
@@ -90,6 +94,7 @@ final readonly class BoundaryReader
                 $statements,
                 static fn (Node $node): bool => $node instanceof Name && $node->toString() === CacheMetadata::class,
             ) !== null,
+            useStrategy: $this->useStrategy($method, $classUseStrategy),
         );
     }
 
@@ -111,6 +116,34 @@ final readonly class BoundaryReader
         $attribute = $this->attributes->find($class->attrGroups, DynamicTtl::class);
 
         return $attribute !== null && $this->enabled($attribute);
+    }
+
+    /**
+     * Returns the strategy usage a class declares for all of its boundaries.
+     */
+    public function classUseStrategy(Class_ $class): ?UseStrategyDeclaration
+    {
+        $attribute = $this->attributes->find($class->attrGroups, UseStrategy::class);
+
+        return $attribute === null ? null : $this->useStrategies->read($attribute);
+    }
+
+    /**
+     * Returns the strategy usage that applies to a boundary method.
+     *
+     * A method-level declaration replaces the class-level default as a
+     * whole, so a disabled method declaration leaves the boundary without a
+     * strategy.
+     */
+    public function useStrategy(ClassMethod $method, ?UseStrategyDeclaration $classUseStrategy): ?UseStrategyDeclaration
+    {
+        $attribute = $this->attributes->find($method->attrGroups, UseStrategy::class);
+
+        if ($attribute !== null) {
+            return $this->useStrategies->read($attribute);
+        }
+
+        return $classUseStrategy;
     }
 
     /**

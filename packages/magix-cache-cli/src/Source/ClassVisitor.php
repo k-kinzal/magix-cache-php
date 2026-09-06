@@ -8,6 +8,7 @@ use function is_string;
 
 use Magix\Cache\Cli\Declaration\ClassDeclaration;
 use Magix\Cache\Cli\Reader\BoundaryReader;
+use Magix\Cache\Cli\Reader\StrategyReader;
 use Magix\Cache\Cli\Reader\TypeReader;
 use Override;
 use PhpParser\Node;
@@ -34,6 +35,7 @@ final class ClassVisitor extends NodeVisitorAbstract
         private readonly string $file,
         private readonly BoundaryReader $boundaries = new BoundaryReader(),
         private readonly TypeReader $types = new TypeReader(),
+        private readonly StrategyReader $strategies = new StrategyReader(),
     ) {
     }
 
@@ -50,11 +52,12 @@ final class ClassVisitor extends NodeVisitorAbstract
         $name = $node->namespacedName?->toString() ?? $node->name->toString();
         $classPolicy = $this->boundaries->classPolicy($node);
         $classDynamicTtl = $this->boundaries->classDynamicTtl($node);
+        $classUseStrategy = $this->boundaries->classUseStrategy($node);
         $propertyTypes = $this->propertyTypes($node);
         $boundaries = [];
 
         foreach ($node->getMethods() as $method) {
-            $boundary = $this->boundaries->read($method, $name, $this->file, $propertyTypes, $classPolicy, $classDynamicTtl);
+            $boundary = $this->boundaries->read($method, $name, $this->file, $propertyTypes, $classPolicy, $classDynamicTtl, $classUseStrategy);
 
             if ($boundary !== null) {
                 $boundaries[] = $boundary;
@@ -71,7 +74,7 @@ final class ClassVisitor extends NodeVisitorAbstract
             $parents[] = $interface->toString();
         }
 
-        $this->collected[] = new ClassDeclaration($name, $parents, $boundaries);
+        $this->collected[] = new ClassDeclaration($name, $parents, $boundaries, $this->strategies->read($node, $this->file));
 
         return null;
     }

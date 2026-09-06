@@ -10,9 +10,9 @@ use Magix\Cache\Cached;
 /**
  * Holds three typed cached values until they are mapped to a result.
  *
- * @template T1
- * @template T2
- * @template T3
+ * @template-covariant T1
+ * @template-covariant T2
+ * @template-covariant T3
  */
 final readonly class Capability3
 {

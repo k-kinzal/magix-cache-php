@@ -15,13 +15,17 @@ use Magix\Cache\Cli\Declaration\Catalog;
  */
 final readonly class CacheTree
 {
+    private StrategyResolver $strategies;
+
     /**
      * Creates a tree builder for one catalog.
      */
     public function __construct(
         private Catalog $catalog,
         private EffectCalculator $effects = new EffectCalculator(),
+        ?StrategyResolver $strategies = null,
     ) {
+        $this->strategies = $strategies ?? new StrategyResolver($catalog);
     }
 
     /**
@@ -45,7 +49,7 @@ final readonly class CacheTree
                 : new DependencyConstraint(TtlEstimate::unknown(condition: 'dependencies beyond the depth limit were not analyzed'));
             $notes = $boundary->dependencies === [] ? [] : ['depth limit reached, dependencies not expanded'];
 
-            return new CacheNode($boundary, $this->effects->calculate($boundary, $constraint), [], $notes);
+            return new CacheNode($boundary, $this->effects->calculate($boundary, $constraint, $this->strategies->resolve($boundary)), [], $notes);
         }
 
         $children = [];
@@ -71,7 +75,7 @@ final readonly class CacheTree
 
         return new CacheNode(
             $boundary,
-            $this->effects->calculate($boundary, $this->effects->constrain($children)),
+            $this->effects->calculate($boundary, $this->effects->constrain($children), $this->strategies->resolve($boundary)),
             $children,
             $notes,
         );

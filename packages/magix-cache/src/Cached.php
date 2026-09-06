@@ -32,7 +32,7 @@ use Stringable;
  * its constraints, so a dependency obtained inside map must be chained with
  * flatMap or combineN instead.
  *
- * @template T
+ * @template-covariant T
  * @mixin T
  */
 final readonly class Cached

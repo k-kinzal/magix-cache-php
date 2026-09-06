@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixture\DeclaredQuery;
+use Tests\Fixture\StrategyQuery;
 
 #[CoversClass(DeclarationFingerprint::class)]
 #[UsesClass(CacheDefinitionResolver::class)]
@@ -22,6 +23,11 @@ use Tests\Fixture\DeclaredQuery;
 #[UsesClass(\Magix\Cache\Attribute\Cache::class)]
 #[UsesClass(\Magix\Cache\Attribute\DynamicTtl::class)]
 #[UsesClass(\Magix\Cache\Attribute\StaleIfError::class)]
+#[UsesClass(\Magix\Cache\Attribute\UseStrategy::class)]
+#[UsesClass(\Magix\Cache\Strategy\ComposedCacheStrategy::class)]
+#[UsesClass(\Magix\Cache\Strategy\CompositeCacheStrategy::class)]
+#[UsesClass(\Magix\Cache\Strategy\KeySpreadExpirationStrategy::class)]
+#[UsesClass(\Magix\Cache\Strategy\StaleIfErrorCacheStrategy::class)]
 #[UsesClass(\Magix\Cache\CachePolicy::class)]
 #[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
@@ -43,5 +49,16 @@ final class DeclarationFingerprintTest extends TestCase
         $class = $resolver->resolve(new DeclaredQuery(), 'viaClass')->keyContext([1]);
 
         self::assertNotSame($method->fingerprint, $class->fingerprint);
+    }
+
+    public function testCalculateSeparatesChangedStrategyArguments(): void
+    {
+        $resolver = new CacheDefinitionResolver();
+        $classLevel = $resolver->resolve(new StrategyQuery(), 'viaClass')->keyContext([1]);
+        $methodLevel = $resolver->resolve(new StrategyQuery(), 'viaMethod')->keyContext([1]);
+        $disabled = $resolver->resolve(new StrategyQuery(), 'withoutStrategy')->keyContext([1]);
+
+        self::assertNotSame($classLevel->fingerprint, $methodLevel->fingerprint);
+        self::assertNotSame($classLevel->fingerprint, $disabled->fingerprint);
     }
 }

@@ -89,12 +89,56 @@ final class TtlEstimateTest extends TestCase
         self::assertSame($invalid, TtlEstimate::unknown()->meet($invalid));
     }
 
+    public function testMeetKeepsTheProvableBoundsOfARange(): void
+    {
+        $met = TtlEstimate::unknown(60, null, 30)->meet(TtlEstimate::unknown(null, null, 30));
+
+        self::assertSame(TtlEstimateState::Unknown, $met->state);
+        self::assertSame(30, $met->lowerBound);
+        self::assertSame(60, $met->upperBound);
+        self::assertSame('30-60s', $met->label());
+    }
+
+    public function testMeetCollapsesAPinnedRangeWithoutAConditionIntoKnown(): void
+    {
+        $met = TtlEstimate::unknown(60, null, 60)->meet(TtlEstimate::unknown(null, null, 60));
+
+        self::assertSame(TtlEstimateState::Known, $met->state);
+        self::assertSame(60, $met->seconds);
+    }
+
+    public function testMeetKeepsAPinnedRangeUnknownUnderACondition(): void
+    {
+        $met = TtlEstimate::unknown(60, 'requires a finite upstream expiration at runtime', 60)
+            ->meet(TtlEstimate::unknown(null, null, 60));
+
+        self::assertSame(TtlEstimateState::Unknown, $met->state);
+        self::assertSame(60, $met->lowerBound);
+        self::assertSame(60, $met->upperBound);
+    }
+
+    public function testMeetDropsTheLowerBoundWhenOneSideGuaranteesNone(): void
+    {
+        $met = TtlEstimate::unknown(60, null, 30)->meet(TtlEstimate::unknown(45));
+
+        self::assertNull($met->lowerBound);
+        self::assertSame(45, $met->upperBound);
+        self::assertSame('≤45s', $met->label());
+    }
+
     public function testBoundReturnsTheTightestGuaranteedUpperBound(): void
     {
         self::assertSame(10, TtlEstimate::known(10)->bound(TtlEstimate::unknown(30)));
         self::assertSame(5, TtlEstimate::unknown(5)->bound(TtlEstimate::unknown(30)));
         self::assertSame(30, TtlEstimate::unknown()->bound(TtlEstimate::unknown(30)));
         self::assertNull(TtlEstimate::unknown()->bound(TtlEstimate::unknown()));
+    }
+
+    public function testFloorSurvivesOnlyWhenBothSidesGuaranteeOne(): void
+    {
+        self::assertSame(10, TtlEstimate::known(10)->floor(TtlEstimate::unknown(60, null, 30)));
+        self::assertSame(30, TtlEstimate::unknown(60, null, 45)->floor(TtlEstimate::unknown(null, null, 30)));
+        self::assertNull(TtlEstimate::unknown(60, null, 30)->floor(TtlEstimate::unknown(45)));
     }
 
     public function testConditionKeepsTheUnknownSideRequirement(): void
@@ -119,18 +163,20 @@ final class TtlEstimateTest extends TestCase
         self::assertSame('30s', TtlEstimate::known(30)->label());
         self::assertSame('unconstrained', TtlEstimate::unconstrained()->label());
         self::assertSame('unknown', TtlEstimate::unknown()->label());
-        self::assertSame('unknown (≤30s)', TtlEstimate::unknown(30)->label());
+        self::assertSame('≤30s', TtlEstimate::unknown(30)->label());
+        self::assertSame('30-60s', TtlEstimate::unknown(60, null, 30)->label());
+        self::assertSame('30-?s', TtlEstimate::unknown(null, null, 30)->label());
         self::assertSame('invalid', TtlEstimate::invalid('broken')->label());
     }
 
     public function testJsonSerializeEncodesTheStateAndEveryField(): void
     {
         self::assertSame(
-            ['state' => 'unknown', 'seconds' => null, 'upperBound' => 30, 'reason' => 'conditional'],
+            ['state' => 'unknown', 'seconds' => null, 'lowerBound' => null, 'upperBound' => 30, 'reason' => 'conditional'],
             TtlEstimate::unknown(30, 'conditional')->jsonSerialize(),
         );
         self::assertSame(
-            ['state' => 'known', 'seconds' => 20, 'upperBound' => null, 'reason' => null],
+            ['state' => 'known', 'seconds' => 20, 'lowerBound' => null, 'upperBound' => null, 'reason' => null],
             TtlEstimate::known(20)->jsonSerialize(),
         );
     }

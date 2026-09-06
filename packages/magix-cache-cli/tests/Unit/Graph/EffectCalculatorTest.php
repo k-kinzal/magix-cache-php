@@ -12,6 +12,7 @@ use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\DependencyConstraint;
 use Magix\Cache\Cli\Graph\EffectCalculator;
+use Magix\Cache\Cli\Graph\StrategyEffect;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
 use Magix\Cache\Metadata\Visibility;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DependencyConstraint::class)]
 #[UsesClass(KeyParameter::class)]
 #[UsesClass(PolicyDeclaration::class)]
+#[UsesClass(StrategyEffect::class)]
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(Visibility::class)]
 final class EffectCalculatorTest extends TestCase
@@ -283,5 +285,88 @@ final class EffectCalculatorTest extends TestCase
     public function testTagsAreDeduplicatedAndSorted(): void
     {
         self::assertSame(['a', 'b'], (new EffectCalculator())->tags(['b', 'a', 'b']));
+    }
+
+    public function testLifetimeLetsAStrategyContractSatisfyADerivedPolicy(): void
+    {
+        $calculator = new EffectCalculator();
+        $boundary = new BoundaryDeclaration('App\PromotedQuery', 'execute', 'a.php', 1);
+        $policy = new PolicyDeclaration(PolicySource::MethodAttribute, ttl: Ttl::Auto);
+        $strategy = new StrategyEffect('S::create(min: 30)', TtlEstimate::unknown(60, null, 30), addsConstraint: true);
+
+        $estimate = $calculator->lifetime($boundary, $policy, new DependencyConstraint(), $strategy);
+
+        self::assertSame(TtlEstimateState::Unknown, $estimate->state);
+        self::assertSame(30, $estimate->lowerBound);
+        self::assertSame(60, $estimate->upperBound);
+        self::assertNull($estimate->reason);
+    }
+
+    public function testLifetimeKeepsCandidateAndEffectiveLifetimesApart(): void
+    {
+        $calculator = new EffectCalculator();
+        $boundary = new BoundaryDeclaration('App\SeasonalQuery', 'execute', 'a.php', 1);
+        $policy = new PolicyDeclaration(PolicySource::MethodAttribute, ttl: Ttl::Auto);
+        $strategy = new StrategyEffect('S::create(min: 30)', TtlEstimate::unknown(60, null, 30), addsConstraint: true);
+        $constraint = new DependencyConstraint(TtlEstimate::known(20), 'ProductQuery::execute');
+
+        $estimate = $calculator->lifetime($boundary, $policy, $constraint, $strategy);
+
+        self::assertSame(20, $estimate->seconds, 'the upstream expiration shortens the candidate');
+        self::assertSame('30-60s', $strategy->ttl->label(), 'the candidate range itself stays untouched');
+    }
+
+    public function testLifetimeMarksAnUnknownUpstreamAsAShorteningCondition(): void
+    {
+        $calculator = new EffectCalculator();
+        $boundary = new BoundaryDeclaration('App\SeasonalQuery', 'execute', 'a.php', 1);
+        $policy = new PolicyDeclaration(PolicySource::MethodAttribute, ttl: Ttl::Auto);
+        $strategy = new StrategyEffect('S::create(min: 30)', TtlEstimate::unknown(60, null, 30), addsConstraint: true);
+        $constraint = new DependencyConstraint(TtlEstimate::unknown());
+
+        $estimate = $calculator->lifetime($boundary, $policy, $constraint, $strategy);
+
+        self::assertSame('≤60s', $estimate->label());
+        self::assertSame('an upstream expiration may shorten the lifetime', $estimate->reason);
+    }
+
+    public function testCalculateSurfacesStrategyProblemsOnTheEffect(): void
+    {
+        $calculator = new EffectCalculator();
+        $boundary = new BoundaryDeclaration(
+            'App\BrokenQuery',
+            'execute',
+            'a.php',
+            1,
+            policy: new PolicyDeclaration(PolicySource::MethodAttribute, ttl: 30),
+        );
+        $strategy = new StrategyEffect('S::create()', TtlEstimate::invalid('problem'), problems: ['problem']);
+
+        $effect = $calculator->calculate($boundary, new DependencyConstraint(), $strategy);
+
+        self::assertSame(['problem'], $effect->problems);
+        self::assertFalse($effect->storable);
+        self::assertSame($strategy, $effect->strategy);
+    }
+
+    public function testStorableAcceptsAProvenPositiveLowerBoundWithoutACondition(): void
+    {
+        $calculator = new EffectCalculator();
+
+        self::assertTrue($calculator->storable(TtlEstimate::known(30), Visibility::Shared, []));
+        self::assertTrue($calculator->storable(TtlEstimate::unknown(60, null, 30), Visibility::Shared, []));
+        self::assertFalse($calculator->storable(TtlEstimate::unknown(60, 'a condition', 30), Visibility::Shared, []));
+        self::assertFalse($calculator->storable(TtlEstimate::unknown(60), Visibility::Shared, []));
+        self::assertFalse($calculator->storable(TtlEstimate::known(30), Visibility::NoStore, []));
+        self::assertFalse($calculator->storable(TtlEstimate::known(30), Visibility::Shared, ['problem']));
+    }
+
+    public function testProblemsMergeTheStrategyProblemsWithoutDuplicates(): void
+    {
+        $calculator = new EffectCalculator();
+        $strategy = new StrategyEffect('S::create()', TtlEstimate::invalid('shared'), problems: ['shared', 'extra']);
+
+        self::assertSame(['shared', 'extra'], $calculator->problems(['shared'], $strategy));
+        self::assertSame(['own'], $calculator->problems(['own'], null));
     }
 }

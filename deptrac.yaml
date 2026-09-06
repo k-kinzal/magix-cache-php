@@ -26,6 +26,10 @@ deptrac:
       collectors:
         - type: directory
           value: packages/magix-cache/src/Runtime/.*
+    - name: Strategy
+      collectors:
+        - type: directory
+          value: packages/magix-cache/src/Strategy/.*
     - name: Cache
       collectors:
         - type: directory
@@ -81,19 +85,25 @@ deptrac:
       - Runtime
       - Cache
       - Clock
+      - Strategy
     Attribute:
       - CoreApi
       - Metadata
       - Runtime
+      - Strategy
     Composition:
       - CoreApi
       - Metadata
     Metadata: ~
+    Strategy:
+      - CoreApi
+      - Metadata
     Runtime:
       - CoreApi
       - Attribute
       - Cache
       - Metadata
+      - Strategy
     Cache:
       - Metadata
       - Clock
@@ -122,6 +132,7 @@ deptrac:
       - Attribute
       - Metadata
       - Runtime
+      - Strategy
     CliDeclaration:
       - Metadata
       - Runtime
@@ -129,6 +140,7 @@ deptrac:
       - CliDeclaration
       - Metadata
       - Runtime
+      - Strategy
     CliRender:
       - CliDeclaration
       - CliGraph

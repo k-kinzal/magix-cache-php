@@ -35,7 +35,7 @@ final readonly class OriginConstraints
     /**
      * Returns the origin metadata with all declared constraints applied.
      *
-     * @param Cached<covariant mixed> $result
+     * @param Cached<mixed> $result
      * @throws InvalidArgumentException when the resolver returns a negative lifetime
      * @throws LogicException when a derived lifetime has no finite upstream expiration to derive from
      */

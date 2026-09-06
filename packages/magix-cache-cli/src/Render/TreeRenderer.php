@@ -31,6 +31,7 @@ final readonly class TreeRenderer
             '<options=bold>'.$node->boundary->id().'</>',
             '  '.$node->boundary->file.':'.$node->boundary->line,
             '',
+            ...$this->strategy($effect),
             '  ttl          '.$this->ttl($effect),
             '  visibility   '.strtolower($effect->visibility->name)
                 .($effect->visibilityReason === null ? '' : ' ('.$effect->visibilityReason.')'),
@@ -42,6 +43,34 @@ final readonly class TreeRenderer
         ];
 
         return implode("\n", array_merge($lines, $this->lines($node)))."\n";
+    }
+
+    /**
+     * Returns the rows describing the declared strategy composition.
+     *
+     * The candidate constraint the strategies choose and the effective
+     * lifetime that survives composition are two different rows on purpose.
+     *
+     * @return list<string>
+     */
+    public function strategy(CacheEffect $effect): array
+    {
+        $strategy = $effect->strategy;
+
+        if ($strategy === null) {
+            return [];
+        }
+
+        $lines = ['  strategy     '.$strategy->label];
+
+        foreach ($strategy->steps as $step) {
+            $assumed = $step->assumed ? ' (assumed)' : '';
+            $lines[] = '               - '.$step->shortName().'  '.$this->labelled($step->ttl).$assumed;
+        }
+
+        $lines[] = '  strategy ttl '.$this->labelled($strategy->ttl);
+
+        return $lines;
     }
 
     /**
@@ -105,9 +134,17 @@ final readonly class TreeRenderer
      */
     public function ttl(CacheEffect $effect): string
     {
-        $ttl = $this->estimate($effect->ttl);
+        return $this->labelled($effect->ttl);
+    }
 
-        return $effect->ttl->reason === null ? $ttl : $ttl.' ('.$effect->ttl->reason.')';
+    /**
+     * Returns one estimate with the reason or condition behind it.
+     */
+    public function labelled(TtlEstimate $estimate): string
+    {
+        $ttl = $this->estimate($estimate);
+
+        return $estimate->reason === null ? $ttl : $ttl.' ('.$estimate->reason.')';
     }
 
     /**

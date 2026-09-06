@@ -8,9 +8,12 @@ use Magix\Cache\Strategy\Contract\Arg;
 use Magix\Cache\Strategy\Contract\ConstructorArg;
 use Magix\Cache\Strategy\Contract\Ttl;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Ttl::class)]
+#[UsesClass(Arg::class)]
+#[UsesClass(ConstructorArg::class)]
 final class TtlTest extends TestCase
 {
     public function testDeclaresBoundsAsValuesOrReferences(): void

@@ -7,9 +7,11 @@ namespace Tests\Unit\Strategy\Contract;
 use Magix\Cache\Strategy\Contract\Arg;
 use Magix\Cache\Strategy\Contract\AssumeTtl;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(AssumeTtl::class)]
+#[UsesClass(Arg::class)]
 final class AssumeTtlTest extends TestCase
 {
     public function testCoversOneStrategyWithBoundsOrReferences(): void

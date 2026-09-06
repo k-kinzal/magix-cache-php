@@ -9,11 +9,16 @@ use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\NextCacheStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixture\AnsweringStrategy;
 use Tests\Fixture\RecordingStrategy;
 
 #[CoversClass(NextCacheStrategy::class)]
+#[UsesClass(Cached::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheMetadata::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
+#[UsesClass(CacheOperation::class)]
 final class NextCacheStrategyTest extends TestCase
 {
     public function testFetchRunsStrategiesInOrderDownToTheAnswer(): void

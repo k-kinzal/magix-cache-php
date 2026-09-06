@@ -8,9 +8,13 @@ use Magix\Cache\Cached;
 use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Strategy\CacheOperation;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CacheOperation::class)]
+#[UsesClass(Cached::class)]
+#[UsesClass(CacheMetadata::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 final class CacheOperationTest extends TestCase
 {
     public function testKeyReturnsTheResolvedStorageKey(): void

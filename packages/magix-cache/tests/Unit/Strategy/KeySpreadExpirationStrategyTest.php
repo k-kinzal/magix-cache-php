@@ -10,10 +10,17 @@ use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\KeySpreadExpirationStrategy;
 use Magix\Cache\Strategy\NextCacheStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixture\AnsweringStrategy;
 
 #[CoversClass(KeySpreadExpirationStrategy::class)]
+#[UsesClass(Cached::class)]
+#[UsesClass(CacheMetadata::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
+#[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
+#[UsesClass(CacheOperation::class)]
+#[UsesClass(NextCacheStrategy::class)]
 final class KeySpreadExpirationStrategyTest extends TestCase
 {
     public function testFetchMeetsADeterministicConstraintWithinTheRange(): void

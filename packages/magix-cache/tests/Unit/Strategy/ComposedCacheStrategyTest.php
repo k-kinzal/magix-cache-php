@@ -10,11 +10,17 @@ use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\ComposedCacheStrategy;
 use Magix\Cache\Strategy\NextCacheStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixture\AnsweringStrategy;
 use Tests\Fixture\RecordingStrategy;
 
 #[CoversClass(ComposedCacheStrategy::class)]
+#[UsesClass(Cached::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheMetadata::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
+#[UsesClass(CacheOperation::class)]
+#[UsesClass(NextCacheStrategy::class)]
 final class ComposedCacheStrategyTest extends TestCase
 {
     public function testFetchActsAsOneStrategyInCompositionOrder(): void

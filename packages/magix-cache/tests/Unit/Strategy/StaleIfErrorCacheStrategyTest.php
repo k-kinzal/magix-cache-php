@@ -10,6 +10,7 @@ use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\NextCacheStrategy;
 use Magix\Cache\Strategy\StaleIfErrorCacheStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Tests\Fixture\AnsweringStrategy;
@@ -18,6 +19,11 @@ use Tests\Fixture\UpstreamUnavailable;
 use Throwable;
 
 #[CoversClass(StaleIfErrorCacheStrategy::class)]
+#[UsesClass(Cached::class)]
+#[UsesClass(CacheMetadata::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
+#[UsesClass(CacheOperation::class)]
+#[UsesClass(NextCacheStrategy::class)]
 final class StaleIfErrorCacheStrategyTest extends TestCase
 {
     public function testFetchServesTheRetainedCandidateOnAnAcceptedFailure(): void

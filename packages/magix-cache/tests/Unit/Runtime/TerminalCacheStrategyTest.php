@@ -14,12 +14,22 @@ use Magix\Cache\Runtime\TerminalCacheStrategy;
 use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\NextCacheStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixture\MemoryCache;
 use Tests\Fixture\RecordingObserver;
 use Tests\Fixture\UpstreamUnavailable;
 
 #[CoversClass(TerminalCacheStrategy::class)]
+#[UsesClass(StaleIfError::class)]
+#[UsesClass(CacheEntry::class)]
+#[UsesClass(Cached::class)]
+#[UsesClass(CacheMetadata::class)]
+#[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
+#[UsesClass(\Magix\Cache\Runtime\CacheEntryConverter::class)]
+#[UsesClass(GuardedCache::class)]
+#[UsesClass(CacheOperation::class)]
+#[UsesClass(NextCacheStrategy::class)]
 final class TerminalCacheStrategyTest extends TestCase
 {
     public function testGetReturnsAFreshHitAndRetainsNoCandidate(): void

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cache Composition — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/pr/5/k-kinzal/magix-cache/doc/docs/cache-composition.md.html">
+<meta name="description" content="Cache Composition, a document of the k-kinzal/magix-cache package.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="Cache Composition — magix-cache-php">
+<meta property="og:description" content="Cache Composition, a document of the k-kinzal/magix-cache package.">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/pr/5/k-kinzal/magix-cache/doc/docs/cache-composition.md.html">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/pr/5/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}document.documentElement.dataset.diffMode=localStorage.getItem("docgen-diff-mode")||"inline"}catch(e){}</script>
+</head>
+<body data-root="../../../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../index.html">magix-cache-php</a></div><div class="sb-pkg"><a href="../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></div><nav class="sb-block"><div class="sb-title">Package</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/all-items.html">All items</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/index.html#documents">Documents</a></li></ul><div class="sb-kind" data-diff="modified">Layers</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/layer.Attribute.html">Attribute</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Cache.html">Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Clock.html">Clock</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Composition.html">Composition</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/layer.CoreApi.html">CoreApi</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Metadata.html">Metadata</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/layer.Runtime.html">Runtime</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Strategy.html">Strategy</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Namespaces</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/index.html" title="Magix\Cache">Magix\Cache</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Attribute/index.html" title="Magix\Cache\Attribute">Magix\Cache\Attribute</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/index.html" title="Magix\Cache\Cache">Magix\Cache\Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/PSR16/index.html" title="Magix\Cache\Cache\PSR16">Magix\Cache\Cache\PSR16</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/PSR6/index.html" title="Magix\Cache\Cache\PSR6">Magix\Cache\Cache\PSR6</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Clock/index.html" title="Magix\Cache\Clock">Magix\Cache\Clock</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Composition/index.html" title="Magix\Cache\Composition">Magix\Cache\Composition</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Metadata/index.html" title="Magix\Cache\Metadata">Magix\Cache\Metadata</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/index.html" title="Magix\Cache\Runtime">Magix\Cache\Runtime</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Extension/index.html" title="Magix\Cache\Runtime\Extension">Magix\Cache\Runtime\Extension</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/KeyStrategy/index.html" title="Magix\Cache\Runtime\KeyStrategy">Magix\Cache\Runtime\KeyStrategy</a></li><li data-diff="added"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Parameter/index.html" title="Magix\Cache\Runtime\Parameter">Magix\Cache\Runtime\Parameter</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Policy/index.html" title="Magix\Cache\Runtime\Policy">Magix\Cache\Runtime\Policy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Strategy/index.html" title="Magix\Cache\Strategy">Magix\Cache\Strategy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Strategy/Contract/index.html" title="Magix\Cache\Strategy\Contract">Magix\Cache\Strategy\Contract</a></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><a href="../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a><span class="crumb-sep">::</span><span class="crumb-current">docs/cache-composition.md</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<span class="diff-range" title="Comparing 8f0c2fd to working tree">8f0c2fd <span class="diff-arrow">→</span> working tree</span><div class="diff-modes" id="diff-modes" role="group" aria-label="Diff display mode"><button type="button" class="diff-mode" data-diff-mode="off" title="Documentation of the head revision, without diff marks">Off</button><button type="button" class="diff-mode" data-diff-mode="inline" title="Every page with additions and removals marked">Diff</button><button type="button" class="diff-mode" data-diff-mode="changes" title="Only what the head revision added, changed, or removed">Changes</button></div><a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<p class="diff-empty" id="diff-empty" data-changes="Nothing on this page changed between 8f0c2fd and working tree." data-off="This page documents what 8f0c2fd had and working tree no longer has. Switch to Diff to read it." hidden></p>
+<div class="symbol-head"><h1><span class="chip chip-kind k-document">document</span>Cache Composition</h1><div class="symbol-meta"><span class="src-link">docs/cache-composition.md</span></div></div>
+<section class="readme" data-diff="same"><div class="doc-block" data-diff="same"><h2>Cache Composition</h2>
+</div><div class="doc-block" data-diff="same"><p>This guide explains how <code>Cached&lt;T&gt;</code> propagates cache constraints through multi-stage queries.</p>
+</div><div class="doc-block" data-diff="same"><h3>Why Composition Matters</h3>
+</div><div class="doc-block" data-diff="same"><p>A query result is only as cacheable as the data used to build it. If a page combines a product that expires in 20 seconds with inventory that expires in 60 seconds, caching the page for 60 seconds would allow stale product data to survive too long.</p>
+</div><div class="doc-block" data-diff="same"><p>MagixCache keeps the value and its constraints together in <code>Cached&lt;T&gt;</code>. Composition merges those constraints with a fixed meet law, so a parent result cannot become less restricted than a dependency.</p>
+</div><div class="doc-block" data-diff="same"><h3>Transform One Value</h3>
+</div><div class="doc-block" data-diff="same"><p><code>map()</code> transforms the value in place and keeps this value&#039;s metadata:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-com">/** @var Cached&lt;Product&gt; $product */</span>
+<span class="tok-var">$product</span> = <span class="tok-var">$productQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>);
+
+<span class="tok-com">/** @var Cached&lt;string&gt; $name */</span>
+<span class="tok-var">$name</span> = <span class="tok-var">$product</span>-&gt;<span class="tok-id">map</span>(<span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">Product</span> <span class="tok-var">$product</span>): <span class="tok-id">string</span> =&gt; <span class="tok-var">$product</span>-&gt;<span class="tok-id">name</span>);</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The transform result is treated as a plain value: a <code>Cached</code> returned from it is not flattened. Use <code>flatMap()</code> when the transform obtains a new dependency:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-com">/** @var Cached&lt;ProductPage&gt; $page */</span>
+<span class="tok-var">$page</span> = <span class="tok-var">$productQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>)-&gt;<span class="tok-id">flatMap</span>(
+    <span class="tok-kw">fn</span> (<span class="tok-id">Product</span> <span class="tok-var">$product</span>): <span class="tok-id">Cached</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">inventory</span>
+        -&gt;<span class="tok-id">execute</span>(<span class="tok-var">$product</span>-&gt;<span class="tok-id">id</span>)
+        -&gt;<span class="tok-id">map</span>(
+            <span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">Inventory</span> <span class="tok-var">$inventory</span>): <span class="tok-id">ProductPage</span> =&gt;
+                <span class="tok-kw">new</span> <span class="tok-id">ProductPage</span>(<span class="tok-var">$product</span>, <span class="tok-var">$inventory</span>),
+        ),
+);</code></pre>
+</div><div class="doc-block" data-diff="same"><p><code>flatMap()</code> meets the metadata of both values, so the inventory constraints survive into the page.</p>
+</div><div class="doc-block" data-diff="same"><blockquote><p>[!WARNING] <code>value()</code> detaches a value from its constraints. Calling another cached query inside <code>map()</code> and using only its <code>value()</code> silently drops that query&#039;s constraints:</p>
+<pre class="code-block"><code>// WRONG: the inventory expiration, visibility, and tags are lost.
+$page = $productQuery-&gt;execute($productId)-&gt;map(
+    fn (Product $product): ProductPage =&gt; new ProductPage(
+        $product,
+        $this-&gt;inventory-&gt;execute($product-&gt;id)-&gt;value(),
+    ),
+);</code></pre>
+<p>A dependency obtained inside <code>map()</code> must be chained with <code>flatMap()</code> or <code>combineN()</code> instead.</p>
+</blockquote>
+</div><div class="doc-block" data-diff="same"><h3>Combine Two Values</h3>
+</div><div class="doc-block" data-diff="same"><p>Use <code>combine2()</code> followed by <code>map()</code>:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-com">/** @var Cached&lt;Product&gt; $product */</span>
+<span class="tok-var">$product</span> = <span class="tok-var">$productQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>);
+
+<span class="tok-com">/** @var Cached&lt;Inventory&gt; $inventory */</span>
+<span class="tok-var">$inventory</span> = <span class="tok-var">$inventoryQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>);
+
+<span class="tok-com">/** @var Cached&lt;ProductPage&gt; $page */</span>
+<span class="tok-var">$page</span> = <span class="tok-var">$product</span>
+    -&gt;<span class="tok-id">combine2</span>(<span class="tok-var">$inventory</span>)
+    -&gt;<span class="tok-id">map</span>(
+        <span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">Product</span> <span class="tok-var">$product</span>, <span class="tok-id">Inventory</span> <span class="tok-var">$inventory</span>): <span class="tok-id">ProductPage</span> =&gt;
+            <span class="tok-kw">new</span> <span class="tok-id">ProductPage</span>(<span class="tok-var">$product</span>, <span class="tok-var">$inventory</span>),
+    );</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The mapping closure receives the unwrapped values. Its return value is wrapped in a new <code>Cached</code> carrying the met metadata of every input.</p>
+</div><div class="doc-block" data-diff="same"><h3>Combine Three to Five Values</h3>
+</div><div class="doc-block" data-diff="same"><p>The same API is available for three, four, or five dependencies:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-var">$viewModel</span> = <span class="tok-var">$product</span>
+    -&gt;<span class="tok-id">combine3</span>(<span class="tok-var">$inventory</span>, <span class="tok-var">$pricing</span>)
+    -&gt;<span class="tok-id">map</span>(
+        <span class="tok-kw">static</span> <span class="tok-kw">fn</span> (
+            <span class="tok-id">Product</span> <span class="tok-var">$product</span>,
+            <span class="tok-id">Inventory</span> <span class="tok-var">$inventory</span>,
+            <span class="tok-id">Pricing</span> <span class="tok-var">$pricing</span>,
+        ): <span class="tok-id">ProductViewModel</span> =&gt; <span class="tok-kw">new</span> <span class="tok-id">ProductViewModel</span>(
+            <span class="tok-var">$product</span>,
+            <span class="tok-var">$inventory</span>,
+            <span class="tok-var">$pricing</span>,
+        ),
+    );</code></pre>
+</div><div class="doc-block" data-diff="same"><p>Use <code>combine4()</code> and <code>combine5()</code> for four and five values respectively. Each method returns a typed capability whose <code>map()</code> closure receives the values in the same order.</p>
+</div><div class="doc-block" data-diff="same"><p>For more than five inputs, compose intermediate domain values and combine those results in another step. The constraints remain monotone at each step.</p>
+</div><div class="doc-block" data-diff="same"><h3>The Meet Law</h3>
+</div><div class="doc-block" data-diff="same"><p><code>CacheMetadata::meet()</code> is the only way to add constraints to existing metadata, and it is a fixed law:</p>
+</div><div class="doc-block" data-diff="same"><div class="table-wrap"><table><thead><tr><th>Constraint</th><th>Meet rule</th></tr></thead><tbody><tr><td>Expiration</td><td>Earliest finite absolute expiration; <code>null</code> is unconstrained</td></tr><tr><td>Cacheability</td><td>Logical AND</td></tr><tr><td>Visibility</td><td>Stricter of the two: <code>Shared &lt; Private &lt; NoStore</code></td></tr><tr><td>Tags</td><td>Deduplicated, sorted union</td></tr><tr><td>Reasons</td><td>Deduplicated, sorted union</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="same"><p><code>CacheMetadata::top()</code> — no declared constraints — is the identity element: meeting with it changes nothing. Every composition is as strict as or stricter than each input.</p>
+</div><div class="doc-block" data-diff="same"><p>For example:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>Product:   expires in 20s, Shared, tags [products]
+Inventory: expires in 60s, Private, tags [inventory]
+Result:    expires in 20s, Private, tags [inventory, products]</code></pre>
+</div><div class="doc-block" data-diff="same"><p>An uncacheable or <code>NoStore</code> dependency makes the composed result uncacheable or <code>NoStore</code>. A later policy cannot loosen those constraints.</p>
+</div><div class="doc-block" data-diff="same"><h3>Apply the Parent Policy</h3>
+</div><div class="doc-block" data-diff="same"><p>Composition happens inside the origin closure. The enclosing cache boundary applies its policy afterward:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Policy\Ttl</span>;
+
+#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-id">Ttl</span>::<span class="tok-id">Auto</span>, <span class="tok-id">tags</span>: [<span class="tok-str">&#039;product-pages&#039;</span>])]
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(<span class="tok-id">int</span> <span class="tok-var">$productId</span>): <span class="tok-id">Cached</span>
+{
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-kw">function</span> () <span class="tok-kw">use</span> (<span class="tok-var">$productId</span>): <span class="tok-id">Cached</span> {
+        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">products</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>)
+            -&gt;<span class="tok-id">combine2</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">inventory</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>))
+            -&gt;<span class="tok-id">map</span>(
+                <span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">Product</span> <span class="tok-var">$product</span>, <span class="tok-id">Inventory</span> <span class="tok-var">$inventory</span>): <span class="tok-id">ProductPage</span> =&gt;
+                    <span class="tok-kw">new</span> <span class="tok-id">ProductPage</span>(<span class="tok-var">$product</span>, <span class="tok-var">$inventory</span>),
+            );
+    });
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p><code>Ttl::Auto</code> retains the composed expiration. A fixed parent TTL is met with the composed metadata, so the earlier of its own expiration and the composed expiration always wins — a parent can never extend what a dependency imposed.</p>
+</div><div class="doc-block" data-diff="same"><h3>Create Source Metadata</h3>
+</div><div class="doc-block" data-diff="same"><p>Most dependencies receive metadata when their own cache boundary applies a policy. A source can also attach constraints directly:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\CacheMetadata</span>;
+
+<span class="tok-var">$result</span> = <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(
+    <span class="tok-var">$response</span>-&gt;<span class="tok-id">value</span>,
+    <span class="tok-kw">new</span> <span class="tok-id">CacheMetadata</span>(
+        <span class="tok-id">expiresAt</span>: <span class="tok-var">$response</span>-&gt;<span class="tok-id">expiresAt</span>,
+        <span class="tok-id">tags</span>: [<span class="tok-str">&#039;upstream-products&#039;</span>],
+    ),
+);</code></pre>
+</div><div class="doc-block" data-diff="same"><p>For a TTL relative to a known timestamp, use <code>CacheMetadata::forTtl()</code>:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-var">$result</span> = <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(
+    <span class="tok-var">$value</span>,
+    <span class="tok-id">CacheMetadata</span>::<span class="tok-id">forTtl</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>, <span class="tok-id">now</span>: <span class="tok-var">$now</span>, <span class="tok-id">tags</span>: [<span class="tok-str">&#039;products&#039;</span>]),
+);</code></pre>
+</div><div class="doc-block" data-diff="same"><p>To forbid storage and preserve a diagnostic reason:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-var">$result</span> = <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(
+    <span class="tok-var">$value</span>,
+    <span class="tok-id">CacheMetadata</span>::<span class="tok-id">uncacheable</span>(<span class="tok-str">&#039;authorization-dependent&#039;</span>),
+);</code></pre>
+</div><div class="doc-block" data-diff="same"><p><code>CacheMetadata</code> is immutable and composes only through <code>meet()</code>; there are no setters that could relax a constraint.</p>
+</div><div class="doc-block" data-diff="same"><h3>Access Wrapped Values</h3>
+</div><div class="doc-block" data-diff="same"><p>Use <code>value()</code> for scalar operations, strict parameter types, or explicit unwrapping:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-var">$product</span> = <span class="tok-var">$cachedProduct</span>-&gt;<span class="tok-id">value</span>();</code></pre>
+</div><div class="doc-block" data-diff="same"><p>For convenience, <code>Cached</code> forwards:</p>
+</div><div class="doc-block" data-diff="same"><ul><li>Public object property reads</li><li>String-keyed array reads</li><li><code>isset()</code> checks</li><li>Callable public object methods</li><li>String conversion for strings and <code>Stringable</code> objects</li></ul>
+</div><div class="doc-block" data-diff="same"><p>These forwarded operations return ordinary PHP values that no longer carry constraints, so they are for final observation only. Use <code>map()</code>, <code>flatMap()</code>, or <code>combineN()-&gt;map()</code> when producing a new cached result, so the dependency metadata is not lost.</p>
+</div><div class="doc-block" data-diff="same"><h3>Use Metadata at the Response Boundary</h3>
+</div><div class="doc-block" data-diff="same"><p>After composing the final page or read model, application code can inspect its metadata to select HTTP cache headers or invalidation tags:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-var">$page</span> = <span class="tok-var">$pageQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>);
+<span class="tok-var">$metadata</span> = <span class="tok-var">$page</span>-&gt;<span class="tok-id">metadata</span>;
+
+<span class="tok-kw">if</span> (!<span class="tok-var">$metadata</span>-&gt;<span class="tok-id">cacheable</span>) {
+    <span class="tok-com">// Emit no-store behavior and optionally log $metadata-&gt;reasons.</span>
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The core library propagates the constraints but intentionally does not depend on an HTTP framework. Header generation remains in the application or a framework-specific adapter.</p>
+</div></section>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../../../assets/search-index.js" defer></script>
+<script src="../../../../assets/app.js" defer></script>
+</body>
+</html>

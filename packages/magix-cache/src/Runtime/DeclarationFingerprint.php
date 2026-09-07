@@ -14,6 +14,7 @@ use Magix\Cache\Attribute\CacheIgnore;
 use Magix\Cache\Attribute\CacheKey;
 use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\StaleIfError;
+use Magix\Cache\Attribute\UseStrategy;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\Metadata\CacheTokenSet;
 use ReflectionMethod;
@@ -44,6 +45,7 @@ final readonly class DeclarationFingerprint
         ?StaleIfError $staleIfError,
         ?DynamicTtl $dynamicTtl,
         ?BypassCacheErrors $bypassCacheErrors,
+        ?UseStrategy $useStrategy = null,
     ): string {
         $exceptions = $staleIfError?->exceptions;
 
@@ -72,6 +74,7 @@ final readonly class DeclarationFingerprint
             'staleIfError' => $staleIfError === null ? null : [$staleIfError->maxAge, $exceptions],
             'dynamicTtl' => $dynamicTtl?->resolver,
             'bypassCacheErrors' => $bypassCacheErrors === null ? null : [$bypassCacheErrors->classifier],
+            'strategy' => $useStrategy === null ? null : [$useStrategy->strategy, $useStrategy->arguments],
             'parameters' => $parameters,
         ]);
 

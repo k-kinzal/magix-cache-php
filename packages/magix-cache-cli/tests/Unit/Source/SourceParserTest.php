@@ -39,6 +39,9 @@ use Tests\Package\Cli\Fixture\Project\ProductQuery;
 #[UsesClass(PolicyDeclaration::class)]
 #[UsesClass(PolicyReader::class)]
 #[UsesClass(TypeReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ContractReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\StrategyReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\UseStrategyReader::class)]
 final class SourceParserTest extends TestCase
 {
     public function testParseReadsABoundaryFromARealFile(): void

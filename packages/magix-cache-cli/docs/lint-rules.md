@@ -9,6 +9,7 @@ This guide documents the rules `magix lint` applies to every cache boundary.
 | [`scoped-ignore-conflict`](#scoped-ignore-conflict) | error | A parameter that is ignored and scoped |
 | [`unscoped-private-key`](#unscoped-private-key) | warning | A private dependency the caller key cannot separate |
 | [`unstable-key-argument`](#unstable-key-argument) | warning | A key parameter that cannot be hashed reliably |
+| [`unresolved-strategy`](#unresolved-strategy) | error | A `#[UseStrategy]` declaration that cannot be bound |
 
 Errors and warnings fail the command; see [Commands](commands.md#magix-lint).
 
@@ -103,3 +104,18 @@ public function execute(object $filter): Cached
 ```
 
 Reduce the value with `#[CacheKey]` to the part that determines the output, or exclude it with `#[CacheIgnore]` when it cannot change the result.
+
+## unresolved-strategy
+
+A `#[UseStrategy]` must bind to the construction code it names: the class needs a public static `create()`, the declared arguments must match the `create()` parameters, and every `ConstructorArg`/`Arg` reference in a contract or assumption must name a parameter that exists.
+
+```php
+#[Cache(ttl: 30)]
+#[UseStrategy(strategy: ProductCacheStrategy::class, minimum: 60)]
+public function execute(int $id): Cached
+{
+    // ProductCacheStrategy::create() declares $min, not $minimum
+}
+```
+
+A missing `create()` throws a `LogicException` when the boundary is resolved; an argument or reference that cannot be bound leaves the analysis with a declaration error instead of a silent unknown. Declare arguments and references that match the construction code of the strategy.

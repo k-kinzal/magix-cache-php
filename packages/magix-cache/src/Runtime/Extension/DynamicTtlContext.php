@@ -12,7 +12,7 @@ use Magix\Cache\Cached;
 final readonly class DynamicTtlContext
 {
     /**
-     * @param Cached<covariant mixed> $result
+     * @param Cached<mixed> $result
      * @param float $now The same base time the fixed policy is evaluated at.
      */
     public function __construct(

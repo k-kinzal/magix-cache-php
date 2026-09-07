@@ -53,7 +53,7 @@ final class BoundaryTableRendererTest extends TestCase
             (new BoundaryTableRenderer())->row($unconstrained),
         );
         self::assertSame(
-            ['App\RateQuery::execute', 'unknown (≤60s)', 'shared', 'no', '-', '0', 'src/RateQuery.php:12'],
+            ['App\RateQuery::execute', '≤60s', 'shared', 'no', '-', '0', 'src/RateQuery.php:12'],
             (new BoundaryTableRenderer())->row($conditional),
         );
     }

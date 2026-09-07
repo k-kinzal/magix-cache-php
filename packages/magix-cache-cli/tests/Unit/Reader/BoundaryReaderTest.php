@@ -10,6 +10,7 @@ use Magix\Cache\Cli\Declaration\DependencyCall;
 use Magix\Cache\Cli\Declaration\KeyParameter;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
+use Magix\Cache\Cli\Declaration\UseStrategyDeclaration;
 use Magix\Cache\Cli\Reader\ArgumentReader;
 use Magix\Cache\Cli\Reader\AttributeReader;
 use Magix\Cache\Cli\Reader\BoundaryReader;
@@ -18,6 +19,7 @@ use Magix\Cache\Cli\Reader\LiteralReader;
 use Magix\Cache\Cli\Reader\ParameterReader;
 use Magix\Cache\Cli\Reader\PolicyReader;
 use Magix\Cache\Cli\Reader\TypeReader;
+use Magix\Cache\Cli\Reader\UseStrategyReader;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Attribute;
 use PhpParser\Node\AttributeGroup;
@@ -46,6 +48,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PolicyDeclaration::class)]
 #[UsesClass(PolicyReader::class)]
 #[UsesClass(TypeReader::class)]
+#[UsesClass(UseStrategyDeclaration::class)]
+#[UsesClass(UseStrategyReader::class)]
 final class BoundaryReaderTest extends TestCase
 {
     public function testReadDescribesACachedMethodWithItsAttributePolicy(): void
@@ -170,6 +174,66 @@ final class BoundaryReaderTest extends TestCase
         self::assertFalse($reader->dynamicTtl($bare, false));
         self::assertFalse($reader->dynamicTtl($disabled, true));
         self::assertTrue($reader->dynamicTtl($declared, false));
+    }
+
+    public function testClassUseStrategyReadsTheClassLevelDeclaration(): void
+    {
+        $code = <<<'SOURCE'
+            <?php
+            #[\Magix\Cache\Attribute\UseStrategy(strategy: \App\ProductCacheStrategy::class, min: 30)]
+            final class CatalogQuery
+            {
+            }
+            SOURCE;
+        $statements = (new NodeTraverser(new NameResolver()))->traverse(
+            (new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? [],
+        );
+        $class = (new NodeFinder())->findFirstInstanceOf($statements, Class_::class);
+        self::assertInstanceOf(Class_::class, $class);
+
+        $declared = (new BoundaryReader())->classUseStrategy($class);
+
+        self::assertInstanceOf(UseStrategyDeclaration::class, $declared);
+        self::assertSame('App\ProductCacheStrategy', $declared->strategy);
+        self::assertSame(['min' => 30], $declared->arguments);
+    }
+
+    public function testUseStrategyLetsAMethodDeclarationReplaceTheClassDefault(): void
+    {
+        $code = <<<'SOURCE'
+            <?php
+            final class CatalogQuery
+            {
+                #[\Magix\Cache\Attribute\UseStrategy(strategy: \App\ProductCacheStrategy::class, min: 60)]
+                public function execute(): int
+                {
+                    return 1;
+                }
+
+                #[\Magix\Cache\Attribute\UseStrategy(strategy: \App\ProductCacheStrategy::class, enabled: false)]
+                public function preview(): int
+                {
+                    return 1;
+                }
+
+                public function fallback(): int
+                {
+                    return 1;
+                }
+            }
+            SOURCE;
+        $statements = (new NodeTraverser(new NameResolver()))->traverse(
+            (new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? [],
+        );
+        $methods = (new NodeFinder())->findInstanceOf($statements, ClassMethod::class);
+        self::assertCount(3, $methods);
+
+        $reader = new BoundaryReader();
+        $classDefault = new UseStrategyDeclaration('App\DefaultStrategy');
+
+        self::assertSame(['min' => 60], $reader->useStrategy($methods[0], $classDefault)?->arguments);
+        self::assertNull($reader->useStrategy($methods[1], $classDefault), 'a disabled method declaration replaces the default as a whole');
+        self::assertSame($classDefault, $reader->useStrategy($methods[2], $classDefault));
     }
 
     public function testEnabledTreatsOnlyAnExplicitFalseAsDisabled(): void

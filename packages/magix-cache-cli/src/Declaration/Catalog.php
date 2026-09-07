@@ -33,6 +33,13 @@ final readonly class Catalog
     private array $ancestors;
 
     /**
+     * Strategy declarations indexed by their class name.
+     *
+     * @var array<string, StrategyDeclaration>
+     */
+    private array $strategies;
+
+    /**
      * Creates a catalog from parsed classes.
      *
      * @param list<ClassDeclaration> $classes
@@ -41,14 +48,21 @@ final readonly class Catalog
     {
         $index = [];
         $direct = [];
+        $strategies = [];
 
         foreach ($classes as $class) {
             $direct[$class->name] = $class->parents;
+
+            if ($class->strategy !== null) {
+                $strategies[$class->name] = $class->strategy;
+            }
 
             foreach ($class->boundaries as $boundary) {
                 $index[$boundary->id()] = $boundary;
             }
         }
+
+        $this->strategies = $strategies;
 
         $ancestors = [];
 
@@ -86,6 +100,14 @@ final readonly class Catalog
     public function boundaries(): array
     {
         return array_values($this->index);
+    }
+
+    /**
+     * Returns the parsed strategy declaration of one class, when any.
+     */
+    public function strategy(string $class): ?StrategyDeclaration
+    {
+        return $this->strategies[$class] ?? null;
     }
 
     /**

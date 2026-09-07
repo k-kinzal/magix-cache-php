@@ -79,6 +79,7 @@ For more detailed information, check out the documentation:
 - [Cache Composition](docs/cache-composition.md): Safely combine cached values and their constraints
 - [Storage Adapters](docs/storage-adapters.md): PSR-6, PSR-16, framework integrations, and custom storage
 - [Cache Behaviors](docs/cache-behaviors.md): Stale-if-error, dynamic TTL, backend-failure bypass, and observation
+- [Cache Strategies](docs/cache-strategies.md): Composable strategies, published contracts, and analyzable compositions
 - [Command Line Tools](../magix-cache-cli/README.md): Show cache trees, keys, and scopes, and lint boundaries
 - [Laravel Integration](../magix-cache-laravel/README.md): Connect MagixCache to Laravel's default cache store
 - [Symfony Integration](../magix-cache-symfony/README.md): Connect MagixCache to Symfony's `cache.app` pool

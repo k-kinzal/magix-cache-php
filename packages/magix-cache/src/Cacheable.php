@@ -56,6 +56,7 @@ trait Cacheable
             staleIfError: $definition->staleIfError,
             dynamicTtl: $definition->dynamicTtl,
             bypassCacheErrors: $definition->bypassCacheErrors,
+            strategy: $definition->strategy,
         ));
     }
 }

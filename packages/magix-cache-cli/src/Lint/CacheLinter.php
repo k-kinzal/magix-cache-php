@@ -11,6 +11,7 @@ use Magix\Cache\Cli\Graph\CacheTree;
 use Magix\Cache\Cli\Lint\Rule\AutoTtlWithoutUpstreamRule;
 use Magix\Cache\Cli\Lint\Rule\MissingPolicyRule;
 use Magix\Cache\Cli\Lint\Rule\ScopedIgnoreConflictRule;
+use Magix\Cache\Cli\Lint\Rule\UnresolvedStrategyRule;
 use Magix\Cache\Cli\Lint\Rule\UnscopedPrivateKeyRule;
 use Magix\Cache\Cli\Lint\Rule\UnstableKeyArgumentRule;
 
@@ -41,6 +42,7 @@ final readonly class CacheLinter
             new ScopedIgnoreConflictRule(),
             new UnscopedPrivateKeyRule(),
             new UnstableKeyArgumentRule(),
+            new UnresolvedStrategyRule(),
         ];
     }
 

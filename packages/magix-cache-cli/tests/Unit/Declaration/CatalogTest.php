@@ -7,6 +7,7 @@ namespace Tests\Package\Cli\Unit\Declaration;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\Catalog;
 use Magix\Cache\Cli\Declaration\ClassDeclaration;
+use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Catalog::class)]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(ClassDeclaration::class)]
+#[UsesClass(StrategyDeclaration::class)]
 final class CatalogTest extends TestCase
 {
     public function testBoundariesAreSortedByIdentifier(): void
@@ -57,5 +59,18 @@ final class CatalogTest extends TestCase
         self::assertCount(1, $catalog->search('ProductQuery::execute'));
         self::assertCount(2, $catalog->search('App\Query\ProductQuery'));
         self::assertSame([], $catalog->search('Missing::execute'));
+    }
+
+    public function testStrategyIsIndexedByItsClassName(): void
+    {
+        $declared = new StrategyDeclaration('App\Cache\SpreadStrategy');
+        $catalog = new Catalog([
+            new ClassDeclaration('App\Cache\SpreadStrategy', [], [], $declared),
+            new ClassDeclaration('App\Query\ProductQuery'),
+        ]);
+
+        self::assertSame($declared, $catalog->strategy('App\Cache\SpreadStrategy'));
+        self::assertNull($catalog->strategy('App\Query\ProductQuery'));
+        self::assertNull($catalog->strategy('App\Missing'));
     }
 }

@@ -10,8 +10,8 @@ use Magix\Cache\Cached;
 /**
  * Holds two typed cached values until they are mapped to a result.
  *
- * @template T1
- * @template T2
+ * @template-covariant T1
+ * @template-covariant T2
  */
 final readonly class Capability2
 {

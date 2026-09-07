@@ -11,6 +11,7 @@ The result answers the questions that are otherwise only observable in productio
 
 - Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node
 - The reason behind each effective value, such as which dependency capped a TTL or made a result private
+- Composed strategy contracts, bound to the same `create()` the runtime calls, with candidate ranges such as `30-60s` kept apart from the effective TTL
 - An inventory of every boundary in a project as a table or as JSON
 - Static rules that report boundaries that throw, never store, or share a private entry between viewers
 - The exact cache key of a call, so an entry can be found in the backend

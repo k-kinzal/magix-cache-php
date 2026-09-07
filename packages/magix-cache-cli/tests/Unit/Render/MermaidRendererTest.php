@@ -61,6 +61,6 @@ final class MermaidRendererTest extends TestCase
 
         $statements = (new MermaidRenderer())->statements($node, 'n0');
 
-        self::assertSame('    n0["RateQuery::execute<br/>unknown (≤30s) - shared"]', $statements[0]);
+        self::assertSame('    n0["RateQuery::execute<br/>≤30s - shared"]', $statements[0]);
     }
 }

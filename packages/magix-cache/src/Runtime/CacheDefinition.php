@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Magix\Cache\Runtime;
 
 use InvalidArgumentException;
+use LogicException;
 use Magix\Cache\Attribute\BypassCacheErrors;
 use Magix\Cache\Attribute\Cache;
 use Magix\Cache\Attribute\CacheIgnore;
 use Magix\Cache\Attribute\CacheScope;
 use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\StaleIfError;
+use Magix\Cache\Attribute\UseStrategy;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\Metadata\Visibility;
+use Magix\Cache\Strategy\CacheStrategy;
 use ReflectionMethod;
 
 /**
@@ -38,12 +41,22 @@ final readonly class CacheDefinition
      */
     public string $runtime;
 
+    /**
+     * Strategy composition resolved from the #[UseStrategy] declaration.
+     */
+    public ?CacheStrategy $strategy;
+
     private string $fingerprint;
 
     /**
      * Creates a definition from one reflected method and its declarations.
      *
+     * The declared strategy is resolved here, once per memoized declaration,
+     * by calling the static create() of the referenced class with the
+     * declared arguments.
+     *
      * @throws InvalidArgumentException when a parameter is both scoped and ignored
+     * @throws LogicException when the declared strategy cannot be resolved
      */
     public function __construct(
         private ReflectionMethod $method,
@@ -52,6 +65,7 @@ final readonly class CacheDefinition
         public ?StaleIfError $staleIfError = null,
         public ?DynamicTtl $dynamicTtl = null,
         public ?BypassCacheErrors $bypassCacheErrors = null,
+        ?UseStrategy $useStrategy = null,
     ) {
         $visibility = Visibility::Shared;
 
@@ -74,12 +88,14 @@ final readonly class CacheDefinition
 
         $this->policy = $declaration->policy()->restrictVisibility($visibility);
         $this->runtime = $declaration->runtime;
+        $this->strategy = $useStrategy?->resolve();
         $this->fingerprint = (new DeclarationFingerprint())->calculate(
             $method,
             $this->policy,
             $staleIfError,
             $dynamicTtl,
             $bypassCacheErrors,
+            $useStrategy,
         );
     }
 

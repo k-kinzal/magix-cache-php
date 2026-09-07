@@ -10,6 +10,8 @@ use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\StrategyEffect;
+use Magix\Cache\Cli\Graph\StrategyStep;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\TreeRenderer;
 use Magix\Cache\Metadata\Visibility;
@@ -23,6 +25,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CacheNode::class)]
 #[UsesClass(KeyParameter::class)]
 #[UsesClass(PolicyDeclaration::class)]
+#[UsesClass(StrategyEffect::class)]
+#[UsesClass(StrategyStep::class)]
 #[UsesClass(TtlEstimate::class)]
 final class TreeRendererTest extends TestCase
 {
@@ -109,8 +113,50 @@ final class TreeRendererTest extends TestCase
             $renderer->ttl(new CacheEffect(ttl: TtlEstimate::known(30, 'inherited from A::b'))),
         );
         self::assertSame(
-            'unknown (≤30s) (requires a finite upstream expiration at runtime)',
+            '≤30s (requires a finite upstream expiration at runtime)',
             $renderer->ttl(new CacheEffect(ttl: TtlEstimate::unknown(30, 'requires a finite upstream expiration at runtime'))),
+        );
+    }
+
+    public function testStrategyRowsKeepCandidateAndEffectiveApart(): void
+    {
+        $renderer = new TreeRenderer();
+        $effect = new CacheEffect(
+            ttl: TtlEstimate::unknown(60, 'an upstream expiration may shorten the lifetime'),
+            strategy: new StrategyEffect(
+                label: 'ProductCacheStrategy::create(min: 30)',
+                ttl: TtlEstimate::unknown(60, null, 30),
+                steps: [
+                    new StrategyStep('App\\KeySpreadExpirationStrategy', TtlEstimate::unknown(60, null, 30)),
+                    new StrategyStep('App\\ExternalStrategy', TtlEstimate::unknown(300, null, 30), assumed: true),
+                ],
+            ),
+        );
+
+        self::assertSame(
+            [
+                '  strategy     ProductCacheStrategy::create(min: 30)',
+                '               - KeySpreadExpirationStrategy  30-60s',
+                '               - ExternalStrategy  30-300s (assumed)',
+                '  strategy ttl 30-60s',
+            ],
+            $renderer->strategy($effect),
+        );
+    }
+
+    public function testStrategyRowsAreAbsentWithoutADeclaredStrategy(): void
+    {
+        self::assertSame([], (new TreeRenderer())->strategy(new CacheEffect()));
+    }
+
+    public function testLabelledAppendsTheReasonOrCondition(): void
+    {
+        $renderer = new TreeRenderer();
+
+        self::assertSame('30-60s', $renderer->labelled(TtlEstimate::unknown(60, null, 30)));
+        self::assertSame(
+            '<fg=green>20s</> (inherited from A::b)',
+            $renderer->labelled(TtlEstimate::known(20, 'inherited from A::b')),
         );
     }
 

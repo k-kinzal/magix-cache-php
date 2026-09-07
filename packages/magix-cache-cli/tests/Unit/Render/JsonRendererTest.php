@@ -11,6 +11,8 @@ use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\StrategyEffect;
+use Magix\Cache\Cli\Graph\StrategyStep;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\JsonRenderer;
 use Magix\Cache\Metadata\Visibility;
@@ -24,6 +26,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CacheNode::class)]
 #[UsesClass(KeyParameter::class)]
 #[UsesClass(PolicyDeclaration::class)]
+#[UsesClass(StrategyEffect::class)]
+#[UsesClass(StrategyStep::class)]
 #[UsesClass(TtlEstimate::class)]
 final class JsonRendererTest extends TestCase
 {
@@ -96,9 +100,33 @@ final class JsonRendererTest extends TestCase
 
         self::assertIsArray($effective);
         self::assertSame(
-            ['state' => 'unknown', 'seconds' => null, 'upperBound' => 30, 'reason' => 'requires a finite upstream expiration at runtime'],
+            ['state' => 'unknown', 'seconds' => null, 'lowerBound' => null, 'upperBound' => 30, 'reason' => 'requires a finite upstream expiration at runtime'],
             $effective['ttl'] ?? null,
         );
         self::assertStringContainsString('"upperBound": 30', (new JsonRenderer())->render([$node]));
+    }
+
+    public function testStrategyEncodesTheCompositionAndItsSteps(): void
+    {
+        $strategy = new StrategyEffect(
+            label: 'ProductCacheStrategy::create(min: 30)',
+            ttl: TtlEstimate::unknown(60, null, 30),
+            steps: [new StrategyStep('App\\Spread', TtlEstimate::unknown(60, null, 30), assumed: true)],
+            addsConstraint: true,
+            problems: [],
+        );
+
+        $encoded = (new JsonRenderer())->strategy($strategy);
+
+        self::assertSame('ProductCacheStrategy::create(min: 30)', $encoded['declared']);
+        self::assertSame(true, $encoded['addsConstraint']);
+        self::assertSame(
+            ['state' => 'unknown', 'seconds' => null, 'lowerBound' => 30, 'upperBound' => 60, 'reason' => null],
+            $encoded['ttl'],
+        );
+        self::assertSame(
+            [['strategy' => 'App\\Spread', 'ttl' => TtlEstimate::unknown(60, null, 30)->jsonSerialize(), 'assumed' => true]],
+            $encoded['steps'],
+        );
     }
 }

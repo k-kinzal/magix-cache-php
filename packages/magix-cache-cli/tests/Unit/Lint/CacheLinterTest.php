@@ -43,6 +43,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnstableKeyArgumentRule::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\StrategyResolver::class)]
+#[UsesClass(\Magix\Cache\Cli\Lint\Rule\UnresolvedStrategyRule::class)]
 final class CacheLinterTest extends TestCase
 {
     public function testInspectAppliesEveryRuleToEveryBoundary(): void

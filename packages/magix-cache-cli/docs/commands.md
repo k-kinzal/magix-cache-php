@@ -53,7 +53,9 @@ The header block describes the boundary itself:
 
 | Field | Meaning |
 |---|---|
-| `ttl` | Expiration after composition, followed by the reason it differs from the declaration. A number appears only when it is statically determined; otherwise the estimate is `unconstrained` (provably no expiration), `unknown` with the tightest provable upper bound such as `unknown (≤30s)` and the runtime condition, or `invalid` when the declaration throws at runtime |
+| `ttl` | Expiration after composition, followed by the reason it differs from the declaration. A number appears only when it is statically determined; a proven range keeps its bounds — `30-60s`, `30-?s` (the `?` is undetermined, not unlimited), `≤60s` — and otherwise the estimate is `unconstrained` (provably no expiration), `unknown` with the runtime condition, or `invalid` when the declaration throws at runtime |
+| `strategy` | The `#[UseStrategy]` construction, one line per composed strategy with its contracted candidate range, and `(assumed)` where an explicit `#[AssumeTtl]` replaced the contract. Only shown when a strategy is declared |
+| `strategy ttl` | The candidate constraint the composition adds on the normal origin path, before dependencies and the policy cap it |
 | `visibility` | `shared`, `private`, or `nostore` after composition, followed by what restricted it |
 | `storable` | Whether the runtime writes an entry for this boundary at all |
 | `tags` | Policy tags unioned with the tags of every dependency |

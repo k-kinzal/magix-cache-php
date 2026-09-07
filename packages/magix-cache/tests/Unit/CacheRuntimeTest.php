@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use function array_slice;
+
+use ArrayObject;
 use Magix\Cache\Attribute\BypassCacheErrors;
 use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\StaleIfError;
@@ -19,6 +22,8 @@ use Magix\Cache\Runtime\Extension\CacheEvent;
 use Magix\Cache\Runtime\Extension\CacheTtlResolver;
 use Magix\Cache\Runtime\Extension\DynamicTtlContext;
 use Magix\Cache\Runtime\Policy\Ttl;
+use Magix\Cache\Strategy\ComposedCacheStrategy;
+use Magix\Cache\Strategy\KeySpreadExpirationStrategy;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
@@ -28,7 +33,9 @@ use Tests\Fixture\FailingCache;
 use Tests\Fixture\FixedTtlResolver;
 use Tests\Fixture\MemoryCache;
 use Tests\Fixture\MutableClock;
+use Tests\Fixture\ProductCacheStrategy;
 use Tests\Fixture\RecordingObserver;
+use Tests\Fixture\RecordingStrategy;
 use Tests\Fixture\UpstreamUnavailable;
 
 #[CoversClass(CacheRuntime::class)]
@@ -320,5 +327,87 @@ final class CacheRuntimeTest extends TestCase
         $runtime->execute($invocation);
 
         self::assertSame([CacheEvent::Miss, CacheEvent::Stored, CacheEvent::FreshHit], $observer->events);
+    }
+
+    public function testExecuteLetsAStrategyConstraintSatisfyAnAutomaticPolicy(): void
+    {
+        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: Ttl::Auto),
+            origin: static fn (): Cached => Cached::of('value'),
+            strategy: new KeySpreadExpirationStrategy(minimum: 30, maximum: 60),
+        );
+
+        $expiresAt = $runtime->execute($invocation)->metadata->expiresAt;
+
+        self::assertNotNull($expiresAt);
+        self::assertGreaterThanOrEqual(130.0, $expiresAt);
+        self::assertLessThanOrEqual(160.0, $expiresAt);
+    }
+
+    public function testExecuteNeverLetsAStrategyExtendAnUpstreamExpiration(): void
+    {
+        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: Ttl::Auto),
+            origin: static fn (): Cached => Cached::of('value', new CacheMetadata(expiresAt: 105.0)),
+            strategy: new KeySpreadExpirationStrategy(minimum: 30, maximum: 60),
+        );
+
+        self::assertSame(105.0, $runtime->execute($invocation)->metadata->expiresAt);
+    }
+
+    public function testExecuteServesStaleThroughAComposedStrategyWithoutTheBehaviorAttribute(): void
+    {
+        $calls = 0;
+        $clock = new MutableClock(100.0);
+        $observer = new RecordingObserver();
+        $runtime = new CacheRuntime(new MemoryCache(), $clock, observer: $observer);
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: Ttl::Auto),
+            origin: static function () use (&$calls): Cached {
+                if (++$calls > 1) {
+                    throw new UpstreamUnavailable('down');
+                }
+
+                return Cached::of('value');
+            },
+            strategy: ProductCacheStrategy::create(min: 30),
+        );
+
+        $first = $runtime->execute($invocation);
+        $clock->advance(70.0);
+        $served = $runtime->execute($invocation);
+
+        self::assertSame('value', $served->value());
+        self::assertSame($first->metadata->expiresAt, $served->metadata->expiresAt, 'a served candidate keeps its expired expiration');
+        self::assertNotContains(CacheEvent::Stored, array_slice($observer->events, 2), 'a served candidate is never stored again');
+    }
+
+    public function testExecuteRunsStrategyStagesAroundTheTerminal(): void
+    {
+        /** @var ArrayObject<int, string> $log */
+        $log = new ArrayObject();
+        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
+            policy: new CachePolicy(ttl: 20),
+            origin: static fn (): Cached => Cached::of('value'),
+            strategy: new ComposedCacheStrategy(new RecordingStrategy('outer', $log), new RecordingStrategy('inner', $log)),
+        );
+
+        $runtime->execute($invocation);
+
+        self::assertSame(
+            [
+                'outer.get.before', 'inner.get.before', 'inner.get.after', 'outer.get.after',
+                'outer.fetch.before', 'inner.fetch.before', 'inner.fetch.after', 'outer.fetch.after',
+                'outer.set.before', 'inner.set.before', 'inner.set.after', 'outer.set.after',
+            ],
+            $log->getArrayCopy(),
+        );
     }
 }

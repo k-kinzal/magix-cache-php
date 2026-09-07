@@ -9,6 +9,8 @@ use function json_encode;
 
 use JsonException;
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\StrategyEffect;
+use Magix\Cache\Cli\Graph\StrategyStep;
 
 use function strtolower;
 
@@ -67,6 +69,7 @@ final readonly class JsonRenderer
                 ],
                 $boundary->parameters,
             ),
+            'strategy' => $effect->strategy === null ? null : $this->strategy($effect->strategy),
             'effective' => [
                 'ttl' => $effect->ttl->jsonSerialize(),
                 'visibility' => strtolower($effect->visibility->name),
@@ -77,6 +80,29 @@ final readonly class JsonRenderer
             ],
             'notes' => $node->notes,
             'dependencies' => array_map($this->tree(...), $node->children),
+        ];
+    }
+
+    /**
+     * Returns one analyzed strategy composition as plain data.
+     *
+     * @return array<string, mixed>
+     */
+    public function strategy(StrategyEffect $strategy): array
+    {
+        return [
+            'declared' => $strategy->label,
+            'ttl' => $strategy->ttl->jsonSerialize(),
+            'addsConstraint' => $strategy->addsConstraint,
+            'steps' => array_map(
+                static fn (StrategyStep $step): array => [
+                    'strategy' => $step->strategy,
+                    'ttl' => $step->ttl->jsonSerialize(),
+                    'assumed' => $step->assumed,
+                ],
+                $strategy->steps,
+            ),
+            'problems' => $strategy->problems,
         ];
     }
 }

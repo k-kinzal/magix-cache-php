@@ -19,6 +19,7 @@ use Tests\Fixture\FixedTtlResolver;
 use Tests\Fixture\MemoryCache;
 use Tests\Fixture\MutableClock;
 use Tests\Fixture\SecondSourceQuery;
+use Tests\Fixture\StrategyQuery;
 
 #[CoversTrait(\Magix\Cache\Cacheable::class)]
 #[UsesNamespace('Magix\Cache')]
@@ -34,6 +35,25 @@ final class CacheableTest extends TestCase
     protected function tearDown(): void
     {
         CacheRuntimeRegistry::reset();
+    }
+
+    public function testCachedRunsTheDeclaredStrategyComposition(): void
+    {
+        CacheRuntimeRegistry::register(
+            CacheRuntimeRegistry::DEFAULT_NAME,
+            new CacheRuntime(new MemoryCache(), new MutableClock(4_000_000_000.0)),
+        );
+        $query = new StrategyQuery();
+
+        $pinned = $query->viaMethod(1);
+        $spread = $query->viaClass(1);
+        $plain = $query->withoutStrategy(1);
+
+        self::assertSame(4_000_000_060.0, $pinned->metadata->expiresAt, 'min: 60 pins the declared spread');
+        self::assertNotNull($spread->metadata->expiresAt);
+        self::assertGreaterThanOrEqual(4_000_000_030.0, $spread->metadata->expiresAt);
+        self::assertLessThanOrEqual(4_000_000_060.0, $spread->metadata->expiresAt);
+        self::assertSame(4_000_000_060.0, $plain->metadata->expiresAt, 'a disabled declaration leaves only the fixed policy');
     }
 
     public function testCachedResolvesTheDeclarationAndReusesTheStoredEntry(): void

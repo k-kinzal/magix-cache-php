@@ -10,6 +10,7 @@ use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\StaleIfError;
 use Magix\Cache\Cached;
 use Magix\Cache\CachePolicy;
+use Magix\Cache\Strategy\CacheStrategy;
 
 /**
  * Bundles every input one runtime execution needs.
@@ -34,6 +35,7 @@ final readonly class CacheInvocation
         public ?StaleIfError $staleIfError = null,
         public ?DynamicTtl $dynamicTtl = null,
         public ?BypassCacheErrors $bypassCacheErrors = null,
+        public ?CacheStrategy $strategy = null,
     ) {
     }
 }

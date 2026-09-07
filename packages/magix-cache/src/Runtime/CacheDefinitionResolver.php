@@ -10,6 +10,7 @@ use Magix\Cache\Attribute\BypassCacheErrors;
 use Magix\Cache\Attribute\Cache;
 use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\StaleIfError;
+use Magix\Cache\Attribute\UseStrategy;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -59,6 +60,7 @@ final class CacheDefinitionResolver
         $staleIfError = $reader->read($service, $methodName, StaleIfError::class);
         $dynamicTtl = $reader->read($service, $methodName, DynamicTtl::class);
         $bypassCacheErrors = $reader->read($service, $methodName, BypassCacheErrors::class);
+        $useStrategy = $reader->read($service, $methodName, UseStrategy::class);
 
         return $this->definitions[$key] = new CacheDefinition(
             method: $method,
@@ -67,6 +69,7 @@ final class CacheDefinitionResolver
             staleIfError: $staleIfError?->enabled === true ? $staleIfError : null,
             dynamicTtl: $dynamicTtl?->enabled === true ? $dynamicTtl : null,
             bypassCacheErrors: $bypassCacheErrors?->enabled === true ? $bypassCacheErrors : null,
+            useStrategy: $useStrategy?->enabled === true ? $useStrategy : null,
         );
     }
 }

@@ -16,6 +16,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[UsesNamespace('Magix\Cache\Cli')]
 #[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Strategy\Contract\ConstructorArg::class)]
+#[UsesClass(\Magix\Cache\Strategy\Contract\Ttl::class)]
 final class BoundariesCommandTest extends TestCase
 {
     public function testBoundariesListEveryDeclaredCache(): void

@@ -28,6 +28,8 @@ final readonly class StrategyDeclaration
      * @param TtlContract|null $ttl Lifetime contract declared on the fetch operation.
      * @param list<TtlAssumption> $assumptions Explicit assumptions declared on create().
      * @param list<string> $notes Why parts of the declaration could not be read.
+     * @param bool $constructible Whether this class can be a constructed CacheStrategy leaf.
+     * @param string|null $definitionProblem A factory signature incompatible with StrategyDefinition.
      */
     public function __construct(
         public string $name,
@@ -40,6 +42,8 @@ final readonly class StrategyDeclaration
         public ?TtlContract $ttl = null,
         public array $assumptions = [],
         public array $notes = [],
+        public bool $constructible = true,
+        public ?string $definitionProblem = null,
     ) {
     }
 

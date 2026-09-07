@@ -10,7 +10,8 @@ use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\StaleIfError;
 use Magix\Cache\Cached;
 use Magix\Cache\CachePolicy;
-use Magix\Cache\Strategy\CacheStrategy;
+use Magix\Cache\Strategy\StaleIfErrorCacheStrategy;
+use Magix\Cache\Strategy\StrategyDefinition;
 
 /**
  * Bundles every input one runtime execution needs.
@@ -24,6 +25,11 @@ use Magix\Cache\Strategy\CacheStrategy;
 final readonly class CacheInvocation
 {
     /**
+     * Construction recipe, never an executable strategy instance.
+     */
+    public ?StrategyDefinition $strategy;
+
+    /**
      * Creates the input of one runtime execution.
      *
      * @param Closure(): Cached<T> $origin
@@ -32,10 +38,16 @@ final readonly class CacheInvocation
         public CacheKeyContext $context,
         public CachePolicy $policy,
         public Closure $origin,
-        public ?StaleIfError $staleIfError = null,
+        ?StaleIfError $staleIfError = null,
         public ?DynamicTtl $dynamicTtl = null,
         public ?BypassCacheErrors $bypassCacheErrors = null,
-        public ?CacheStrategy $strategy = null,
+        ?StrategyDefinition $strategy = null,
     ) {
+        $declared = $staleIfError?->enabled === true
+            ? StrategyDefinition::of(StaleIfErrorCacheStrategy::class, maxAge: $staleIfError->maxAge, exceptions: $staleIfError->exceptions)
+            : null;
+        $this->strategy = $declared === null
+            ? $strategy
+            : ($strategy === null ? $declared : StrategyDefinition::compose($strategy, $declared));
     }
 }

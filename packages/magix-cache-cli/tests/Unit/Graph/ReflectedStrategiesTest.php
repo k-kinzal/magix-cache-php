@@ -130,4 +130,11 @@ final class ReflectedStrategiesTest extends TestCase
         self::assertSame(30, $reflected->bound(30));
         self::assertNull($reflected->bound(null));
     }
+    public function testDefinitionProblemAcceptsConstructionDefinitionFactories(): void
+    {
+        $declaration = (new ReflectedStrategies())->read(ProductCacheStrategy::class);
+
+        self::assertNotNull($declaration);
+        self::assertNull($declaration->definitionProblem);
+    }
 }

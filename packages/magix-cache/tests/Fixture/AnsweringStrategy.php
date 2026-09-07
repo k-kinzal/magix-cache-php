@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace Tests\Fixture;
 
 use Magix\Cache\Cached;
+use Magix\Cache\Strategy\CacheAnswer;
 use Magix\Cache\Strategy\CacheOperation;
+use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
+use Magix\Cache\Strategy\CacheWrite;
 use Magix\Cache\Strategy\NextCacheStrategy;
+use Magix\Cache\Strategy\OriginFailure;
+use Magix\Cache\Strategy\OriginResult;
 use Override;
+use RuntimeException;
 
 /**
  * Answers every operation itself without delegating, like a terminal.
@@ -16,9 +22,9 @@ use Override;
 final class AnsweringStrategy implements CacheStrategy
 {
     /**
-     * @var Cached<mixed>|null
+     * @var CacheWrite<mixed>|null
      */
-    public ?Cached $stored = null;
+    public ?CacheWrite $stored = null;
 
     /**
      * @param Cached<mixed>|null $hit
@@ -29,38 +35,40 @@ final class AnsweringStrategy implements CacheStrategy
         private readonly ?Cached $hit,
         private readonly Cached $fetched,
         private readonly bool $succeeds = true,
+        private readonly ?RuntimeException $failure = null,
+        private readonly ?float $retainedUntil = null,
     ) {
     }
 
     /**
-     * @return Cached<mixed>|null
+     * @return CacheRead<mixed>|null
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?Cached
+    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
     {
-        return $this->hit;
+        return $this->hit === null ? null : new CacheRead($this->hit, $this->retainedUntil ?? $this->hit->metadata->expiresAt ?? 150.0);
     }
 
     /**
-     * @return Cached<mixed>
+     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
      */
     #[Override]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): Cached
+    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
     {
-        if ($this->succeeds) {
-            $operation->stampBaseTime($operation->now());
-        } else {
-            $operation->suppressStore();
+        if ($this->failure !== null) {
+            return new OriginFailure($this->failure);
         }
 
-        return $this->fetched;
+        return $this->succeeds
+            ? new OriginResult($this->fetched, $operation->now())
+            : new CacheAnswer($this->fetched);
     }
 
     /**
-     * @param Cached<mixed> $result
+     * @param CacheWrite<mixed> $result
      */
     #[Override]
-    public function set(CacheOperation $operation, Cached $result, NextCacheStrategy $next): void
+    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void
     {
         $this->stored = $result;
     }

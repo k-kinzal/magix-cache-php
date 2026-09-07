@@ -6,7 +6,6 @@ namespace Tests\Unit;
 
 use function array_slice;
 
-use ArrayObject;
 use Magix\Cache\Attribute\BypassCacheErrors;
 use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\StaleIfError;
@@ -22,8 +21,8 @@ use Magix\Cache\Runtime\Extension\CacheEvent;
 use Magix\Cache\Runtime\Extension\CacheTtlResolver;
 use Magix\Cache\Runtime\Extension\DynamicTtlContext;
 use Magix\Cache\Runtime\Policy\Ttl;
-use Magix\Cache\Strategy\ComposedCacheStrategy;
 use Magix\Cache\Strategy\KeySpreadExpirationStrategy;
+use Magix\Cache\Strategy\StrategyDefinition;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
@@ -35,7 +34,6 @@ use Tests\Fixture\MemoryCache;
 use Tests\Fixture\MutableClock;
 use Tests\Fixture\ProductCacheStrategy;
 use Tests\Fixture\RecordingObserver;
-use Tests\Fixture\RecordingStrategy;
 use Tests\Fixture\UpstreamUnavailable;
 
 #[CoversClass(CacheRuntime::class)]
@@ -336,7 +334,7 @@ final class CacheRuntimeTest extends TestCase
             context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
             policy: new CachePolicy(ttl: Ttl::Auto),
             origin: static fn (): Cached => Cached::of('value'),
-            strategy: new KeySpreadExpirationStrategy(minimum: 30, maximum: 60),
+            strategy: StrategyDefinition::of(KeySpreadExpirationStrategy::class, minimum: 30, maximum: 60),
         );
 
         $expiresAt = $runtime->execute($invocation)->metadata->expiresAt;
@@ -353,7 +351,7 @@ final class CacheRuntimeTest extends TestCase
             context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
             policy: new CachePolicy(ttl: Ttl::Auto),
             origin: static fn (): Cached => Cached::of('value', new CacheMetadata(expiresAt: 105.0)),
-            strategy: new KeySpreadExpirationStrategy(minimum: 30, maximum: 60),
+            strategy: StrategyDefinition::of(KeySpreadExpirationStrategy::class, minimum: 30, maximum: 60),
         );
 
         self::assertSame(105.0, $runtime->execute($invocation)->metadata->expiresAt);
@@ -387,27 +385,118 @@ final class CacheRuntimeTest extends TestCase
         self::assertNotContains(CacheEvent::Stored, array_slice($observer->events, 2), 'a served candidate is never stored again');
     }
 
-    public function testExecuteRunsStrategyStagesAroundTheTerminal(): void
+    public function testExecuteCreatesFreshStateForRepeatedInvocationsOfTheSameDefinition(): void
     {
-        /** @var ArrayObject<int, string> $log */
-        $log = new ArrayObject();
         $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
+        $definition = StrategyDefinition::compose(
+            StrategyDefinition::of(\Tests\Fixture\StatefulStrategy::class, label: 'outer'),
+            StrategyDefinition::compose(StrategyDefinition::of(\Tests\Fixture\StatefulStrategy::class, label: 'inner')),
+        );
         $invocation = new CacheInvocation(
-            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'f'),
-            policy: new CachePolicy(ttl: 20),
-            origin: static fn (): Cached => Cached::of('value'),
-            strategy: new ComposedCacheStrategy(new RecordingStrategy('outer', $log), new RecordingStrategy('inner', $log)),
+            new CacheKeyContext('', 'Q', 'Q', 'execute', [], '1', 'f'),
+            new CachePolicy(ttl: 0),
+            static fn (): Cached => Cached::of('value'),
+            strategy: $definition,
+        );
+        $first = $runtime->execute($invocation);
+        $second = $runtime->execute($invocation);
+
+        self::assertContains('outer:1:1', $first->metadata->tags);
+        self::assertContains('inner:1:1', $first->metadata->tags);
+        self::assertSame($first->metadata->tags, $second->metadata->tags);
+    }
+
+    public function testExecuteDoesNotShareStateWithANestedInvocation(): void
+    {
+        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
+        $definition = StrategyDefinition::of(\Tests\Fixture\StatefulStrategy::class);
+        $inner = new CacheInvocation(
+            new CacheKeyContext('', 'Q', 'Q', 'execute', ['id' => 2], '1', 'f'),
+            new CachePolicy(ttl: 0),
+            static fn (): Cached => Cached::of('inner'),
+            strategy: $definition,
+        );
+        $outer = new CacheInvocation(
+            new CacheKeyContext('', 'Q', 'Q', 'execute', ['id' => 1], '1', 'f'),
+            new CachePolicy(ttl: 0),
+            static function () use ($runtime, $inner): Cached {
+                $runtime->execute($inner);
+
+                return Cached::of('outer');
+            },
+            strategy: $definition,
+        );
+        $result = $runtime->execute($outer);
+        $key = (new \Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy())->generate($outer->context->withNamespace('magix'));
+
+        self::assertContains('state:1:1', $result->metadata->tags);
+        self::assertContains('lookup:'.$key, $result->metadata->tags);
+    }
+
+    public function testExecuteKeepsNestedStaleCandidatesInTheirOwnStrategies(): void
+    {
+        $clock = new MutableClock(100.0);
+        $runtime = new CacheRuntime(new MemoryCache(), $clock);
+        $definition = StrategyDefinition::of(\Magix\Cache\Strategy\StaleIfErrorCacheStrategy::class, maxAge: 30, exceptions: [UpstreamUnavailable::class]);
+        $policy = new CachePolicy(ttl: 10);
+        $outerKey = new CacheKeyContext('', 'Q', 'Q', 'execute', ['id' => 1], '1', 'f');
+        $innerKey = new CacheKeyContext('', 'Q', 'Q', 'execute', ['id' => 2], '1', 'f');
+        $runtime->execute(new CacheInvocation($outerKey, $policy, static fn (): Cached => Cached::of('outer-old'), strategy: $definition));
+        $runtime->execute(new CacheInvocation($innerKey, $policy, static fn (): Cached => Cached::of('inner-old'), strategy: $definition));
+        $clock->advance(11.0);
+        $inner = new CacheInvocation($innerKey, $policy, static fn (): Cached => throw new UpstreamUnavailable('inner-down'), strategy: $definition);
+        $outer = new CacheInvocation(
+            $outerKey,
+            $policy,
+            /** @throws UpstreamUnavailable */
+            static function () use ($runtime, $inner): Cached {
+                $runtime->execute($inner);
+
+                throw new UpstreamUnavailable('outer-down');
+            },
+            strategy: $definition,
         );
 
-        $runtime->execute($invocation);
+        $result = $runtime->execute($outer);
 
-        self::assertSame(
-            [
-                'outer.get.before', 'inner.get.before', 'inner.get.after', 'outer.get.after',
-                'outer.fetch.before', 'inner.fetch.before', 'inner.fetch.after', 'outer.fetch.after',
-                'outer.set.before', 'inner.set.before', 'inner.set.after', 'outer.set.after',
-            ],
-            $log->getArrayCopy(),
-        );
+        self::assertSame('outer-old', $result->value());
+        self::assertSame(110.0, $result->metadata->expiresAt);
+    }
+
+    public function testExecuteDoesNotReuseACandidateFromAnotherKey(): void
+    {
+        $clock = new MutableClock(100.0);
+        $runtime = new CacheRuntime(new MemoryCache(), $clock);
+        $definition = StrategyDefinition::of(\Magix\Cache\Strategy\StaleIfErrorCacheStrategy::class, maxAge: 30, exceptions: [UpstreamUnavailable::class]);
+        $key = new CacheKeyContext('', 'Q', 'Q', 'execute', ['id' => 1], '1', 'f');
+        $policy = new CachePolicy(ttl: 10);
+        $runtime->execute(new CacheInvocation($key, $policy, static fn (): Cached => Cached::of('old'), strategy: $definition));
+        $clock->advance(11.0);
+        $served = $runtime->execute(new CacheInvocation($key, $policy, static fn (): Cached => throw new UpstreamUnavailable('down'), strategy: $definition));
+        self::assertSame('old', $served->value());
+        $error = new UpstreamUnavailable('missing');
+
+        $this->expectExceptionObject($error);
+        $runtime->execute(new CacheInvocation(
+            new CacheKeyContext('', 'Q', 'Q', 'execute', ['id' => 2], '1', 'f'),
+            $policy,
+            static fn (): Cached => throw $error,
+            strategy: $definition,
+        ));
+    }
+    public function testExecuteDoesNotAnswerAnExpiredEntryWithoutAStaleStrategy(): void
+    {
+        $store = new MemoryCache();
+        $context = new CacheKeyContext('', 'Q', 'Q', 'execute', [], '1', 'f');
+        $key = (new \Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy())->generate($context->withNamespace('magix'));
+        $store->set($key, new \Magix\Cache\Cache\CacheEntry('old', new CacheMetadata(expiresAt: 90.0), 130.0));
+        $error = new UpstreamUnavailable('down');
+
+        $this->expectExceptionObject($error);
+        (new CacheRuntime($store, new MutableClock(100.0)))->execute(new CacheInvocation(
+            $context,
+            new CachePolicy(ttl: 10),
+            static fn (): Cached => throw $error,
+        ));
     }
 }

@@ -379,4 +379,37 @@ final class StrategyResolverTest extends TestCase
         self::assertSame('Spread', $resolver->shortName('App\Spread'));
         self::assertSame('Spread', $resolver->shortName('Spread'));
     }
+    public function testResolveMarksAnExecutableFactoryResultInvalid(): void
+    {
+        $declaration = new StrategyDeclaration('App\Factory', hasCreate: true, definitionProblem: 'create() must return StrategyDefinition');
+        $catalog = new Catalog([new ClassDeclaration('App\Factory', strategy: $declaration)]);
+        $boundary = new BoundaryDeclaration('App\Q', 'execute', 'a.php', 1, useStrategy: new UseStrategyDeclaration('App\Factory'));
+
+        $result = (new StrategyResolver($catalog))->resolve($boundary);
+
+        self::assertNotNull($result);
+        self::assertSame(TtlEstimateState::Invalid, $result->ttl->state);
+        self::assertSame(['create() must return StrategyDefinition'], $result->problems);
+    }
+
+    public function testStepPropagatesInvalidConfigurationDespiteAnAssumption(): void
+    {
+        $declaration = new StrategyDeclaration('App\Factory', assumptions: [new TtlAssumption('App\Child', unconstrained: true)]);
+        $child = new StrategyInstantiation('App\Child', problem: 'configuration contains a closure');
+
+        [$step, $problems] = (new StrategyResolver(new Catalog([])))->step($declaration, $child, []);
+
+        self::assertSame(TtlEstimateState::Invalid, $step->ttl->state);
+        self::assertSame(['configuration contains a closure'], $problems);
+    }
+
+    public function testStepRejectsAFactoryUsedAsAnExecutableLeaf(): void
+    {
+        $child = new StrategyDeclaration('App\Factory', constructible: false);
+        $catalog = new Catalog([new ClassDeclaration('App\Factory', strategy: $child)]);
+        [$step, $problems] = (new StrategyResolver($catalog))->step(new StrategyDeclaration('App\Outer'), new StrategyInstantiation('App\Factory'), []);
+
+        self::assertSame(TtlEstimateState::Invalid, $step->ttl->state);
+        self::assertSame(['App\Factory is not a constructible CacheStrategy for StrategyDefinition::of()'], $problems);
+    }
 }

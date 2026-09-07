@@ -43,4 +43,17 @@ enum CacheEvent
      * A classified backend failure was bypassed instead of propagated.
      */
     case BackendBypassed;
+    /**
+     * Resolves a diagnostic name supplied by a strategy answer.
+     */
+    public static function named(?string $name): ?self
+    {
+        foreach (self::cases() as $event) {
+            if ($event->name === $name) {
+                return $event;
+            }
+        }
+
+        return null;
+    }
 }

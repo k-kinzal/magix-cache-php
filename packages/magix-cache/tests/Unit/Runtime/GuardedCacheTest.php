@@ -32,12 +32,11 @@ final class GuardedCacheTest extends TestCase
         $store->set('key', $entry);
         $observer = new RecordingObserver();
 
-        [$fresh, $stale] = (new GuardedCache($store, $observer))
+        $retained = (new GuardedCache($store, $observer))
             ->lookup('key', null, static fn (): string => '', 110.0);
 
-        self::assertSame($entry, $fresh);
-        self::assertNull($stale);
-        self::assertSame([CacheEvent::FreshHit], $observer->events);
+        self::assertSame($entry, $retained);
+        self::assertSame([], $observer->events);
     }
 
     public function testLookupRetainsAnExpiredEntryAsTheStaleCandidate(): void
@@ -47,12 +46,11 @@ final class GuardedCacheTest extends TestCase
         $store->set('key', $entry);
         $observer = new RecordingObserver();
 
-        [$fresh, $stale] = (new GuardedCache($store, $observer))
+        $retained = (new GuardedCache($store, $observer))
             ->lookup('key', null, static fn (): string => '', 130.0);
 
-        self::assertNull($fresh);
-        self::assertSame($entry, $stale);
-        self::assertSame([CacheEvent::Miss], $observer->events);
+        self::assertSame($entry, $retained);
+        self::assertSame([], $observer->events);
     }
 
     public function testLookupReportsAMissBeyondPhysicalRetention(): void
@@ -61,12 +59,12 @@ final class GuardedCacheTest extends TestCase
         $store->set('key', new CacheEntry('value', new CacheMetadata(expiresAt: 120.0), retainedUntil: 150.0));
         $observer = new RecordingObserver();
 
-        [$fresh, $stale] = (new GuardedCache($store, $observer))
+        $retained = (new GuardedCache($store, $observer))
             ->lookup('key', null, static fn (): string => '', 150.0);
 
-        self::assertNull($fresh);
-        self::assertNull($stale);
-        self::assertSame([CacheEvent::Miss], $observer->events);
+        self::assertNull($retained);
+
+        self::assertSame([], $observer->events);
     }
 
     public function testReadReturnsTheStoredEntry(): void

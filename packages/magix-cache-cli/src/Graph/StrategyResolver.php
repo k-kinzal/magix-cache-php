@@ -67,6 +67,12 @@ final readonly class StrategyResolver
             return new StrategyEffect($use->label(), TtlEstimate::invalid($problem), [], null, [$problem]);
         }
 
+        if ($declaration->definitionProblem !== null) {
+            $problem = $declaration->definitionProblem;
+
+            return new StrategyEffect($use->label(), TtlEstimate::invalid($problem), [], null, [$problem]);
+        }
+
         [$environment, $problems] = $this->binding->bindCreate($declaration, $use->arguments);
         $composed = $this->composition($declaration, $environment);
         $ttl = $problems === [] ? $composed->ttl : TtlEstimate::invalid($problems[0]);
@@ -89,6 +95,12 @@ final readonly class StrategyResolver
      */
     public function composition(StrategyDeclaration $declaration, array $environment): StrategyEffect
     {
+        if ($declaration->definitionProblem !== null) {
+            $problem = $declaration->definitionProblem;
+
+            return new StrategyEffect('', TtlEstimate::invalid($problem), problems: [$problem]);
+        }
+
         if ($declaration->composed === null) {
             $condition = $declaration->notes[0] ?? ('the composition of '.$declaration->shortName().' cannot be read statically');
 
@@ -121,6 +133,12 @@ final readonly class StrategyResolver
      */
     public function step(StrategyDeclaration $declaration, StrategyInstantiation $instantiation, array $environment): array
     {
+        if ($instantiation->problem !== null) {
+            $problem = $instantiation->problem;
+
+            return [new StrategyStep($instantiation->class, TtlEstimate::invalid($problem)), [$problem], null];
+        }
+
         $child = $this->declaration($instantiation->class);
         $assumption = $declaration->assumptionFor($instantiation->class);
 
@@ -136,6 +154,12 @@ final readonly class StrategyResolver
             $condition = $this->shortName($instantiation->class).'::create() cannot be analyzed statically';
 
             return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition)), [], null];
+        }
+
+        if ($child !== null && !$child->constructible) {
+            $problem = $child->name.' is not a constructible CacheStrategy for StrategyDefinition::of()';
+
+            return [new StrategyStep($child->name, TtlEstimate::invalid($problem)), [$problem], null];
         }
 
         if ($child === null || $child->ttl === null) {

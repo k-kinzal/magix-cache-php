@@ -12,10 +12,14 @@ use Magix\Cache\Runtime\Extension\CacheEvent;
 use Magix\Cache\Runtime\GuardedCache;
 use Magix\Cache\Runtime\TerminalCacheStrategy;
 use Magix\Cache\Strategy\CacheOperation;
+use Magix\Cache\Strategy\CacheWrite;
 use Magix\Cache\Strategy\NextCacheStrategy;
+use Magix\Cache\Strategy\OriginFailure;
+use Magix\Cache\Strategy\OriginResult;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Tests\Fixture\MemoryCache;
 use Tests\Fixture\RecordingObserver;
 use Tests\Fixture\UpstreamUnavailable;
@@ -30,9 +34,13 @@ use Tests\Fixture\UpstreamUnavailable;
 #[UsesClass(GuardedCache::class)]
 #[UsesClass(CacheOperation::class)]
 #[UsesClass(NextCacheStrategy::class)]
+#[UsesClass(OriginFailure::class)]
+#[UsesClass(OriginResult::class)]
+#[UsesClass(CacheWrite::class)]
+#[UsesClass(\Magix\Cache\Strategy\CacheRead::class)]
 final class TerminalCacheStrategyTest extends TestCase
 {
-    public function testGetReturnsAFreshHitAndRetainsNoCandidate(): void
+    public function testGetExposesAStoredFreshCandidate(): void
     {
         $storage = new MemoryCache();
         $storage->set('key', new CacheEntry('stored', new CacheMetadata(expiresAt: 150.0)));
@@ -43,8 +51,7 @@ final class TerminalCacheStrategyTest extends TestCase
         );
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
-        self::assertSame('stored', $terminal->get($operation, NextCacheStrategy::end())?->value());
-        self::assertNull($operation->stale());
+        self::assertSame('stored', $terminal->get($operation, NextCacheStrategy::end())?->cached->value());
     }
 
     public function testGetRetainsAnExpiredEntryStillInsideItsRetention(): void
@@ -58,9 +65,10 @@ final class TerminalCacheStrategyTest extends TestCase
         );
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
-        self::assertNull($terminal->get($operation, NextCacheStrategy::end()));
-        self::assertSame('stale', $operation->stale()?->value());
-        self::assertSame(90.0, $operation->stale()->metadata->expiresAt);
+        $read = $terminal->get($operation, NextCacheStrategy::end());
+        self::assertSame('stale', $read?->cached->value());
+        self::assertSame(90.0, $read->cached->metadata->expiresAt);
+        self::assertSame(400.0, $read->retainedUntil);
     }
 
     public function testFetchStampsTheBaseTimeRightAfterTheOriginSucceeds(): void
@@ -74,45 +82,36 @@ final class TerminalCacheStrategyTest extends TestCase
 
         $result = $terminal->fetch($operation, NextCacheStrategy::end());
 
-        self::assertSame('origin', $result->value());
-        self::assertSame(100.0, $operation->baseTime());
-        self::assertFalse($operation->storeSuppressed());
+        self::assertInstanceOf(OriginResult::class, $result);
+        self::assertSame('origin', $result->cached->value());
+        self::assertSame(100.0, $result->baseTime);
     }
 
-    public function testFetchServesTheDeclaredStaleFallbackAndSuppressesTheStore(): void
+    public function testFetchReportsTheOriginalFailureWithoutAnsweringIt(): void
     {
-        $observer = new RecordingObserver();
+        $error = new UpstreamUnavailable('down');
         $terminal = new TerminalCacheStrategy(
-            cache: new GuardedCache(new MemoryCache(), $observer),
+            cache: new GuardedCache(new MemoryCache()),
             classifier: null,
-            origin: static fn (): Cached => throw new UpstreamUnavailable('down'),
-            staleIfError: new StaleIfError(maxAge: 300, exceptions: [UpstreamUnavailable::class]),
-            observer: $observer,
+            origin: static fn (): Cached => throw $error,
         );
-        $operation = new CacheOperation('key', static fn (): float => 100.0);
-        $operation->retainStale(Cached::of('stale', new CacheMetadata(expiresAt: 90.0)), 400.0);
+        $result = $terminal->fetch(new CacheOperation('key', static fn (): float => 100.0), NextCacheStrategy::end());
 
-        $result = $terminal->fetch($operation, NextCacheStrategy::end());
-
-        self::assertSame('stale', $result->value());
-        self::assertTrue($operation->storeSuppressed());
-        self::assertFalse($operation->originSucceeded());
-        self::assertContains(CacheEvent::StaleServed, $observer->events);
+        self::assertInstanceOf(OriginFailure::class, $result);
+        self::assertSame($error, $result->error);
     }
 
-    public function testSetWritesWithTheLargestRequestedRetention(): void
+    public function testSetWritesTheRequestedRetention(): void
     {
         $storage = new MemoryCache();
         $terminal = new TerminalCacheStrategy(
             cache: new GuardedCache($storage),
             classifier: null,
             origin: static fn (): Cached => Cached::of('origin'),
-            staleIfError: new StaleIfError(maxAge: 100, exceptions: [UpstreamUnavailable::class]),
         );
         $operation = new CacheOperation('key', static fn (): float => 100.0);
-        $operation->extendRetention(500.0);
 
-        $terminal->set($operation, Cached::of('value', new CacheMetadata(expiresAt: 160.0)), NextCacheStrategy::end());
+        $terminal->set($operation, new CacheWrite(Cached::of('value', new CacheMetadata(expiresAt: 160.0)), 500.0), NextCacheStrategy::end());
 
         $entry = $storage->get('key', static fn (): string => 'value');
 
@@ -131,30 +130,18 @@ final class TerminalCacheStrategyTest extends TestCase
         );
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
-        $terminal->set($operation, Cached::of('value'), NextCacheStrategy::end());
+        $terminal->set($operation, new CacheWrite(Cached::of('value')), NextCacheStrategy::end());
 
         self::assertSame([CacheEvent::StoreSkipped], $observer->events);
     }
 
-    public function testRetentionTakesTheDeclaredBehaviorAndTheLargerRequest(): void
+    public function testFetchDoesNotClassifyAFailureAfterOriginSuccessAsAnOriginFailure(): void
     {
-        $terminal = new TerminalCacheStrategy(
-            cache: new GuardedCache(new MemoryCache()),
-            classifier: null,
-            origin: static fn (): Cached => Cached::of('origin'),
-            staleIfError: new StaleIfError(maxAge: 100, exceptions: [UpstreamUnavailable::class]),
-        );
-        $operation = new CacheOperation('key', static fn (): float => 100.0);
-        $result = Cached::of('value', new CacheMetadata(expiresAt: 160.0));
+        $error = new RuntimeException('clock failed');
+        $terminal = new TerminalCacheStrategy(new GuardedCache(new MemoryCache()), null, static fn (): Cached => Cached::of('origin'));
+        $operation = new CacheOperation('key', static fn (): float => throw $error);
 
-        self::assertSame(260.0, $terminal->retention($operation, $result));
-
-        $operation->extendRetention(500.0);
-
-        self::assertSame(500.0, $terminal->retention($operation, $result));
-        self::assertNull(
-            $terminal->retention(new CacheOperation('key', static fn (): float => 100.0), Cached::of('value')),
-            'no expiration and no request means no retention',
-        );
+        $this->expectExceptionObject($error);
+        $terminal->fetch($operation, NextCacheStrategy::end());
     }
 }

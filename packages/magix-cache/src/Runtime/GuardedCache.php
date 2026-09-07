@@ -39,35 +39,18 @@ final readonly class GuardedCache
     }
 
     /**
-     * Performs the lookup stage: a fresh hit, a stale candidate, or a miss.
-     *
-     * The judgement happens at one instant and never refreshes the stored
-     * expiration. An expired entry still inside its physical retention is
-     * returned as the stale candidate for the origin stage.
+     * Returns physically retained data without choosing a reuse policy.
      *
      * @template T
      * @param Closure(): T $typeWitness
-     * @return array{CacheEntry<T>|null, CacheEntry<T>|null} Fresh entry and stale candidate.
-     * @throws RuntimeException when the read fails and no classifier accepts the failure
+     * @return CacheEntry<T>|null
+     * @throws RuntimeException when the read fails and no classifier accepts it
      */
-    public function lookup(string $key, ?BackendErrorClassifier $classifier, Closure $typeWitness, float $now): array
+    public function lookup(string $key, ?BackendErrorClassifier $classifier, Closure $typeWitness, float $now): ?CacheEntry
     {
         $entry = $this->read($key, $classifier, $typeWitness);
-        $stale = null;
 
-        if ($entry !== null && $entry->retainedUntil > $now) {
-            if ($entry->expiresAt > $now) {
-                $this->observer?->observe(CacheEvent::FreshHit, $key);
-
-                return [$entry, null];
-            }
-
-            $stale = $entry;
-        }
-
-        $this->observer?->observe(CacheEvent::Miss, $key);
-
-        return [null, $stale];
+        return $entry !== null && $entry->retainedUntil > $now ? $entry : null;
     }
 
     /**

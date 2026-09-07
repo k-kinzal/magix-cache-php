@@ -51,10 +51,10 @@ final class StrategyReaderTest extends TestCase
             <?php
             final class ProductCacheStrategy extends \Magix\Cache\Strategy\CompositeCacheStrategy
             {
-                public static function create(int $min = 30): \Magix\Cache\Strategy\CacheStrategy
+                public static function create(int $min = 30): \Magix\Cache\Strategy\StrategyDefinition
                 {
                     return parent::compose(
-                        new \App\KeySpread(minimum: $min, maximum: 60),
+                        \Magix\Cache\Strategy\StrategyDefinition::of(\App\KeySpread::class, minimum: $min, maximum: 60),
                         \App\Nested::create($min),
                     );
                 }
@@ -238,9 +238,9 @@ final class StrategyReaderTest extends TestCase
             {
                 #[\Magix\Cache\Strategy\Contract\AssumeTtl(strategy: \App\First::class, min: 10)]
                 #[\Magix\Cache\Strategy\Contract\AssumeTtl(strategy: \App\Second::class, max: 300)]
-                public static function create(): \Magix\Cache\Strategy\CacheStrategy
+                public static function create(): \Magix\Cache\Strategy\StrategyDefinition
                 {
-                    return parent::compose(new \App\First(), new \App\Second());
+                    return parent::compose(\Magix\Cache\Strategy\StrategyDefinition::of(\App\First::class), \Magix\Cache\Strategy\StrategyDefinition::of(\App\Second::class));
                 }
             }
             SOURCE;
@@ -267,12 +267,12 @@ final class StrategyReaderTest extends TestCase
             <?php
             final class BranchStrategy extends \Magix\Cache\Strategy\CompositeCacheStrategy
             {
-                public static function create(bool $flag): \Magix\Cache\Strategy\CacheStrategy
+                public static function create(bool $flag): \Magix\Cache\Strategy\StrategyDefinition
                 {
                     if ($flag) {
-                        return parent::compose(new \App\First());
+                        return parent::compose(\Magix\Cache\Strategy\StrategyDefinition::of(\App\First::class));
                     } else {
-                        return parent::compose(new \App\Second());
+                        return parent::compose(\Magix\Cache\Strategy\StrategyDefinition::of(\App\Second::class));
                     }
                 }
             }
@@ -295,7 +295,7 @@ final class StrategyReaderTest extends TestCase
             <?php
             final class ComposedStrategy extends \Magix\Cache\Strategy\CompositeCacheStrategy
             {
-                public static function create(): \Magix\Cache\Strategy\CacheStrategy
+                public static function create(): \Magix\Cache\Strategy\StrategyDefinition
                 {
                     return parent::compose($first, $second);
                 }
@@ -340,14 +340,14 @@ final class StrategyReaderTest extends TestCase
         self::assertNull($reader->compose($construction));
     }
 
-    public function testInstantiationReadsANewExpression(): void
+    public function testInstantiationReadsAConstructionDefinition(): void
     {
-        $code = '<?php new \App\X(1);';
+        $code = '<?php \Magix\Cache\Strategy\StrategyDefinition::of(\App\X::class, 1);';
         $statements = (new NodeTraverser(new NameResolver()))->traverse(
             (new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? [],
         );
-        $construction = (new NodeFinder())->findFirstInstanceOf($statements, New_::class);
-        self::assertInstanceOf(New_::class, $construction);
+        $construction = (new NodeFinder())->findFirstInstanceOf($statements, StaticCall::class);
+        self::assertInstanceOf(StaticCall::class, $construction);
 
         $instantiation = (new StrategyReader())->instantiation($construction);
 
@@ -409,5 +409,65 @@ final class StrategyReaderTest extends TestCase
         self::assertInstanceOf(FuncCall::class, $call);
 
         self::assertNull((new StrategyReader())->arguments($call->args));
+    }
+    public function testDefinitionReadsNamedConstructorArguments(): void
+    {
+        $code = '<?php \Magix\Cache\Strategy\StrategyDefinition::of(\App\Spread::class, minimum: $min, maximum: 60);';
+        $statements = (new NodeTraverser(new NameResolver()))->traverse((new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? []);
+        $call = (new NodeFinder())->findFirstInstanceOf($statements, StaticCall::class);
+        self::assertInstanceOf(StaticCall::class, $call);
+        $definition = (new StrategyReader())->definition($call);
+
+        self::assertInstanceOf(StrategyInstantiation::class, $definition);
+        self::assertSame('App\Spread', $definition->class);
+        self::assertSame('min', $definition->arguments[0]->variable);
+        self::assertSame(60, $definition->arguments[1]->value);
+    }
+
+    public function testDefinitionProblemIdentifiesExecutableFactoryReturnTypes(): void
+    {
+        $code = '<?php final class Factory { public static function create(): \Magix\Cache\Strategy\CacheStrategy { return new \App\Spread(); } }';
+        $statements = (new NodeTraverser(new NameResolver()))->traverse((new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? []);
+        $method = (new NodeFinder())->findFirstInstanceOf($statements, ClassMethod::class);
+        self::assertInstanceOf(ClassMethod::class, $method);
+
+        self::assertSame('create() must return StrategyDefinition, not an executable strategy instance', (new StrategyReader())->definitionProblem($method));
+    }
+
+    public function testInstantiationMarksAnExecutableConstructionInvalid(): void
+    {
+        $code = '<?php new \App\Spread();';
+        $statements = (new NodeTraverser(new NameResolver()))->traverse((new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? []);
+        $construction = (new NodeFinder())->findFirstInstanceOf($statements, New_::class);
+        self::assertInstanceOf(New_::class, $construction);
+        $instantiation = (new StrategyReader())->instantiation($construction);
+
+        self::assertNotNull($instantiation);
+        self::assertSame('create() must return construction definitions; replace new with StrategyDefinition::of()', $instantiation->problem);
+    }
+    public function testDefinitionDetectsObjectsNestedInsideConfigurationArrays(): void
+    {
+        $code = '<?php \Magix\Cache\Strategy\StrategyDefinition::of(\App\Spread::class, options: ["client" => new \stdClass()]);';
+        $statements = (new NodeTraverser(new NameResolver()))->traverse((new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? []);
+        $call = (new NodeFinder())->findFirstInstanceOf($statements, StaticCall::class);
+        self::assertInstanceOf(StaticCall::class, $call);
+        $definition = (new StrategyReader())->definition($call);
+
+        self::assertNotNull($definition);
+        self::assertSame('StrategyDefinition arguments cannot contain objects or closures; keep execution state in the strategy', $definition->problem);
+    }
+
+    public function testDefinitionSupportsThePublicConstructorAndNamedClassArgument(): void
+    {
+        $code = '<?php new \Magix\Cache\Strategy\StrategyDefinition(minimum: 30, class: \App\Spread::class);';
+        $statements = (new NodeTraverser(new NameResolver()))->traverse((new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? []);
+        $construction = (new NodeFinder())->findFirstInstanceOf($statements, New_::class);
+        self::assertInstanceOf(New_::class, $construction);
+        $definition = (new StrategyReader())->instantiation($construction);
+
+        self::assertNotNull($definition);
+        self::assertSame('App\Spread', $definition->class);
+        self::assertNull($definition->problem);
+        self::assertSame(30, $definition->arguments[0]->value);
     }
 }

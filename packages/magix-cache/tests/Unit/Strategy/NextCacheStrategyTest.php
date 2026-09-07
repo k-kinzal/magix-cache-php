@@ -7,7 +7,9 @@ namespace Tests\Unit\Strategy;
 use ArrayObject;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheOperation;
+use Magix\Cache\Strategy\CacheWrite;
 use Magix\Cache\Strategy\NextCacheStrategy;
+use Magix\Cache\Strategy\OriginResult;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +21,9 @@ use Tests\Fixture\RecordingStrategy;
 #[UsesClass(\Magix\Cache\Metadata\CacheMetadata::class)]
 #[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 #[UsesClass(CacheOperation::class)]
+#[UsesClass(\Magix\Cache\Strategy\CacheRead::class)]
+#[UsesClass(CacheWrite::class)]
+#[UsesClass(OriginResult::class)]
 final class NextCacheStrategyTest extends TestCase
 {
     public function testFetchRunsStrategiesInOrderDownToTheAnswer(): void
@@ -31,7 +36,9 @@ final class NextCacheStrategyTest extends TestCase
         $chain = NextCacheStrategy::of($first, $second, $terminal);
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
-        self::assertSame('origin', $chain->fetch($operation)->value());
+        $fetched1 = $chain->fetch($operation);
+        self::assertInstanceOf(OriginResult::class, $fetched1);
+        self::assertSame('origin', $fetched1->cached->value());
         self::assertSame(
             ['first.fetch.before', 'second.fetch.before', 'second.fetch.after', 'first.fetch.after'],
             $log->getArrayCopy(),
@@ -40,11 +47,11 @@ final class NextCacheStrategyTest extends TestCase
 
     public function testGetReachesTheAnswerAtTheEndOfTheChain(): void
     {
-        $terminal = new AnsweringStrategy(hit: Cached::of('hit'), fetched: Cached::of('origin'));
+        $terminal = new AnsweringStrategy(hit: Cached::of('hit', new \Magix\Cache\Metadata\CacheMetadata(expiresAt: 150.0)), fetched: Cached::of('origin'));
         $chain = NextCacheStrategy::of(new RecordingStrategy('outer'), $terminal);
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
-        self::assertSame('hit', $chain->get($operation)?->value());
+        self::assertSame('hit', $chain->get($operation)?->cached->value());
     }
 
     public function testSetReachesTheAnswerAtTheEndOfTheChain(): void
@@ -54,20 +61,20 @@ final class NextCacheStrategyTest extends TestCase
         $operation = new CacheOperation('key', static fn (): float => 100.0);
         $result = Cached::of('value');
 
-        $chain->set($operation, $result);
+        $chain->set($operation, new CacheWrite($result));
 
-        self::assertSame($result, $terminal->stored);
+        self::assertSame($result, $terminal->stored?->cached);
     }
 
     public function testPrependBindsInFrontOfTheExistingChain(): void
     {
         /** @var ArrayObject<int, string> $log */
         $log = new ArrayObject();
-        $terminal = new AnsweringStrategy(hit: Cached::of('hit'), fetched: Cached::of('origin'));
+        $terminal = new AnsweringStrategy(hit: Cached::of('hit', new \Magix\Cache\Metadata\CacheMetadata(expiresAt: 150.0)), fetched: Cached::of('origin'));
         $chain = NextCacheStrategy::of($terminal)->prepend(new RecordingStrategy('outer', $log));
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
-        self::assertSame('hit', $chain->get($operation)?->value());
+        self::assertSame('hit', $chain->get($operation)?->cached->value());
         self::assertSame(['outer.get.before', 'outer.get.after'], $log->getArrayCopy());
     }
 
@@ -77,7 +84,9 @@ final class NextCacheStrategyTest extends TestCase
         $chain = NextCacheStrategy::end()->prepend($terminal);
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
-        self::assertSame('origin', $chain->fetch($operation)->value());
+        $fetched2 = $chain->fetch($operation);
+        self::assertInstanceOf(OriginResult::class, $fetched2);
+        self::assertSame('origin', $fetched2->cached->value());
     }
 
     public function testOfBindsTheGivenStrategiesInOrder(): void

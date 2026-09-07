@@ -14,13 +14,15 @@ final readonly class StrategyInstantiation
      *
      * @param string $class Fully qualified class name being constructed.
      * @param list<StrategyArgument> $arguments Written arguments in order.
-     * @param bool $viaCreate True when the child is built by its own create() instead of new.
+     * @param bool $viaCreate True when the child is built by its own create() instead of StrategyDefinition::of().
+     * @param string|null $problem A statically proven construction error, never an unknown TTL.
      */
     public function __construct(
         public string $class,
         public array $arguments = [],
         public bool $viaCreate = false,
         public int $line = 0,
+        public ?string $problem = null,
     ) {
     }
 }

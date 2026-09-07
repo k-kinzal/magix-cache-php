@@ -25,6 +25,9 @@ use Tests\Fixture\ProductCacheStrategy;
 #[UsesClass(\Magix\Cache\Strategy\KeySpreadExpirationStrategy::class)]
 #[UsesClass(NextCacheStrategy::class)]
 #[UsesClass(\Magix\Cache\Strategy\StaleIfErrorCacheStrategy::class)]
+#[UsesClass(\Magix\Cache\Strategy\OriginResult::class)]
+#[UsesClass(\Magix\Cache\Strategy\StrategyArguments::class)]
+#[UsesClass(\Magix\Cache\Strategy\StrategyDefinition::class)]
 final class UseStrategyTest extends TestCase
 {
     public function testCarriesTheTypedArgumentsForCreate(): void
@@ -38,14 +41,15 @@ final class UseStrategyTest extends TestCase
 
     public function testResolveBuildsTheStrategyThroughCreate(): void
     {
-        $strategy = (new UseStrategy(strategy: ProductCacheStrategy::class, min: 60))->resolve();
+        $strategy = (new UseStrategy(strategy: ProductCacheStrategy::class, min: 60))->resolve()->instantiate();
         $terminal = new AnsweringStrategy(hit: null, fetched: Cached::of('origin'));
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
         $result = $strategy->fetch($operation, NextCacheStrategy::of($terminal));
+        self::assertInstanceOf(\Magix\Cache\Strategy\OriginResult::class, $result);
 
-        self::assertSame('origin', $result->value());
-        self::assertSame(160.0, $result->metadata->expiresAt, 'the declared min: 60 pins the spread');
+        self::assertSame('origin', $result->cached->value());
+        self::assertSame(160.0, $result->cached->metadata->expiresAt, 'the declared min: 60 pins the spread');
     }
 
     public function testDisablingKeepsTheDeclarationReadable(): void

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Strategy;
 
-use Magix\Cache\Cached;
 use RuntimeException;
 
 /**
@@ -17,6 +16,9 @@ use RuntimeException;
  * it decides pre- and post-processing, the capture range of failures, and
  * which delegations are short-circuited.
  *
+ * Each boundary execution constructs its own strategy objects, including
+ * every child. They may hold execution state across get/fetch/set.
+ *
  * A strategy publishes the effects it guarantees as contract attributes on
  * its operations, such as Contract\Ttl on fetch(). The analyzer derives the
  * composed behavior from those contracts and the construction code alone,
@@ -25,40 +27,40 @@ use RuntimeException;
 interface CacheStrategy
 {
     /**
-     * Returns the cached value for this operation, or null for a miss.
+     * Returns a storage candidate for this operation, or null for a miss.
      *
-     * Delegating reaches the storage lookup at the end of the chain, which
-     * retains an expired-but-retained entry on the operation as the stale
-     * candidate for the fetch stage.
+     * Delegating exposes physically retained data, including expired entries.
+     * The runtime judges freshness after the chain returns. A strategy owns
+     * any candidate it needs across the stages of this one execution.
      *
-     * @return Cached<mixed>|null
+     * @return CacheRead<mixed>|null
      * @throws RuntimeException when a delegated read fails with declared behavior
      */
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?Cached;
+    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead;
 
     /**
      * Produces the value of the boundary with this strategy's constraints.
      *
      * Delegating reaches the origin computation at the end of the chain.
-     * Constraints on the produced metadata may only be added through the
-     * metadata meet on the normal origin path, after the delegate returned
-     * with the origin base time stamped on the operation.
+     * OriginResult carries the successful value and its single base time;
+     * constraints are added through its metadata meet. OriginFailure carries
+     * only declared origin behavior. CacheAnswer ends the execution without
+     * applying origin constraints or storing the answer again.
      *
-     * @return Cached<mixed>
+     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
      * @throws RuntimeException when the origin or a delegate fails with declared behavior
      */
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): Cached;
+    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer;
 
     /**
      * Stores the produced value, or refuses to by not delegating.
      *
      * Delegating reaches the re-judged storage write at the end of the
-     * chain. A strategy may extend the physical retention through the
-     * operation before delegating; extending retention never changes the
-     * expiration itself.
+     * chain. A strategy may extend the request's physical retention before
+     * delegating; extending retention never changes the expiration itself.
      *
-     * @param Cached<mixed> $result
+     * @param CacheWrite<mixed> $result
      * @throws RuntimeException when a delegated write fails with declared behavior
      */
-    public function set(CacheOperation $operation, Cached $result, NextCacheStrategy $next): void;
+    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void;
 }

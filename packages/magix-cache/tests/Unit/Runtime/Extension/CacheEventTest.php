@@ -18,4 +18,10 @@ final class CacheEventTest extends TestCase
         self::assertSame(7, count(CacheEvent::cases()));
         self::assertNotSame(CacheEvent::FreshHit, CacheEvent::StaleServed);
     }
+    public function testNamedResolvesRecognizedDiagnostics(): void
+    {
+        self::assertSame(CacheEvent::StaleServed, CacheEvent::named('StaleServed'));
+        self::assertNull(CacheEvent::named(null));
+        self::assertNull(CacheEvent::named('application-diagnostic'));
+    }
 }

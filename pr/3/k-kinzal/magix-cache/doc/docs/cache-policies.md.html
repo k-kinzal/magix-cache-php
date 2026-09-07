@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cache Policies — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/pr/3/k-kinzal/magix-cache/doc/docs/cache-policies.md.html">
+<meta name="description" content="Cache Policies, a document of the k-kinzal/magix-cache package.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="Cache Policies — magix-cache-php">
+<meta property="og:description" content="Cache Policies, a document of the k-kinzal/magix-cache package.">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/pr/3/k-kinzal/magix-cache/doc/docs/cache-policies.md.html">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/pr/3/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}document.documentElement.dataset.diffMode=localStorage.getItem("docgen-diff-mode")||"inline"}catch(e){}</script>
+</head>
+<body data-root="../../../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../index.html">magix-cache-php</a></div><div class="sb-pkg"><a href="../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></div><nav class="sb-block"><div class="sb-title">Package</div><ul class="sb-list"><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/all-items.html">All items</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/index.html#documents">Documents</a></li></ul><div class="sb-kind" data-diff="same">Layers</div><ul class="sb-list"><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Attribute.html">Attribute</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Cache.html">Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Clock.html">Clock</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Composition.html">Composition</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.CoreApi.html">CoreApi</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Metadata.html">Metadata</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Runtime.html">Runtime</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Namespaces</div><ul class="sb-list"><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/index.html" title="Magix\Cache">Magix\Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Attribute/index.html" title="Magix\Cache\Attribute">Magix\Cache\Attribute</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/index.html" title="Magix\Cache\Cache">Magix\Cache\Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/PSR16/index.html" title="Magix\Cache\Cache\PSR16">Magix\Cache\Cache\PSR16</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/PSR6/index.html" title="Magix\Cache\Cache\PSR6">Magix\Cache\Cache\PSR6</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Clock/index.html" title="Magix\Cache\Clock">Magix\Cache\Clock</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Composition/index.html" title="Magix\Cache\Composition">Magix\Cache\Composition</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Metadata/index.html" title="Magix\Cache\Metadata">Magix\Cache\Metadata</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/index.html" title="Magix\Cache\Runtime">Magix\Cache\Runtime</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Extension/index.html" title="Magix\Cache\Runtime\Extension">Magix\Cache\Runtime\Extension</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/KeyStrategy/index.html" title="Magix\Cache\Runtime\KeyStrategy">Magix\Cache\Runtime\KeyStrategy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Policy/index.html" title="Magix\Cache\Runtime\Policy">Magix\Cache\Runtime\Policy</a></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><a href="../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a><span class="crumb-sep">::</span><span class="crumb-current">docs/cache-policies.md</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<span class="diff-range" title="Comparing 08e0901 to working tree">08e0901 <span class="diff-arrow">→</span> working tree</span><div class="diff-modes" id="diff-modes" role="group" aria-label="Diff display mode"><button type="button" class="diff-mode" data-diff-mode="off" title="Documentation of the head revision, without diff marks">Off</button><button type="button" class="diff-mode" data-diff-mode="inline" title="Every page with additions and removals marked">Diff</button><button type="button" class="diff-mode" data-diff-mode="changes" title="Only what the head revision added, changed, or removed">Changes</button></div><a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<p class="diff-empty" id="diff-empty" data-changes="Nothing on this page changed between 08e0901 and working tree." data-off="This page documents what 08e0901 had and working tree no longer has. Switch to Diff to read it." hidden></p>
+<div class="symbol-head"><h1><span class="chip chip-kind k-document">document</span>Cache Policies</h1><div class="symbol-meta"><span class="src-link">docs/cache-policies.md</span></div></div>
+<section class="readme" data-diff="same"><div class="doc-block" data-diff="same"><h2>Cache Policies</h2>
+</div><div class="doc-block" data-diff="same"><p>This guide explains how cache boundaries declare TTL, tags, visibility, and key versions.</p>
+</div><div class="doc-block" data-diff="same"><h3>Declaring a Policy</h3>
+</div><div class="doc-block" data-diff="same"><p>Use <code>#[Cache]</code> on a method for the common case:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\Cache</span>;
+
+#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>, <span class="tok-id">tags</span>: [<span class="tok-str">&#039;products&#039;</span>], <span class="tok-id">version</span>: <span class="tok-str">&#039;2&#039;</span>)]
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(<span class="tok-id">int</span> <span class="tok-var">$productId</span>): <span class="tok-id">Cached</span>
+{
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(
+        <span class="tok-kw">fn</span> (): <span class="tok-id">Cached</span> =&gt; <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">products</span>-&gt;<span class="tok-id">find</span>(<span class="tok-var">$productId</span>)),
+    );
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The attribute can also be placed on the concrete class as a default for every method that calls <code>cached()</code>:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>, <span class="tok-id">tags</span>: [<span class="tok-str">&#039;catalog&#039;</span>])]
+<span class="tok-kw">final</span> <span class="tok-kw">class</span> <span class="tok-id">CatalogQueries</span>
+{
+    <span class="tok-kw">use</span> <span class="tok-id">Cacheable</span>;
+
+    <span class="tok-com">// The class policy applies unless a method declares its own #[Cache].</span>
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>A method-level <code>#[Cache]</code> wins over the class-level one as a whole; the two are never mixed per option. Attributes on a parent class are never inherited implicitly, and declarations are static — there is no per-call override path. If neither the method nor its concrete class declares <code>#[Cache]</code>, <code>cached()</code> throws a <code>LogicException</code>.</p>
+</div><div class="doc-block" data-diff="same"><p><code>#[Cache]</code> accepts these options:</p>
+</div><div class="doc-block" data-diff="same"><div class="table-wrap"><table><thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>ttl</code></td><td><code>int|Ttl</code></td><td><code>Ttl::Auto</code></td><td>Selects the boundary expiration</td></tr><tr><td><code>maxTtl</code></td><td><code>?int</code></td><td><code>null</code></td><td>Upper bound for <code>Ttl::FromUpstream</code> (required in that mode)</td></tr><tr><td><code>tags</code></td><td><code>list&lt;string&gt;</code></td><td><code>[]</code></td><td>Adds cache invalidation or response tags</td></tr><tr><td><code>visibility</code></td><td><code>Visibility</code></td><td><code>Visibility::Shared</code></td><td>Restricts where the result may be stored</td></tr><tr><td><code>version</code></td><td><code>string</code></td><td><code>&#039;1&#039;</code></td><td>Changes the generated cache key</td></tr><tr><td><code>runtime</code></td><td><code>string</code></td><td><code>&#039;default&#039;</code></td><td>Name of a runtime registered at bootstrap</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="same"><p>The same constraint options are carried by the shared <code>CachePolicy</code> value type, which <code>#[Cache]</code> converts to internally. A policy only ever adds constraints: no setting can extend an expiration a dependency already imposed, or relax cacheability, visibility, tags, or reasons.</p>
+</div><div class="doc-block" data-diff="same"><h3>Fixed TTL</h3>
+</div><div class="doc-block" data-diff="same"><p>An integer TTL is relative to the base time taken right after the origin result is produced:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">60</span>)]</code></pre>
+</div><div class="doc-block" data-diff="same"><p>A fixed TTL is always bounded by the upstream expiration; there is no opt-out. If a dependency has 20 seconds left, a 60-second boundary still expires after 20 seconds.</p>
+</div><div class="doc-block" data-diff="same"><p>A TTL of <code>0</code> is valid, but its expiration is not in the future, so the result is returned without being stored and the next call executes the origin again.</p>
+</div><div class="doc-block" data-diff="same"><h3>Automatic TTL</h3>
+</div><div class="doc-block" data-diff="same"><p><code>Ttl::Auto</code> inherits the finite expiration carried by the origin result:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Policy\Ttl</span>;
+
+#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-id">Ttl</span>::<span class="tok-id">Auto</span>)]
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(<span class="tok-id">int</span> <span class="tok-var">$productId</span>): <span class="tok-id">Cached</span>
+{
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-kw">function</span> () <span class="tok-kw">use</span> (<span class="tok-var">$productId</span>): <span class="tok-id">Cached</span> {
+        <span class="tok-var">$product</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">products</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>);
+        <span class="tok-var">$inventory</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">inventory</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>);
+
+        <span class="tok-kw">return</span> <span class="tok-var">$product</span>
+            -&gt;<span class="tok-id">combine2</span>(<span class="tok-var">$inventory</span>)
+            -&gt;<span class="tok-id">map</span>(
+                <span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">Product</span> <span class="tok-var">$product</span>, <span class="tok-id">Inventory</span> <span class="tok-var">$inventory</span>): <span class="tok-id">ProductPage</span> =&gt;
+                    <span class="tok-kw">new</span> <span class="tok-id">ProductPage</span>(<span class="tok-var">$product</span>, <span class="tok-var">$inventory</span>),
+            );
+    });
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p><code>Ttl::Auto</code> requires the returned <code>Cached</code> value to already carry a finite expiration. A value created with <code>Cached::of($value)</code> has unconstrained metadata until a policy is applied, so returning it directly under <code>Ttl::Auto</code> is a definition error and the runtime throws a <code>LogicException</code>.</p>
+</div><div class="doc-block" data-diff="same"><p>A <code>#[DynamicTtl]</code> resolver can supply the finite expiration before the automatic policy is applied. See <a href="../../../../k-kinzal/magix-cache/doc/docs/cache-behaviors.md.html#dynamic-ttl">Cache Behaviors</a>.</p>
+</div><div class="doc-block" data-diff="same"><h3>Upstream TTL</h3>
+</div><div class="doc-block" data-diff="same"><p><code>Ttl::FromUpstream</code> inherits an absolute expiration supplied in the returned metadata and caps it with <code>maxTtl</code>:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\CacheMetadata</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Policy\Ttl</span>;
+
+#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-id">Ttl</span>::<span class="tok-id">FromUpstream</span>, <span class="tok-id">maxTtl</span>: <span class="tok-num">300</span>)]
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(): <span class="tok-id">Cached</span>
+{
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-kw">function</span> (): <span class="tok-id">Cached</span> {
+        <span class="tok-var">$response</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">client</span>-&gt;<span class="tok-id">fetch</span>();
+
+        <span class="tok-kw">return</span> <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(
+            <span class="tok-var">$response</span>-&gt;<span class="tok-id">value</span>,
+            <span class="tok-kw">new</span> <span class="tok-id">CacheMetadata</span>(<span class="tok-id">expiresAt</span>: <span class="tok-var">$response</span>-&gt;<span class="tok-id">expiresAt</span>),
+        );
+    });
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The effective expiration is the earlier of the upstream expiration and <code>now + maxTtl</code>. <code>maxTtl</code> is required for this mode, and like <code>Ttl::Auto</code>, a missing finite upstream expiration is a definition error at runtime.</p>
+</div><div class="doc-block" data-diff="same"><h3>Tags</h3>
+</div><div class="doc-block" data-diff="same"><p>Policy tags are unioned with tags from every dependency:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>, <span class="tok-id">tags</span>: [<span class="tok-str">&#039;products&#039;</span>, <span class="tok-str">&#039;product:42&#039;</span>])]</code></pre>
+</div><div class="doc-block" data-diff="same"><p>Tags are deduplicated and sorted. They must be non-empty and contain only letters, digits, <code>_</code>, <code>.</code>, <code>:</code>, or <code>-</code>, which keeps them safe to forward through HTTP headers.</p>
+</div><div class="doc-block" data-diff="same"><p>The core PSR adapters preserve tags in each entry but do not call backend-specific tag invalidation APIs. Use a custom <code>Cache</code> implementation or decorator when storage-level tag invalidation is required.</p>
+</div><div class="doc-block" data-diff="same"><h3>Visibility</h3>
+</div><div class="doc-block" data-diff="same"><p>Visibility becomes more restrictive as results are composed:</p>
+</div><div class="doc-block" data-diff="same"><div class="table-wrap"><table><thead><tr><th>Visibility</th><th>Meaning</th></tr></thead><tbody><tr><td><code>Visibility::Shared</code></td><td>May be stored by shared caches such as a CDN</td></tr><tr><td><code>Visibility::Private</code></td><td>May be stored when the key identifies the private variant</td></tr><tr><td><code>Visibility::NoStore</code></td><td>Must not be read from or written to storage</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="same"><p>The order is <code>Shared &lt; Private &lt; NoStore</code>; a parent boundary cannot loosen a dependency&#039;s visibility. A boundary whose effective visibility is <code>NoStore</code> skips the cache lookup entirely and always executes the origin.</p>
+</div><div class="doc-block" data-diff="same"><p>Declare a boundary-wide restriction in the policy:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\Visibility</span>;
+
+#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>, <span class="tok-id">visibility</span>: <span class="tok-id">Visibility</span>::<span class="tok-kw">Private</span>)]</code></pre>
+</div><div class="doc-block" data-diff="same"><p>Use <code>#[CacheScope]</code> when a parameter introduces the restriction. The parameter remains part of the key, so entries stay separated per principal:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheScope</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\Visibility</span>;
+
+#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>)]
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(
+    #[<span class="tok-id">CacheScope</span>(<span class="tok-id">Visibility</span>::<span class="tok-kw">Private</span>)] <span class="tok-id">int</span> <span class="tok-var">$viewerId</span>,
+    <span class="tok-id">int</span> <span class="tok-var">$productId</span>,
+): <span class="tok-id">Cached</span> {
+    <span class="tok-com">// The result is private, and viewerId differentiates cache entries.</span>
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p><code>#[CacheScope]</code> defaults to <code>Visibility::Private</code>. The visibility a scoped parameter imposes is folded into the policy with the meet, so the method declaration cannot relax it.</p>
+</div><div class="doc-block" data-diff="same"><p>An ignored parameter cannot also be scoped unless its scope is <code>NoStore</code>. This special combination lets an unkeyable value force execution without storage:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Closure</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheIgnore</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheScope</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\Visibility</span>;
+
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(
+    #[<span class="tok-id">CacheIgnore</span>]
+    #[<span class="tok-id">CacheScope</span>(<span class="tok-id">Visibility</span>::<span class="tok-id">NoStore</span>)]
+    <span class="tok-id">Closure</span> <span class="tok-var">$load</span>,
+): <span class="tok-id">Cached</span> {
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-kw">fn</span> (): <span class="tok-id">Cached</span> =&gt; <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(<span class="tok-var">$load</span>()));
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><h3>Uncacheable Results</h3>
+</div><div class="doc-block" data-diff="same"><p>An origin or dependency can explicitly prohibit storage and record a diagnostic reason:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\CacheMetadata</span>;
+
+<span class="tok-kw">return</span> <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(
+    <span class="tok-var">$value</span>,
+    <span class="tok-id">CacheMetadata</span>::<span class="tok-id">uncacheable</span>(<span class="tok-str">&#039;authorization-dependent&#039;</span>),
+);</code></pre>
+</div><div class="doc-block" data-diff="same"><p>Uncacheable metadata sets <code>cacheable</code> to <code>false</code>, visibility to <code>NoStore</code>, and retains the reason. Once introduced, later composition or policies cannot make the result cacheable again.</p>
+</div><div class="doc-block" data-diff="same"><h3>Cache Version</h3>
+</div><div class="doc-block" data-diff="same"><p>The version is part of the default cache key. A fingerprint of the effective declaration is also part of the key, so changing the TTL, tags, visibility, behaviors, or key attributes already moves the boundary to new entries. Change the version when the declaration is unchanged but a deployment changes the meaning or serialized shape of the value:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">300</span>, <span class="tok-id">version</span>: <span class="tok-str">&#039;product-v3&#039;</span>)]</code></pre>
+</div><div class="doc-block" data-diff="same"><p>Versions must be non-empty strings. Changing the version leaves old backend entries in place until their physical expiration; it only moves new reads and writes to a different key.</p>
+</div></section>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../../../assets/search-index.js" defer></script>
+<script src="../../../../assets/app.js" defer></script>
+</body>
+</html>

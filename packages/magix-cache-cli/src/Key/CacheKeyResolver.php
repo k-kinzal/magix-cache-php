@@ -67,7 +67,7 @@ final readonly class CacheKeyResolver
             );
         }
 
-        return $this->definitions->resolve(new ReflectionClass($class)->newInstanceWithoutConstructor(), $method);
+        return $this->definitions->resolve((new ReflectionClass($class))->newInstanceWithoutConstructor(), $method);
     }
 
     /**

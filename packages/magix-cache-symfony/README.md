@@ -18,8 +18,8 @@ Symfony continues to own the storage backend and its configuration.
 
 ## Requirements
 
-- PHP 8.5 or later
-- Symfony FrameworkBundle 7.4 or 8
+- PHP 8.3 or later
+- Symfony FrameworkBundle 7.4, or 8 on PHP 8.4 or later (subject to Symfony's PHP requirements)
 - A configured `cache.app` pool
 
 ## Installation

@@ -4,7 +4,7 @@ This guide explains how to install MagixCache, connect a cache backend, and add 
 
 ## Requirements
 
-- PHP 8.5 or later
+- PHP 8.3 or later
 - Composer
 - A PSR-6 or PSR-16 cache implementation
 

@@ -18,11 +18,11 @@
         "cache",
         "cacheability",
         "cli",
-        "php-8.5",
+        "php-8.3",
         "static-analysis"
     ],
     "require": {
-        "php": "^8.5",
+        "php": "^8.3",
         "k-kinzal/magix-cache": "^1.0",
         "nikic/php-parser": "^5.4",
         "symfony/console": "^7.4 || ^8.0"

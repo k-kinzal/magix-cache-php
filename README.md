@@ -1,13 +1,13 @@
 # MagixCache
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PHP Version](https://img.shields.io/badge/PHP-8.5%2B-blue.svg)](https://www.php.net/)
+[![PHP Version](https://img.shields.io/badge/PHP-8.3%2B-blue.svg)](https://www.php.net/)
 [![docs](https://img.shields.io/badge/docs-magix--cache-0969da?logo=php&logoColor=white)](https://k-kinzal.github.io/magix-cache-php/)
 
 > [!CAUTION]
 > This project has not been published on Packagist yet.
 
-MagixCache is a cacheability propagation library for PHP 8.5+ that safely composes cache constraints across multi-stage queries during server-side rendering.
+MagixCache is a cacheability propagation library for PHP 8.3+ that safely composes cache constraints across multi-stage queries during server-side rendering.
 
 This monorepo contains a framework-independent core with PSR-6 and PSR-16 adapters, dedicated integrations for Laravel and Symfony, and command line tools that make the resulting caches visible.
 
@@ -81,6 +81,10 @@ ProductPageQuery::execute  ttl 20s (declared 120s)  private  tags inventory,page
 Because the analysis is static, a TTL is not always a single number: it may be reported as a known value, as unconstrained, or as a conditional upper bound such as "≤30s, requires a finite upstream expiration at runtime".
 
 `magix boundaries` lists every boundary of a project, `magix lint` fails a build when a declaration cannot hold at runtime — for example a derived TTL with no upstream expiration, or a private entry shared between viewers — and `magix key` prints the key of one call so an entry can be found in the backend. See [packages/magix-cache-cli/README.md](packages/magix-cache-cli/README.md).
+
+## Development
+
+The workspace resolves dependencies for PHP 8.3 via Composer's `config.platform.php`, so the committed lock file installs on every supported PHP version. CI runs tests and the CLI entry point on PHP 8.3, 8.4, and 8.5, and checks the latest supported Symfony dependencies separately on PHP 8.5. Static analysis targets PHP 8.3.
 
 ## License
 

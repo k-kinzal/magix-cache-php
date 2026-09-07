@@ -9,7 +9,7 @@
         "source": "https://github.com/k-kinzal/magix-cache"
     },
     "require": {
-        "php": "^8.5",
+        "php": "^8.3",
         "illuminate/cache": "^12.0 || ^13.0",
         "illuminate/support": "^12.0 || ^13.0",
         "k-kinzal/magix-cache": "^1.0"

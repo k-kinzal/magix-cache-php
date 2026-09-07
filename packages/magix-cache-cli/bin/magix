@@ -5,8 +5,8 @@ declare(strict_types=1);
 
 use Magix\Cache\Cli\Console\Application;
 
-if (PHP_VERSION_ID < 80500) {
-    fwrite(STDERR, 'magix requires PHP 8.5 or later.' . PHP_EOL);
+if (PHP_VERSION_ID < 80300) {
+    fwrite(STDERR, 'magix requires PHP 8.3 or later.' . PHP_EOL);
 
     exit(1);
 }

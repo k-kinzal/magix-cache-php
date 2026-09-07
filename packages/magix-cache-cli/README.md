@@ -18,7 +18,7 @@ The result answers the questions that are otherwise only observable in productio
 
 ## Requirements
 
-- PHP 8.5 or later
+- PHP 8.3 or later
 - Composer
 - A project that uses [k-kinzal/magix-cache](../magix-cache/)
 

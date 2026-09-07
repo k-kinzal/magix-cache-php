@@ -42,35 +42,40 @@
 <h3>The CacheStrategy Interface</h3>
 <pre class="code-block"><code><span class="tok-kw">interface</span> <span class="tok-id">CacheStrategy</span>
 {
-    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">get</span>(<span class="tok-id">CacheOperation</span> <span class="tok-var">$operation</span>, <span class="tok-id">NextCacheStrategy</span> <span class="tok-var">$next</span>): ?<span class="tok-id">Cached</span>;
-    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">fetch</span>(<span class="tok-id">CacheOperation</span> <span class="tok-var">$operation</span>, <span class="tok-id">NextCacheStrategy</span> <span class="tok-var">$next</span>): <span class="tok-id">Cached</span>;
-    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">set</span>(<span class="tok-id">CacheOperation</span> <span class="tok-var">$operation</span>, <span class="tok-id">Cached</span> <span class="tok-var">$result</span>, <span class="tok-id">NextCacheStrategy</span> <span class="tok-var">$next</span>): <span class="tok-id">void</span>;
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">get</span>(<span class="tok-id">CacheOperation</span> <span class="tok-var">$operation</span>, <span class="tok-id">NextCacheStrategy</span> <span class="tok-var">$next</span>): ?<span class="tok-id">CacheRead</span>;
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">fetch</span>(<span class="tok-id">CacheOperation</span> <span class="tok-var">$operation</span>, <span class="tok-id">NextCacheStrategy</span> <span class="tok-var">$next</span>): <span class="tok-id">OriginResult</span>|<span class="tok-id">OriginFailure</span>|<span class="tok-id">CacheAnswer</span>;
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">set</span>(<span class="tok-id">CacheOperation</span> <span class="tok-var">$operation</span>, <span class="tok-id">CacheWrite</span> <span class="tok-var">$request</span>, <span class="tok-id">NextCacheStrategy</span> <span class="tok-var">$next</span>): <span class="tok-id">void</span>;
 }</code></pre>
-<p>Each operation receives the shared <code>CacheOperation</code> context — the resolved key, the clock, the single base time taken right after the origin succeeded, the stale candidate the lookup retained — and <code>$next</code>, the bound remainder of the chain. The runtime appends its own terminal strategy, which owns the fixed stage bodies: the guarded lookup, the origin call inside the stale-if-error capture range, and the re-judged store. A strategy wraps those stages; it cannot reorder them.</p>
+<p>Each <code>cached()</code> call constructs a fresh strategy composition, including every nested child. The same objects participate in that call&#039;s <code>get</code>, <code>fetch</code>, and <code>set</code>; a later call or a nested call gets different objects. Strategies may keep execution state in their own properties. The library does not require them to be pure or to support concurrent reuse of one object.</p>
+<p><code>CacheOperation</code> supplies only the resolved key and the clock. It carries no feature state, stale candidates, retention requests, or mutable store flags. The stage protocol is explicit:</p>
+<ul><li><code>get()</code> returns a <code>CacheRead</code> containing <code>Cached</code> and <code>retainedUntil</code>, or null. Physically retained expired entries are visible to strategies. The runtime judges freshness <strong>after</strong> the chain returns.</li><li><code>fetch()</code> returns <code>OriginResult</code> (successful <code>Cached</code> and the single <code>baseTime</code>), <code>OriginFailure</code> (the original <code>RuntimeException</code>), or <code>CacheAnswer</code> (an answer returned without origin constraints or a new store). Use <code>OriginResult::constrain()</code> to meet strategy constraints into a normal result. Preserve failures and answers when a strategy has no applicable behavior.</li><li><code>set()</code> receives a <code>CacheWrite</code> containing the final <code>Cached</code> and an optional physical retention deadline. <code>retainUntil()</code> returns a new request with the greater deadline; it changes neither the value nor expiration. The terminal rechecks storage eligibility immediately before writing.</li></ul>
+<p>The runtime appends an internal terminal which reads storage, calls the origin, and writes storage. It captures only the origin&#039;s <code>RuntimeException</code> into <code>OriginFailure</code>; errors from strategy code, the clock, reads, writes, or policy evaluation are not origin failures. If no strategy answers the failure, the runtime rethrows the original exception object.</p>
 <p>The composition order is meaningful: the first strategy wraps everything after it, so its pre-processing runs first, its post-processing last, and its failure capture surrounds the delegates. A strategy may also short-circuit by answering without delegating.</p>
 <h3>Declaring a Composition</h3>
 <p>Extend <code>CompositeCacheStrategy</code> and build the composition inside a public static <code>create()</code> that takes typed arguments:</p>
 <pre class="code-block"><code><span class="tok-kw">final</span> <span class="tok-kw">class</span> <span class="tok-id">ProductCacheStrategy</span> <span class="tok-kw">extends</span> <span class="tok-id">CompositeCacheStrategy</span>
 {
-    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">function</span> <span class="tok-id">create</span>(<span class="tok-id">int</span> <span class="tok-var">$min</span> = <span class="tok-num">30</span>): <span class="tok-id">CacheStrategy</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">function</span> <span class="tok-id">create</span>(<span class="tok-id">int</span> <span class="tok-var">$min</span> = <span class="tok-num">30</span>): <span class="tok-id">StrategyDefinition</span>
     {
         <span class="tok-kw">return</span> <span class="tok-id">parent</span>::<span class="tok-id">compose</span>(
-            <span class="tok-kw">new</span> <span class="tok-id">KeySpreadExpirationStrategy</span>(
+            <span class="tok-id">StrategyDefinition</span>::<span class="tok-id">of</span>(
+                <span class="tok-id">KeySpreadExpirationStrategy</span>::<span class="tok-kw">class</span>,
                 <span class="tok-id">minimum</span>: <span class="tok-var">$min</span>,
                 <span class="tok-id">maximum</span>: <span class="tok-num">60</span>,
             ),
-            <span class="tok-kw">new</span> <span class="tok-id">ProductFreshnessStrategy</span>(
+            <span class="tok-id">StrategyDefinition</span>::<span class="tok-id">of</span>(
+                <span class="tok-id">ProductFreshnessStrategy</span>::<span class="tok-kw">class</span>,
                 <span class="tok-id">minimum</span>: <span class="tok-var">$min</span>,
             ),
-            <span class="tok-kw">new</span> <span class="tok-id">StaleIfErrorCacheStrategy</span>(
+            <span class="tok-id">StrategyDefinition</span>::<span class="tok-id">of</span>(
+                <span class="tok-id">StaleIfErrorCacheStrategy</span>::<span class="tok-kw">class</span>,
                 <span class="tok-id">maxAge</span>: <span class="tok-num">300</span>,
-                <span class="tok-id">accepts</span>: <span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">Throwable</span> <span class="tok-var">$error</span>): <span class="tok-id">bool</span> =&gt;
-                    <span class="tok-var">$error</span> <span class="tok-kw">instanceof</span> <span class="tok-id">UpstreamUnavailable</span>,
+                <span class="tok-id">exceptions</span>: [<span class="tok-id">UpstreamUnavailable</span>::<span class="tok-kw">class</span>],
             ),
         );
     }
 }</code></pre>
-<p><code>create()</code> constructs and composes; <code>compose()</code> connects the delegation; the returned value is an ordinary <code>CacheStrategy</code> that the runtime executes and that another <code>create()</code> can take as a child.</p>
+<p><code>create()</code> returns immutable construction definitions. <code>StrategyDefinition::of()</code> declares a class and its constructor arguments; <code>compose()</code> connects definitions in delegation order. A definition composes again. The runtime constructs the executable objects with <code>new</code> at each invocation. No executable Strategy or factory closure is cached. Configuration accepts scalar values, null, enum cases, arrays (up to 64 levels), and nested <code>StrategyDefinition</code> values; mutable objects and closures are rejected. Nested definitions are constructed afresh even when passed as constructor dependencies. Strategies can create their own execution resources in their constructors.</p>
 <p>A boundary declares which composition it runs, and with which arguments:</p>
 <pre class="code-block"><code>#[<span class="tok-id">Cache</span>]
 #[<span class="tok-id">UseStrategy</span>(<span class="tok-id">strategy</span>: <span class="tok-id">ProductCacheStrategy</span>::<span class="tok-kw">class</span>, <span class="tok-id">min</span>: <span class="tok-num">60</span>)]
@@ -78,7 +83,7 @@
 {
     <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-kw">fn</span> (): <span class="tok-id">Cached</span> =&gt; <span class="tok-com">/* ... */</span>);
 }</code></pre>
-<p>The runtime resolves <code>ProductCacheStrategy::create(min: 60)</code> once per boundary declaration. A method-level <code>#[UseStrategy]</code> replaces a class-level one as a whole, and <code>enabled: false</code> disables a class-level default. The strategy class and its arguments are part of the declaration fingerprint, so changing them separates the stored entries.</p>
+<p>The declaration resolver calls <code>ProductCacheStrategy::create(min: 60)</code> once to memoize its construction definition. Executable instances are created for every invocation, including cache hits. A method-level <code>#[UseStrategy]</code> replaces a class-level one as a whole, and <code>enabled: false</code> disables a class-level default. The strategy class and its arguments are part of the declaration fingerprint, so changing them separates the stored entries.</p>
 <h3>Publishing a Contract</h3>
 <p>A strategy declares the effect of its normal origin path on <code>fetch()</code>:</p>
 <pre class="code-block"><code><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">ProductFreshnessStrategy</span> <span class="tok-kw">implements</span> <span class="tok-id">CacheStrategy</span>
@@ -86,9 +91,13 @@
     <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(<span class="tok-kw">private</span> <span class="tok-id">int</span> <span class="tok-var">$minimum</span>) {}
 
     #[<span class="tok-id">Ttl</span>(<span class="tok-id">min</span>: <span class="tok-kw">new</span> <span class="tok-id">ConstructorArg</span>(<span class="tok-str">&#039;minimum&#039;</span>))]
-    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">fetch</span>(<span class="tok-id">CacheOperation</span> <span class="tok-var">$operation</span>, <span class="tok-id">NextCacheStrategy</span> <span class="tok-var">$next</span>): <span class="tok-id">Cached</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">fetch</span>(<span class="tok-id">CacheOperation</span> <span class="tok-var">$operation</span>, <span class="tok-id">NextCacheStrategy</span> <span class="tok-var">$next</span>): <span class="tok-id">OriginResult</span>|<span class="tok-id">OriginFailure</span>|<span class="tok-id">CacheAnswer</span>
     {
-        <span class="tok-com">// any implementation that honors the contract</span>
+        <span class="tok-var">$result</span> = <span class="tok-var">$next</span>-&gt;<span class="tok-id">fetch</span>(<span class="tok-var">$operation</span>);
+
+        <span class="tok-kw">return</span> <span class="tok-var">$result</span> <span class="tok-kw">instanceof</span> <span class="tok-id">OriginResult</span>
+            ? <span class="tok-var">$result</span>-&gt;<span class="tok-id">constrain</span>(<span class="tok-id">CacheMetadata</span>::<span class="tok-id">forTtl</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">minimum</span>, <span class="tok-var">$result</span>-&gt;<span class="tok-id">baseTime</span>))
+            : <span class="tok-var">$result</span>;
     }
 }</code></pre>
 <p><code>Contract\Ttl</code> is not a range annotation but a promise: on the normal origin path the strategy meets one lifetime constraint into the produced metadata, that constraint lies within the declared bounds relative to the base time, and it never extends an expiration a dependency already imposed. <code>new ConstructorArg(&#039;minimum&#039;)</code> is an explicit reference to the constructor argument — the analyzer binds it to the value the construction code passes; it never guesses from the name. A missing bound is undetermined, not unlimited, and <code>#[Ttl(unconstrained: true)]</code> declares that the operation adds no lifetime constraint at all.</p>
@@ -96,7 +105,11 @@
 <p>A composition never re-declares the contracts of its children: the contract of <code>create()</code> is derived from the child contracts and the construction arguments.</p>
 <h3>Strategies and the Fixed Stages</h3>
 <p>The runtime meets strategy constraints <em>before</em> the policy constraint, both at the single base time taken right after the origin succeeded. A boundary with <code>#[Cache]</code> (that is, <code>Ttl::Auto</code>) can therefore take its lifetime from what the strategies guarantee, and a fixed policy TTL still caps whatever the strategies choose. Nothing a strategy does can extend an expiration a dependency already imposed — every addition goes through the metadata meet.</p>
-<p>On a failure path, a strategy such as <code>StaleIfErrorCacheStrategy</code> catches only the <code>RuntimeException</code> family — failures the origin declares as behavior — and serves the retained candidate through <code>CacheOperation::staleWithin()</code>, which applies the same retention and age judgement the runtime uses. A served candidate keeps its expired expiration and suppresses the store.</p>
+<p><code>StaleIfErrorCacheStrategy</code> owns the candidate it observes in <code>get()</code>. When <code>fetch()</code> receives an accepted <code>OriginFailure</code>, it checks the candidate&#039;s expiration, physical retention, and <code>maxAge</code> at the current failure time. It returns a <code>CacheAnswer</code> with the original expired metadata. Its <code>set()</code> extends only the write request&#039;s retention. No part of this feature lives in <code>CacheOperation</code> or the terminal.</p>
+<p><code>#[StaleIfError]</code> is declaration syntax for this same strategy, placed next to the origin behind the user&#039;s composition. It has no separate fallback execution path. An optional diagnostic name on <code>CacheAnswer</code> is reported when recognized by the runtime; the built-in strategy supplies <code>StaleServed</code>.</p>
+<h3>Migrating an Existing Strategy</h3>
+<p>Change <code>create(): CacheStrategy</code> to <code>create(): StrategyDefinition</code> and each constructed child from <code>new Child(...)</code> to <code>StrategyDefinition::of(Child::class, ...)</code>. Update <code>get/fetch/set</code> to the protocol above. Replace the bundled stale strategy&#039;s <code>accepts</code> closure argument with its <code>exceptions</code> list; custom decisions belong in a custom Strategy&#039;s <code>fetch()</code> implementation.</p>
+<p>Move invocation-local fields such as a fallback candidate into the Strategy. Remove calls to <code>retainStale()</code>, <code>stale()</code>, <code>staleWithin()</code>, <code>suppressStore()</code>, and <code>extendRetention()</code> on <code>CacheOperation</code>. Use the successful result&#039;s <code>baseTime</code>, the explicit <code>CacheAnswer</code>, and the write request&#039;s <code>retainUntil()</code> instead. An origin failure is now an <code>OriginFailure</code> result; catch around delegation only for declared failures from the delegate itself.</p>
 <h3>What the Analyzer Shows</h3>
 <p><code>magix analyze</code> binds the <code>#[UseStrategy]</code> arguments to <code>create()</code>, follows the composed constructions in order, binds each contract reference, and meets the child contracts:</p>
 <pre class="code-block"><code>PromotedProductQuery::seasonal
@@ -110,16 +123,16 @@
 <h3>Skipping Analysis Explicitly</h3>
 <p>When a composed child cannot be analyzed — an external factory, a class outside the scanned sources — declare the assumption on <code>create()</code>:</p>
 <pre class="code-block"><code>#[<span class="tok-id">AssumeTtl</span>(<span class="tok-id">strategy</span>: <span class="tok-id">ExternalTtlStrategy</span>::<span class="tok-kw">class</span>, <span class="tok-id">min</span>: <span class="tok-kw">new</span> <span class="tok-id">Arg</span>(<span class="tok-str">&#039;min&#039;</span>), <span class="tok-id">max</span>: <span class="tok-num">300</span>)]
-<span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">function</span> <span class="tok-id">create</span>(<span class="tok-id">int</span> <span class="tok-var">$min</span> = <span class="tok-num">30</span>): <span class="tok-id">CacheStrategy</span>
+<span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">function</span> <span class="tok-id">create</span>(<span class="tok-id">int</span> <span class="tok-var">$min</span> = <span class="tok-num">30</span>): <span class="tok-id">StrategyDefinition</span>
 {
     <span class="tok-kw">return</span> <span class="tok-id">parent</span>::<span class="tok-id">compose</span>(
-        <span class="tok-kw">new</span> <span class="tok-id">ExternalTtlStrategy</span>(),
-        <span class="tok-kw">new</span> <span class="tok-id">KeySpreadExpirationStrategy</span>(<span class="tok-id">minimum</span>: <span class="tok-var">$min</span>, <span class="tok-id">maximum</span>: <span class="tok-num">60</span>),
+        <span class="tok-id">StrategyDefinition</span>::<span class="tok-id">of</span>(<span class="tok-id">ExternalTtlStrategy</span>::<span class="tok-kw">class</span>),
+        <span class="tok-id">StrategyDefinition</span>::<span class="tok-id">of</span>(<span class="tok-id">KeySpreadExpirationStrategy</span>::<span class="tok-kw">class</span>, <span class="tok-id">minimum</span>: <span class="tok-var">$min</span>, <span class="tok-id">maximum</span>: <span class="tok-num">60</span>),
     );
 }</code></pre>
 <p>The assumption replaces exactly the one analysis item it names, is marked <code>(assumed)</code> in the output, and changes nothing at runtime. Effects it does not mention stay unanalyzed. Reusable behavior belongs in the contract of the strategy itself; the assumption only feeds the analysis of this composition.</p>
 <h3>Contracts Are Declared, Not Proven</h3>
-<p>The analyzer derives results from contracts and construction code; it does not prove an arbitrary implementation correct, and it does not restrict how a strategy is implemented to make itself smarter. The implementer of a strategy is responsible for honoring the published contract. A declaration that cannot work as written — a reference to a constructor parameter that does not exist, a <code>create()</code> that is missing — is reported as <code>invalid</code> by <code>magix analyze</code> and by the <code>unresolved-strategy</code> lint rule, never silently corrected.</p>
+<p>The analyzer derives results from contracts and construction code; it does not prove an arbitrary implementation correct, and it does not restrict how a strategy is implemented to make itself smarter. The implementer of a strategy is responsible for honoring the published contract. A declaration that cannot work as written — a reference to a constructor parameter that does not exist, a missing <code>create()</code>, an executable factory result, or a definition containing mutable objects — is reported as <code>invalid</code> by <code>magix analyze</code> and by the <code>unresolved-strategy</code> lint rule, never silently corrected.</p>
 </section>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

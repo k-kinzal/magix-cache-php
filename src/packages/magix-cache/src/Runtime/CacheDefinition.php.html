@@ -51,7 +51,7 @@
 <span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\UseStrategy</span>;</span>
 <span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\CachePolicy</span>;</span>
 <span class="src-line" id="L17"><a class="ln" href="#L17">17</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\Visibility</span>;</span>
-<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Strategy\CacheStrategy</span>;</span>
+<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Strategy\StrategyDefinition</span>;</span>
 <span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-kw">use</span> <span class="tok-id">ReflectionMethod</span>;</span>
 <span class="src-line" id="L20"><a class="ln" href="#L20">20</a></span>
 <span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com">/**</span></span>
@@ -78,9 +78,9 @@
 <span class="src-line" id="L42"><a class="ln" href="#L42">42</a>    <span class="tok-kw">public</span> <span class="tok-id">string</span> <span class="tok-var">$runtime</span>;</span>
 <span class="src-line" id="L43"><a class="ln" href="#L43">43</a></span>
 <span class="src-line" id="L44"><a class="ln" href="#L44">44</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L45"><a class="ln" href="#L45">45</a><span class="tok-com">     * Strategy composition resolved from the #[UseStrategy] declaration.</span></span>
+<span class="src-line" id="L45"><a class="ln" href="#L45">45</a><span class="tok-com">     * Strategy construction definition resolved from the #[UseStrategy] declaration.</span></span>
 <span class="src-line" id="L46"><a class="ln" href="#L46">46</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L47"><a class="ln" href="#L47">47</a>    <span class="tok-kw">public</span> ?<span class="tok-id">CacheStrategy</span> <span class="tok-var">$strategy</span>;</span>
+<span class="src-line" id="L47"><a class="ln" href="#L47">47</a>    <span class="tok-kw">public</span> ?<span class="tok-id">StrategyDefinition</span> <span class="tok-var">$strategy</span>;</span>
 <span class="src-line" id="L48"><a class="ln" href="#L48">48</a></span>
 <span class="src-line" id="L49"><a class="ln" href="#L49">49</a>    <span class="tok-kw">private</span> <span class="tok-id">string</span> <span class="tok-var">$fingerprint</span>;</span>
 <span class="src-line" id="L50"><a class="ln" href="#L50">50</a></span>

@@ -41,12 +41,12 @@
 <span class="src-line" id="L5"><a class="ln" href="#L5">5</a><span class="tok-kw">namespace</span> <span class="tok-id">Magix\Cache\Strategy</span>;</span>
 <span class="src-line" id="L6"><a class="ln" href="#L6">6</a></span>
 <span class="src-line" id="L7"><a class="ln" href="#L7">7</a><span class="tok-com">/**</span></span>
-<span class="src-line" id="L8"><a class="ln" href="#L8">8</a><span class="tok-com"> * Base class for strategy compositions built by a typed static create().</span></span>
+<span class="src-line" id="L8"><a class="ln" href="#L8">8</a><span class="tok-com"> * Base class for strategy compositions built by a typed static create() definition.</span></span>
 <span class="src-line" id="L9"><a class="ln" href="#L9">9</a><span class="tok-com"> *</span></span>
 <span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-com"> * A subclass declares one public static create() that takes typed arguments,</span></span>
-<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com"> * constructs its child strategies, and connects them with compose(). The</span></span>
-<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * returned value is an ordinary CacheStrategy: the runtime executes it, and</span></span>
-<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> * another composition can take it as a child.</span></span>
+<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com"> * describes its child strategies, and connects their definitions with compose().</span></span>
+<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * The returned definition composes again. The runtime constructs a fresh</span></span>
+<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> * composition for each execution; no executable instance is memoized.</span></span>
 <span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com"> *</span></span>
 <span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com"> * The composition never re-declares the contracts of its children. The</span></span>
 <span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-com"> * analyzer binds the create() arguments to the same construction code and</span></span>
@@ -64,9 +64,9 @@
 <span class="src-line" id="L28"><a class="ln" href="#L28">28</a><span class="tok-com">     * first, its post-processing last, and its failure capture surrounds the</span></span>
 <span class="src-line" id="L29"><a class="ln" href="#L29">29</a><span class="tok-com">     * delegates. The result composes again.</span></span>
 <span class="src-line" id="L30"><a class="ln" href="#L30">30</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L31"><a class="ln" href="#L31">31</a>    <span class="tok-kw">final</span> <span class="tok-kw">protected</span> <span class="tok-kw">static</span> <span class="tok-kw">function</span> <span class="tok-id">compose</span>(<span class="tok-id">CacheStrategy</span> <span class="tok-var">$first</span>, <span class="tok-id">CacheStrategy</span> ...<span class="tok-var">$rest</span>): <span class="tok-id">CacheStrategy</span></span>
+<span class="src-line" id="L31"><a class="ln" href="#L31">31</a>    <span class="tok-kw">final</span> <span class="tok-kw">protected</span> <span class="tok-kw">static</span> <span class="tok-kw">function</span> <span class="tok-id">compose</span>(<span class="tok-id">StrategyDefinition</span> <span class="tok-var">$first</span>, <span class="tok-id">StrategyDefinition</span> ...<span class="tok-var">$rest</span>): <span class="tok-id">StrategyDefinition</span></span>
 <span class="src-line" id="L32"><a class="ln" href="#L32">32</a>    {</span>
-<span class="src-line" id="L33"><a class="ln" href="#L33">33</a>        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">ComposedCacheStrategy</span>(<span class="tok-var">$first</span>, ...<span class="tok-var">$rest</span>);</span>
+<span class="src-line" id="L33"><a class="ln" href="#L33">33</a>        <span class="tok-kw">return</span> <span class="tok-id">StrategyDefinition</span>::<span class="tok-id">compose</span>(<span class="tok-var">$first</span>, ...<span class="tok-var">$rest</span>);</span>
 <span class="src-line" id="L34"><a class="ln" href="#L34">34</a>    }</span>
 <span class="src-line" id="L35"><a class="ln" href="#L35">35</a>}</span>
 <span class="src-line" id="L36"><a class="ln" href="#L36">36</a></span>

@@ -33,6 +33,7 @@ final readonly class CacheInvocation
      * Creates the input of one runtime execution.
      *
      * @param Closure(): Cached<T> $origin
+     * @param int<0, max>|null $parameterTtl Validated lifetime supplied by boundary parameters.
      */
     public function __construct(
         public CacheKeyContext $context,
@@ -42,6 +43,7 @@ final readonly class CacheInvocation
         public ?DynamicTtl $dynamicTtl = null,
         public ?BypassCacheErrors $bypassCacheErrors = null,
         ?StrategyDefinition $strategy = null,
+        public ?int $parameterTtl = null,
     ) {
         $declared = $staleIfError?->enabled === true
             ? StrategyDefinition::of(StaleIfErrorCacheStrategy::class, maxAge: $staleIfError->maxAge, exceptions: $staleIfError->exceptions)

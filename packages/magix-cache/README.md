@@ -12,6 +12,7 @@ Storage remains independent from the core behavior. Connect any PSR-6 or PSR-16 
 - Immutable values and cache metadata through `Cached<T>`
 - Safe composition using the earliest expiration, logical AND for cacheability, the strictest visibility, and the union of tags and diagnostic reasons
 - Automatic cache keys derived from the runtime namespace, class, method, arguments, policy version, and declaration fingerprint
+- Parameter-bound constraints and strategy arguments: `#[CacheTtl]`, `#[CacheTags]`, `#[CacheVisibility]`, and `#[StrategyArgument]`
 - Attribute-declared policies and behaviors: `#[Cache]`, `#[StaleIfError]`, `#[DynamicTtl]`, and `#[BypassCacheErrors]`
 - Named runtimes fixed at bootstrap through `CacheRuntimeRegistry`
 - Transparent property, method, and string access to wrapped values
@@ -74,6 +75,7 @@ Use `map()`, `flatMap()`, and `combine2()` through `combine5()` to compose neste
 For more detailed information, check out the documentation:
 
 - [Getting Started](docs/getting-started.md): Installation, runtime registration, and a first cached query
+- [Parameter Configuration](docs/parameter-configuration.md): Bind method parameters to constraints and strategy settings
 - [Cache Policies](docs/cache-policies.md): TTL modes, tags, visibility, versions, and scopes
 - [Cache Keys](docs/cache-keys.md): Default keys, argument reduction, ignored arguments, and custom strategies
 - [Cache Composition](docs/cache-composition.md): Safely combine cached values and their constraints

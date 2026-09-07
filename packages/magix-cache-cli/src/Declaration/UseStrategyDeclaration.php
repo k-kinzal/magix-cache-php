@@ -41,6 +41,12 @@ final readonly class UseStrategyDeclaration
         foreach ($this->arguments as $name => $value) {
             $prefix = is_int($name) ? '' : $name.': ';
 
+            if ($value instanceof ParameterReference) {
+                $rendered[] = $prefix.'$'.$value->name;
+
+                continue;
+            }
+
             if ($value === Unresolved::Value) {
                 $rendered[] = $prefix.'?';
 

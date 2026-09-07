@@ -50,6 +50,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TypeReader::class)]
 #[UsesClass(UseStrategyDeclaration::class)]
 #[UsesClass(UseStrategyReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ParameterConfigurationReader::class)]
 final class BoundaryReaderTest extends TestCase
 {
     public function testReadDescribesACachedMethodWithItsAttributePolicy(): void

@@ -40,9 +40,13 @@ final readonly class EffectCalculator
         $visibility = Visibility::Shared;
         $visibilitySource = null;
         $tags = [];
+        $visibilityUnknown = false;
+        $tagsUnknown = false;
 
         foreach ($children as $child) {
             $effect = $child->effect;
+            $visibilityUnknown = $visibilityUnknown || $effect->visibilityUnknown;
+            $tagsUnknown = $tagsUnknown || $effect->tagsUnknown;
             $tags = array_merge($tags, $effect->tags);
             $met = $ttl->meet($effect->ttl);
 
@@ -58,7 +62,7 @@ final readonly class EffectCalculator
             }
         }
 
-        return new DependencyConstraint($ttl, $ttlSource, $visibility, $visibilitySource, $this->tags($tags));
+        return new DependencyConstraint($ttl, $ttlSource, $visibility, $visibilitySource, $this->tags($tags), $visibilityUnknown, $tagsUnknown);
     }
 
     /**
@@ -101,7 +105,7 @@ final readonly class EffectCalculator
             $strategy,
         );
 
-        return new CacheEffect(
+        $effect = new CacheEffect(
             ttl: $estimate,
             visibility: $visibility,
             storable: $this->storable($estimate, $visibility, $problems),
@@ -110,6 +114,8 @@ final readonly class EffectCalculator
             problems: $problems,
             strategy: $strategy,
         );
+
+        return (new ParameterEffects())->apply($boundary, $constraint, $effect);
     }
 
     /**
@@ -124,6 +130,8 @@ final readonly class EffectCalculator
         $upstream = $constraint->ttl;
         $candidate = $strategy?->ttl;
         $combined = $candidate === null ? $upstream : $upstream->meet($candidate);
+        $parameterTtl = (new ParameterEffects())->ttl($boundary);
+        $combined = $parameterTtl === null ? $combined : $combined->meet($parameterTtl);
         $source = $candidate !== null && !$combined->equals($upstream)
             ? 'the declared strategy'
             : ($constraint->ttlSource ?? 'a dependency');
@@ -135,7 +143,7 @@ final readonly class EffectCalculator
         } elseif (is_int($declared)) {
             $estimate = $this->fixed($declared, $combined, $source);
         } else {
-            $estimate = $this->derived($declared, $policy->maxTtl, $boundary, $combined, $source, $strategy?->addsConstraint === true);
+            $estimate = $this->derived($declared, $policy->maxTtl, $boundary, $combined, $source, $strategy?->addsConstraint === true || $parameterTtl !== null);
         }
 
         if ($candidate !== null && $upstream->state === TtlEstimateState::Unknown
@@ -144,12 +152,12 @@ final readonly class EffectCalculator
         }
 
         if ($boundary->hasDynamicTtl) {
-            return $estimate->meet(TtlEstimate::unknown(
+            $estimate = $estimate->meet(TtlEstimate::unknown(
                 condition: 'a #[DynamicTtl] resolver decides the final lifetime at runtime',
             ));
         }
 
-        return $estimate;
+        return $parameterTtl === null ? $estimate : $parameterTtl->meet($estimate);
     }
 
     /**

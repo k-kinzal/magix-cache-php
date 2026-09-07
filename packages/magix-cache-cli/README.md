@@ -105,3 +105,18 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 - [nikic/php-parser](https://github.com/nikic/PHP-Parser) for the syntax trees the analysis is built on
 - [Symfony Console](https://symfony.com/doc/current/components/console.html) for the command line interface
+
+## Parameter Configuration
+
+`magix analyze` and `magix lint` understand `CacheTtl`, `CacheTags`,
+`CacheVisibility`, and `StrategyArgument` on boundary parameters. Configuration
+values remain runtime-dependent even when defaults are declared. TTL caps are
+preserved, strategy labels show their source parameters, and dynamic visibility
+and tags remain explicit throughout the dependency tree. JSON includes
+`visibilityUnknown` and `tagsUnknown` alongside the proven metadata bounds.
+
+`invalid-parameter-binding` reports invalid source declarations;
+`unresolved-strategy` reports missing or conflicting factory destinations.
+`magix key` uses the runtime binding and key construction, including the evaluated
+configuration component. See the core package's
+[Parameter Configuration](../magix-cache/docs/parameter-configuration.md) guide.

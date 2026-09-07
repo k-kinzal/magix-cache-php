@@ -44,4 +44,19 @@ final class CacheEffectTest extends TestCase
         self::assertSame(Visibility::Shared, $effect->visibility);
         self::assertFalse($effect->storable);
     }
+
+    public function testVisibilityLabelDistinguishesAProvenFloorFromAnExactValue(): void
+    {
+        $effect = new CacheEffect(visibility: Visibility::Private, visibilityUnknown: true);
+
+        self::assertSame('private or stricter', $effect->visibilityLabel());
+        self::assertSame('shared', (new CacheEffect())->visibilityLabel());
+    }
+
+    public function testTagsLabelKeepsKnownAndRuntimeTagsSeparate(): void
+    {
+        self::assertSame('fixed + runtime tags', (new CacheEffect(tags: ['fixed'], tagsUnknown: true))->tagsLabel());
+        self::assertSame('runtime tags', (new CacheEffect(tagsUnknown: true))->tagsLabel());
+        self::assertSame('-', (new CacheEffect())->tagsLabel());
+    }
 }

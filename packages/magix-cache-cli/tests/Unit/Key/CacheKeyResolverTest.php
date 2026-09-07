@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Key;
 
+use Magix\Cache\Cached;
 use Magix\Cache\Cli\Key\CacheKeyResolver;
 use Magix\Cache\Cli\Key\CacheKeyUnresolvable;
 use Magix\Cache\Runtime\CacheDefinitionResolver;
@@ -12,11 +13,12 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
+use Tests\Package\Cli\Fixture\ParameterQuery;
 use Tests\Package\Cli\Fixture\Project\ProductQuery;
 
 #[CoversClass(CacheKeyResolver::class)]
 #[UsesClass(CacheKeyUnresolvable::class)]
-#[UsesNamespace('Magix\Cache\Runtime')]
+#[UsesNamespace('Magix\Cache')]
 #[UsesNamespace('Magix\Cache\Attribute')]
 #[UsesNamespace('Magix\Cache\Metadata')]
 #[UsesClass(\Magix\Cache\CachePolicy::class)]
@@ -83,5 +85,15 @@ final class CacheKeyResolverTest extends TestCase
         $key = (new CacheKeyResolver())->resolve(ProductQuery::class, 'execute', [42]);
 
         self::assertSame($expected, $key);
+    }
+
+    public function testResolveMatchesAnInvocationWithParameterConfigurationAndDefaults(): void
+    {
+        $definition = (new CacheDefinitionResolver())->resolve(new ParameterQuery(), 'fetch');
+        $invocation = $definition->invocation([10], static fn (): Cached => Cached::of('origin'));
+        $expected = (new HashCacheKeyStrategy())->generate($invocation->context);
+
+        self::assertSame($expected, (new CacheKeyResolver())->resolve(ParameterQuery::class, 'fetch', [10]));
+        self::assertNotSame($expected, (new CacheKeyResolver())->resolve(ParameterQuery::class, 'fetch', [20]));
     }
 }

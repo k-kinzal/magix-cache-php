@@ -14,8 +14,6 @@ use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
 
-use function strtolower;
-
 /**
  * Renders one cache tree as an indented terminal report.
  */
@@ -33,10 +31,10 @@ final readonly class TreeRenderer
             '',
             ...$this->strategy($effect),
             '  ttl          '.$this->ttl($effect),
-            '  visibility   '.strtolower($effect->visibility->name)
+            '  visibility   '.$effect->visibilityLabel()
                 .($effect->visibilityReason === null ? '' : ' ('.$effect->visibilityReason.')'),
             '  storable     '.($effect->storable ? 'yes' : 'no'),
-            '  tags         '.($effect->tags === [] ? '-' : implode(', ', $effect->tags)),
+            '  tags         '.$effect->tagsLabel(),
             '  key          '.$this->key($node->boundary),
             '  policy       '.($node->boundary->policy?->label() ?? 'not declared'),
             '',
@@ -119,11 +117,11 @@ final readonly class TreeRenderer
         $parts = [
             '<options=bold>'.$node->boundary->shortId().'</>',
             $ttl,
-            strtolower($effect->visibility->name),
+            $effect->visibilityLabel(),
         ];
 
-        if ($effect->tags !== []) {
-            $parts[] = 'tags '.implode(',', $effect->tags);
+        if ($effect->tags !== [] || $effect->tagsUnknown) {
+            $parts[] = 'tags '.$effect->tagsLabel(',');
         }
 
         return implode('  ', $parts);

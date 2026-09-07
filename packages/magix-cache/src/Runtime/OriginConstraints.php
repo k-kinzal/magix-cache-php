@@ -16,7 +16,7 @@ use Magix\Cache\Runtime\Policy\PolicySemantics;
 /**
  * Applies the fixed success-stage constraint order at one base time.
  *
- * The dynamic-TTL constraint is met first, then the policy constraint, both
+ * Parameter and dynamic-TTL constraints are met before the policy, all
  * evaluated at the same base time taken right after the origin succeeded.
  * Every step goes through the metadata meet, so no step can relax what a
  * dependency already imposed.
@@ -36,6 +36,7 @@ final readonly class OriginConstraints
      * Returns the origin metadata with all declared constraints applied.
      *
      * @param Cached<mixed> $result
+     * @param int<0, max>|null $parameterTtl Validated parameter constraint at the same base time.
      * @throws InvalidArgumentException when the resolver returns a negative lifetime
      * @throws LogicException when a derived lifetime has no finite upstream expiration to derive from
      */
@@ -45,8 +46,13 @@ final readonly class OriginConstraints
         Cached $result,
         string $key,
         float $baseTime,
+        ?int $parameterTtl = null,
     ): CacheMetadata {
         $metadata = $result->metadata;
+
+        if ($parameterTtl !== null) {
+            $metadata = $metadata->meet(CacheMetadata::forTtl($parameterTtl, $baseTime));
+        }
 
         if ($resolver !== null) {
             $ttl = $resolver->resolve(new DynamicTtlContext($key, $result, $baseTime));

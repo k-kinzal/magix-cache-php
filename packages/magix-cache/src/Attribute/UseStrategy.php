@@ -19,8 +19,9 @@ use function method_exists;
  *
  * The attribute is the declarative entry to a strategy, not a runtime of its
  * own: it names a class with a public static create() and carries the typed
- * arguments to pass to it. The resolver memoizes the construction definition
- * returned by create(), never an executable strategy. Every invocation
+ * arguments to pass to it. Static arguments produce a memoized construction
+ * definition; StrategyArgument parameter bindings produce a fresh definition
+ * per invocation. The resolver never memoizes an executable strategy. Every invocation
  * constructs fresh strategy instances from that definition. The analyzer
  * binds the same arguments to the definition without executing user code.
  * A method-level declaration replaces a class-level one as a whole, and
@@ -59,9 +60,10 @@ final readonly class UseStrategy
     /**
      * Resolves an immutable construction definition through create().
      *
+     * @param array<string, mixed> $boundArguments Validated parameter bindings for this invocation.
      * @throws LogicException when the class has no static create() or it returns no StrategyDefinition
      */
-    public function resolve(): StrategyDefinition
+    public function resolve(array $boundArguments = []): StrategyDefinition
     {
         $factory = [$this->strategy, 'create'];
 
@@ -69,7 +71,7 @@ final readonly class UseStrategy
             throw new LogicException($this->strategy.' declares no public static create() that describes its strategy.');
         }
 
-        $strategy = $factory(...$this->arguments);
+        $strategy = $factory(...[...$this->arguments, ...$boundArguments]);
 
         if (!$strategy instanceof StrategyDefinition) {
             throw new LogicException($this->strategy.'::create() must return a StrategyDefinition.');

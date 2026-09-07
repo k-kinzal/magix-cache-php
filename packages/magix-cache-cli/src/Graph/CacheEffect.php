@@ -32,7 +32,31 @@ final readonly class CacheEffect
         public ?string $visibilityReason = null,
         public array $problems = [],
         public ?StrategyEffect $strategy = null,
+        public bool $visibilityUnknown = false,
+        public bool $tagsUnknown = false,
     ) {
         $this->ttl = $ttl ?? TtlEstimate::unknown();
+    }
+
+    /**
+     * Renders the proven visibility restriction and any runtime uncertainty.
+     */
+    public function visibilityLabel(): string
+    {
+        return strtolower($this->visibility->name).($this->visibilityUnknown ? ' or stricter' : '');
+    }
+
+    /**
+     * Renders proven tags separately from additional tags supplied at runtime.
+     */
+    public function tagsLabel(string $separator = ', '): string
+    {
+        $known = implode($separator, $this->tags);
+
+        if ($this->tagsUnknown) {
+            return $known === '' ? 'runtime tags' : $known.' + runtime tags';
+        }
+
+        return $known === '' ? '-' : $known;
     }
 }

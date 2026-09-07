@@ -32,6 +32,7 @@ use Tests\Fixture\StrategyQuery;
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesClass(\Magix\Cache\Strategy\StrategyArguments::class)]
 #[UsesClass(StrategyDefinition::class)]
+#[\PHPUnit\Framework\Attributes\UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class CacheDefinitionResolverTest extends TestCase
 {
     public function testResolveMemoizesTheStaticDeclaration(): void

@@ -28,6 +28,8 @@ final readonly class DependencyConstraint
         public Visibility $visibility = Visibility::Shared,
         public ?string $visibilitySource = null,
         public array $tags = [],
+        public bool $visibilityUnknown = false,
+        public bool $tagsUnknown = false,
     ) {
         $this->ttl = $ttl ?? TtlEstimate::unconstrained();
     }

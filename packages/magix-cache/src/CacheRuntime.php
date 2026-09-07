@@ -118,7 +118,7 @@ final readonly class CacheRuntime
             return $fetched->cached;
         }
 
-        $metadata = (new OriginConstraints())->apply($invocation->policy, $resolver, $fetched->cached, $key, $fetched->baseTime);
+        $metadata = (new OriginConstraints())->apply($invocation->policy, $resolver, $fetched->cached, $key, $fetched->baseTime, $invocation->parameterTtl);
         $result = Cached::of($fetched->cached->value(), $metadata);
         $chain->set($operation, new CacheWrite($result));
 

@@ -45,6 +45,9 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\StrategyResolver::class)]
 #[UsesClass(\Magix\Cache\Cli\Lint\Rule\UnresolvedStrategyRule::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\ParameterEffects::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\ParameterStrategyBinding::class)]
+#[UsesClass(\Magix\Cache\Cli\Lint\Rule\ParameterBindingRule::class)]
 final class CacheLinterTest extends TestCase
 {
     public function testInspectAppliesEveryRuleToEveryBoundary(): void

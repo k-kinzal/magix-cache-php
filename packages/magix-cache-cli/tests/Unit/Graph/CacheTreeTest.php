@@ -34,6 +34,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\StrategyResolver::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\ParameterEffects::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\ParameterStrategyBinding::class)]
 final class CacheTreeTest extends TestCase
 {
     public function testBuildComposesTheEffectOfEveryDependency(): void

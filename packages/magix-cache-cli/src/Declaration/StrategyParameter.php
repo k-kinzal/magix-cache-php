@@ -19,6 +19,8 @@ final readonly class StrategyParameter
         public int $position,
         public bool $hasDefault = false,
         public mixed $default = null,
+        public bool $variadic = false,
+        public bool $byReference = false,
     ) {
     }
 }

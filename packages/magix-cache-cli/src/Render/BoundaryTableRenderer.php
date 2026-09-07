@@ -14,7 +14,6 @@ use function max;
 use function rtrim;
 use function str_pad;
 use function strlen;
-use function strtolower;
 
 /**
  * Renders every known boundary as one aligned inventory table.
@@ -69,9 +68,9 @@ final readonly class BoundaryTableRenderer
         return [
             $node->boundary->id(),
             $effect->ttl->label(),
-            strtolower($effect->visibility->name),
+            $effect->visibilityLabel(),
             $effect->storable ? 'yes' : 'no',
-            $effect->tags === [] ? '-' : implode(',', $effect->tags),
+            $effect->tagsLabel(','),
             (string) count($node->children),
             $node->boundary->file.':'.$node->boundary->line,
         ];

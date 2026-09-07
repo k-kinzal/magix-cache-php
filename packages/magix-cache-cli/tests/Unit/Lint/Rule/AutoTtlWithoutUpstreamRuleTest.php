@@ -31,6 +31,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\DependencyConstraint::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\ParameterEffects::class)]
 final class AutoTtlWithoutUpstreamRuleTest extends TestCase
 {
     public function testCheckReportsAConfirmedUnconstrainedUpstreamAsAnError(): void

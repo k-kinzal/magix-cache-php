@@ -33,6 +33,7 @@ use Tests\Fixture\StrategyQuery;
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesClass(\Magix\Cache\Strategy\StrategyArguments::class)]
 #[UsesClass(\Magix\Cache\Strategy\StrategyDefinition::class)]
+#[\PHPUnit\Framework\Attributes\UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class DeclarationFingerprintTest extends TestCase
 {
     public function testCalculateIsStableForEqualEffectiveDeclarations(): void

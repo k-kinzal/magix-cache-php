@@ -10,7 +10,6 @@ use function debug_backtrace;
 
 use LogicException;
 use Magix\Cache\Runtime\CacheDefinitionResolver;
-use Magix\Cache\Runtime\CacheInvocation;
 use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use RuntimeException;
 
@@ -22,7 +21,8 @@ use function str_contains;
  * cached() is the anti-corruption layer between PHP and the internal model:
  * it captures the call site, resolves the static declaration, and delegates
  * to the runtime the declaration references. Policy, behaviors, and runtime
- * come from attributes alone; there is no per-call override path.
+ * come from attributes, including declared parameter bindings; there is no
+ * per-call override path. Binding values are resolved before lookup.
  */
 trait Cacheable
 {
@@ -49,14 +49,8 @@ trait Cacheable
         $definitions = self::$magixCacheDefinitions ??= new CacheDefinitionResolver();
         $definition = $definitions->resolve($this, $caller['function']);
 
-        return CacheRuntimeRegistry::resolve($definition->runtime)->execute(new CacheInvocation(
-            context: $definition->keyContext($caller['args'] ?? []),
-            policy: $definition->policy,
-            origin: $compute,
-            staleIfError: $definition->staleIfError,
-            dynamicTtl: $definition->dynamicTtl,
-            bypassCacheErrors: $definition->bypassCacheErrors,
-            strategy: $definition->strategy,
-        ));
+        return CacheRuntimeRegistry::resolve($definition->runtime)->execute(
+            $definition->invocation($caller['args'] ?? [], $compute),
+        );
     }
 }

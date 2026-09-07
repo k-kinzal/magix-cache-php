@@ -28,6 +28,7 @@ use Tests\Fixture\KeyQuery;
 #[UsesClass(\Magix\Cache\CachePolicy::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
+#[\PHPUnit\Framework\Attributes\UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class CacheKeyArgumentBinderTest extends TestCase
 {
     public function testBindNormalizesIgnoredReducedAndVariadicArguments(): void

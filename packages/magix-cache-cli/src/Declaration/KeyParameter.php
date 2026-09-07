@@ -28,6 +28,7 @@ final readonly class KeyParameter
         public ?string $reducer = null,
         public bool $variadic = false,
         public bool $optional = false,
+        public ?ParameterConfiguration $configuration = null,
     ) {
     }
 
@@ -48,6 +49,10 @@ final readonly class KeyParameter
 
         if ($this->reducer !== null) {
             $notes[] = 'reduced by '.$this->reducer;
+        }
+
+        if ($this->configuration !== null) {
+            $notes[] = $this->configuration->label();
         }
 
         $name = ($this->variadic ? '...$' : '$').$this->name;

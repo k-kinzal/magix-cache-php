@@ -9,7 +9,7 @@
         "source": "https://github.com/k-kinzal/magix-cache"
     },
     "require": {
-        "php": "^8.5",
+        "php": "^8.3",
         "k-kinzal/magix-cache": "^1.0",
         "psr/cache": "^3.0",
         "symfony/framework-bundle": "^7.4 || ^8.0"

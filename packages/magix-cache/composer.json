@@ -1,6 +1,6 @@
 {
     "name": "k-kinzal/magix-cache",
-    "description": "MagixCache is a PSR-compatible cacheability propagation library for PHP 8.5",
+    "description": "MagixCache is a PSR-compatible cacheability propagation library for PHP 8.3",
     "type": "library",
     "license": "MIT",
     "homepage": "https://github.com/k-kinzal/magix-cache",
@@ -17,10 +17,10 @@
     "keywords": [
         "cache",
         "cacheability",
-        "php-8.5"
+        "php-8.3"
     ],
     "require": {
-        "php": "^8.5",
+        "php": "^8.3",
         "psr/cache": "^3.0",
         "psr/clock": "^1.0",
         "psr/simple-cache": "^3.0"

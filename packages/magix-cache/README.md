@@ -3,7 +3,7 @@
 [![GitHub Actions](https://github.com/k-kinzal/magix-cache/actions/workflows/ci.yml/badge.svg)](https://github.com/k-kinzal/magix-cache/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-MagixCache is a PSR-compatible cacheability propagation library for PHP 8.5. It carries values and their cache constraints together so that nested query results can be cached safely during server-side rendering.
+MagixCache is a PSR-compatible cacheability propagation library for PHP 8.3. It carries values and their cache constraints together so that nested query results can be cached safely during server-side rendering.
 
 Storage remains independent from the core behavior. Connect any PSR-6 or PSR-16 implementation through the included adapters.
 
@@ -19,7 +19,7 @@ Storage remains independent from the core behavior. Connect any PSR-6 or PSR-16 
 
 ## Requirements
 
-- PHP 8.5 or later
+- PHP 8.3 or later
 - Composer
 - A PSR-6 or PSR-16 cache implementation
 

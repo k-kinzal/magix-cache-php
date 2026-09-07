@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+
+use function sys_get_temp_dir;
+
 use Tests\Fixture\MemoryCache;
 
 #[CoversClass(MagixCacheBundle::class)]
@@ -39,6 +42,8 @@ final class MagixCacheBundleTest extends TestCase
     public function testLoadExtensionRegistersStoreAndRuntime(): void
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'test');
+        $container->setParameter('kernel.build_dir', sys_get_temp_dir());
         $container->setDefinition('cache.app', (new Definition(ArrayAdapter::class))->setPublic(true));
         $bundle = new MagixCacheBundle();
         $extension = $bundle->getContainerExtension();

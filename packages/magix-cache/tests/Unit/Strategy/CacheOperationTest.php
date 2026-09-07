@@ -19,7 +19,7 @@ final class CacheOperationTest extends TestCase
 {
     public function testKeyReturnsTheResolvedStorageKey(): void
     {
-        self::assertSame('key', new CacheOperation('key', static fn (): float => 100.0)->key());
+        self::assertSame('key', (new CacheOperation('key', static fn (): float => 100.0))->key());
     }
 
     public function testNowReadsTheClockOnEveryCall(): void
@@ -75,7 +75,7 @@ final class CacheOperationTest extends TestCase
 
     public function testStaleIsNullUntilTheLookupRetainsACandidate(): void
     {
-        self::assertNull(new CacheOperation('key', static fn (): float => 100.0)->stale());
+        self::assertNull((new CacheOperation('key', static fn (): float => 100.0))->stale());
     }
 
     public function testStaleWithinJudgesRetentionAndAgeAtOneInstant(): void
@@ -96,7 +96,7 @@ final class CacheOperationTest extends TestCase
 
     public function testStaleWithinIsNullWithoutARetainedCandidate(): void
     {
-        self::assertNull(new CacheOperation('key', static fn (): float => 100.0)->staleWithin(300));
+        self::assertNull((new CacheOperation('key', static fn (): float => 100.0))->staleWithin(300));
     }
 
     public function testSuppressStoreMarksTheOperation(): void
@@ -109,7 +109,7 @@ final class CacheOperationTest extends TestCase
 
     public function testStoreSuppressedIsFalseByDefault(): void
     {
-        self::assertFalse(new CacheOperation('key', static fn (): float => 100.0)->storeSuppressed());
+        self::assertFalse((new CacheOperation('key', static fn (): float => 100.0))->storeSuppressed());
     }
 
     public function testExtendRetentionRequestsOnlyEverGrow(): void
@@ -123,6 +123,6 @@ final class CacheOperationTest extends TestCase
 
     public function testRetentionIsNullUntilAStrategyRequestsOne(): void
     {
-        self::assertNull(new CacheOperation('key', static fn (): float => 100.0)->retention());
+        self::assertNull((new CacheOperation('key', static fn (): float => 100.0))->retention());
     }
 }

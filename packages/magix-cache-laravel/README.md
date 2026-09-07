@@ -19,7 +19,7 @@ Laravel continues to own the storage backend and its configuration.
 
 ## Requirements
 
-- PHP 8.5 or later
+- PHP 8.3 or later
 - Laravel 12 or 13
 - A configured Laravel cache store
 

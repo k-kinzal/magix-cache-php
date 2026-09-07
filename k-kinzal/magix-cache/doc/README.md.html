@@ -36,12 +36,12 @@
 <div class="symbol-head"><h1><span class="chip chip-kind k-document">document</span>MagixCache</h1><div class="symbol-meta"><span class="src-link">README.md</span></div></div>
 <section class="readme"><h2>MagixCache</h2>
 <p><a href="https://github.com/k-kinzal/magix-cache/actions"><span class="md-target" title="https://github.com/k-kinzal/magix-cache/actions/workflows/ci.yml/badge.svg">GitHub Actions</span></a> <a href="https://opensource.org/licenses/MIT"><span class="md-target" title="https://img.shields.io/badge/License-MIT-yellow.svg">License: MIT</span></a></p>
-<p>MagixCache is a PSR-compatible cacheability propagation library for PHP 8.5. It carries values and their cache constraints together so that nested query results can be cached safely during server-side rendering.</p>
+<p>MagixCache is a PSR-compatible cacheability propagation library for PHP 8.3. It carries values and their cache constraints together so that nested query results can be cached safely during server-side rendering.</p>
 <p>Storage remains independent from the core behavior. Connect any PSR-6 or PSR-16 implementation through the included adapters.</p>
 <h3>Features</h3>
 <ul><li>Immutable values and cache metadata through <code>Cached&lt;T&gt;</code></li><li>Safe composition using the earliest expiration, logical AND for cacheability, the strictest visibility, and the union of tags and diagnostic reasons</li><li>Automatic cache keys derived from the runtime namespace, class, method, arguments, policy version, and declaration fingerprint</li><li>Attribute-declared policies and behaviors: <code>#[Cache]</code>, <code>#[StaleIfError]</code>, <code>#[DynamicTtl]</code>, and <code>#[BypassCacheErrors]</code></li><li>Named runtimes fixed at bootstrap through <code>CacheRuntimeRegistry</code></li><li>Transparent property, method, and string access to wrapped values</li><li>Independent PSR-6 and PSR-16 adapters</li></ul>
 <h3>Requirements</h3>
-<ul><li>PHP 8.5 or later</li><li>Composer</li><li>A PSR-6 or PSR-16 cache implementation</li></ul>
+<ul><li>PHP 8.3 or later</li><li>Composer</li><li>A PSR-6 or PSR-16 cache implementation</li></ul>
 <h3>Installation</h3>
 <pre class="code-block"><code>composer require k-kinzal/magix-cache</code></pre>
 <h3>Quick Start</h3>

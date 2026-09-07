@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>k-kinzal/magix-cache — magix-cache-php</title>
 <link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/k-kinzal/magix-cache/">
-<meta name="description" content="MagixCache is a PSR-compatible cacheability propagation library for PHP 8.5">
+<meta name="description" content="MagixCache is a PSR-compatible cacheability propagation library for PHP 8.3">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="magix-cache-php">
 <meta property="og:title" content="k-kinzal/magix-cache — magix-cache-php">
-<meta property="og:description" content="MagixCache is a PSR-compatible cacheability propagation library for PHP 8.5">
+<meta property="og:description" content="MagixCache is a PSR-compatible cacheability propagation library for PHP 8.3">
 <meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/k-kinzal/magix-cache/">
 <meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/assets/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -34,7 +34,7 @@
 <div class="search-results" id="search-results" hidden></div>
 <main class="content">
 <div class="symbol-head"><h1><span class="chip chip-kind k-package">package</span>k-kinzal/magix-cache</h1></div>
-<p class="lede">MagixCache is a PSR-compatible cacheability propagation library for PHP 8.5</p>
+<p class="lede">MagixCache is a PSR-compatible cacheability propagation library for PHP 8.3</p>
 <div class="relation-row"><span class="relation-label">Repository</span> <a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com/k-kinzal/magix-cache-php</a></div>
 <div class="relation-row"><span class="relation-label">Depends on</span> <a href="../../psr/cache/index.html">psr/cache</a>, <a href="../../psr/clock/index.html">psr/clock</a>, <a href="../../psr/simple-cache/index.html">psr/simple-cache</a></div>
 <div class="relation-row"><span class="relation-label">Required by</span> <a href="../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a>, <a href="../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a>, <a href="../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></div>
@@ -43,12 +43,12 @@
 <section><h2 id="documents">Documents <span class="count">8</span><a class="anchor" href="#documents">§</a></h2><div class="table-wrap"><table class="symbol-table"><tr><td><a href="../../k-kinzal/magix-cache/doc/README.md.html">MagixCache</a></td><td class="item-ns">README.md</td></tr><tr><td><a href="../../k-kinzal/magix-cache/doc/docs/cache-behaviors.md.html">Cache Behaviors</a></td><td class="item-ns">docs/cache-behaviors.md</td></tr><tr><td><a href="../../k-kinzal/magix-cache/doc/docs/cache-composition.md.html">Cache Composition</a></td><td class="item-ns">docs/cache-composition.md</td></tr><tr><td><a href="../../k-kinzal/magix-cache/doc/docs/cache-keys.md.html">Cache Keys</a></td><td class="item-ns">docs/cache-keys.md</td></tr><tr><td><a href="../../k-kinzal/magix-cache/doc/docs/cache-policies.md.html">Cache Policies</a></td><td class="item-ns">docs/cache-policies.md</td></tr><tr><td><a href="../../k-kinzal/magix-cache/doc/docs/cache-strategies.md.html">Cache Strategies</a></td><td class="item-ns">docs/cache-strategies.md</td></tr><tr><td><a href="../../k-kinzal/magix-cache/doc/docs/getting-started.md.html">Getting Started</a></td><td class="item-ns">docs/getting-started.md</td></tr><tr><td><a href="../../k-kinzal/magix-cache/doc/docs/storage-adapters.md.html">Storage Adapters</a></td><td class="item-ns">docs/storage-adapters.md</td></tr></table></div></section>
 <section class="readme"><h2 id="readme">README<a class="anchor" href="#readme">§</a></h2><h2>MagixCache</h2>
 <p><a href="https://github.com/k-kinzal/magix-cache/actions"><span class="md-target" title="https://github.com/k-kinzal/magix-cache/actions/workflows/ci.yml/badge.svg">GitHub Actions</span></a> <a href="https://opensource.org/licenses/MIT"><span class="md-target" title="https://img.shields.io/badge/License-MIT-yellow.svg">License: MIT</span></a></p>
-<p>MagixCache is a PSR-compatible cacheability propagation library for PHP 8.5. It carries values and their cache constraints together so that nested query results can be cached safely during server-side rendering.</p>
+<p>MagixCache is a PSR-compatible cacheability propagation library for PHP 8.3. It carries values and their cache constraints together so that nested query results can be cached safely during server-side rendering.</p>
 <p>Storage remains independent from the core behavior. Connect any PSR-6 or PSR-16 implementation through the included adapters.</p>
 <h3>Features</h3>
 <ul><li>Immutable values and cache metadata through <code>Cached&lt;T&gt;</code></li><li>Safe composition using the earliest expiration, logical AND for cacheability, the strictest visibility, and the union of tags and diagnostic reasons</li><li>Automatic cache keys derived from the runtime namespace, class, method, arguments, policy version, and declaration fingerprint</li><li>Attribute-declared policies and behaviors: <code>#[Cache]</code>, <code>#[StaleIfError]</code>, <code>#[DynamicTtl]</code>, and <code>#[BypassCacheErrors]</code></li><li>Named runtimes fixed at bootstrap through <code>CacheRuntimeRegistry</code></li><li>Transparent property, method, and string access to wrapped values</li><li>Independent PSR-6 and PSR-16 adapters</li></ul>
 <h3>Requirements</h3>
-<ul><li>PHP 8.5 or later</li><li>Composer</li><li>A PSR-6 or PSR-16 cache implementation</li></ul>
+<ul><li>PHP 8.3 or later</li><li>Composer</li><li>A PSR-6 or PSR-16 cache implementation</li></ul>
 <h3>Installation</h3>
 <pre class="code-block"><code>composer require k-kinzal/magix-cache</code></pre>
 <h3>Quick Start</h3>

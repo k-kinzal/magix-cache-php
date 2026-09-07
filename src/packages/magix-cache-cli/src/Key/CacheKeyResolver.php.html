@@ -103,7 +103,7 @@
 <span class="src-line" id="L67"><a class="ln" href="#L67">67</a>            );</span>
 <span class="src-line" id="L68"><a class="ln" href="#L68">68</a>        }</span>
 <span class="src-line" id="L69"><a class="ln" href="#L69">69</a></span>
-<span class="src-line" id="L70"><a class="ln" href="#L70">70</a>        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">definitions</span>-&gt;<span class="tok-id">resolve</span>(<span class="tok-kw">new</span> <span class="tok-id">ReflectionClass</span>(<span class="tok-var">$class</span>)-&gt;<span class="tok-id">newInstanceWithoutConstructor</span>(), <span class="tok-var">$method</span>);</span>
+<span class="src-line" id="L70"><a class="ln" href="#L70">70</a>        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">definitions</span>-&gt;<span class="tok-id">resolve</span>((<span class="tok-kw">new</span> <span class="tok-id">ReflectionClass</span>(<span class="tok-var">$class</span>))-&gt;<span class="tok-id">newInstanceWithoutConstructor</span>(), <span class="tok-var">$method</span>);</span>
 <span class="src-line" id="L71"><a class="ln" href="#L71">71</a>    }</span>
 <span class="src-line" id="L72"><a class="ln" href="#L72">72</a></span>
 <span class="src-line" id="L73"><a class="ln" href="#L73">73</a>    <span class="tok-com">/**</span></span>

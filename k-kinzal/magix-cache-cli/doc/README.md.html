@@ -41,7 +41,7 @@
 <h3>Features</h3>
 <ul><li>Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node</li><li>The reason behind each effective value, such as which dependency capped a TTL or made a result private</li><li>Composed strategy contracts, bound to the same <code>create()</code> the runtime calls, with candidate ranges such as <code>30-60s</code> kept apart from the effective TTL</li><li>An inventory of every boundary in a project as a table or as JSON</li><li>Static rules that report boundaries that throw, never store, or share a private entry between viewers</li><li>The exact cache key of a call, so an entry can be found in the backend</li><li>Tree, table, JSON, and Mermaid output for terminals, editors, and documentation</li></ul>
 <h3>Requirements</h3>
-<ul><li>PHP 8.5 or later</li><li>Composer</li><li>A project that uses <span class="md-target" title="../magix-cache/">k-kinzal/magix-cache</span></li></ul>
+<ul><li>PHP 8.3 or later</li><li>Composer</li><li>A project that uses <span class="md-target" title="../magix-cache/">k-kinzal/magix-cache</span></li></ul>
 <h3>Installation</h3>
 <pre class="code-block"><code>composer require --dev k-kinzal/magix-cache-cli</code></pre>
 <h3>Quick Start</h3>

@@ -48,7 +48,7 @@
 <h3>Features</h3>
 <ul><li>Supports Symfony 7.4 and 8</li><li>Registers MagixCache through a Symfony bundle</li><li>Uses the application&#039;s <code>cache.app</code> pool</li><li>Adapts the pool through the MagixCache PSR-6 adapter</li><li>Registers <code>CacheRuntime</code> as a public container service</li><li>Fixes the <code>default</code> reference in <code>CacheRuntimeRegistry</code> with a container-backed provider at bundle boot</li></ul>
 <h3>Requirements</h3>
-<ul><li>PHP 8.5 or later</li><li>Symfony FrameworkBundle 7.4 or 8</li><li>A configured <code>cache.app</code> pool</li></ul>
+<ul><li>PHP 8.3 or later</li><li>Symfony FrameworkBundle 7.4, or 8 on PHP 8.4 or later (subject to Symfony&#039;s PHP requirements)</li><li>A configured <code>cache.app</code> pool</li></ul>
 <h3>Installation</h3>
 <pre class="code-block"><code>composer require k-kinzal/magix-cache-symfony</code></pre>
 <h3>Quick Start</h3>

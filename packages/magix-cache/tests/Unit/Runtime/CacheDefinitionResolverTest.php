@@ -6,7 +6,7 @@ namespace Tests\Unit\Runtime;
 
 use Magix\Cache\Runtime\CacheDefinition;
 use Magix\Cache\Runtime\CacheDefinitionResolver;
-use Magix\Cache\Strategy\CacheStrategy;
+use Magix\Cache\Strategy\StrategyDefinition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -30,6 +30,8 @@ use Tests\Fixture\StrategyQuery;
 #[UsesClass(\Magix\Cache\CachePolicy::class)]
 #[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
+#[UsesClass(\Magix\Cache\Strategy\StrategyArguments::class)]
+#[UsesClass(StrategyDefinition::class)]
 final class CacheDefinitionResolverTest extends TestCase
 {
     public function testResolveMemoizesTheStaticDeclaration(): void
@@ -75,8 +77,8 @@ final class CacheDefinitionResolverTest extends TestCase
     {
         $resolver = new CacheDefinitionResolver();
 
-        self::assertInstanceOf(CacheStrategy::class, $resolver->resolve(new StrategyQuery(), 'viaClass')->strategy);
-        self::assertInstanceOf(CacheStrategy::class, $resolver->resolve(new StrategyQuery(), 'viaMethod')->strategy);
+        self::assertInstanceOf(StrategyDefinition::class, $resolver->resolve(new StrategyQuery(), 'viaClass')->strategy);
+        self::assertInstanceOf(StrategyDefinition::class, $resolver->resolve(new StrategyQuery(), 'viaMethod')->strategy);
         self::assertNull($resolver->resolve(new StrategyQuery(), 'withoutStrategy')->strategy);
     }
 }

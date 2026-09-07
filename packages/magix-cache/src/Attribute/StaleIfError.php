@@ -10,7 +10,6 @@ use InvalidArgumentException;
 use function is_a;
 
 use RuntimeException;
-use Throwable;
 
 /**
  * Serves a retained expired entry when the origin fails with a declared exception.
@@ -57,17 +56,4 @@ final readonly class StaleIfError
         }
     }
 
-    /**
-     * Reports whether the failure matches one of the declared exception types.
-     */
-    public function captures(Throwable $error): bool
-    {
-        foreach ($this->exceptions as $type) {
-            if (is_a($error, $type)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

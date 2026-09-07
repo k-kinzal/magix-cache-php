@@ -13,13 +13,21 @@ Every strategy also publishes what it guarantees as a *contract*. The runtime ex
 ```php
 interface CacheStrategy
 {
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?Cached;
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): Cached;
-    public function set(CacheOperation $operation, Cached $result, NextCacheStrategy $next): void;
+    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead;
+    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer;
+    public function set(CacheOperation $operation, CacheWrite $request, NextCacheStrategy $next): void;
 }
 ```
 
-Each operation receives the shared `CacheOperation` context — the resolved key, the clock, the single base time taken right after the origin succeeded, the stale candidate the lookup retained — and `$next`, the bound remainder of the chain. The runtime appends its own terminal strategy, which owns the fixed stage bodies: the guarded lookup, the origin call inside the stale-if-error capture range, and the re-judged store. A strategy wraps those stages; it cannot reorder them.
+Each `cached()` call constructs a fresh strategy composition, including every nested child. The same objects participate in that call's `get`, `fetch`, and `set`; a later call or a nested call gets different objects. Strategies may keep execution state in their own properties. The library does not require them to be pure or to support concurrent reuse of one object.
+
+`CacheOperation` supplies only the resolved key and the clock. It carries no feature state, stale candidates, retention requests, or mutable store flags. The stage protocol is explicit:
+
+- `get()` returns a `CacheRead` containing `Cached` and `retainedUntil`, or null. Physically retained expired entries are visible to strategies. The runtime judges freshness **after** the chain returns.
+- `fetch()` returns `OriginResult` (successful `Cached` and the single `baseTime`), `OriginFailure` (the original `RuntimeException`), or `CacheAnswer` (an answer returned without origin constraints or a new store). Use `OriginResult::constrain()` to meet strategy constraints into a normal result. Preserve failures and answers when a strategy has no applicable behavior.
+- `set()` receives a `CacheWrite` containing the final `Cached` and an optional physical retention deadline. `retainUntil()` returns a new request with the greater deadline; it changes neither the value nor expiration. The terminal rechecks storage eligibility immediately before writing.
+
+The runtime appends an internal terminal which reads storage, calls the origin, and writes storage. It captures only the origin's `RuntimeException` into `OriginFailure`; errors from strategy code, the clock, reads, writes, or policy evaluation are not origin failures. If no strategy answers the failure, the runtime rethrows the original exception object.
 
 The composition order is meaningful: the first strategy wraps everything after it, so its pre-processing runs first, its post-processing last, and its failure capture surrounds the delegates. A strategy may also short-circuit by answering without delegating.
 
@@ -30,27 +38,29 @@ Extend `CompositeCacheStrategy` and build the composition inside a public static
 ```php
 final class ProductCacheStrategy extends CompositeCacheStrategy
 {
-    public static function create(int $min = 30): CacheStrategy
+    public static function create(int $min = 30): StrategyDefinition
     {
         return parent::compose(
-            new KeySpreadExpirationStrategy(
+            StrategyDefinition::of(
+                KeySpreadExpirationStrategy::class,
                 minimum: $min,
                 maximum: 60,
             ),
-            new ProductFreshnessStrategy(
+            StrategyDefinition::of(
+                ProductFreshnessStrategy::class,
                 minimum: $min,
             ),
-            new StaleIfErrorCacheStrategy(
+            StrategyDefinition::of(
+                StaleIfErrorCacheStrategy::class,
                 maxAge: 300,
-                accepts: static fn (Throwable $error): bool =>
-                    $error instanceof UpstreamUnavailable,
+                exceptions: [UpstreamUnavailable::class],
             ),
         );
     }
 }
 ```
 
-`create()` constructs and composes; `compose()` connects the delegation; the returned value is an ordinary `CacheStrategy` that the runtime executes and that another `create()` can take as a child.
+`create()` returns immutable construction definitions. `StrategyDefinition::of()` declares a class and its constructor arguments; `compose()` connects definitions in delegation order. A definition composes again. The runtime constructs the executable objects with `new` at each invocation. No executable Strategy or factory closure is cached. Configuration accepts scalar values, null, enum cases, arrays (up to 64 levels), and nested `StrategyDefinition` values; mutable objects and closures are rejected. Nested definitions are constructed afresh even when passed as constructor dependencies. Strategies can create their own execution resources in their constructors.
 
 A boundary declares which composition it runs, and with which arguments:
 
@@ -63,7 +73,7 @@ public function execute(int $productId): Cached
 }
 ```
 
-The runtime resolves `ProductCacheStrategy::create(min: 60)` once per boundary declaration. A method-level `#[UseStrategy]` replaces a class-level one as a whole, and `enabled: false` disables a class-level default. The strategy class and its arguments are part of the declaration fingerprint, so changing them separates the stored entries.
+The declaration resolver calls `ProductCacheStrategy::create(min: 60)` once to memoize its construction definition. Executable instances are created for every invocation, including cache hits. A method-level `#[UseStrategy]` replaces a class-level one as a whole, and `enabled: false` disables a class-level default. The strategy class and its arguments are part of the declaration fingerprint, so changing them separates the stored entries.
 
 ## Publishing a Contract
 
@@ -75,9 +85,13 @@ final readonly class ProductFreshnessStrategy implements CacheStrategy
     public function __construct(private int $minimum) {}
 
     #[Ttl(min: new ConstructorArg('minimum'))]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): Cached
+    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
     {
-        // any implementation that honors the contract
+        $result = $next->fetch($operation);
+
+        return $result instanceof OriginResult
+            ? $result->constrain(CacheMetadata::forTtl($this->minimum, $result->baseTime))
+            : $result;
     }
 }
 ```
@@ -92,7 +106,15 @@ A composition never re-declares the contracts of its children: the contract of `
 
 The runtime meets strategy constraints *before* the policy constraint, both at the single base time taken right after the origin succeeded. A boundary with `#[Cache]` (that is, `Ttl::Auto`) can therefore take its lifetime from what the strategies guarantee, and a fixed policy TTL still caps whatever the strategies choose. Nothing a strategy does can extend an expiration a dependency already imposed — every addition goes through the metadata meet.
 
-On a failure path, a strategy such as `StaleIfErrorCacheStrategy` catches only the `RuntimeException` family — failures the origin declares as behavior — and serves the retained candidate through `CacheOperation::staleWithin()`, which applies the same retention and age judgement the runtime uses. A served candidate keeps its expired expiration and suppresses the store.
+`StaleIfErrorCacheStrategy` owns the candidate it observes in `get()`. When `fetch()` receives an accepted `OriginFailure`, it checks the candidate's expiration, physical retention, and `maxAge` at the current failure time. It returns a `CacheAnswer` with the original expired metadata. Its `set()` extends only the write request's retention. No part of this feature lives in `CacheOperation` or the terminal.
+
+`#[StaleIfError]` is declaration syntax for this same strategy, placed next to the origin behind the user's composition. It has no separate fallback execution path. An optional diagnostic name on `CacheAnswer` is reported when recognized by the runtime; the built-in strategy supplies `StaleServed`.
+
+## Migrating an Existing Strategy
+
+Change `create(): CacheStrategy` to `create(): StrategyDefinition` and each constructed child from `new Child(...)` to `StrategyDefinition::of(Child::class, ...)`. Update `get/fetch/set` to the protocol above. Replace the bundled stale strategy's `accepts` closure argument with its `exceptions` list; custom decisions belong in a custom Strategy's `fetch()` implementation.
+
+Move invocation-local fields such as a fallback candidate into the Strategy. Remove calls to `retainStale()`, `stale()`, `staleWithin()`, `suppressStore()`, and `extendRetention()` on `CacheOperation`. Use the successful result's `baseTime`, the explicit `CacheAnswer`, and the write request's `retainUntil()` instead. An origin failure is now an `OriginFailure` result; catch around delegation only for declared failures from the delegate itself.
 
 ## What the Analyzer Shows
 
@@ -116,11 +138,11 @@ When a composed child cannot be analyzed — an external factory, a class outsid
 
 ```php
 #[AssumeTtl(strategy: ExternalTtlStrategy::class, min: new Arg('min'), max: 300)]
-public static function create(int $min = 30): CacheStrategy
+public static function create(int $min = 30): StrategyDefinition
 {
     return parent::compose(
-        new ExternalTtlStrategy(),
-        new KeySpreadExpirationStrategy(minimum: $min, maximum: 60),
+        StrategyDefinition::of(ExternalTtlStrategy::class),
+        StrategyDefinition::of(KeySpreadExpirationStrategy::class, minimum: $min, maximum: 60),
     );
 }
 ```
@@ -129,4 +151,4 @@ The assumption replaces exactly the one analysis item it names, is marked `(assu
 
 ## Contracts Are Declared, Not Proven
 
-The analyzer derives results from contracts and construction code; it does not prove an arbitrary implementation correct, and it does not restrict how a strategy is implemented to make itself smarter. The implementer of a strategy is responsible for honoring the published contract. A declaration that cannot work as written — a reference to a constructor parameter that does not exist, a `create()` that is missing — is reported as `invalid` by `magix analyze` and by the `unresolved-strategy` lint rule, never silently corrected.
+The analyzer derives results from contracts and construction code; it does not prove an arbitrary implementation correct, and it does not restrict how a strategy is implemented to make itself smarter. The implementer of a strategy is responsible for honoring the published contract. A declaration that cannot work as written — a reference to a constructor parameter that does not exist, a missing `create()`, an executable factory result, or a definition containing mutable objects — is reported as `invalid` by `magix analyze` and by the `unresolved-strategy` lint rule, never silently corrected.

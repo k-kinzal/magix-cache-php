@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Magix\Cache\Strategy;
 
 /**
- * Base class for strategy compositions built by a typed static create().
+ * Base class for strategy compositions built by a typed static create() definition.
  *
  * A subclass declares one public static create() that takes typed arguments,
- * constructs its child strategies, and connects them with compose(). The
- * returned value is an ordinary CacheStrategy: the runtime executes it, and
- * another composition can take it as a child.
+ * describes its child strategies, and connects their definitions with compose().
+ * The returned definition composes again. The runtime constructs a fresh
+ * composition for each execution; no executable instance is memoized.
  *
  * The composition never re-declares the contracts of its children. The
  * analyzer binds the create() arguments to the same construction code and
@@ -28,8 +28,8 @@ abstract class CompositeCacheStrategy
      * first, its post-processing last, and its failure capture surrounds the
      * delegates. The result composes again.
      */
-    final protected static function compose(CacheStrategy $first, CacheStrategy ...$rest): CacheStrategy
+    final protected static function compose(StrategyDefinition $first, StrategyDefinition ...$rest): StrategyDefinition
     {
-        return new ComposedCacheStrategy($first, ...$rest);
+        return StrategyDefinition::compose($first, ...$rest);
     }
 }

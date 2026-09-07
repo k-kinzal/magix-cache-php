@@ -7,7 +7,6 @@ namespace Magix\Cache\Strategy;
 use function array_reverse;
 
 use LogicException;
-use Magix\Cache\Cached;
 use RuntimeException;
 
 /**
@@ -65,11 +64,11 @@ final readonly class NextCacheStrategy
     /**
      * Runs the lookup operation of the remaining chain.
      *
-     * @return Cached<mixed>|null
+     * @return CacheRead<mixed>|null
      * @throws RuntimeException when a delegated read fails with declared behavior
      * @throws LogicException when the chain has already ended
      */
-    public function get(CacheOperation $operation): ?Cached
+    public function get(CacheOperation $operation): ?CacheRead
     {
         return $this->strategy()->get($operation, $this->next ?? self::end());
     }
@@ -77,11 +76,11 @@ final readonly class NextCacheStrategy
     /**
      * Runs the origin operation of the remaining chain.
      *
-     * @return Cached<mixed>
+     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
      * @throws RuntimeException when the origin or a delegate fails with declared behavior
      * @throws LogicException when the chain has already ended
      */
-    public function fetch(CacheOperation $operation): Cached
+    public function fetch(CacheOperation $operation): OriginResult|OriginFailure|CacheAnswer
     {
         return $this->strategy()->fetch($operation, $this->next ?? self::end());
     }
@@ -89,11 +88,11 @@ final readonly class NextCacheStrategy
     /**
      * Runs the store operation of the remaining chain.
      *
-     * @param Cached<mixed> $result
+     * @param CacheWrite<mixed> $result
      * @throws RuntimeException when a delegated write fails with declared behavior
      * @throws LogicException when the chain has already ended
      */
-    public function set(CacheOperation $operation, Cached $result): void
+    public function set(CacheOperation $operation, CacheWrite $result): void
     {
         $this->strategy()->set($operation, $result, $this->next ?? self::end());
     }

@@ -20,6 +20,7 @@ use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CompositeCacheStrategy;
 use Magix\Cache\Strategy\Contract\AssumeTtl;
 use Magix\Cache\Strategy\Contract\Ttl as TtlAttribute;
+use Magix\Cache\Strategy\StrategyDefinition;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\New_;
@@ -31,6 +32,7 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Return_;
 use PhpParser\Node\VariadicPlaceholder;
+use PhpParser\NodeFinder;
 
 /**
  * Reads one strategy class into its contracts and construction shape.
@@ -81,6 +83,8 @@ final readonly class StrategyReader
             ttl: $this->contract($node->getMethod('fetch')),
             assumptions: $hasCreate ? $this->assumptions($create) : [],
             notes: $notes,
+            constructible: $leaf && !$node->isAbstract(),
+            definitionProblem: $hasCreate ? $this->definitionProblem($create) : null,
         );
     }
 
@@ -202,7 +206,7 @@ final readonly class StrategyReader
             || !$expression->name instanceof Identifier
             || $expression->name->toString() !== 'compose'
             || !$expression->class instanceof Name
-            || !in_array($expression->class->toString(), ['parent', 'self', 'static', CompositeCacheStrategy::class], true)) {
+            || !in_array($expression->class->toString(), ['parent', 'self', 'static', CompositeCacheStrategy::class, StrategyDefinition::class], true)) {
             return null;
         }
 
@@ -213,7 +217,7 @@ final readonly class StrategyReader
                 return [$expression];
             }
 
-            $children[] = $argument->value;
+            $children = [...$children, ...($this->compose($argument->value) ?? [$argument->value])];
         }
 
         return $children;
@@ -225,13 +229,21 @@ final readonly class StrategyReader
     public function instantiation(Expr $expression): ?StrategyInstantiation
     {
         if ($expression instanceof New_ && $expression->class instanceof Name) {
-            $arguments = $this->arguments($expression->args);
+            if ($expression->class->toString() === StrategyDefinition::class) {
+                return $this->definition($expression);
+            }
 
-            return $arguments === null ? null : new StrategyInstantiation(
+            return new StrategyInstantiation(
                 class: $expression->class->toString(),
-                arguments: $arguments,
                 line: $expression->getStartLine(),
+                problem: 'create() must return construction definitions; replace new with StrategyDefinition::of()',
             );
+        }
+
+        if ($expression instanceof StaticCall && $expression->class instanceof Name
+            && $expression->class->toString() === StrategyDefinition::class
+            && $expression->name instanceof Identifier && $expression->name->toString() === 'of') {
+            return $this->definition($expression);
         }
 
         if ($expression instanceof StaticCall
@@ -247,6 +259,59 @@ final readonly class StrategyReader
                 viaCreate: true,
                 line: $expression->getStartLine(),
             );
+        }
+
+        return null;
+    }
+
+    /**
+     * Reads the class and constructor arguments of a construction definition.
+     */
+    public function definition(StaticCall|New_ $call): ?StrategyInstantiation
+    {
+        $classArgument = null;
+        $arguments = [];
+
+        foreach ($call->args as $argument) {
+            if (!$argument instanceof Arg || $argument->unpack) {
+                return null;
+            }
+
+            if ($argument->name?->toString() === 'class' || ($classArgument === null && $argument->name === null)) {
+                $classArgument = $argument;
+            } else {
+                $arguments[] = $argument;
+            }
+        }
+
+        $class = $classArgument === null ? null : $this->literals->value($classArgument->value);
+        $bound = $this->arguments($arguments);
+
+        if (!is_string($class) || $class === LiteralReader::UNRESOLVED || $bound === null) {
+            return null;
+        }
+
+        $shared = (new NodeFinder())->findFirst(
+            $arguments,
+            static fn (\PhpParser\Node $node): bool =>
+            $node instanceof Expr\Closure || $node instanceof Expr\ArrowFunction
+            || ($node instanceof New_ && (!$node->class instanceof Name || $node->class->toString() !== StrategyDefinition::class))
+        );
+        $problem = $shared === null ? null : 'StrategyDefinition arguments cannot contain objects or closures; keep execution state in the strategy';
+
+        return new StrategyInstantiation($class, $bound, line: $call->getStartLine(), problem: $problem);
+    }
+
+    /**
+     * Rejects a factory whose declared result cannot be a construction definition.
+     */
+    public function definitionProblem(ClassMethod $create): ?string
+    {
+        $type = $create->returnType;
+
+        if (($type instanceof Name || $type instanceof Identifier)
+            && !in_array($type->toString(), [StrategyDefinition::class, 'object', 'mixed'], true)) {
+            return 'create() must return StrategyDefinition, not an executable strategy instance';
         }
 
         return null;

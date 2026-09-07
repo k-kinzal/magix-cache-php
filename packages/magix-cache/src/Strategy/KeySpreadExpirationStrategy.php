@@ -7,7 +7,6 @@ namespace Magix\Cache\Strategy;
 use function crc32;
 
 use InvalidArgumentException;
-use Magix\Cache\Cached;
 use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Strategy\Contract\ConstructorArg;
 use Magix\Cache\Strategy\Contract\Ttl;
@@ -48,11 +47,11 @@ final readonly class KeySpreadExpirationStrategy implements CacheStrategy
     /**
      * Delegates the lookup unchanged.
      *
-     * @return Cached<mixed>|null
+     * @return CacheRead<mixed>|null
      * @throws RuntimeException when the delegated read fails with declared behavior
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?Cached
+    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
     {
         return $next->get($operation);
     }
@@ -60,33 +59,33 @@ final readonly class KeySpreadExpirationStrategy implements CacheStrategy
     /**
      * Meets the key-derived lifetime constraint into the origin result.
      *
-     * @return Cached<mixed>
+     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
      * @throws RuntimeException when the origin or a delegate fails with declared behavior
      */
     #[Override]
     #[Ttl(min: new ConstructorArg('minimum'), max: new ConstructorArg('maximum'))]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): Cached
+    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
     {
         $result = $next->fetch($operation);
 
-        if (!$operation->originSucceeded()) {
+        if (!$result instanceof OriginResult) {
             return $result;
         }
 
         $spread = crc32($operation->key()) % ($this->maximum - $this->minimum + 1);
-        $constraint = CacheMetadata::forTtl($this->minimum + $spread, $operation->baseTime());
+        $constraint = CacheMetadata::forTtl($this->minimum + $spread, $result->baseTime);
 
-        return Cached::of($result->value(), $result->metadata->meet($constraint));
+        return $result->constrain($constraint);
     }
 
     /**
      * Delegates the store unchanged.
      *
-     * @param Cached<mixed> $result
+     * @param CacheWrite<mixed> $result
      * @throws RuntimeException when the delegated write fails with declared behavior
      */
     #[Override]
-    public function set(CacheOperation $operation, Cached $result, NextCacheStrategy $next): void
+    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void
     {
         $next->set($operation, $result);
     }

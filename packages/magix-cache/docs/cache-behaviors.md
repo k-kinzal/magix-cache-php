@@ -76,6 +76,8 @@ The exception list is the whole contract, and it only accepts declared behavior:
 
 A served stale value keeps its expired expiration. A parent that composes it inherits the expired constraint through the metadata meet, so the parent cannot re-store the result as fresh. Extending retention never changes the expiration itself; see [Storage Adapters](storage-adapters.md#logical-expiration-and-physical-retention).
 
+`#[StaleIfError]` declares the same `StaleIfErrorCacheStrategy` available to compositions. The strategy is constructed for each invocation and owns its own candidate and reuse judgement; the runtime has no separate attribute fallback path.
+
 `maxAge` must be zero or greater. Only the origin call is inside the capture range: a failure while reading or writing the cache never produces a stale fallback.
 
 ## Dynamic TTL

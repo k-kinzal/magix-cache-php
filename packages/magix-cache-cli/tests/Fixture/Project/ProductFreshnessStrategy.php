@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Fixture\Project;
 
-use Magix\Cache\Cached;
 use Magix\Cache\Metadata\CacheMetadata;
+use Magix\Cache\Strategy\CacheAnswer;
 use Magix\Cache\Strategy\CacheOperation;
+use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
+use Magix\Cache\Strategy\CacheWrite;
 use Magix\Cache\Strategy\Contract\ConstructorArg;
 use Magix\Cache\Strategy\Contract\Ttl;
 use Magix\Cache\Strategy\NextCacheStrategy;
+use Magix\Cache\Strategy\OriginFailure;
+use Magix\Cache\Strategy\OriginResult;
 
 use function max;
 
@@ -29,37 +33,37 @@ final readonly class ProductFreshnessStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>|null
+     * @return CacheRead<mixed>|null
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?Cached
+    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
     {
         return $next->get($operation);
     }
 
     /**
-     * @return Cached<mixed>
+     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
      */
     #[Override]
     #[Ttl(min: new ConstructorArg('minimum'))]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): Cached
+    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
     {
         $result = $next->fetch($operation);
 
-        if (!$operation->originSucceeded()) {
+        if (!$result instanceof OriginResult) {
             return $result;
         }
 
-        $volatility = max($this->minimum, $this->lifetime($result->value()));
+        $volatility = max($this->minimum, $this->lifetime($result->cached->value()));
 
-        return Cached::of($result->value(), $result->metadata->meet(CacheMetadata::forTtl($volatility, $operation->baseTime())));
+        return $result->constrain(CacheMetadata::forTtl($volatility, $result->baseTime));
     }
 
     /**
-     * @param Cached<mixed> $result
+     * @param CacheWrite<mixed> $result
      */
     #[Override]
-    public function set(CacheOperation $operation, Cached $result, NextCacheStrategy $next): void
+    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void
     {
         $next->set($operation, $result);
     }

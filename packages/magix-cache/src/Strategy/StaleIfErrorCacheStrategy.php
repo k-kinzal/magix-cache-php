@@ -4,99 +4,114 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Strategy;
 
-use Closure;
 use InvalidArgumentException;
-use Magix\Cache\Cached;
+
+use function is_a;
+
 use Magix\Cache\Strategy\Contract\Ttl;
 use Override;
 use RuntimeException;
 
 /**
- * Serves a retained expired entry when a delegate fails with accepted behavior.
+ * Owns the retained candidate and fallback decisions of one execution.
  *
- * The capture range is exactly the delegated fetch, and the capture takes
- * only the RuntimeException family — failures the origin declares as
- * behavior. Bugs never enter the catch and can never be answered with stale
- * data; an origin that meets an expected outage in a foreign exception
- * hierarchy translates it into its own declared RuntimeException subtype at
- * the boundary. A served candidate keeps its expired expiration and is never
- * stored again, and extending the physical retention on store never changes
- * the expiration itself.
+ * Only declared origin failures are eligible. Candidate retention and age
+ * are judged at the failure time. An answer preserves its expired metadata,
+ * and a store extends physical retention without extending freshness.
  */
-final readonly class StaleIfErrorCacheStrategy implements CacheStrategy
+final class StaleIfErrorCacheStrategy implements CacheStrategy
 {
+    /** @var CacheRead<mixed>|null */
+    private ?CacheRead $candidate = null;
+
     /**
-     * Creates a stale-if-error strategy.
+     * Creates one execution's stale-if-error behavior.
      *
-     * @param int $maxAge Maximum seconds past expiration a retained value may still stand in.
-     * @param Closure(RuntimeException): bool $accepts Judges whether a declared failure is eligible.
-     * @throws InvalidArgumentException when the maximum age is negative
+     * @param list<string> $exceptions RuntimeException subtypes eligible for fallback.
+     * @throws InvalidArgumentException when age or accepted exception types are invalid
      */
-    public function __construct(
-        private int $maxAge,
-        private Closure $accepts,
-    ) {
-        if ($maxAge < 0) {
-            throw new InvalidArgumentException('Stale maximum age must be zero or greater.');
+    public function __construct(private readonly int $maxAge, private readonly array $exceptions)
+    {
+        if ($maxAge < 0 || $exceptions === []) {
+            throw new InvalidArgumentException('StaleIfError requires a non-negative maximum age and accepted exception types.');
+        }
+
+        foreach ($exceptions as $type) {
+            if (!is_a($type, RuntimeException::class, true)) {
+                throw new InvalidArgumentException('StaleIfError accepts only RuntimeException subtypes.');
+            }
         }
     }
 
     /**
-     * Delegates the lookup unchanged.
+     * Retains a lookup candidate in this strategy's own execution state.
      *
-     * @return Cached<mixed>|null
-     * @throws RuntimeException when the delegated read fails with declared behavior
+     * @return CacheRead<mixed>|null
+     * @throws RuntimeException when the delegated read fails
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?Cached
+    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
     {
-        return $next->get($operation);
+        $read = $next->get($operation);
+        $this->candidate = $read;
+
+        return $read;
     }
 
     /**
-     * Serves the stale candidate when the delegate fails acceptably.
+     * Answers an accepted origin failure with a currently eligible candidate.
      *
-     * @return Cached<mixed>
-     * @throws RuntimeException when the failure is not accepted or no eligible candidate exists
+     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
+     * @throws RuntimeException when a delegate raises a failure outside the origin
      */
     #[Override]
     #[Ttl(unconstrained: true)]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): Cached
+    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
     {
-        try {
-            return $next->fetch($operation);
-        } catch (RuntimeException $error) {
-            if (($this->accepts)($error) !== true) {
-                throw $error;
-            }
+        $result = $next->fetch($operation);
 
-            $served = $operation->staleWithin($this->maxAge);
-
-            if ($served === null) {
-                throw $error;
-            }
-
-            $operation->suppressStore();
-
-            return $served;
+        if (!$result instanceof OriginFailure) {
+            return $result;
         }
+
+        $accepted = false;
+
+        foreach ($this->exceptions as $type) {
+            $accepted = $accepted || is_a($result->error, $type);
+        }
+
+        if (!$accepted) {
+            return $result;
+        }
+
+        $candidate = $this->candidate;
+        $expiresAt = $candidate?->cached->metadata->expiresAt;
+        $now = $operation->now();
+
+        if ($candidate === null || $expiresAt === null || $now < $expiresAt
+            || $now >= $candidate->retainedUntil || $now >= $expiresAt + $this->maxAge) {
+            return $result;
+        }
+
+        return new CacheAnswer($candidate->cached, event: 'StaleServed');
     }
 
     /**
-     * Extends the physical retention so a future failure can be answered.
+     * Extends this write's retention to cover the configured fallback window.
      *
-     * @param Cached<mixed> $result
-     * @throws RuntimeException when the delegated write fails with declared behavior
+     * @param CacheWrite<mixed> $request
+     * @throws RuntimeException when the delegated write fails
      */
     #[Override]
-    public function set(CacheOperation $operation, Cached $result, NextCacheStrategy $next): void
+    public function set(CacheOperation $operation, CacheWrite $request, NextCacheStrategy $next): void
     {
-        $expiresAt = $result->metadata->expiresAt;
+        $expiresAt = $request->cached->metadata->expiresAt;
 
         if ($expiresAt !== null) {
-            $operation->extendRetention($expiresAt + $this->maxAge);
+            $request = $request->retainUntil($expiresAt + $this->maxAge);
         }
 
-        $next->set($operation, $result);
+        $next->set($operation, $request);
     }
+
 }

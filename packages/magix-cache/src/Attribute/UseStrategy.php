@@ -10,7 +10,7 @@ use InvalidArgumentException;
 use function is_callable;
 
 use LogicException;
-use Magix\Cache\Strategy\CacheStrategy;
+use Magix\Cache\Strategy\StrategyDefinition;
 
 use function method_exists;
 
@@ -19,11 +19,12 @@ use function method_exists;
  *
  * The attribute is the declarative entry to a strategy, not a runtime of its
  * own: it names a class with a public static create() and carries the typed
- * arguments to pass to it. The runtime resolves create() once per boundary
- * declaration, and the analyzer binds the same arguments to the same
- * construction code, so what executes and what is explained come from one
- * declaration. A method-level declaration replaces a class-level one as a
- * whole, and enabled: false disables a class-level default.
+ * arguments to pass to it. The resolver memoizes the construction definition
+ * returned by create(), never an executable strategy. Every invocation
+ * constructs fresh strategy instances from that definition. The analyzer
+ * binds the same arguments to the definition without executing user code.
+ * A method-level declaration replaces a class-level one as a whole, and
+ * enabled: false disables a class-level default.
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 final readonly class UseStrategy
@@ -38,7 +39,7 @@ final readonly class UseStrategy
     /**
      * Declares the strategy of a boundary.
      *
-     * @param string $strategy Class name whose static create() builds the strategy.
+     * @param string $strategy Class name whose static create() describes the strategy.
      * @param bool $enabled Explicit false disables a class-level declaration.
      * @param mixed ...$arguments Arguments forwarded to create() by position or name.
      * @throws InvalidArgumentException when the strategy reference is empty
@@ -56,22 +57,22 @@ final readonly class UseStrategy
     }
 
     /**
-     * Builds the declared strategy by calling create() with the arguments.
+     * Resolves an immutable construction definition through create().
      *
-     * @throws LogicException when the class has no static create() or it returns no CacheStrategy
+     * @throws LogicException when the class has no static create() or it returns no StrategyDefinition
      */
-    public function resolve(): CacheStrategy
+    public function resolve(): StrategyDefinition
     {
         $factory = [$this->strategy, 'create'];
 
         if (!method_exists($this->strategy, 'create') || !is_callable($factory)) {
-            throw new LogicException($this->strategy.' declares no public static create() that builds its strategy.');
+            throw new LogicException($this->strategy.' declares no public static create() that describes its strategy.');
         }
 
         $strategy = $factory(...$this->arguments);
 
-        if (!$strategy instanceof CacheStrategy) {
-            throw new LogicException($this->strategy.'::create() must return a CacheStrategy.');
+        if (!$strategy instanceof StrategyDefinition) {
+            throw new LogicException($this->strategy.'::create() must return a StrategyDefinition.');
         }
 
         return $strategy;

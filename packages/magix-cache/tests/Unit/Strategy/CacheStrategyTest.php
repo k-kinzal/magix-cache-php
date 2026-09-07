@@ -7,7 +7,9 @@ namespace Tests\Unit\Strategy;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\CacheStrategy;
+use Magix\Cache\Strategy\CacheWrite;
 use Magix\Cache\Strategy\NextCacheStrategy;
+use Magix\Cache\Strategy\OriginResult;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
@@ -32,7 +34,7 @@ final class CacheStrategyTest extends TestCase
     {
         $operation = new CacheOperation('key', static fn (): float => 100.0);
         $next = NextCacheStrategy::end();
-        $produced = Cached::of('value');
+        $produced = new OriginResult(Cached::of('value'), 100.0);
         $strategy = $this->createMock(CacheStrategy::class);
         $strategy
             ->expects(self::once())
@@ -47,7 +49,7 @@ final class CacheStrategyTest extends TestCase
     {
         $operation = new CacheOperation('key', static fn (): float => 100.0);
         $next = NextCacheStrategy::end();
-        $produced = Cached::of('value');
+        $produced = new CacheWrite(Cached::of('value'));
         $strategy = $this->createMock(CacheStrategy::class);
         $strategy
             ->expects(self::once())

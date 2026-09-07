@@ -20,9 +20,11 @@ use Magix\Cache\Strategy\Contract\Arg;
 use Magix\Cache\Strategy\Contract\AssumeTtl;
 use Magix\Cache\Strategy\Contract\ConstructorArg;
 use Magix\Cache\Strategy\Contract\Ttl;
+use Magix\Cache\Strategy\StrategyDefinition;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionNamedType;
 
 /**
  * Reads the contracts of strategies that live outside the scanned sources.
@@ -64,8 +66,24 @@ final readonly class ReflectedStrategies
             composed: null,
             ttl: $leaf ? $this->contract($reflection) : null,
             assumptions: $hasCreate ? $this->assumptions($create) : [],
+            constructible: $leaf && $reflection->isInstantiable(),
+            definitionProblem: $hasCreate ? $this->definitionProblem($create) : null,
             notes: $hasCreate ? ['the body of '.$class.'::create() is outside the scanned sources'] : [],
         );
+    }
+
+    /**
+     * Rejects factories declaring an incompatible result without calling them.
+     */
+    public function definitionProblem(ReflectionMethod $create): ?string
+    {
+        $type = $create->getReturnType();
+
+        if ($type instanceof ReflectionNamedType && !$type->isBuiltin() && $type->getName() !== StrategyDefinition::class) {
+            return 'create() must return StrategyDefinition, not an executable strategy instance';
+        }
+
+        return null;
     }
 
     /**

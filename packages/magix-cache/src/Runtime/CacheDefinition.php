@@ -15,7 +15,7 @@ use Magix\Cache\Attribute\StaleIfError;
 use Magix\Cache\Attribute\UseStrategy;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\Metadata\Visibility;
-use Magix\Cache\Strategy\CacheStrategy;
+use Magix\Cache\Strategy\StrategyDefinition;
 use ReflectionMethod;
 
 /**
@@ -42,9 +42,9 @@ final readonly class CacheDefinition
     public string $runtime;
 
     /**
-     * Strategy composition resolved from the #[UseStrategy] declaration.
+     * Strategy construction definition resolved from the #[UseStrategy] declaration.
      */
-    public ?CacheStrategy $strategy;
+    public ?StrategyDefinition $strategy;
 
     private string $fingerprint;
 

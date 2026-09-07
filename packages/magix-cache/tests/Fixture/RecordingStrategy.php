@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Tests\Fixture;
 
 use ArrayObject;
-use Magix\Cache\Cached;
+use Magix\Cache\Strategy\CacheAnswer;
 use Magix\Cache\Strategy\CacheOperation;
+use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
+use Magix\Cache\Strategy\CacheWrite;
 use Magix\Cache\Strategy\NextCacheStrategy;
+use Magix\Cache\Strategy\OriginFailure;
+use Magix\Cache\Strategy\OriginResult;
 use Override;
 
 /**
@@ -31,10 +35,10 @@ final class RecordingStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>|null
+     * @return CacheRead<mixed>|null
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?Cached
+    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
     {
         $this->record($this->name.'.get.before');
         $result = $next->get($operation);
@@ -44,10 +48,10 @@ final class RecordingStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>
+     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
      */
     #[Override]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): Cached
+    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
     {
         $this->record($this->name.'.fetch.before');
         $result = $next->fetch($operation);
@@ -57,10 +61,10 @@ final class RecordingStrategy implements CacheStrategy
     }
 
     /**
-     * @param Cached<mixed> $result
+     * @param CacheWrite<mixed> $result
      */
     #[Override]
-    public function set(CacheOperation $operation, Cached $result, NextCacheStrategy $next): void
+    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void
     {
         $this->record($this->name.'.set.before');
         $next->set($operation, $result);

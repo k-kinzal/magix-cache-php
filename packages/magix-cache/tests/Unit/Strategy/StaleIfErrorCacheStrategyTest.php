@@ -6,98 +6,164 @@ namespace Tests\Unit\Strategy;
 
 use Magix\Cache\Cached;
 use Magix\Cache\Metadata\CacheMetadata;
+use Magix\Cache\Strategy\CacheAnswer;
 use Magix\Cache\Strategy\CacheOperation;
+use Magix\Cache\Strategy\CacheRead;
+use Magix\Cache\Strategy\CacheWrite;
 use Magix\Cache\Strategy\NextCacheStrategy;
+use Magix\Cache\Strategy\OriginFailure;
+use Magix\Cache\Strategy\OriginResult;
 use Magix\Cache\Strategy\StaleIfErrorCacheStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Tests\Fixture\AnsweringStrategy;
-use Tests\Fixture\FailingStrategy;
 use Tests\Fixture\UpstreamUnavailable;
-use Throwable;
 
 #[CoversClass(StaleIfErrorCacheStrategy::class)]
 #[UsesClass(Cached::class)]
 #[UsesClass(CacheMetadata::class)]
 #[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 #[UsesClass(CacheOperation::class)]
+#[UsesClass(CacheRead::class)]
+#[UsesClass(CacheWrite::class)]
+#[UsesClass(CacheAnswer::class)]
+#[UsesClass(OriginFailure::class)]
+#[UsesClass(OriginResult::class)]
 #[UsesClass(NextCacheStrategy::class)]
 final class StaleIfErrorCacheStrategyTest extends TestCase
 {
-    public function testFetchServesTheRetainedCandidateOnAnAcceptedFailure(): void
+    public function testGetRetainsTheCandidateForFetch(): void
     {
-        $strategy = new StaleIfErrorCacheStrategy(
-            maxAge: 300,
-            accepts: static fn (Throwable $error): bool => $error instanceof UpstreamUnavailable,
-        );
+        $strategy = new StaleIfErrorCacheStrategy(maxAge: 30, exceptions: [UpstreamUnavailable::class]);
         $operation = new CacheOperation('key', static fn (): float => 100.0);
         $stale = Cached::of('stale', new CacheMetadata(expiresAt: 90.0));
-        $operation->retainStale($stale, 400.0);
+        $next = NextCacheStrategy::of(new AnsweringStrategy($stale, Cached::of('unused'), failure: new UpstreamUnavailable('down'), retainedUntil: 130.0));
 
-        $result = $strategy->fetch($operation, NextCacheStrategy::of(new FailingStrategy(new UpstreamUnavailable('down'))));
+        $read = $strategy->get($operation, $next);
+        $answer = $strategy->fetch($operation, $next);
 
-        self::assertSame('stale', $result->value());
-        self::assertSame(90.0, $result->metadata->expiresAt, 'a served candidate keeps its expired expiration');
-        self::assertTrue($operation->storeSuppressed());
+        self::assertSame($stale, $read?->cached);
+        self::assertInstanceOf(CacheAnswer::class, $answer);
+        self::assertSame($stale, $answer->cached);
+        self::assertSame(90.0, $answer->cached->metadata->expiresAt);
+        self::assertSame('StaleServed', $answer->event);
     }
 
-    public function testFetchRethrowsAFailureTheJudgementDoesNotAccept(): void
+    /**
+     * @return iterable<string, array{float, float, int}>
+     */
+    public static function providerRejectedWindows(): iterable
     {
-        $strategy = new StaleIfErrorCacheStrategy(
-            maxAge: 300,
-            accepts: static fn (Throwable $error): bool => $error instanceof UpstreamUnavailable,
-        );
-        $operation = new CacheOperation('key', static fn (): float => 100.0);
-        $operation->retainStale(Cached::of('stale', new CacheMetadata(expiresAt: 90.0)), 400.0);
-
-        $this->expectException(RuntimeException::class);
-        $strategy->fetch($operation, NextCacheStrategy::of(new FailingStrategy(new RuntimeException('other'))));
+        yield 'still fresh' => [89.0, 130.0, 30];
+        yield 'age limit reached' => [120.0, 130.0, 30];
+        yield 'physical limit reached' => [130.0, 130.0, 300];
+        yield 'zero window' => [90.0, 130.0, 0];
     }
 
-    public function testFetchRethrowsWhenNoEligibleCandidateExists(): void
+    #[DataProvider('providerRejectedWindows')]
+    public function testFetchJudgesAgeAndRetentionAtFailureTime(float $now, float $retention, int $age): void
     {
-        $strategy = new StaleIfErrorCacheStrategy(
-            maxAge: 300,
-            accepts: static fn (Throwable $error): bool => true,
-        );
-        $operation = new CacheOperation('key', static fn (): float => 100.0);
+        $time = 80.0;
+        $operation = new CacheOperation('key', static function () use (&$time): float {
+            return $time;
+        });
+        $strategy = new StaleIfErrorCacheStrategy($age, [UpstreamUnavailable::class]);
+        $error = new UpstreamUnavailable('down');
+        $next = NextCacheStrategy::of(new AnsweringStrategy(
+            Cached::of('old', new CacheMetadata(expiresAt: 90.0)),
+            Cached::of('unused'),
+            failure: $error,
+            retainedUntil: $retention,
+        ));
+        $strategy->get($operation, $next);
+        $time = $now;
 
-        $this->expectException(UpstreamUnavailable::class);
-        $strategy->fetch($operation, NextCacheStrategy::of(new FailingStrategy(new UpstreamUnavailable('down'))));
+        $result = $strategy->fetch($operation, $next);
+
+        self::assertInstanceOf(OriginFailure::class, $result);
+        self::assertSame($error, $result->error);
     }
 
-    public function testSetExtendsRetentionWithoutChangingTheExpiration(): void
+    public function testFetchPassesAnUnacceptedFailureThroughUnchanged(): void
     {
-        $strategy = new StaleIfErrorCacheStrategy(maxAge: 300, accepts: static fn (Throwable $error): bool => true);
+        $strategy = new StaleIfErrorCacheStrategy(300, [UpstreamUnavailable::class]);
         $operation = new CacheOperation('key', static fn (): float => 100.0);
-        $terminal = new AnsweringStrategy(hit: null, fetched: Cached::of('value'));
-        $result = Cached::of('value', new CacheMetadata(expiresAt: 160.0));
+        $error = new RuntimeException('other');
+        $next = NextCacheStrategy::of(new AnsweringStrategy(
+            Cached::of('old', new CacheMetadata(expiresAt: 90.0)),
+            Cached::of('unused'),
+            failure: $error,
+            retainedUntil: 400.0,
+        ));
+        $strategy->get($operation, $next);
 
-        $strategy->set($operation, $result, NextCacheStrategy::of($terminal));
+        $result = $strategy->fetch($operation, $next);
 
-        self::assertSame(460.0, $operation->retention());
-        self::assertSame(160.0, $terminal->stored?->metadata->expiresAt);
+        self::assertInstanceOf(OriginFailure::class, $result);
+        self::assertSame($error, $result->error);
     }
 
-    public function testSetLeavesAnUnconstrainedResultWithoutRetention(): void
+    public function testFetchCannotUseAnotherStrategyInstancesCandidate(): void
     {
-        $strategy = new StaleIfErrorCacheStrategy(maxAge: 300, accepts: static fn (Throwable $error): bool => true);
+        $first = new StaleIfErrorCacheStrategy(300, [UpstreamUnavailable::class]);
+        $second = new StaleIfErrorCacheStrategy(300, [UpstreamUnavailable::class]);
         $operation = new CacheOperation('key', static fn (): float => 100.0);
-        $terminal = new AnsweringStrategy(hit: null, fetched: Cached::of('value'));
+        $error = new UpstreamUnavailable('down');
+        $next = NextCacheStrategy::of(new AnsweringStrategy(
+            Cached::of('old', new CacheMetadata(expiresAt: 90.0)),
+            Cached::of('unused'),
+            failure: $error,
+            retainedUntil: 400.0,
+        ));
+        $first->get($operation, $next);
 
-        $strategy->set($operation, Cached::of('value'), NextCacheStrategy::of($terminal));
+        $result = $second->fetch($operation, $next);
 
-        self::assertNull($operation->retention());
+        self::assertInstanceOf(OriginFailure::class, $result);
+        self::assertSame($error, $result->error);
     }
 
-    public function testGetDelegatesTheLookupUnchanged(): void
+    public function testFetchPassesSuccessThrough(): void
     {
-        $strategy = new StaleIfErrorCacheStrategy(maxAge: 300, accepts: static fn (Throwable $error): bool => true);
-        $terminal = new AnsweringStrategy(hit: Cached::of('hit'), fetched: Cached::of('value'));
-        $operation = new CacheOperation('key', static fn (): float => 100.0);
+        $strategy = new StaleIfErrorCacheStrategy(300, [RuntimeException::class]);
+        $cached = Cached::of('origin');
+        $next = NextCacheStrategy::of(new AnsweringStrategy(null, $cached));
 
-        self::assertSame('hit', $strategy->get($operation, NextCacheStrategy::of($terminal))?->value());
+        $result = $strategy->fetch(new CacheOperation('key', static fn (): float => 100.0), $next);
+
+        self::assertInstanceOf(OriginResult::class, $result);
+        self::assertSame($cached, $result->cached);
+        self::assertSame(100.0, $result->baseTime);
+    }
+
+    public function testSetExtendsOnlyTheWriteRequestsPhysicalRetention(): void
+    {
+        $strategy = new StaleIfErrorCacheStrategy(300, [RuntimeException::class]);
+        $operation = new CacheOperation('key', static fn (): float => 100.0);
+        $terminal = new AnsweringStrategy(null, Cached::of('unused'));
+        $request = new CacheWrite(Cached::of('value', new CacheMetadata(expiresAt: 160.0)));
+
+        $strategy->set($operation, $request, NextCacheStrategy::of($terminal));
+
+        self::assertSame(460.0, $terminal->stored?->retainedUntil);
+        self::assertSame($request->cached, $terminal->stored->cached);
+        self::assertNull($request->retainedUntil);
+    }
+
+    public function testSetPreservesALongerRequestAndUnconstrainedResults(): void
+    {
+        $strategy = new StaleIfErrorCacheStrategy(300, [RuntimeException::class]);
+        $operation = new CacheOperation('key', static fn (): float => 100.0);
+        $terminal = new AnsweringStrategy(null, Cached::of('unused'));
+        $request = new CacheWrite(Cached::of('value', new CacheMetadata(expiresAt: 160.0)), 500.0);
+        $strategy->set($operation, $request, NextCacheStrategy::of($terminal));
+        self::assertSame(500.0, $terminal->stored?->retainedUntil);
+
+        $strategy->set($operation, new CacheWrite(Cached::of('value')), NextCacheStrategy::of($terminal));
+        self::assertNotNull($terminal->stored);
+        self::assertNull($terminal->stored->retainedUntil);
     }
 }

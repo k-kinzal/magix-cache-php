@@ -13,6 +13,6 @@ final class ArgTest extends TestCase
 {
     public function testReferencesAMethodParameterByName(): void
     {
-        self::assertSame('min', new Arg('min')->name);
+        self::assertSame('min', (new Arg('min'))->name);
     }
 }

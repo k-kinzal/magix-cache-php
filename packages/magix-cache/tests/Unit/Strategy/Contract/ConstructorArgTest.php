@@ -13,6 +13,6 @@ final class ConstructorArgTest extends TestCase
 {
     public function testReferencesAConstructorParameterByName(): void
     {
-        self::assertSame('minimum', new ConstructorArg('minimum')->name);
+        self::assertSame('minimum', (new ConstructorArg('minimum'))->name);
     }
 }

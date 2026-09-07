@@ -92,6 +92,6 @@ final class NextCacheStrategyTest extends TestCase
     {
         $terminal = new AnsweringStrategy(hit: null, fetched: Cached::of('origin'));
 
-        self::assertSame($terminal, new NextCacheStrategy($terminal)->strategy());
+        self::assertSame($terminal, (new NextCacheStrategy($terminal))->strategy());
     }
 }

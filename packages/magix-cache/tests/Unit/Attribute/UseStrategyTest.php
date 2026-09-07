@@ -38,7 +38,7 @@ final class UseStrategyTest extends TestCase
 
     public function testResolveBuildsTheStrategyThroughCreate(): void
     {
-        $strategy = new UseStrategy(strategy: ProductCacheStrategy::class, min: 60)->resolve();
+        $strategy = (new UseStrategy(strategy: ProductCacheStrategy::class, min: 60))->resolve();
         $terminal = new AnsweringStrategy(hit: null, fetched: Cached::of('origin'));
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 

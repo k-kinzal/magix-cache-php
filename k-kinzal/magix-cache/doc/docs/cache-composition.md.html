@@ -99,7 +99,43 @@ $page = $productQuery-&gt;execute($productId)-&gt;map(
         ),
     );</code></pre>
 <p>Use <code>combine4()</code> and <code>combine5()</code> for four and five values respectively. Each method returns a typed capability whose <code>map()</code> closure receives the values in the same order.</p>
-<p>For more than five inputs, compose intermediate domain values and combine those results in another step. The constraints remain monotone at each step.</p>
+<p>For more than five inputs of different types, compose intermediate domain values and combine those results in another step. For a variable number of results, use <code>sequence()</code> or <code>traverse()</code> below.</p>
+<h3>Flatten a Nested Cached Value</h3>
+<p><code>flatten()</code> changes <code>Cached&lt;Cached&lt;T&gt;&gt;</code> into <code>Cached&lt;T&gt;</code>, meeting the outer and inner metadata:</p>
+<pre class="code-block"><code><span class="tok-var">$nested</span> = <span class="tok-var">$productQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>)-&gt;<span class="tok-id">map</span>(
+    <span class="tok-kw">fn</span> (<span class="tok-id">Product</span> <span class="tok-var">$product</span>): <span class="tok-id">Cached</span> =&gt; <span class="tok-var">$inventoryQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$product</span>-&gt;<span class="tok-id">id</span>),
+);
+<span class="tok-var">$inventory</span> = <span class="tok-var">$nested</span>-&gt;<span class="tok-id">flatten</span>(); <span class="tok-com">// Cached&lt;Inventory&gt;</span></code></pre>
+<p>This is equivalent to using <code>flatMap()</code> for that transform. Only one layer is removed; <code>Cached&lt;Cached&lt;Cached&lt;T&gt;&gt;&gt;</code> becomes <code>Cached&lt;Cached&lt;T&gt;&gt;</code>. An expired inner value stays expired, and an uncacheable inner value stays uncacheable. Calling <code>flatten()</code> on a value that is not another <code>Cached</code> is a programming error (<code>LogicException</code>).</p>
+<h3>Pair and Split Typed Values</h3>
+<p><code>zip()</code> changes <code>Cached&lt;A&gt;</code> and <code>Cached&lt;B&gt;</code> into <code>Cached&lt;array{A, B}&gt;</code>. It is useful when the next consumer accepts a tuple instead of separate callback arguments:</p>
+<pre class="code-block"><code><span class="tok-var">$pair</span> = <span class="tok-var">$product</span>-&gt;<span class="tok-id">zip</span>(<span class="tok-var">$inventory</span>); <span class="tok-com">// Cached&lt;array{Product, Inventory}&gt;</span>
+
+[<span class="tok-var">$productPart</span>, <span class="tok-var">$inventoryPart</span>] = <span class="tok-var">$pair</span>-&gt;<span class="tok-id">unzip</span>();
+<span class="tok-com">// Cached&lt;Product&gt;, Cached&lt;Inventory&gt;</span></code></pre>
+<p><code>unzip()</code> requires a two-element list and returns two <code>Cached</code> values. <strong>Both keep the entire pair&#039;s metadata</strong>, including the constraints contributed by the other part. Splitting a private or expired pair cannot make either projection shared or fresh. It does not reconstruct the weaker metadata from before <code>zip()</code>. A value that is not a two-element list is a programming error (<code>LogicException</code>).</p>
+<h3>Collect a Variable Number of Results</h3>
+<p><code>sequence()</code> changes <code>iterable&lt;K, Cached&lt;T&gt;&gt;</code> into <code>Cached&lt;array&lt;K, T&gt;&gt;</code>:</p>
+<pre class="code-block"><code><span class="tok-var">$products</span> = <span class="tok-id">Cached</span>::<span class="tok-id">sequence</span>([
+    <span class="tok-str">&#039;featured&#039;</span> =&gt; <span class="tok-var">$productQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$featuredId</span>),
+    <span class="tok-str">&#039;related&#039;</span> =&gt; <span class="tok-var">$productQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$relatedId</span>),
+]);
+<span class="tok-com">// Cached&lt;array&lt;string, Product&gt;&gt;</span></code></pre>
+<p><code>traverse()</code> maps each ordinary input to a <code>Cached</code> result and collects it in the same way:</p>
+<pre class="code-block"><code><span class="tok-var">$products</span> = <span class="tok-id">Cached</span>::<span class="tok-id">traverse</span>(
+    <span class="tok-var">$productIds</span>,
+    <span class="tok-kw">fn</span> (<span class="tok-id">int</span> <span class="tok-var">$id</span>): <span class="tok-id">Cached</span> =&gt; <span class="tok-var">$productQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$id</span>),
+);</code></pre>
+<p>When the list of IDs itself carries constraints, use <code>flatMap()</code> to retain them:</p>
+<pre class="code-block"><code><span class="tok-var">$products</span> = <span class="tok-var">$cachedProductIds</span>-&gt;<span class="tok-id">flatMap</span>(
+    <span class="tok-kw">fn</span> (<span class="tok-kw">array</span> <span class="tok-var">$ids</span>): <span class="tok-id">Cached</span> =&gt; <span class="tok-id">Cached</span>::<span class="tok-id">traverse</span>(
+        <span class="tok-var">$ids</span>,
+        <span class="tok-kw">fn</span> (<span class="tok-id">int</span> <span class="tok-var">$id</span>): <span class="tok-id">Cached</span> =&gt; <span class="tok-var">$productQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$id</span>),
+    ),
+);</code></pre>
+<p>Both operations consume arrays or generators eagerly, once, in iteration order. <code>traverse()</code> invokes its callback once per input value. Integer and string keys are preserved using PHP array key rules. If a generator repeats a key, the last value wins, but <strong>every yielded result&#039;s constraints still contribute</strong>. All items are evaluated even when an earlier item prohibits storage; callback or iteration failures propagate.</p>
+<p>Empty input returns <code>Cached::of([])</code> with <code>CacheMetadata::top()</code> and does not call the transform. It supplies no finite expiration by itself: use a fixed parent TTL or another finite dependency when an empty collection is possible. An automatic TTL requires that finite constraint.</p>
+<p>These are eager operations on evaluated values. <code>null</code> is an ordinary wrapped value; it does not represent a missing branch, and these methods do not introduce Option/Result types.</p>
 <h3>The Meet Law</h3>
 <p><code>CacheMetadata::meet()</code> is the only way to add constraints to existing metadata, and it is a fixed law:</p>
 <div class="table-wrap"><table><thead><tr><th>Constraint</th><th>Meet rule</th></tr></thead><tbody><tr><td>Expiration</td><td>Earliest finite absolute expiration; <code>null</code> is unconstrained</td></tr><tr><td>Cacheability</td><td>Logical AND</td></tr><tr><td>Visibility</td><td>Stricter of the two: <code>Shared &lt; Private &lt; NoStore</code></td></tr><tr><td>Tags</td><td>Deduplicated, sorted union</td></tr><tr><td>Reasons</td><td>Deduplicated, sorted union</td></tr></tbody></table></div>
@@ -147,11 +183,23 @@ Result:    expires in 20s, Private, tags [inventory, products]</code></pre>
 );</code></pre>
 <p><code>CacheMetadata</code> is immutable and composes only through <code>meet()</code>; there are no setters that could relax a constraint.</p>
 <h3>Access Wrapped Values</h3>
-<p>Use <code>value()</code> for scalar operations, strict parameter types, or explicit unwrapping:</p>
-<pre class="code-block"><code><span class="tok-var">$product</span> = <span class="tok-var">$cachedProduct</span>-&gt;<span class="tok-id">value</span>();</code></pre>
-<p>For convenience, <code>Cached</code> forwards:</p>
-<ul><li>Public object property reads</li><li>String-keyed array reads</li><li><code>isset()</code> checks</li><li>Callable public object methods</li><li>String conversion for strings and <code>Stringable</code> objects</li></ul>
-<p>These forwarded operations return ordinary PHP values that no longer carry constraints, so they are for final observation only. Use <code>map()</code>, <code>flatMap()</code>, or <code>combineN()-&gt;map()</code> when producing a new cached result, so the dependency metadata is not lost.</p>
+<p><code>Cached</code> exposes its own methods and <code>metadata</code>; it does not proxy properties, methods, <code>isset()</code>, or string conversion to the wrapped value. Use <code>value()</code> at the final observation boundary:</p>
+<pre class="code-block"><code><span class="tok-var">$product</span> = <span class="tok-var">$cachedProduct</span>-&gt;<span class="tok-id">value</span>();
+<span class="tok-kw">echo</span> <span class="tok-var">$product</span>-&gt;<span class="tok-id">name</span>;
+<span class="tok-kw">echo</span> <span class="tok-var">$product</span>-&gt;<span class="tok-id">displayName</span>();
+<span class="tok-kw">echo</span> <span class="tok-var">$cachedTitle</span>-&gt;<span class="tok-id">value</span>();
+
+<span class="tok-kw">foreach</span> (<span class="tok-var">$cachedProducts</span>-&gt;<span class="tok-id">value</span>() <span class="tok-kw">as</span> <span class="tok-var">$product</span>) {
+    <span class="tok-kw">echo</span> <span class="tok-var">$product</span>-&gt;<span class="tok-id">name</span>;
+}</code></pre>
+<p><code>value()</code> detaches the value from its constraints. To produce another cached result with a PHP array function, apply it inside <code>map()</code> or <code>combineN()-&gt;map()</code>:</p>
+<pre class="code-block"><code><span class="tok-var">$visibleIds</span> = <span class="tok-var">$allIds</span>-&gt;<span class="tok-id">combine2</span>(<span class="tok-var">$excludedIds</span>)-&gt;<span class="tok-id">map</span>(
+    <span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-kw">array</span> <span class="tok-var">$all</span>, <span class="tok-kw">array</span> <span class="tok-var">$excluded</span>): <span class="tok-kw">array</span> =&gt; <span class="tok-id">array_diff</span>(<span class="tok-var">$all</span>, <span class="tok-var">$excluded</span>),
+);</code></pre>
+<p>The result keeps the constraints from both queries. It can then be iterated with <code>foreach ($visibleIds-&gt;value() as $id)</code> when rendering the response.</p>
+<h4>Migrating from Magic Access</h4>
+<div class="table-wrap"><table><thead><tr><th>Previous access</th><th>Explicit access</th></tr></thead><tbody><tr><td><code>$cached-&gt;name</code></td><td><code>$cached-&gt;value()-&gt;name</code> for an object, or <code>$cached-&gt;value()[&#039;name&#039;]</code> for an array</td></tr><tr><td><code>$cached-&gt;displayName()</code></td><td><code>$cached-&gt;value()-&gt;displayName()</code></td></tr><tr><td><code>isset($cached-&gt;name)</code></td><td><code>isset($cached-&gt;value()-&gt;name)</code> or <code>isset($cached-&gt;value()[&#039;name&#039;])</code></td></tr><tr><td><code>(string) $cached</code></td><td><code>(string) $cached-&gt;value()</code> when the value supports string conversion</td></tr></tbody></table></div>
+<p>Use <code>map()</code> for these transformations when the result must remain cached, and <code>flatMap()</code> or <code>flatten()</code> when the transformation returns another <code>Cached</code>.</p>
 <h3>Use Metadata at the Response Boundary</h3>
 <p>After composing the final page or read model, application code can inspect its metadata to select HTTP cache headers or invalidation tags:</p>
 <pre class="code-block"><code><span class="tok-var">$page</span> = <span class="tok-var">$pageQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>);

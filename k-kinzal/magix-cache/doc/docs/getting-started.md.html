@@ -109,14 +109,15 @@
 <p>Policy and behaviors come from attributes alone: <code>#[Cache]</code> on the method wins over the concrete class as a whole, and there is no per-call override argument. A method without any <code>#[Cache]</code> on itself or its concrete class throws a <code>LogicException</code>. <code>cached()</code> must also be called directly from the boundary method, not through a helper or closure.</p>
 <p>The cache key includes the runtime namespace, the concrete class, the declaring method, the arguments, the policy version, and a fingerprint of the effective declaration. See <a href="../../../../k-kinzal/magix-cache/doc/docs/cache-keys.md.html">Cache Keys</a> for key reduction, ignored arguments, and custom key strategies.</p>
 <h3>Read the Result</h3>
-<p>Use <code>value()</code> whenever PHP needs the original type explicitly:</p>
+<p>Use <code>value()</code> to access the original value:</p>
 <pre class="code-block"><code><span class="tok-com">/** @var Product $product */</span>
 <span class="tok-var">$product</span> = <span class="tok-var">$query</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-num">42</span>)-&gt;<span class="tok-id">value</span>();</code></pre>
-<p><code>Cached</code> also forwards public property reads, public method calls, <code>isset()</code>, and string conversion where the wrapped value supports them:</p>
+<p><code>Cached</code> does not forward property reads, method calls, <code>isset()</code>, or string conversion. Access the wrapped value explicitly:</p>
 <pre class="code-block"><code><span class="tok-var">$result</span> = <span class="tok-var">$query</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-num">42</span>);
 
-<span class="tok-kw">echo</span> <span class="tok-var">$result</span>-&gt;<span class="tok-id">name</span>;
-<span class="tok-kw">echo</span> <span class="tok-var">$result</span>-&gt;<span class="tok-id">displayName</span>();</code></pre>
+<span class="tok-kw">echo</span> <span class="tok-var">$result</span>-&gt;<span class="tok-id">value</span>()-&gt;<span class="tok-id">name</span>;
+<span class="tok-kw">echo</span> <span class="tok-var">$result</span>-&gt;<span class="tok-id">value</span>()-&gt;<span class="tok-id">displayName</span>();</code></pre>
+<p><code>value()</code> detaches the value from its cache constraints. When creating another cached result, use <code>map()</code>, <code>flatMap()</code>, or the <a href="../../../../k-kinzal/magix-cache/doc/docs/cache-composition.md.html">composition operations</a> to preserve them.</p>
 <p>The cache constraints are available through the immutable <code>metadata</code> property:</p>
 <pre class="code-block"><code><span class="tok-var">$result</span>-&gt;<span class="tok-id">metadata</span>-&gt;<span class="tok-id">expiresAt</span>;
 <span class="tok-var">$result</span>-&gt;<span class="tok-id">metadata</span>-&gt;<span class="tok-id">cacheable</span>;

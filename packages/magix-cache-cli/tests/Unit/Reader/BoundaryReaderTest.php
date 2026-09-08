@@ -53,6 +53,18 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Reader\ParameterConfigurationReader::class)]
 final class BoundaryReaderTest extends TestCase
 {
+    public function testCommentKeepsUnresolvedExpressionsVisibleInsteadOfUsingTheClassDefault(): void
+    {
+        $reader = new BoundaryReader();
+        $attribute = new Attribute(new Name(\Magix\Cache\Attribute\CacheComment::class), [
+            new Arg(new ConstFetch(new Name('APPLICATION_NOTE'))),
+        ]);
+
+        self::assertSame('(unresolved #[CacheComment])', $reader->comment([new AttributeGroup([$attribute])], 'class default'));
+        self::assertSame('class default', $reader->comment([], 'class default'));
+        self::assertNull($reader->comment([]));
+    }
+
     public function testEntryPointReadsCallsWithoutApplyingCacheDeclarations(): void
     {
         $code = <<<'SOURCE'

@@ -9,6 +9,8 @@ use function implode;
 
 use Magix\Cache\Cli\Graph\CacheNode;
 
+use function strtr;
+
 /**
  * Renders a cache tree as a Mermaid flowchart for documentation.
  */
@@ -32,6 +34,11 @@ final readonly class MermaidRenderer
         $effect = $node->effect;
         $entryPoint = $node->boundary->isCacheBoundary ? '' : ' (uncached entry point)';
         $label = $node->boundary->shortId().$entryPoint.'<br/>'.$effect->ttl->label().' - '.$effect->visibilityLabel();
+
+        if ($node->boundary->comment !== null && $node->boundary->comment !== '') {
+            $label .= '<br/>comment: '.$this->comment($node->boundary->comment);
+        }
+
         $statements = ['    '.$id.'["'.$label.'"]'];
 
         if ($effect->localRestrictions !== []) {
@@ -48,5 +55,22 @@ final readonly class MermaidRenderer
         }
 
         return $statements;
+    }
+
+    /**
+     * Escapes comment text as Mermaid entities, retaining line breaks in the label.
+     */
+    public function comment(string $comment): string
+    {
+        return strtr($comment, [
+            '#' => '#35;',
+            '&' => '#38;',
+            '"' => '#quot;',
+            '<' => '#lt;',
+            '>' => '#gt;',
+            "\r\n" => '<br/>',
+            "\r" => '<br/>',
+            "\n" => '<br/>',
+        ]);
     }
 }

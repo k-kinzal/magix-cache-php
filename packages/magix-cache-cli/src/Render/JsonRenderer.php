@@ -51,6 +51,7 @@ final readonly class JsonRenderer
             'kind' => $boundary->isCacheBoundary ? 'boundary' : 'entry-point',
             'file' => $boundary->file,
             'line' => $boundary->line,
+            'comment' => $boundary->comment,
             'policy' => $policy === null ? null : [
                 'source' => $policy->source->name,
                 'ttl' => $policy->ttlLabel(),

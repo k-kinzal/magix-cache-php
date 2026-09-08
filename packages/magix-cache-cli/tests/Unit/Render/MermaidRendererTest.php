@@ -23,6 +23,14 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class MermaidRendererTest extends TestCase
 {
+    public function testCommentEscapesLabelSyntaxAndPreservesAllLineEndings(): void
+    {
+        self::assertSame(
+            '#quot;比較#quot; #38; #lt;info#gt; #35;35;<br/>two<br/>three<br/>four',
+            (new MermaidRenderer())->comment("\"比較\" & <info> #35;\r\ntwo\rthree\nfour"),
+        );
+    }
+
     public function testRenderStartsAFlowchart(): void
     {
         $node = new CacheNode(

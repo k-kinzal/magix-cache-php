@@ -49,6 +49,7 @@ final class JsonRendererTest extends TestCase
         self::assertStringContainsString('"boundary": "App\\\\ProductQuery::execute"', $json);
         self::assertStringContainsString('"state": "known"', $json);
         self::assertStringContainsString('"seconds": 20', $json);
+        self::assertStringContainsString('"comment": null', $json);
     }
 
     public function testTreeDescribesPolicyKeyAndDependencies(): void

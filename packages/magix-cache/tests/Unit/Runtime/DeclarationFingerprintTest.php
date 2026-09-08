@@ -9,6 +9,7 @@ use Magix\Cache\Runtime\DeclarationFingerprint;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use Tests\Fixture\CommentedQuery;
 use Tests\Fixture\DeclaredQuery;
 use Tests\Fixture\StrategyQuery;
 
@@ -36,6 +37,21 @@ use Tests\Fixture\StrategyQuery;
 #[\PHPUnit\Framework\Attributes\UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class DeclarationFingerprintTest extends TestCase
 {
+    public function testCommentsDoNotChangeTheEffectivePolicyOrDeclarationFingerprint(): void
+    {
+        $resolver = new CacheDefinitionResolver();
+        $query = new CommentedQuery();
+        $class = $resolver->resolve($query, 'viaClass');
+        $method = $resolver->resolve($query, 'viaMethod');
+        $hidden = $resolver->resolve($query, 'hidden');
+
+        self::assertSame($class->keyContext([])->fingerprint, $method->keyContext([])->fingerprint);
+        self::assertSame($class->keyContext([])->fingerprint, $hidden->keyContext([])->fingerprint);
+        self::assertSame(30, $class->policy->ttl);
+        self::assertEquals($class->policy, $method->policy);
+        self::assertEquals($class->policy, $hidden->policy);
+    }
+
     public function testCalculateIsStableForEqualEffectiveDeclarations(): void
     {
         $resolver = new CacheDefinitionResolver();

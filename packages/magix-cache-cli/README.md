@@ -12,6 +12,7 @@ The result answers the questions that are otherwise only observable in productio
 - Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node
 - The reason behind each effective value, such as which dependency capped a TTL or made a result private
 - Yellow highlights where local TTL, `maxTtl`, or visibility settings restrict composed metadata, making bubbling stops visible
+- `#[CacheComment('...')]` notes beside each node to record migration decisions and unfinished verification
 - Composed strategy contracts, bound to the same `create()` the runtime calls, with candidate ranges such as `30-60s` kept apart from the effective TTL
 - The default hash strategy's cache key for a call in the configured runtime namespace
 - Tree, JSON, and Mermaid output for terminals, editors, and documentation

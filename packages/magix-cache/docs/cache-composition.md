@@ -228,7 +228,7 @@ In particular, a hit represents the stored source generation. If an origin would
 
 ### Regression Coverage
 
-[`MetadataBubblingTest`](../tests/Integration/MetadataBubblingTest.php) exercises the public attributed API through seven boundaries, including a shared leaf. It enumerates all 128 retained-entry subsets for storable graphs and every subset of the remaining storable branches when one dependency prevents storage. Each layout is checked against the same cold result and the metadata and retention written by recomputed subtrees, using memory, serialized PSR-6, and serialized PSR-16 storage. Separate cases cover elapsed time, parent recomputation, and stale fallback. These tests run with `composer test`.
+[`MetadataBubblingTest`](../tests/Integration/MetadataBubblingTest.php) exercises the public attributed API through seven boundaries, including a shared leaf. It enumerates all 128 retained-entry subsets for storable graphs and every subset of the remaining storable branches when one dependency prevents storage. Each layout is checked against the same cold result and the metadata and retention written by recomputed subtrees, using memory, PSR-6, and PSR-16 storage. The PSR test backend serializes entries with the locked Symfony 7.4 dependencies and deep-clones them with Symfony 8.1; restored metadata must be equal and independently reconstructed in both cases. Separate cases cover elapsed time, parent recomputation, and stale fallback. These tests run with `composer test`.
 
 ## Apply the Parent Policy
 

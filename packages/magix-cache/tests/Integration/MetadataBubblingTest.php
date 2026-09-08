@@ -131,7 +131,7 @@ final class MetadataBubblingTest extends TestCase
     /**
      * @return iterable<string, array{'psr6'|'psr16'}>
      */
-    public static function providerSerializedBackends(): iterable
+    public static function providerPsrBackends(): iterable
     {
         yield 'psr6' => ['psr6'];
         yield 'psr16' => ['psr16'];
@@ -140,8 +140,8 @@ final class MetadataBubblingTest extends TestCase
     /**
      * @param 'psr6'|'psr16' $backend
      */
-    #[DataProvider('providerSerializedBackends')]
-    public function testSerializedRootHitRestoresMetadataWithoutExecutingOrStoring(string $backend): void
+    #[DataProvider('providerPsrBackends')]
+    public function testPsrRootHitRestoresMetadataWithoutExecutingOrStoring(string $backend): void
     {
         $scenario = new MetadataScenario($backend, CacheMetadata::top());
         $cold = $scenario->graph->root();

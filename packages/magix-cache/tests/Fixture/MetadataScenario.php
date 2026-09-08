@@ -75,14 +75,17 @@ final class MetadataScenario
     }
 
     /**
-     * Creates an empty backend; both PSR variants serialize stored values.
+     * Creates an empty backend with Symfony's default value isolation.
+     *
+     * ArrayAdapter serializes in 7.4 and deep-clones in 8.1; use its defaults
+     * because the constructor option was renamed between these versions.
      */
     public function emptyCache(): RecordingCache
     {
         return new RecordingCache(match ($this->backend) {
             'memory' => new MemoryCache(),
-            'psr6' => new CacheItemPool(new ArrayAdapter(storeSerialized: true)),
-            'psr16' => new SimpleCache(new Psr16Cache(new ArrayAdapter(storeSerialized: true)), $this->clock),
+            'psr6' => new CacheItemPool(new ArrayAdapter()),
+            'psr16' => new SimpleCache(new Psr16Cache(new ArrayAdapter()), $this->clock),
         });
     }
 

@@ -10,18 +10,19 @@ use function strrpos;
 use function substr;
 
 /**
- * Holds one cached() call site with everything declared around it.
+ * Holds an analyzed method and the declarations around its cached() call, if any.
  */
 final readonly class BoundaryDeclaration
 {
     /**
-     * Creates a cache boundary declaration.
+     * Creates a method declaration for a cache boundary or an uncached analysis entry point.
      *
      * @param list<KeyParameter> $parameters
      * @param list<DependencyCall> $dependencies
      * @param bool $hasDynamicTtl Whether an enabled #[DynamicTtl] applies to the boundary.
      * @param bool $suppliesMetadata Whether the boundary builds CacheMetadata itself.
      * @param UseStrategyDeclaration|null $useStrategy The enabled #[UseStrategy] applying to the boundary.
+     * @param bool $isCacheBoundary False for an uncached analysis entry point, whose dependencies alone supply constraints.
      */
     public function __construct(
         public string $class,
@@ -34,6 +35,7 @@ final readonly class BoundaryDeclaration
         public bool $hasDynamicTtl = false,
         public bool $suppliesMetadata = false,
         public ?UseStrategyDeclaration $useStrategy = null,
+        public bool $isCacheBoundary = true,
     ) {
     }
 

@@ -38,6 +38,38 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Graph\ParameterStrategyBinding::class)]
 final class CacheTreeTest extends TestCase
 {
+    public function testBuildKeepsUncachedRootDepthLimitsAndRecursionUnknown(): void
+    {
+        $query = new BoundaryDeclaration('App\ProductQuery', 'execute', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 20));
+        $root = new BoundaryDeclaration(
+            'App\Controller',
+            'index',
+            'b.php',
+            1,
+            dependencies: [
+                new DependencyCall('App\ProductQuery', 'execute', 2),
+                new DependencyCall('App\ProductQuery', 'execute', 3),
+                new DependencyCall('App\Controller', 'index', 4),
+            ],
+            isCacheBoundary: false,
+        );
+        $tree = new CacheTree(new Catalog([
+            new ClassDeclaration('App\ProductQuery', boundaries: [$query]),
+            new ClassDeclaration('App\Controller', entryPoints: [$root]),
+        ]));
+
+        $limited = $tree->build($root, 0);
+        self::assertSame(TtlEstimateState::Unknown, $limited->effect->ttl->state);
+        self::assertSame([], $limited->effect->problems);
+        self::assertSame(['depth limit reached, dependencies not expanded'], $limited->notes);
+        $recursive = $tree->build($root);
+        self::assertCount(2, $recursive->children);
+        self::assertSame(TtlEstimateState::Unknown, $recursive->effect->ttl->state);
+        self::assertSame(20, $recursive->effect->ttl->upperBound);
+        self::assertSame([], $recursive->effect->problems);
+        self::assertSame(['recursive dependency, not expanded again'], $recursive->children[1]->notes);
+    }
+
     public function testBuildComposesTheEffectOfEveryDependency(): void
     {
         $product = new BoundaryDeclaration(

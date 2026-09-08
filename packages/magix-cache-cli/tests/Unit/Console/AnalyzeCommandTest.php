@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Console;
 
+use JsonException;
 use Magix\Cache\Cli\Console\AnalyzeCommand;
 use Magix\Cache\Cli\Console\Application;
 use Magix\Cache\Cli\Console\CatalogLoader;
@@ -21,6 +22,92 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class AnalyzeCommandTest extends TestCase
 {
+    public function testAnalyzeComposesQueriesInjectedIntoActionParameters(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $tester->execute([
+            'boundary' => 'ProductController::injected',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('ttl          20s', $tester->getDisplay());
+        self::assertStringContainsString('tags         inventory, product', $tester->getDisplay());
+        self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
+    }
+
+    public function testAnalyzeComposesAnUncachedControllerAction(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $tester->execute([
+            'boundary' => 'ProductController::show',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $output = $tester->getDisplay();
+        self::assertStringContainsString('ProductController::show (uncached entry point)', $output);
+        self::assertStringContainsString('ttl          20s', $output);
+        self::assertStringContainsString('private (restricted by ViewerQuery::execute)', $output);
+        self::assertStringContainsString('tags         inventory, product, viewer', $output);
+        self::assertStringContainsString('key          none (uncached entry point)', $output);
+        self::assertStringContainsString('policy       none (uncached entry point)', $output);
+        self::assertStringContainsString('storable     no', $output);
+        self::assertStringContainsString('ProductQuery::execute', $output);
+        self::assertStringContainsString('InventoryQuery::execute', $output);
+        self::assertStringContainsString('ViewerQuery::execute', $output);
+        self::assertStringNotContainsString('LogicException', $output);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testAnalyzeRendersAnUncachedRootInJsonAndMermaid(): void
+    {
+        $application = (new Application(dirname(__DIR__, 5)))->console();
+        $json = new CommandTester($application->find('analyze'));
+        $mermaid = new CommandTester($application->find('analyze'));
+        $arguments = [
+            'boundary' => 'ProductController::show',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
+        ];
+
+        $json->execute([...$arguments, '--format' => 'json']);
+        $mermaid->execute([...$arguments, '--format' => 'mermaid']);
+
+        $json->assertCommandIsSuccessful();
+        $mermaid->assertCommandIsSuccessful();
+        $data = json_decode($json->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
+        self::assertSame('entry-point', $data['kind']);
+        self::assertNull($data['policy']);
+        self::assertNull($data['key']);
+        self::assertIsArray($data['effective']);
+        self::assertSame('private', $data['effective']['visibility']);
+        self::assertFalse($data['effective']['storable']);
+        self::assertSame([], $data['effective']['problems']);
+        self::assertIsArray($data['dependencies']);
+        self::assertCount(3, $data['dependencies']);
+        self::assertStringContainsString('ProductController::show (uncached entry point)<br/>20s - private', $mermaid->getDisplay());
+    }
+
+    public function testAnalyzeFollowsAnUncachedMethodCallingAnotherUncachedMethod(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $tester->execute([
+            'boundary' => 'ProductController::index',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('ttl          20s', $tester->getDisplay());
+        self::assertStringContainsString('ProductController::show (uncached entry point)', $tester->getDisplay());
+        self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
+    }
+
     public function testAnalyzeRendersTheComposedTreeOfABoundary(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));

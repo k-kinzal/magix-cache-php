@@ -11,7 +11,7 @@ use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\Catalog;
 
 /**
- * Expands one boundary into the tree of boundaries it depends on.
+ * Expands a boundary or an uncached entry point into its cache dependency tree.
  */
 final readonly class CacheTree
 {
@@ -29,7 +29,7 @@ final readonly class CacheTree
     }
 
     /**
-     * Returns the resolved tree rooted at one boundary.
+     * Returns a tree rooted at a boundary or an uncached method whose callees are composed.
      *
      * @param list<string> $visited Boundary identifiers already on the current path.
      */
@@ -57,7 +57,7 @@ final readonly class CacheTree
         $seen = [];
 
         foreach ($boundary->dependencies as $dependency) {
-            $candidates = $this->catalog->candidates($dependency->class, $dependency->method);
+            $candidates = $this->catalog->candidates($dependency->class, $dependency->method, includeEntryPoints: !$boundary->isCacheBoundary);
 
             if (count($candidates) > 1) {
                 $notes[] = $dependency->class.'::'.$dependency->method.' resolves to '.count($candidates).' implementations';

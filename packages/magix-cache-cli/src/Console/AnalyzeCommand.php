@@ -23,12 +23,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Shows how one boundary composes the caches it depends on.
+ * Shows the composed caches of a boundary or an uncached entry point.
  */
 #[AsCommand(
     name: 'analyze',
-    description: 'Shows the cache tree of one boundary with its key, TTL, scope and tags',
-    help: 'Reads the source of a project without running it and expands one cached() call site into the tree of boundaries it depends on.',
+    description: 'Shows the cache tree of a boundary or an uncached entry point',
+    help: 'Reads source without running it and composes the cache boundaries called by a cached method or an uncached entry point, such as a controller action.',
 )]
 final readonly class AnalyzeCommand
 {
@@ -47,7 +47,7 @@ final readonly class AnalyzeCommand
      */
     public function __invoke(
         SymfonyStyle $io,
-        #[Argument(description: 'Boundary to analyze, for example FooBarQuery::execute')]
+        #[Argument(description: 'Boundary or entry point to analyze, for example FooBarQuery::execute or HomeController::index')]
         string $boundary,
         #[Option(description: 'Directory or file to scan, repeatable', name: 'path')]
         array $path = [],
@@ -57,10 +57,10 @@ final readonly class AnalyzeCommand
         int $depth = 8,
     ): int {
         $catalog = $this->catalog->load($path);
-        $matches = $catalog->search($boundary);
+        $matches = $catalog->search($boundary, includeEntryPoints: true);
 
         if ($matches === []) {
-            $io->error('No cache boundary matches "'.$boundary.'".');
+            $io->error('No cache boundary or entry point matches "'.$boundary.'".');
             $io->writeln($this->suggestions($catalog->boundaries()));
 
             return Command::FAILURE;

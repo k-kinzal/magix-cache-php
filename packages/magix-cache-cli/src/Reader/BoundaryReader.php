@@ -99,6 +99,32 @@ final readonly class BoundaryReader
     }
 
     /**
+     * Reads an uncached method as an analysis entry point without applying cache attributes.
+     *
+     * Call this only after read() has established that the method has no cached() call.
+     *
+     * @param array<string, string> $propertyTypes
+     */
+    public function entryPoint(ClassMethod $method, string $class, string $file, array $propertyTypes): ?BoundaryDeclaration
+    {
+        $parameters = $this->parameters->read($method);
+        $dependencies = $this->dependencies->read($method, $class, $propertyTypes, $parameters);
+
+        if ($dependencies === []) {
+            return null;
+        }
+
+        return new BoundaryDeclaration(
+            class: $class,
+            method: $method->name->toString(),
+            file: $file,
+            line: $method->getStartLine(),
+            dependencies: $dependencies,
+            isCacheBoundary: false,
+        );
+    }
+
+    /**
      * Returns the policy a class declares for all of its boundaries.
      */
     public function classPolicy(Class_ $class): ?PolicyDeclaration

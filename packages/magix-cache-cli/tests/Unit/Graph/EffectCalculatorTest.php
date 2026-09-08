@@ -36,6 +36,42 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Visibility::class)]
 final class EffectCalculatorTest extends TestCase
 {
+    public function testComposePreservesUnknownConstraintsWithoutRequiringAPolicy(): void
+    {
+        $root = new BoundaryDeclaration('App\ProductController', 'show', 'a.php', 1, isCacheBoundary: false);
+        $ttl = TtlEstimate::unknown(20, 'runtime ttl', 0);
+        $effect = (new EffectCalculator())->calculate($root, new DependencyConstraint(
+            ttl: $ttl,
+            visibility: Visibility::Private,
+            visibilitySource: 'ViewerQuery::execute',
+            tags: ['product', 'viewer'],
+            visibilityUnknown: true,
+            tagsUnknown: true,
+        ));
+
+        self::assertSame($ttl, $effect->ttl);
+        self::assertSame(Visibility::Private, $effect->visibility);
+        self::assertSame('restricted by ViewerQuery::execute', $effect->visibilityReason);
+        self::assertSame(['product', 'viewer'], $effect->tags);
+        self::assertTrue($effect->visibilityUnknown);
+        self::assertTrue($effect->tagsUnknown);
+        self::assertFalse($effect->storable);
+        self::assertSame([], $effect->problems);
+    }
+
+    public function testAnUncachedRootPreservesNoStoreAndInvalidDependencies(): void
+    {
+        $root = new BoundaryDeclaration('App\ProductController', 'show', 'a.php', 1, isCacheBoundary: false);
+        $calculator = new EffectCalculator();
+        $noStore = $calculator->calculate($root, new DependencyConstraint(TtlEstimate::known(20), visibility: Visibility::NoStore));
+        $invalid = $calculator->calculate($root, new DependencyConstraint(TtlEstimate::invalid('a dependency is invalid')));
+
+        self::assertSame(Visibility::NoStore, $noStore->visibility);
+        self::assertFalse($noStore->storable);
+        self::assertSame(TtlEstimateState::Invalid, $invalid->ttl->state);
+        self::assertSame(['a dependency is invalid'], $invalid->problems);
+    }
+
     public function testConstrainSelectsTheEarliestExpirationAndStrictestVisibility(): void
     {
         $constraint = (new EffectCalculator())->constrain([
@@ -90,7 +126,7 @@ final class EffectCalculatorTest extends TestCase
         self::assertSame('RateQuery::execute', $constraint->ttlSource);
     }
 
-    public function testCalculateCapsAFixedTtlByItsDependencies(): void
+    public function testApplyPolicyCapsAFixedTtlByItsDependencies(): void
     {
         $boundary = new BoundaryDeclaration(
             class: 'App\PageQuery',
@@ -100,7 +136,7 @@ final class EffectCalculatorTest extends TestCase
             policy: new PolicyDeclaration(PolicySource::MethodAttribute, 120, tags: ['page']),
         );
 
-        $effect = (new EffectCalculator())->calculate(
+        $effect = (new EffectCalculator())->applyPolicy(
             $boundary,
             new DependencyConstraint(TtlEstimate::known(20), 'ProductQuery::execute', tags: ['product']),
         );

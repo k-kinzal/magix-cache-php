@@ -9,8 +9,6 @@ use function implode;
 
 use Magix\Cache\Cli\Graph\CacheNode;
 
-use function strtolower;
-
 /**
  * Renders a cache tree as a Mermaid flowchart for documentation.
  */
@@ -32,7 +30,8 @@ final readonly class MermaidRenderer
     public function statements(CacheNode $node, string $id): array
     {
         $effect = $node->effect;
-        $label = $node->boundary->shortId().'<br/>'.$effect->ttl->label().' - '.strtolower($effect->visibility->name);
+        $entryPoint = $node->boundary->isCacheBoundary ? '' : ' (uncached entry point)';
+        $label = $node->boundary->shortId().$entryPoint.'<br/>'.$effect->ttl->label().' - '.$effect->visibilityLabel();
         $statements = ['    '.$id.'["'.$label.'"]'];
         $position = 0;
 

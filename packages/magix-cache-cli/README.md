@@ -58,7 +58,7 @@ The boundary declares 120 seconds, but `ProductQuery` expires after 20, and `Vie
 
 | Command | Purpose |
 |---|---|
-| `magix analyze <boundary>` | Expands one boundary into its cache tree with keys, TTLs, scopes, and tags |
+| `magix analyze <boundary>` | Expands a cache boundary or uncached controller action into its composed cache tree |
 | `magix boundaries` | Lists every boundary of the project with its effective values |
 | `magix lint` | Reports boundaries that cannot behave the way they are declared |
 | `magix key <boundary> [arguments]` | Prints the cache key one call produces |

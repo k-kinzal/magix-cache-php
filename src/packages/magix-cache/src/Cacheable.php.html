@@ -46,19 +46,19 @@
 <span class="src-line" id="L10"><a class="ln" href="#L10">10</a></span>
 <span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-kw">use</span> <span class="tok-id">LogicException</span>;</span>
 <span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\CacheDefinitionResolver</span>;</span>
-<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\CacheInvocation</span>;</span>
-<span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\CacheRuntimeRegistry</span>;</span>
-<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-kw">use</span> <span class="tok-id">RuntimeException</span>;</span>
-<span class="src-line" id="L16"><a class="ln" href="#L16">16</a></span>
-<span class="src-line" id="L17"><a class="ln" href="#L17">17</a><span class="tok-kw">use</span> <span class="tok-kw">function</span> <span class="tok-id">str_contains</span>;</span>
-<span class="src-line" id="L18"><a class="ln" href="#L18">18</a></span>
-<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com">/**</span></span>
-<span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com"> * Adds a declarative cache boundary around one method.</span></span>
-<span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L22"><a class="ln" href="#L22">22</a><span class="tok-com"> * cached() is the anti-corruption layer between PHP and the internal model:</span></span>
-<span class="src-line" id="L23"><a class="ln" href="#L23">23</a><span class="tok-com"> * it captures the call site, resolves the static declaration, and delegates</span></span>
-<span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-com"> * to the runtime the declaration references. Policy, behaviors, and runtime</span></span>
-<span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-com"> * come from attributes alone; there is no per-call override path.</span></span>
+<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\CacheRuntimeRegistry</span>;</span>
+<span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-kw">use</span> <span class="tok-id">RuntimeException</span>;</span>
+<span class="src-line" id="L15"><a class="ln" href="#L15">15</a></span>
+<span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-kw">use</span> <span class="tok-kw">function</span> <span class="tok-id">str_contains</span>;</span>
+<span class="src-line" id="L17"><a class="ln" href="#L17">17</a></span>
+<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com">/**</span></span>
+<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com"> * Adds a declarative cache boundary around one method.</span></span>
+<span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com"> *</span></span>
+<span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com"> * cached() is the anti-corruption layer between PHP and the internal model:</span></span>
+<span class="src-line" id="L22"><a class="ln" href="#L22">22</a><span class="tok-com"> * it captures the call site, resolves the static declaration, and delegates</span></span>
+<span class="src-line" id="L23"><a class="ln" href="#L23">23</a><span class="tok-com"> * to the runtime the declaration references. Policy, behaviors, and runtime</span></span>
+<span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-com"> * come from attributes, including declared parameter bindings; there is no</span></span>
+<span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-com"> * per-call override path. Binding values are resolved before lookup.</span></span>
 <span class="src-line" id="L26"><a class="ln" href="#L26">26</a><span class="tok-com"> */</span></span>
 <span class="src-line" id="L27"><a class="ln" href="#L27">27</a><span class="tok-kw">trait</span> <span class="tok-id">Cacheable</span></span>
 <span class="src-line" id="L28"><a class="ln" href="#L28">28</a>{</span>
@@ -85,18 +85,12 @@
 <span class="src-line" id="L49"><a class="ln" href="#L49">49</a>        <span class="tok-var">$definitions</span> = <span class="tok-id">self</span>::<span class="tok-var">$magixCacheDefinitions</span> ??= <span class="tok-kw">new</span> <span class="tok-id">CacheDefinitionResolver</span>();</span>
 <span class="src-line" id="L50"><a class="ln" href="#L50">50</a>        <span class="tok-var">$definition</span> = <span class="tok-var">$definitions</span>-&gt;<span class="tok-id">resolve</span>(<span class="tok-var">$this</span>, <span class="tok-var">$caller</span>[<span class="tok-str">&#039;function&#039;</span>]);</span>
 <span class="src-line" id="L51"><a class="ln" href="#L51">51</a></span>
-<span class="src-line" id="L52"><a class="ln" href="#L52">52</a>        <span class="tok-kw">return</span> <span class="tok-id">CacheRuntimeRegistry</span>::<span class="tok-id">resolve</span>(<span class="tok-var">$definition</span>-&gt;<span class="tok-id">runtime</span>)-&gt;<span class="tok-id">execute</span>(<span class="tok-kw">new</span> <span class="tok-id">CacheInvocation</span>(</span>
-<span class="src-line" id="L53"><a class="ln" href="#L53">53</a>            <span class="tok-id">context</span>: <span class="tok-var">$definition</span>-&gt;<span class="tok-id">keyContext</span>(<span class="tok-var">$caller</span>[<span class="tok-str">&#039;args&#039;</span>] ?? []),</span>
-<span class="src-line" id="L54"><a class="ln" href="#L54">54</a>            <span class="tok-id">policy</span>: <span class="tok-var">$definition</span>-&gt;<span class="tok-id">policy</span>,</span>
-<span class="src-line" id="L55"><a class="ln" href="#L55">55</a>            <span class="tok-id">origin</span>: <span class="tok-var">$compute</span>,</span>
-<span class="src-line" id="L56"><a class="ln" href="#L56">56</a>            <span class="tok-id">staleIfError</span>: <span class="tok-var">$definition</span>-&gt;<span class="tok-id">staleIfError</span>,</span>
-<span class="src-line" id="L57"><a class="ln" href="#L57">57</a>            <span class="tok-id">dynamicTtl</span>: <span class="tok-var">$definition</span>-&gt;<span class="tok-id">dynamicTtl</span>,</span>
-<span class="src-line" id="L58"><a class="ln" href="#L58">58</a>            <span class="tok-id">bypassCacheErrors</span>: <span class="tok-var">$definition</span>-&gt;<span class="tok-id">bypassCacheErrors</span>,</span>
-<span class="src-line" id="L59"><a class="ln" href="#L59">59</a>            <span class="tok-id">strategy</span>: <span class="tok-var">$definition</span>-&gt;<span class="tok-id">strategy</span>,</span>
-<span class="src-line" id="L60"><a class="ln" href="#L60">60</a>        ));</span>
-<span class="src-line" id="L61"><a class="ln" href="#L61">61</a>    }</span>
-<span class="src-line" id="L62"><a class="ln" href="#L62">62</a>}</span>
-<span class="src-line" id="L63"><a class="ln" href="#L63">63</a></span>
+<span class="src-line" id="L52"><a class="ln" href="#L52">52</a>        <span class="tok-kw">return</span> <span class="tok-id">CacheRuntimeRegistry</span>::<span class="tok-id">resolve</span>(<span class="tok-var">$definition</span>-&gt;<span class="tok-id">runtime</span>)-&gt;<span class="tok-id">execute</span>(</span>
+<span class="src-line" id="L53"><a class="ln" href="#L53">53</a>            <span class="tok-var">$definition</span>-&gt;<span class="tok-id">invocation</span>(<span class="tok-var">$caller</span>[<span class="tok-str">&#039;args&#039;</span>] ?? [], <span class="tok-var">$compute</span>),</span>
+<span class="src-line" id="L54"><a class="ln" href="#L54">54</a>        );</span>
+<span class="src-line" id="L55"><a class="ln" href="#L55">55</a>    }</span>
+<span class="src-line" id="L56"><a class="ln" href="#L56">56</a>}</span>
+<span class="src-line" id="L57"><a class="ln" href="#L57">57</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

@@ -43,75 +43,80 @@
 <span class="src-line" id="L7"><a class="ln" href="#L7">7</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Declaration\Catalog</span>;</span>
 <span class="src-line" id="L8"><a class="ln" href="#L8">8</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Graph\CacheNode</span>;</span>
 <span class="src-line" id="L9"><a class="ln" href="#L9">9</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Graph\EffectCalculator</span>;</span>
-<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Graph\TtlEstimateState</span>;</span>
-<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Lint\Diagnostic</span>;</span>
-<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Lint\LintRule</span>;</span>
-<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Lint\Severity</span>;</span>
-<span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Policy\Ttl</span>;</span>
-<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-kw">use</span> <span class="tok-id">Override</span>;</span>
-<span class="src-line" id="L16"><a class="ln" href="#L16">16</a></span>
-<span class="src-line" id="L17"><a class="ln" href="#L17">17</a><span class="tok-com">/**</span></span>
-<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com"> * Reports derived TTLs whose finite upstream expiration never exists.</span></span>
-<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com"> * An upstream that is confirmed unconstrained is an error, because applying</span></span>
-<span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com"> * the policy throws at runtime. An upstream the analyzer cannot decide is</span></span>
-<span class="src-line" id="L22"><a class="ln" href="#L22">22</a><span class="tok-com"> * only a conditional requirement and is reported as a notice.</span></span>
-<span class="src-line" id="L23"><a class="ln" href="#L23">23</a><span class="tok-com"> */</span></span>
-<span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">AutoTtlWithoutUpstreamRule</span> <span class="tok-kw">implements</span> <span class="tok-id">LintRule</span></span>
-<span class="src-line" id="L25"><a class="ln" href="#L25">25</a>{</span>
-<span class="src-line" id="L26"><a class="ln" href="#L26">26</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L27"><a class="ln" href="#L27">27</a><span class="tok-com">     * Creates the rule.</span></span>
-<span class="src-line" id="L28"><a class="ln" href="#L28">28</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L29"><a class="ln" href="#L29">29</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(<span class="tok-kw">private</span> <span class="tok-id">EffectCalculator</span> <span class="tok-var">$effects</span> = <span class="tok-kw">new</span> <span class="tok-id">EffectCalculator</span>())</span>
-<span class="src-line" id="L30"><a class="ln" href="#L30">30</a>    {</span>
-<span class="src-line" id="L31"><a class="ln" href="#L31">31</a>    }</span>
-<span class="src-line" id="L32"><a class="ln" href="#L32">32</a></span>
-<span class="src-line" id="L33"><a class="ln" href="#L33">33</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L34"><a class="ln" href="#L34">34</a><span class="tok-com">     * Returns a finding when a derived TTL has nothing to derive from.</span></span>
-<span class="src-line" id="L35"><a class="ln" href="#L35">35</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L36"><a class="ln" href="#L36">36</a><span class="tok-com">     * @return list&lt;Diagnostic&gt;</span></span>
-<span class="src-line" id="L37"><a class="ln" href="#L37">37</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L38"><a class="ln" href="#L38">38</a>    #[<span class="tok-id">Override</span>]</span>
-<span class="src-line" id="L39"><a class="ln" href="#L39">39</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">check</span>(<span class="tok-id">CacheNode</span> <span class="tok-var">$node</span>, <span class="tok-id">Catalog</span> <span class="tok-var">$catalog</span>): <span class="tok-kw">array</span></span>
-<span class="src-line" id="L40"><a class="ln" href="#L40">40</a>    {</span>
-<span class="src-line" id="L41"><a class="ln" href="#L41">41</a>        <span class="tok-kw">unset</span>(<span class="tok-var">$catalog</span>);</span>
-<span class="src-line" id="L42"><a class="ln" href="#L42">42</a>        <span class="tok-var">$boundary</span> = <span class="tok-var">$node</span>-&gt;<span class="tok-id">boundary</span>;</span>
-<span class="src-line" id="L43"><a class="ln" href="#L43">43</a>        <span class="tok-var">$declared</span> = <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">policy</span>?-&gt;<span class="tok-id">ttl</span>;</span>
-<span class="src-line" id="L44"><a class="ln" href="#L44">44</a></span>
-<span class="src-line" id="L45"><a class="ln" href="#L45">45</a>        <span class="tok-kw">if</span> (!<span class="tok-var">$declared</span> <span class="tok-kw">instanceof</span> <span class="tok-id">Ttl</span> || <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">suppliesMetadata</span> || <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">hasDynamicTtl</span>) {</span>
-<span class="src-line" id="L46"><a class="ln" href="#L46">46</a>            <span class="tok-kw">return</span> [];</span>
-<span class="src-line" id="L47"><a class="ln" href="#L47">47</a>        }</span>
-<span class="src-line" id="L48"><a class="ln" href="#L48">48</a></span>
-<span class="src-line" id="L49"><a class="ln" href="#L49">49</a>        <span class="tok-var">$upstream</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">effects</span>-&gt;<span class="tok-id">constrain</span>(<span class="tok-var">$node</span>-&gt;<span class="tok-id">children</span>)-&gt;<span class="tok-id">ttl</span>;</span>
-<span class="src-line" id="L50"><a class="ln" href="#L50">50</a></span>
-<span class="src-line" id="L51"><a class="ln" href="#L51">51</a>        <span class="tok-kw">if</span> (<span class="tok-var">$upstream</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unconstrained</span>) {</span>
-<span class="src-line" id="L52"><a class="ln" href="#L52">52</a>            <span class="tok-kw">return</span> [<span class="tok-kw">new</span> <span class="tok-id">Diagnostic</span>(</span>
-<span class="src-line" id="L53"><a class="ln" href="#L53">53</a>                <span class="tok-id">rule</span>: <span class="tok-str">&#039;auto-ttl-without-upstream&#039;</span>,</span>
-<span class="src-line" id="L54"><a class="ln" href="#L54">54</a>                <span class="tok-id">severity</span>: <span class="tok-id">Severity</span>::<span class="tok-id">Error</span>,</span>
-<span class="src-line" id="L55"><a class="ln" href="#L55">55</a>                <span class="tok-id">boundary</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">id</span>(),</span>
-<span class="src-line" id="L56"><a class="ln" href="#L56">56</a>                <span class="tok-id">file</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">file</span>,</span>
-<span class="src-line" id="L57"><a class="ln" href="#L57">57</a>                <span class="tok-id">line</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">line</span>,</span>
-<span class="src-line" id="L58"><a class="ln" href="#L58">58</a>                <span class="tok-id">message</span>: <span class="tok-str">&#039;Ttl::&#039;</span>.<span class="tok-var">$declared</span>-&gt;<span class="tok-id">name</span>.<span class="tok-str">&#039; has no dependency with a finite expiration, so applying the policy throws a LogicException.&#039;</span>,</span>
-<span class="src-line" id="L59"><a class="ln" href="#L59">59</a>                <span class="tok-id">hint</span>: <span class="tok-str">&#039;Declare a fixed ttl, depend on a cached query, or supply CacheMetadata with an expiration.&#039;</span>,</span>
-<span class="src-line" id="L60"><a class="ln" href="#L60">60</a>            )];</span>
-<span class="src-line" id="L61"><a class="ln" href="#L61">61</a>        }</span>
-<span class="src-line" id="L62"><a class="ln" href="#L62">62</a></span>
-<span class="src-line" id="L63"><a class="ln" href="#L63">63</a>        <span class="tok-kw">if</span> (<span class="tok-var">$upstream</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span>) {</span>
-<span class="src-line" id="L64"><a class="ln" href="#L64">64</a>            <span class="tok-kw">return</span> [<span class="tok-kw">new</span> <span class="tok-id">Diagnostic</span>(</span>
-<span class="src-line" id="L65"><a class="ln" href="#L65">65</a>                <span class="tok-id">rule</span>: <span class="tok-str">&#039;auto-ttl-without-upstream&#039;</span>,</span>
-<span class="src-line" id="L66"><a class="ln" href="#L66">66</a>                <span class="tok-id">severity</span>: <span class="tok-id">Severity</span>::<span class="tok-id">Notice</span>,</span>
-<span class="src-line" id="L67"><a class="ln" href="#L67">67</a>                <span class="tok-id">boundary</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">id</span>(),</span>
-<span class="src-line" id="L68"><a class="ln" href="#L68">68</a>                <span class="tok-id">file</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">file</span>,</span>
-<span class="src-line" id="L69"><a class="ln" href="#L69">69</a>                <span class="tok-id">line</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">line</span>,</span>
-<span class="src-line" id="L70"><a class="ln" href="#L70">70</a>                <span class="tok-id">message</span>: <span class="tok-str">&#039;Ttl::&#039;</span>.<span class="tok-var">$declared</span>-&gt;<span class="tok-id">name</span>.<span class="tok-str">&#039; requires a finite upstream expiration at runtime, and whether one exists cannot be determined statically.&#039;</span>,</span>
-<span class="src-line" id="L71"><a class="ln" href="#L71">71</a>                <span class="tok-id">hint</span>: <span class="tok-str">&#039;Confirm the dependencies always carry a finite expiration, or declare a fixed ttl.&#039;</span>,</span>
-<span class="src-line" id="L72"><a class="ln" href="#L72">72</a>            )];</span>
-<span class="src-line" id="L73"><a class="ln" href="#L73">73</a>        }</span>
-<span class="src-line" id="L74"><a class="ln" href="#L74">74</a></span>
-<span class="src-line" id="L75"><a class="ln" href="#L75">75</a>        <span class="tok-kw">return</span> [];</span>
-<span class="src-line" id="L76"><a class="ln" href="#L76">76</a>    }</span>
-<span class="src-line" id="L77"><a class="ln" href="#L77">77</a>}</span>
-<span class="src-line" id="L78"><a class="ln" href="#L78">78</a></span>
+<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Graph\ParameterEffects</span>;</span>
+<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Graph\TtlEstimateState</span>;</span>
+<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Lint\Diagnostic</span>;</span>
+<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Lint\LintRule</span>;</span>
+<span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cli\Lint\Severity</span>;</span>
+<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Policy\Ttl</span>;</span>
+<span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-kw">use</span> <span class="tok-id">Override</span>;</span>
+<span class="src-line" id="L17"><a class="ln" href="#L17">17</a></span>
+<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com">/**</span></span>
+<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com"> * Reports derived TTLs whose finite upstream expiration never exists.</span></span>
+<span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com"> *</span></span>
+<span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com"> * An upstream that is confirmed unconstrained is an error, because applying</span></span>
+<span class="src-line" id="L22"><a class="ln" href="#L22">22</a><span class="tok-com"> * the policy throws at runtime. An upstream the analyzer cannot decide is</span></span>
+<span class="src-line" id="L23"><a class="ln" href="#L23">23</a><span class="tok-com"> * only a conditional requirement and is reported as a notice.</span></span>
+<span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-com"> */</span></span>
+<span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">AutoTtlWithoutUpstreamRule</span> <span class="tok-kw">implements</span> <span class="tok-id">LintRule</span></span>
+<span class="src-line" id="L26"><a class="ln" href="#L26">26</a>{</span>
+<span class="src-line" id="L27"><a class="ln" href="#L27">27</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L28"><a class="ln" href="#L28">28</a><span class="tok-com">     * Creates the rule.</span></span>
+<span class="src-line" id="L29"><a class="ln" href="#L29">29</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L30"><a class="ln" href="#L30">30</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(<span class="tok-kw">private</span> <span class="tok-id">EffectCalculator</span> <span class="tok-var">$effects</span> = <span class="tok-kw">new</span> <span class="tok-id">EffectCalculator</span>())</span>
+<span class="src-line" id="L31"><a class="ln" href="#L31">31</a>    {</span>
+<span class="src-line" id="L32"><a class="ln" href="#L32">32</a>    }</span>
+<span class="src-line" id="L33"><a class="ln" href="#L33">33</a></span>
+<span class="src-line" id="L34"><a class="ln" href="#L34">34</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L35"><a class="ln" href="#L35">35</a><span class="tok-com">     * Returns a finding when a derived TTL has nothing to derive from.</span></span>
+<span class="src-line" id="L36"><a class="ln" href="#L36">36</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L37"><a class="ln" href="#L37">37</a><span class="tok-com">     * @return list&lt;Diagnostic&gt;</span></span>
+<span class="src-line" id="L38"><a class="ln" href="#L38">38</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L39"><a class="ln" href="#L39">39</a>    #[<span class="tok-id">Override</span>]</span>
+<span class="src-line" id="L40"><a class="ln" href="#L40">40</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">check</span>(<span class="tok-id">CacheNode</span> <span class="tok-var">$node</span>, <span class="tok-id">Catalog</span> <span class="tok-var">$catalog</span>): <span class="tok-kw">array</span></span>
+<span class="src-line" id="L41"><a class="ln" href="#L41">41</a>    {</span>
+<span class="src-line" id="L42"><a class="ln" href="#L42">42</a>        <span class="tok-kw">unset</span>(<span class="tok-var">$catalog</span>);</span>
+<span class="src-line" id="L43"><a class="ln" href="#L43">43</a>        <span class="tok-var">$boundary</span> = <span class="tok-var">$node</span>-&gt;<span class="tok-id">boundary</span>;</span>
+<span class="src-line" id="L44"><a class="ln" href="#L44">44</a>        <span class="tok-var">$declared</span> = <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">policy</span>?-&gt;<span class="tok-id">ttl</span>;</span>
+<span class="src-line" id="L45"><a class="ln" href="#L45">45</a></span>
+<span class="src-line" id="L46"><a class="ln" href="#L46">46</a>        <span class="tok-kw">if</span> (!<span class="tok-var">$declared</span> <span class="tok-kw">instanceof</span> <span class="tok-id">Ttl</span> || <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">suppliesMetadata</span> || <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">hasDynamicTtl</span>) {</span>
+<span class="src-line" id="L47"><a class="ln" href="#L47">47</a>            <span class="tok-kw">return</span> [];</span>
+<span class="src-line" id="L48"><a class="ln" href="#L48">48</a>        }</span>
+<span class="src-line" id="L49"><a class="ln" href="#L49">49</a></span>
+<span class="src-line" id="L50"><a class="ln" href="#L50">50</a>        <span class="tok-kw">if</span> ((<span class="tok-kw">new</span> <span class="tok-id">ParameterEffects</span>())-&gt;<span class="tok-id">ttl</span>(<span class="tok-var">$boundary</span>) !== <span class="tok-id">null</span> || <span class="tok-var">$node</span>-&gt;<span class="tok-id">effect</span>-&gt;<span class="tok-id">strategy</span>?-&gt;<span class="tok-id">addsConstraint</span> === <span class="tok-id">true</span>) {</span>
+<span class="src-line" id="L51"><a class="ln" href="#L51">51</a>            <span class="tok-kw">return</span> [];</span>
+<span class="src-line" id="L52"><a class="ln" href="#L52">52</a>        }</span>
+<span class="src-line" id="L53"><a class="ln" href="#L53">53</a></span>
+<span class="src-line" id="L54"><a class="ln" href="#L54">54</a>        <span class="tok-var">$upstream</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">effects</span>-&gt;<span class="tok-id">constrain</span>(<span class="tok-var">$node</span>-&gt;<span class="tok-id">children</span>)-&gt;<span class="tok-id">ttl</span>;</span>
+<span class="src-line" id="L55"><a class="ln" href="#L55">55</a></span>
+<span class="src-line" id="L56"><a class="ln" href="#L56">56</a>        <span class="tok-kw">if</span> (<span class="tok-var">$upstream</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unconstrained</span>) {</span>
+<span class="src-line" id="L57"><a class="ln" href="#L57">57</a>            <span class="tok-kw">return</span> [<span class="tok-kw">new</span> <span class="tok-id">Diagnostic</span>(</span>
+<span class="src-line" id="L58"><a class="ln" href="#L58">58</a>                <span class="tok-id">rule</span>: <span class="tok-str">&#039;auto-ttl-without-upstream&#039;</span>,</span>
+<span class="src-line" id="L59"><a class="ln" href="#L59">59</a>                <span class="tok-id">severity</span>: <span class="tok-id">Severity</span>::<span class="tok-id">Error</span>,</span>
+<span class="src-line" id="L60"><a class="ln" href="#L60">60</a>                <span class="tok-id">boundary</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">id</span>(),</span>
+<span class="src-line" id="L61"><a class="ln" href="#L61">61</a>                <span class="tok-id">file</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">file</span>,</span>
+<span class="src-line" id="L62"><a class="ln" href="#L62">62</a>                <span class="tok-id">line</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">line</span>,</span>
+<span class="src-line" id="L63"><a class="ln" href="#L63">63</a>                <span class="tok-id">message</span>: <span class="tok-str">&#039;Ttl::&#039;</span>.<span class="tok-var">$declared</span>-&gt;<span class="tok-id">name</span>.<span class="tok-str">&#039; has no dependency with a finite expiration, so applying the policy throws a LogicException.&#039;</span>,</span>
+<span class="src-line" id="L64"><a class="ln" href="#L64">64</a>                <span class="tok-id">hint</span>: <span class="tok-str">&#039;Declare a fixed ttl, depend on a cached query, or supply CacheMetadata with an expiration.&#039;</span>,</span>
+<span class="src-line" id="L65"><a class="ln" href="#L65">65</a>            )];</span>
+<span class="src-line" id="L66"><a class="ln" href="#L66">66</a>        }</span>
+<span class="src-line" id="L67"><a class="ln" href="#L67">67</a></span>
+<span class="src-line" id="L68"><a class="ln" href="#L68">68</a>        <span class="tok-kw">if</span> (<span class="tok-var">$upstream</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span>) {</span>
+<span class="src-line" id="L69"><a class="ln" href="#L69">69</a>            <span class="tok-kw">return</span> [<span class="tok-kw">new</span> <span class="tok-id">Diagnostic</span>(</span>
+<span class="src-line" id="L70"><a class="ln" href="#L70">70</a>                <span class="tok-id">rule</span>: <span class="tok-str">&#039;auto-ttl-without-upstream&#039;</span>,</span>
+<span class="src-line" id="L71"><a class="ln" href="#L71">71</a>                <span class="tok-id">severity</span>: <span class="tok-id">Severity</span>::<span class="tok-id">Notice</span>,</span>
+<span class="src-line" id="L72"><a class="ln" href="#L72">72</a>                <span class="tok-id">boundary</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">id</span>(),</span>
+<span class="src-line" id="L73"><a class="ln" href="#L73">73</a>                <span class="tok-id">file</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">file</span>,</span>
+<span class="src-line" id="L74"><a class="ln" href="#L74">74</a>                <span class="tok-id">line</span>: <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">line</span>,</span>
+<span class="src-line" id="L75"><a class="ln" href="#L75">75</a>                <span class="tok-id">message</span>: <span class="tok-str">&#039;Ttl::&#039;</span>.<span class="tok-var">$declared</span>-&gt;<span class="tok-id">name</span>.<span class="tok-str">&#039; requires a finite upstream expiration at runtime, and whether one exists cannot be determined statically.&#039;</span>,</span>
+<span class="src-line" id="L76"><a class="ln" href="#L76">76</a>                <span class="tok-id">hint</span>: <span class="tok-str">&#039;Confirm the dependencies always carry a finite expiration, or declare a fixed ttl.&#039;</span>,</span>
+<span class="src-line" id="L77"><a class="ln" href="#L77">77</a>            )];</span>
+<span class="src-line" id="L78"><a class="ln" href="#L78">78</a>        }</span>
+<span class="src-line" id="L79"><a class="ln" href="#L79">79</a></span>
+<span class="src-line" id="L80"><a class="ln" href="#L80">80</a>        <span class="tok-kw">return</span> [];</span>
+<span class="src-line" id="L81"><a class="ln" href="#L81">81</a>    }</span>
+<span class="src-line" id="L82"><a class="ln" href="#L82">82</a>}</span>
+<span class="src-line" id="L83"><a class="ln" href="#L83">83</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

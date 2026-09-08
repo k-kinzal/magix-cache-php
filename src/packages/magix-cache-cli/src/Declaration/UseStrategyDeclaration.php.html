@@ -77,19 +77,25 @@
 <span class="src-line" id="L41"><a class="ln" href="#L41">41</a>        <span class="tok-kw">foreach</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">arguments</span> <span class="tok-kw">as</span> <span class="tok-var">$name</span> =&gt; <span class="tok-var">$value</span>) {</span>
 <span class="src-line" id="L42"><a class="ln" href="#L42">42</a>            <span class="tok-var">$prefix</span> = <span class="tok-id">is_int</span>(<span class="tok-var">$name</span>) ? <span class="tok-str">&#039;&#039;</span> : <span class="tok-var">$name</span>.<span class="tok-str">&#039;: &#039;</span>;</span>
 <span class="src-line" id="L43"><a class="ln" href="#L43">43</a></span>
-<span class="src-line" id="L44"><a class="ln" href="#L44">44</a>            <span class="tok-kw">if</span> (<span class="tok-var">$value</span> === <span class="tok-id">Unresolved</span>::<span class="tok-id">Value</span>) {</span>
-<span class="src-line" id="L45"><a class="ln" href="#L45">45</a>                <span class="tok-var">$rendered</span>[] = <span class="tok-var">$prefix</span>.<span class="tok-str">&#039;?&#039;</span>;</span>
+<span class="src-line" id="L44"><a class="ln" href="#L44">44</a>            <span class="tok-kw">if</span> (<span class="tok-var">$value</span> <span class="tok-kw">instanceof</span> <span class="tok-id">ParameterReference</span>) {</span>
+<span class="src-line" id="L45"><a class="ln" href="#L45">45</a>                <span class="tok-var">$rendered</span>[] = <span class="tok-var">$prefix</span>.<span class="tok-str">&#039;$&#039;</span>.<span class="tok-var">$value</span>-&gt;<span class="tok-id">name</span>;</span>
 <span class="src-line" id="L46"><a class="ln" href="#L46">46</a></span>
 <span class="src-line" id="L47"><a class="ln" href="#L47">47</a>                <span class="tok-kw">continue</span>;</span>
 <span class="src-line" id="L48"><a class="ln" href="#L48">48</a>            }</span>
 <span class="src-line" id="L49"><a class="ln" href="#L49">49</a></span>
-<span class="src-line" id="L50"><a class="ln" href="#L50">50</a>            <span class="tok-var">$rendered</span>[] = <span class="tok-var">$prefix</span>.(<span class="tok-id">is_string</span>(<span class="tok-var">$value</span>) ? <span class="tok-str">&quot;&#039;&quot;</span>.<span class="tok-var">$value</span>.<span class="tok-str">&quot;&#039;&quot;</span> : <span class="tok-id">var_export</span>(<span class="tok-var">$value</span>, <span class="tok-id">true</span>));</span>
-<span class="src-line" id="L51"><a class="ln" href="#L51">51</a>        }</span>
+<span class="src-line" id="L50"><a class="ln" href="#L50">50</a>            <span class="tok-kw">if</span> (<span class="tok-var">$value</span> === <span class="tok-id">Unresolved</span>::<span class="tok-id">Value</span>) {</span>
+<span class="src-line" id="L51"><a class="ln" href="#L51">51</a>                <span class="tok-var">$rendered</span>[] = <span class="tok-var">$prefix</span>.<span class="tok-str">&#039;?&#039;</span>;</span>
 <span class="src-line" id="L52"><a class="ln" href="#L52">52</a></span>
-<span class="src-line" id="L53"><a class="ln" href="#L53">53</a>        <span class="tok-kw">return</span> <span class="tok-var">$class</span>.<span class="tok-str">&#039;::create(&#039;</span>.<span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$rendered</span>).<span class="tok-str">&#039;)&#039;</span>;</span>
-<span class="src-line" id="L54"><a class="ln" href="#L54">54</a>    }</span>
-<span class="src-line" id="L55"><a class="ln" href="#L55">55</a>}</span>
-<span class="src-line" id="L56"><a class="ln" href="#L56">56</a></span>
+<span class="src-line" id="L53"><a class="ln" href="#L53">53</a>                <span class="tok-kw">continue</span>;</span>
+<span class="src-line" id="L54"><a class="ln" href="#L54">54</a>            }</span>
+<span class="src-line" id="L55"><a class="ln" href="#L55">55</a></span>
+<span class="src-line" id="L56"><a class="ln" href="#L56">56</a>            <span class="tok-var">$rendered</span>[] = <span class="tok-var">$prefix</span>.(<span class="tok-id">is_string</span>(<span class="tok-var">$value</span>) ? <span class="tok-str">&quot;&#039;&quot;</span>.<span class="tok-var">$value</span>.<span class="tok-str">&quot;&#039;&quot;</span> : <span class="tok-id">var_export</span>(<span class="tok-var">$value</span>, <span class="tok-id">true</span>));</span>
+<span class="src-line" id="L57"><a class="ln" href="#L57">57</a>        }</span>
+<span class="src-line" id="L58"><a class="ln" href="#L58">58</a></span>
+<span class="src-line" id="L59"><a class="ln" href="#L59">59</a>        <span class="tok-kw">return</span> <span class="tok-var">$class</span>.<span class="tok-str">&#039;::create(&#039;</span>.<span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$rendered</span>).<span class="tok-str">&#039;)&#039;</span>;</span>
+<span class="src-line" id="L60"><a class="ln" href="#L60">60</a>    }</span>
+<span class="src-line" id="L61"><a class="ln" href="#L61">61</a>}</span>
+<span class="src-line" id="L62"><a class="ln" href="#L62">62</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

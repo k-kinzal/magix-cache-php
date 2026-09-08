@@ -31,7 +31,7 @@ final readonly class TreeRenderer
             '',
             ...$this->strategy($effect),
             '  ttl          '.$this->ttl($effect),
-            '  visibility   '.$effect->visibilityLabel()
+            '  visibility   '.$this->restricted($effect->visibilityLabel(), $effect, 'visibility')
                 .($effect->visibilityReason === null ? '' : ' ('.$effect->visibilityReason.')'),
             '  storable     '.($effect->storable ? 'yes' : 'no'),
             '  tags         '.$effect->tagsLabel(),
@@ -108,7 +108,7 @@ final readonly class TreeRenderer
     {
         $effect = $node->effect;
         $declared = $node->boundary->policy;
-        $ttl = 'ttl '.$this->estimate($effect->ttl);
+        $ttl = 'ttl '.$this->restricted($this->estimate($effect->ttl), $effect, 'ttl');
 
         if ($declared !== null && $declared->ttlLabel() !== $effect->ttl->label()) {
             $ttl .= ' (declared '.$declared->ttlLabel().')';
@@ -117,7 +117,7 @@ final readonly class TreeRenderer
         $parts = [
             '<options=bold>'.$node->boundary->shortId().'</>'.($node->boundary->isCacheBoundary ? '' : ' (uncached entry point)'),
             $ttl,
-            $effect->visibilityLabel(),
+            $this->restricted($effect->visibilityLabel(), $effect, 'visibility'),
         ];
 
         if ($effect->tags !== [] || $effect->tagsUnknown) {
@@ -132,7 +132,25 @@ final readonly class TreeRenderer
      */
     public function ttl(CacheEffect $effect): string
     {
-        return $this->labelled($effect->ttl);
+        $ttl = $this->restricted($this->estimate($effect->ttl), $effect, 'ttl');
+
+        return $effect->ttl->reason === null ? $ttl : $ttl.' ('.$effect->ttl->reason.')';
+    }
+
+    /**
+     * Highlights a locally restricted field without adding text to the report.
+     *
+     * @param 'ttl'|'visibility' $field
+     */
+    public function restricted(string $label, CacheEffect $effect, string $field): string
+    {
+        if (!isset($effect->localRestrictions[$field])) {
+            return $label;
+        }
+
+        $label = $field === 'ttl' ? $effect->ttl->label() : $label;
+
+        return '<fg=yellow>'.$label.'</>';
     }
 
     /**

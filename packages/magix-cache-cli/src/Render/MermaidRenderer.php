@@ -33,6 +33,11 @@ final readonly class MermaidRenderer
         $entryPoint = $node->boundary->isCacheBoundary ? '' : ' (uncached entry point)';
         $label = $node->boundary->shortId().$entryPoint.'<br/>'.$effect->ttl->label().' - '.$effect->visibilityLabel();
         $statements = ['    '.$id.'["'.$label.'"]'];
+
+        if ($effect->localRestrictions !== []) {
+            $statements[] = '    style '.$id.' fill:#fff3cd,stroke:#b58100,color:#664d03';
+        }
+
         $position = 0;
 
         foreach ($node->children as $child) {

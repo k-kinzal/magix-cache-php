@@ -32,6 +32,18 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class TreeRendererTest extends TestCase
 {
+    public function testRestrictedReplacesKnownTtlColorAndKeepsUnrestrictedFields(): void
+    {
+        $renderer = new TreeRenderer();
+        $effect = new CacheEffect(ttl: TtlEstimate::known(20), localRestrictions: ['ttl' => 'local ttl 20s; composed 60s']);
+
+        self::assertSame(
+            '<fg=yellow>20s</>',
+            $renderer->restricted($renderer->estimate($effect->ttl), $effect, 'ttl'),
+        );
+        self::assertSame('shared', $renderer->restricted('shared', $effect, 'visibility'));
+    }
+
     public function testRenderShowsTheEffectiveValuesOfTheRootBoundary(): void
     {
         $node = new CacheNode(

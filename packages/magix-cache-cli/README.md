@@ -12,7 +12,8 @@ The result answers the questions that are otherwise only observable in productio
 - Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node
 - Optional ordinary method calls with `--show-uncached`, and independent subtree filters with repeatable `--ignore` patterns
 - The reason behind each effective value, such as which dependency capped a TTL or made a result private
-- Yellow highlights where local TTL, `maxTtl`, or visibility settings restrict composed metadata, making bubbling stops visible
+- White rows for provably storable caches and gray rows for other nodes, so the extent of cache bubbling is visible at a glance
+- Yellow fields where local TTL, `maxTtl`, or visibility settings restrict a storable result
 - Composed strategy contracts, bound to the same `create()` the runtime calls, with candidate ranges such as `30-60s` kept apart from the effective TTL
 - The default hash strategy's cache key for a call in the configured runtime namespace
 - Tree, JSON, and Mermaid output for terminals, editors, and documentation
@@ -53,6 +54,8 @@ ProductPageQuery::execute  ttl 20s (declared 120s)  private  tags inventory,page
 ```
 
 The boundary declares 120 seconds, but `ProductQuery` expires after 20, and `ViewerQuery` is personalized, so the page is stored privately for 20 seconds. Nothing needs to be executed to see this.
+
+In a color terminal, these storable boundaries appear white. A `NoStore` result and the parents it constrains appear gray, while stored children remain white. Uncached methods, missing `#[Cache]` declarations, zero TTLs, and results whose storage depends on runtime values are also gray. `shared` and `private` retain their text labels without separate colors. Use `--ansi` to force colors or `--no-ansi` for plain text.
 
 For a parent that only bubbles up child constraints, declare `#[Cache]` without a TTL. The tree shows the effective values directly, without a `(declared Ttl::Auto)` annotation, and the policy row uses `#[Cache]` (or includes any additional options). Explicit `ttl: Ttl::Auto` renders the same way. Fixed TTL declarations, upstream caps, and unknown or invalid lifetime diagnostics remain visible; JSON retains the normalized TTL mode in `policy.ttl`.
 

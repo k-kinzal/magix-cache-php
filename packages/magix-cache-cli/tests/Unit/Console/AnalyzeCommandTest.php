@@ -75,7 +75,7 @@ final class AnalyzeCommandTest extends TestCase
         $tester->assertCommandIsSuccessful();
         self::assertStringContainsString("\033[33m10s\033[39m", $tester->getDisplay());
         self::assertStringContainsString("\033[33mprivate\033[39m", $tester->getDisplay());
-        self::assertStringContainsString("\033[32m60s\033[39m", $tester->getDisplay());
+        self::assertStringContainsString("\033[37m  ttl 60s  shared  tags inventory\033[39m", $tester->getDisplay());
         self::assertStringNotContainsString('local restriction:', $tester->getDisplay());
 
         $tester->execute([...$arguments, 'boundary' => 'RestrictedPageQuery::show'], ['decorated' => false]);

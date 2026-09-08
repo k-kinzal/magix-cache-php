@@ -27,7 +27,7 @@ final readonly class TreeRenderer
     {
         $effect = $node->effect;
         $lines = [
-            '<options=bold>'.$node->boundary->id().'</>',
+            $this->highlight($node->boundary->id(), $node, bold: true),
             '  '.$node->boundary->file.':'.$node->boundary->line,
             '',
             ...$this->strategy($effect),
@@ -41,7 +41,7 @@ final readonly class TreeRenderer
             '',
         ];
 
-        return implode("\n", array_merge($lines, $this->lines($node)))."\n";
+        return $this->highlight(implode("\n", $lines), $node)."\n".implode("\n", $this->lines($node))."\n";
     }
 
     /**
@@ -89,7 +89,7 @@ final readonly class TreeRenderer
         }
 
         foreach ($node->notes as $note) {
-            $lines[] = $indent.'    <fg=yellow>~ '.$note.'</>';
+            $lines[] = $indent.'    <fg=gray>~ '.$note.'</>';
         }
 
         $remaining = count($node->children);
@@ -110,7 +110,7 @@ final readonly class TreeRenderer
     public function summary(CacheNode $node, bool $root = true): string
     {
         if (!$root && !$node->boundary->isCacheBoundary) {
-            return '<options=bold>'.$node->boundary->shortId().'</> (uncached)';
+            return $this->highlight($this->highlight($node->boundary->shortId(), $node, bold: true).' (uncached)', $node);
         }
 
         $effect = $node->effect;
@@ -122,7 +122,7 @@ final readonly class TreeRenderer
         }
 
         $parts = [
-            '<options=bold>'.$node->boundary->shortId().'</>'.($node->boundary->isCacheBoundary ? '' : ' (uncached entry point)'),
+            $this->highlight($node->boundary->shortId(), $node, bold: true).($node->boundary->isCacheBoundary ? '' : ' (uncached entry point)'),
             $ttl,
             $this->restricted($effect->visibilityLabel(), $effect, 'visibility'),
         ];
@@ -131,7 +131,20 @@ final readonly class TreeRenderer
             $parts[] = 'tags '.$effect->tagsLabel(',');
         }
 
-        return implode('  ', $parts);
+        return $this->highlight(implode('  ', $parts), $node);
+    }
+
+    /**
+     * Uses white for provably storable boundaries and gray for every other node.
+     *
+     * Runtime-dependent effects remain gray because storage is not proven.
+     * Nested bold labels repeat the foreground because Console styles do not inherit it.
+     */
+    public function highlight(string $label, CacheNode $node, bool $bold = false): string
+    {
+        $color = $node->effect->storable ? 'white' : 'gray';
+
+        return '<fg='.$color.($bold ? ';options=bold' : '').'>'.$label.'</>';
     }
 
     /**
@@ -145,13 +158,13 @@ final readonly class TreeRenderer
     }
 
     /**
-     * Highlights a locally restricted field without adding text to the report.
+     * Highlights a locally restricted field only while the result remains storable.
      *
      * @param 'ttl'|'visibility' $field
      */
     public function restricted(string $label, CacheEffect $effect, string $field): string
     {
-        if (!isset($effect->localRestrictions[$field])) {
+        if (!$effect->storable || !isset($effect->localRestrictions[$field])) {
             return $label;
         }
 
@@ -176,7 +189,6 @@ final readonly class TreeRenderer
     public function estimate(TtlEstimate $estimate): string
     {
         return match ($estimate->state) {
-            TtlEstimateState::Known => '<fg=green>'.$estimate->label().'</>',
             TtlEstimateState::Invalid => '<fg=red>invalid</>',
             default => $estimate->label(),
         };

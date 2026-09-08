@@ -66,9 +66,17 @@ final readonly class EffectCalculator
     }
 
     /**
-     * Returns the metadata a boundary produces once its policy is applied.
+     * Returns a boundary's effective metadata or an uncached entry point's composed constraints.
      */
     public function calculate(BoundaryDeclaration $boundary, DependencyConstraint $constraint, ?StrategyEffect $strategy = null): CacheEffect
+    {
+        return $boundary->isCacheBoundary ? $this->applyPolicy($boundary, $constraint, $strategy) : $this->compose($constraint);
+    }
+
+    /**
+     * Returns the metadata a cached() boundary produces once its policy is applied.
+     */
+    public function applyPolicy(BoundaryDeclaration $boundary, DependencyConstraint $constraint, ?StrategyEffect $strategy = null): CacheEffect
     {
         $visibility = $constraint->visibility;
         $reason = $constraint->visibilitySource === null ? null : 'restricted by '.$constraint->visibilitySource;
@@ -116,6 +124,22 @@ final readonly class EffectCalculator
         );
 
         return (new ParameterEffects())->apply($boundary, $constraint, $effect);
+    }
+
+    /**
+     * Returns an uncached entry point's composed constraints without inventing a policy or a stored entry.
+     */
+    public function compose(DependencyConstraint $constraint): CacheEffect
+    {
+        return new CacheEffect(
+            ttl: $constraint->ttl,
+            visibility: $constraint->visibility,
+            tags: $constraint->tags,
+            visibilityReason: $constraint->visibilitySource === null ? null : 'restricted by '.$constraint->visibilitySource,
+            problems: $constraint->ttl->state === TtlEstimateState::Invalid && $constraint->ttl->reason !== null ? [$constraint->ttl->reason] : [],
+            visibilityUnknown: $constraint->visibilityUnknown,
+            tagsUnknown: $constraint->tagsUnknown,
+        );
     }
 
     /**

@@ -7,6 +7,7 @@ namespace Tests\Package\Cli\Unit\Reader;
 use Magix\Cache\Cli\Declaration\DependencyCall;
 use Magix\Cache\Cli\Declaration\KeyParameter;
 use Magix\Cache\Cli\Reader\DependencyReader;
+use Magix\Cache\Cli\Reader\TypeReader;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\MethodCall;
@@ -29,8 +30,37 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(DependencyReader::class)]
 #[UsesClass(DependencyCall::class)]
 #[UsesClass(KeyParameter::class)]
+#[UsesClass(TypeReader::class)]
 final class DependencyReaderTest extends TestCase
 {
+    public function testParameterTypesResolveInjectedQueriesAndReadTheirCalls(): void
+    {
+        $code = <<<'SOURCE'
+            <?php
+            namespace App;
+            use App\Query\ProductQuery as Products;
+
+            final class ProductController
+            {
+                public function show(Products $products, ?InventoryQuery $inventory, int $id, Products ...$others): array
+                {
+                    return [$products->execute($id), $inventory->execute($id)];
+                }
+            }
+            SOURCE;
+        $statements = (new NodeTraverser(new NameResolver()))->traverse(
+            (new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? [],
+        );
+        $method = (new NodeFinder())->findFirstInstanceOf($statements, ClassMethod::class);
+        self::assertInstanceOf(ClassMethod::class, $method);
+        $reader = new DependencyReader();
+
+        self::assertSame(['products' => 'App\Query\ProductQuery', 'inventory' => 'App\InventoryQuery'], $reader->parameterTypes($method));
+        $calls = $reader->read($method, 'App\ProductController', [], [new KeyParameter('id')]);
+        self::assertSame(['App\Query\ProductQuery', 'App\InventoryQuery'], array_map(static fn (DependencyCall $call): string => $call->class, $calls));
+        self::assertSame([0 => 'id'], $calls[0]->forwarded);
+    }
+
     public function testReadCollectsCallsMadeThroughTypedProperties(): void
     {
         $code = <<<'SOURCE'

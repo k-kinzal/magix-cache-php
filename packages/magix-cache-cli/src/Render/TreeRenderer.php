@@ -36,7 +36,7 @@ final readonly class TreeRenderer
             '  storable     '.($effect->storable ? 'yes' : 'no'),
             '  tags         '.$effect->tagsLabel(),
             '  key          '.$this->key($node->boundary),
-            '  policy       '.($node->boundary->policy?->label() ?? 'not declared'),
+            '  policy       '.($node->boundary->isCacheBoundary ? ($node->boundary->policy?->label() ?? 'not declared') : 'none (uncached entry point)'),
             '',
         ];
 
@@ -115,7 +115,7 @@ final readonly class TreeRenderer
         }
 
         $parts = [
-            '<options=bold>'.$node->boundary->shortId().'</>',
+            '<options=bold>'.$node->boundary->shortId().'</>'.($node->boundary->isCacheBoundary ? '' : ' (uncached entry point)'),
             $ttl,
             $effect->visibilityLabel(),
         ];
@@ -162,6 +162,10 @@ final readonly class TreeRenderer
      */
     public function key(BoundaryDeclaration $boundary): string
     {
+        if (!$boundary->isCacheBoundary) {
+            return 'none (uncached entry point)';
+        }
+
         $keyed = [];
         $ignored = [];
 

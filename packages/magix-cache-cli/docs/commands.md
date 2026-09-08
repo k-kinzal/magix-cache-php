@@ -22,11 +22,11 @@ vendor/bin/magix analyze ProductPageQuery::execute
 vendor/bin/magix analyze ProductPageQuery
 ```
 
-A reference without a method matches every boundary of the class. When a reference matches several boundaries, `analyze` renders all of them and `key` asks for the fully qualified name.
+A reference without a method matches every boundary of the class. `analyze` also accepts uncached methods that make resolvable method calls, including controller actions. When a reference matches several methods, `analyze` renders each separately; `key` only accepts cache boundaries and asks for the fully qualified name when ambiguous.
 
 ## magix analyze
 
-Expands one boundary into the tree of boundaries it depends on.
+Expands a cache boundary or an uncached entry point into its cache dependency tree.
 
 ```bash
 vendor/bin/magix analyze ProductPageQuery::execute
@@ -64,6 +64,31 @@ The header block describes the boundary itself:
 
 Lines below the header show each boundary of the tree, with `!` for a problem that makes the boundary fail and `~` for a note about how the tree was resolved.
 
+An action that gathers several cached results for a view does not need `#[Cache]` or `cached()` to be analyzed:
+
+```php
+public function show(int $productId, int $viewerId): View
+{
+    $product = $this->products->execute($productId);
+    $stock = $this->inventory->execute($productId);
+    $viewer = $this->viewer->execute($viewerId);
+
+    return view('product', [
+        'product' => $product->value(),
+        'stock' => $stock->value(),
+        'viewer' => $viewer->value(),
+    ]);
+}
+```
+
+```bash
+vendor/bin/magix analyze ProductController::show
+```
+
+The root is labelled `uncached entry point`. Its TTL is the shortest lifetime of the called boundaries, visibility is the strictest, and tags are unioned. For the three queries above, it reports `20s`, `private`, and `inventory, product, viewer`. Unknown bounds and runtime metadata stay unknown. Calls through uncached methods are followed until cache boundaries are reached; those boundaries retain their usual policy analysis. Query objects can be resolved through typed properties, typed action parameters, local constructor assignments, and static calls.
+
+The root's `key` and `policy` are `none (uncached entry point)` and `storable` is `no`, because the action itself does not write a cache entry. This report summarizes the called caches; it does not attach metadata to values extracted with `value()` or configure HTTP caching for the view. Methods that actually call `cached()` still require a cache policy. Uncached entry points are excluded from `boundaries`, `key`, and lint targets.
+
 | Option | Default | Purpose |
 |---|---|---|
 | `--path` | Composer autoload roots | Directory or file to scan, repeatable |
@@ -71,6 +96,8 @@ Lines below the header show each boundary of the tree, with `!` for a problem th
 | `--depth` | `8` | Maximum dependency depth to expand |
 
 `--format=json` prints the whole tree, including every policy, parameter, effective value, and reason, which suits editors and other tools:
+
+Each node has a `kind` of `boundary` or `entry-point`. Entry points have `policy: null`, `key: null`, and `effective.storable: false`, while `effective` and `dependencies` contain the composed result and its inputs.
 
 ```bash
 vendor/bin/magix analyze ProductPageQuery::execute --format=json

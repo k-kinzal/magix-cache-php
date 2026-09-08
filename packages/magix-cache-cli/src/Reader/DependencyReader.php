@@ -52,7 +52,7 @@ final readonly class DependencyReader
     public function read(ClassMethod $method, string $class, array $propertyTypes, array $parameters): array
     {
         $statements = $method->stmts ?? [];
-        $variableTypes = $this->variableTypes($statements, $propertyTypes);
+        $variableTypes = [...$this->parameterTypes($method), ...$this->variableTypes($statements, $propertyTypes)];
         $calls = [];
 
         foreach ($statements === [] ? [] : $this->finder->find($statements, static fn (Node $node): bool => $node instanceof MethodCall || $node instanceof StaticCall) as $node) {
@@ -75,6 +75,27 @@ final readonly class DependencyReader
         }
 
         return $calls;
+    }
+
+    /**
+     * Returns class types for method arguments, including injected query objects.
+     *
+     * @return array<string, string>
+     */
+    public function parameterTypes(ClassMethod $method): array
+    {
+        $types = [];
+        $reader = new TypeReader();
+
+        foreach ($method->params as $parameter) {
+            $type = $reader->className($parameter->type);
+
+            if ($type !== null && !$parameter->variadic && $parameter->var instanceof Variable && is_string($parameter->var->name)) {
+                $types[$parameter->var->name] = $type;
+            }
+        }
+
+        return $types;
     }
 
     /**

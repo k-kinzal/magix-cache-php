@@ -15,12 +15,14 @@ final readonly class ClassDeclaration
      * @param list<string> $parents Directly extended and implemented type names.
      * @param list<BoundaryDeclaration> $boundaries
      * @param StrategyDeclaration|null $strategy Set when the class is a cache strategy.
+     * @param list<BoundaryDeclaration> $entryPoints Uncached methods available as analysis roots.
      */
     public function __construct(
         public string $name,
         public array $parents = [],
         public array $boundaries = [],
         public ?StrategyDeclaration $strategy = null,
+        public array $entryPoints = [],
     ) {
     }
 }

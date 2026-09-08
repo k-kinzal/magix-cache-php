@@ -18,6 +18,22 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(StrategyDeclaration::class)]
 final class CatalogTest extends TestCase
 {
+    public function testEntryPointsAreOptInAndNeverListedAsCacheBoundaries(): void
+    {
+        $entryPoint = new BoundaryDeclaration('App\ProductController', 'show', 'a.php', 1, isCacheBoundary: false);
+        $cached = new BoundaryDeclaration('App\ProductController', 'query', 'a.php', 10);
+        $catalog = new Catalog([
+            new ClassDeclaration('App\ProductController', boundaries: [$cached], entryPoints: [$entryPoint]),
+        ]);
+
+        self::assertSame([$cached], $catalog->boundaries());
+        self::assertSame([], $catalog->search('ProductController::show'));
+        self::assertSame([], $catalog->candidates('App\ProductController', 'show'));
+        self::assertSame([$entryPoint], $catalog->search('App\ProductController::show', includeEntryPoints: true));
+        self::assertSame([$entryPoint], $catalog->candidates('App\ProductController', 'show', includeEntryPoints: true));
+        self::assertSame([$cached, $entryPoint], $catalog->search('ProductController', includeEntryPoints: true));
+    }
+
     public function testBoundariesAreSortedByIdentifier(): void
     {
         $catalog = new Catalog([

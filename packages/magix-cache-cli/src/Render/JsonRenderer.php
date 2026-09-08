@@ -48,6 +48,7 @@ final readonly class JsonRenderer
 
         return [
             'boundary' => $boundary->id(),
+            'kind' => $boundary->isCacheBoundary ? 'boundary' : 'entry-point',
             'file' => $boundary->file,
             'line' => $boundary->line,
             'policy' => $policy === null ? null : [
@@ -59,7 +60,7 @@ final readonly class JsonRenderer
                 'version' => $policy->version,
                 'runtime' => $policy->runtime,
             ],
-            'key' => array_map(
+            'key' => !$boundary->isCacheBoundary ? null : array_map(
                 static fn ($parameter): array => [
                     'name' => $parameter->name,
                     'type' => $parameter->type,

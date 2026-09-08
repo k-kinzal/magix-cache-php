@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Declaration;
 
+use function array_filter;
 use function array_key_exists;
 use function array_keys;
 use function array_shift;
@@ -19,7 +20,7 @@ use function substr;
 final readonly class Catalog
 {
     /**
-     * Boundaries indexed by their fully qualified identifier.
+     * Boundaries and uncached entry points indexed by their fully qualified identifier.
      *
      * @var array<string, BoundaryDeclaration>
      */
@@ -57,7 +58,7 @@ final readonly class Catalog
                 $strategies[$class->name] = $class->strategy;
             }
 
-            foreach ($class->boundaries as $boundary) {
+            foreach ([...$class->entryPoints, ...$class->boundaries] as $boundary) {
                 $index[$boundary->id()] = $boundary;
             }
         }
@@ -99,7 +100,7 @@ final readonly class Catalog
      */
     public function boundaries(): array
     {
-        return array_values($this->index);
+        return array_values(array_filter($this->index, static fn (BoundaryDeclaration $boundary): bool => $boundary->isCacheBoundary));
     }
 
     /**
@@ -113,20 +114,23 @@ final readonly class Catalog
     /**
      * Returns the boundaries a call to the given type and method can reach.
      *
+     * @param bool $includeEntryPoints Include uncached callees when tracing an analysis entry point.
      * @return list<BoundaryDeclaration>
      */
-    public function candidates(string $class, string $method): array
+    public function candidates(string $class, string $method, bool $includeEntryPoints = false): array
     {
         $id = $class.'::'.$method;
 
         if (array_key_exists($id, $this->index)) {
-            return [$this->index[$id]];
+            $found = $this->index[$id];
+
+            return $found->isCacheBoundary || $includeEntryPoints ? [$found] : [];
         }
 
         $matches = [];
 
         foreach ($this->index as $boundary) {
-            if ($boundary->method !== $method) {
+            if ($boundary->method !== $method || (!$boundary->isCacheBoundary && !$includeEntryPoints)) {
                 continue;
             }
 
@@ -139,11 +143,12 @@ final readonly class Catalog
     }
 
     /**
-     * Returns the boundaries matching a user supplied reference.
+     * Returns matching boundaries, optionally including uncached analysis entry points.
      *
+     * @param bool $includeEntryPoints Allow analyze to select uncached methods; other commands only select cache boundaries.
      * @return list<BoundaryDeclaration>
      */
-    public function search(string $reference): array
+    public function search(string $reference, bool $includeEntryPoints = false): array
     {
         $separator = strpos($reference, '::');
         $class = $separator === false ? $reference : substr($reference, 0, $separator);
@@ -151,6 +156,10 @@ final readonly class Catalog
         $matches = [];
 
         foreach ($this->index as $boundary) {
+            if (!$boundary->isCacheBoundary && !$includeEntryPoints) {
+                continue;
+            }
+
             if ($method !== null && $method !== '' && $boundary->method !== $method) {
                 continue;
             }

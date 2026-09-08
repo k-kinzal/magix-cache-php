@@ -53,6 +53,39 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Reader\ParameterConfigurationReader::class)]
 final class BoundaryReaderTest extends TestCase
 {
+    public function testEntryPointReadsCallsWithoutApplyingCacheDeclarations(): void
+    {
+        $code = <<<'SOURCE'
+            <?php
+            final class ProductController
+            {
+                #[\Magix\Cache\Attribute\Cache(ttl: 90)]
+                public function show(#[\Magix\Cache\Attribute\CacheScope] int $viewerId): array
+                {
+                    return [$this->products->execute(1), $this->viewer->execute($viewerId)];
+                }
+            }
+            SOURCE;
+        $statements = (new NodeTraverser(new NameResolver()))->traverse(
+            (new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? [],
+        );
+        $method = (new NodeFinder())->findFirstInstanceOf($statements, ClassMethod::class);
+        self::assertInstanceOf(ClassMethod::class, $method);
+
+        $entryPoint = (new BoundaryReader())->entryPoint($method, 'ProductController', 'controller.php', [
+            'products' => 'ProductQuery',
+            'viewer' => 'ViewerQuery',
+        ]);
+
+        self::assertInstanceOf(BoundaryDeclaration::class, $entryPoint);
+        self::assertFalse($entryPoint->isCacheBoundary);
+        self::assertNull($entryPoint->policy);
+        self::assertSame([], $entryPoint->parameters);
+        self::assertSame('ProductController::show', $entryPoint->id());
+        self::assertSame(['ProductQuery', 'ViewerQuery'], array_map(static fn (DependencyCall $call): string => $call->class, $entryPoint->dependencies));
+        self::assertNull((new BoundaryReader())->entryPoint(new ClassMethod('empty'), 'ProductController', 'controller.php', []));
+    }
+
     public function testReadDescribesACachedMethodWithItsAttributePolicy(): void
     {
         $code = <<<'SOURCE'

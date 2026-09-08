@@ -77,7 +77,7 @@ final readonly class StrategyResolver
         $composed = $this->composition($declaration, $environment);
         $ttl = $problems === [] ? $composed->ttl : TtlEstimate::invalid($problems[0]);
 
-        return new StrategyEffect($use->label(), $ttl, $composed->steps, $composed->addsConstraint, [...$problems, ...$composed->problems]);
+        return new StrategyEffect($use->label(), $ttl, $composed->steps, $composed->addsConstraint, [...$problems, ...$composed->problems], $composed->expirations);
     }
 
     /**
@@ -109,6 +109,7 @@ final readonly class StrategyResolver
 
         $ttl = TtlEstimate::unconstrained();
         $steps = [];
+        $expirations = [];
         $problems = [];
         $adds = false;
         $open = false;
@@ -116,13 +117,14 @@ final readonly class StrategyResolver
         foreach ($declaration->composed as $instantiation) {
             [$step, $stepProblems, $stepAdds] = $this->step($declaration, $instantiation, $environment);
             $steps[] = $step;
+            $expirations = [...$expirations, ...$step->expirations];
             $problems = [...$problems, ...$stepProblems];
             $ttl = $ttl->meet($step->ttl);
             $adds = $adds || $stepAdds === true;
             $open = $open || $stepAdds === null;
         }
 
-        return new StrategyEffect('', $ttl, $steps, $adds ? true : ($open ? null : false), $problems);
+        return new StrategyEffect('', $ttl, $steps, $adds ? true : ($open ? null : false), $problems, $expirations);
     }
 
     /**
@@ -162,7 +164,7 @@ final readonly class StrategyResolver
             return [new StrategyStep($child->name, TtlEstimate::invalid($problem)), [$problem], null];
         }
 
-        if ($child === null || $child->ttl === null) {
+        if ($child === null || ($child->ttl === null && $child->expiration === null)) {
             if ($assumption !== null) {
                 return $this->assumed($instantiation->class, $assumption, $environment);
             }
@@ -190,7 +192,7 @@ final readonly class StrategyResolver
         $composed = $this->composition($child, $childEnvironment);
         $ttl = $problems === [] ? $composed->ttl : TtlEstimate::invalid($problems[0]);
 
-        return [new StrategyStep($instantiation->class, $ttl), [...$problems, ...$composed->problems], $composed->addsConstraint];
+        return [new StrategyStep($instantiation->class, $ttl, expirations: $composed->expirations), [...$problems, ...$composed->problems], $composed->addsConstraint];
     }
 
     /**
@@ -207,12 +209,20 @@ final readonly class StrategyResolver
         $subject = '#[Ttl] on '.$child->shortName().'::fetch()';
         [$estimate, $contractProblems] = $this->binding->contract($contract, ContractSource::Constructor, $constructor, $subject);
         $problems = [...$problems, ...$contractProblems];
+        $expirations = [];
+
+        if ($child->expiration !== null) {
+            [$expiration, $expirationProblems] = (new ExpirationBinding())->resolve($child->expiration, $constructor, '#[ExpiresAt] on '.$child->shortName().'::fetch()');
+            $problems = [...$problems, ...$expirationProblems];
+            $expirations[] = $expiration;
+            $estimate = $estimate->meet(TtlEstimate::unknown(condition: 'duration depends on the origin time and daily expiration', finite: true));
+        }
 
         if ($problems !== []) {
             return [new StrategyStep($child->name, TtlEstimate::invalid($problems[0])), $problems, true];
         }
 
-        return [new StrategyStep($child->name, $estimate), [], !$contract->unconstrained];
+        return [new StrategyStep($child->name, $estimate, expirations: $expirations), [], !$contract->unconstrained || $expirations !== []];
     }
 
     /**

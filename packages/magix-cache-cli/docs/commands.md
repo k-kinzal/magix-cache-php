@@ -222,3 +222,24 @@ The namespace is a runtime setting, separate from the runtime reference named in
 
 > [!NOTE]
 > This command loads the referenced class through the Composer autoloader and runs its `#[CacheKey]` reducers and strategy factories. It does not call the boundary body or read or write cache entries. It reports the default hash strategy's key; a custom `CacheKeyStrategy` installed on the runtime is not loaded and may produce a different key.
+
+## Wall-clock expiration contracts
+
+`analyze` reads `#[ExpiresAt('12:00', until: '12:15', timezone: 'Asia/Tokyo')]`
+on a strategy's `fetch()` and displays `daily 12:00-12:15 Asia/Tokyo` separately
+from TTL seconds. Omit `until` for a single time; overnight ranges retain a
+`(+1 day)` marker. The `strategy at` row describes the local candidate, while
+`expires by` propagates its upper constraint through dependencies. Other
+constraints can expire the result earlier. A parent with a 60-second TTL shows
+`≤60s` and keeps the wall-clock window.
+
+Tree summaries and Mermaid nodes include the time constraints. JSON preserves
+structured clock fields in `strategy.expirations`, each strategy step's
+`expirations`, and `effective.expirationConstraints`. Those optional keys are
+omitted when no clock contract applies. The ordinary `ttl` fields remain
+relative durations, unknown until the origin time is available. A valid clock
+contract supplies finite-expiration proof to automatic parent policies.
+
+See [Daily Expiration Times and Distribution Windows](../../magix-cache/docs/cache-strategies.md#daily-expiration-times-and-distribution-windows)
+for constructor references, invocation-dependent values, composition, timezone
+semantics, and the responsibility of the strategy implementation.

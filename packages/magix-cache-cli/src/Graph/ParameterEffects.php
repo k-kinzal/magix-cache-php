@@ -168,6 +168,7 @@ final readonly class ParameterEffects
             visibilityReason: $reason,
             problems: $problems,
             strategy: $effect->strategy,
+            expirationConstraints: $effect->expirationConstraints,
             visibilityUnknown: $visibilityUnknown,
             tagsUnknown: $tagsUnknown,
             localRestrictions: $problems === [] ? (new LocalRestrictions())->describe($boundary, $constraint, $effect, $visibilityUnknown) : [],

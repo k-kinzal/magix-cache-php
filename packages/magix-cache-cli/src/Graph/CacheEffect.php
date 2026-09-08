@@ -24,6 +24,7 @@ final readonly class CacheEffect
      * @param list<string> $problems Reasons the boundary cannot work as written.
      * @param StrategyEffect|null $strategy The analyzed strategy composition, when one is declared.
      * @param array{ttl?: string, visibility?: string} $localRestrictions Local settings that provably restrict composed constraints; absent keys make no claim.
+     * @param list<ExpirationEstimate> $expirationConstraints Daily candidates that may only be shortened by further composition.
      */
     public function __construct(
         ?TtlEstimate $ttl = null,
@@ -36,6 +37,7 @@ final readonly class CacheEffect
         public bool $visibilityUnknown = false,
         public bool $tagsUnknown = false,
         public array $localRestrictions = [],
+        public array $expirationConstraints = [],
     ) {
         $this->ttl = $ttl ?? TtlEstimate::unknown();
     }

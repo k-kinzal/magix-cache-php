@@ -75,6 +75,7 @@ final readonly class JsonRenderer
             'strategy' => $effect->strategy === null ? null : $this->strategy($effect->strategy),
             'effective' => [
                 'ttl' => $effect->ttl->jsonSerialize(),
+                ...($effect->expirationConstraints === [] ? [] : ['expirationConstraints' => $effect->expirationConstraints]),
                 'visibility' => strtolower($effect->visibility->name),
                 'visibilityReason' => $effect->visibilityReason,
                 'visibilityUnknown' => $effect->visibilityUnknown,
@@ -99,11 +100,13 @@ final readonly class JsonRenderer
             'declared' => $strategy->label,
             'ttl' => $strategy->ttl->jsonSerialize(),
             'addsConstraint' => $strategy->addsConstraint,
+            ...($strategy->expirations === [] ? [] : ['expirations' => $strategy->expirations]),
             'steps' => array_map(
                 static fn (StrategyStep $step): array => [
                     'strategy' => $step->strategy,
                     'ttl' => $step->ttl->jsonSerialize(),
                     'assumed' => $step->assumed,
+                    ...($step->expirations === [] ? [] : ['expirations' => $step->expirations]),
                 ],
                 $strategy->steps,
             ),

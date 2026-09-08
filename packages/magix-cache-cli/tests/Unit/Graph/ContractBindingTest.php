@@ -234,4 +234,12 @@ final class ContractBindingTest extends TestCase
         self::assertSame(['minimum' => 30, 'maximum' => 60], $values);
         self::assertSame([], $problems);
     }
+
+    public function testValuesPreservesExplicitNullConstructorArguments(): void
+    {
+        $arguments = [new StrategyArgument('until', Unresolved::Value, 'end')];
+
+        self::assertSame(['until' => null], (new ContractBinding())->values($arguments, ['end' => null]));
+        self::assertSame(['until' => Unresolved::Value], (new ContractBinding())->values($arguments, []));
+    }
 }

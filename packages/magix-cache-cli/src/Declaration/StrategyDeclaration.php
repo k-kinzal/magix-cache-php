@@ -29,6 +29,7 @@ final readonly class StrategyDeclaration
      * @param list<TtlAssumption> $assumptions Explicit assumptions declared on create().
      * @param list<string> $notes Why parts of the declaration could not be read.
      * @param bool $constructible Whether this class can be a constructed CacheStrategy leaf.
+     * @param ExpirationContract|null $expiration Daily wall-clock contract on fetch(), independent of TTL.
      * @param string|null $definitionProblem A factory signature incompatible with StrategyDefinition.
      */
     public function __construct(
@@ -44,6 +45,7 @@ final readonly class StrategyDeclaration
         public array $notes = [],
         public bool $constructible = true,
         public ?string $definitionProblem = null,
+        public ?ExpirationContract $expiration = null,
     ) {
     }
 

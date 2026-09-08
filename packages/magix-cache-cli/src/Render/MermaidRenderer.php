@@ -8,6 +8,7 @@ use function array_merge;
 use function implode;
 
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\ExpirationEstimate;
 
 /**
  * Renders a cache tree as a Mermaid flowchart for documentation.
@@ -35,6 +36,10 @@ final readonly class MermaidRenderer
 
         if ($id !== 'n0' && !$node->boundary->isCacheBoundary) {
             $label = $node->boundary->shortId().' (uncached)';
+        }
+
+        if ($effect->expirationConstraints !== [] && ($id === 'n0' || $node->boundary->isCacheBoundary)) {
+            $label .= '<br/>expires by '.ExpirationEstimate::describe($effect->expirationConstraints);
         }
 
         $statements = ['    '.$id.'["'.$label.'"]'];

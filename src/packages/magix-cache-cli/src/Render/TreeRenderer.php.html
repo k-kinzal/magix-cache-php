@@ -72,7 +72,7 @@
 <span class="src-line" id="L36"><a class="ln" href="#L36">36</a>            <span class="tok-str">&#039;  storable     &#039;</span>.(<span class="tok-var">$effect</span>-&gt;<span class="tok-id">storable</span> ? <span class="tok-str">&#039;yes&#039;</span> : <span class="tok-str">&#039;no&#039;</span>),</span>
 <span class="src-line" id="L37"><a class="ln" href="#L37">37</a>            <span class="tok-str">&#039;  tags         &#039;</span>.<span class="tok-var">$effect</span>-&gt;<span class="tok-id">tagsLabel</span>(),</span>
 <span class="src-line" id="L38"><a class="ln" href="#L38">38</a>            <span class="tok-str">&#039;  key          &#039;</span>.<span class="tok-var">$this</span>-&gt;<span class="tok-id">key</span>(<span class="tok-var">$node</span>-&gt;<span class="tok-id">boundary</span>),</span>
-<span class="src-line" id="L39"><a class="ln" href="#L39">39</a>            <span class="tok-str">&#039;  policy       &#039;</span>.(<span class="tok-var">$node</span>-&gt;<span class="tok-id">boundary</span>-&gt;<span class="tok-id">policy</span>?-&gt;<span class="tok-id">label</span>() ?? <span class="tok-str">&#039;not declared&#039;</span>),</span>
+<span class="src-line" id="L39"><a class="ln" href="#L39">39</a>            <span class="tok-str">&#039;  policy       &#039;</span>.(<span class="tok-var">$node</span>-&gt;<span class="tok-id">boundary</span>-&gt;<span class="tok-id">isCacheBoundary</span> ? (<span class="tok-var">$node</span>-&gt;<span class="tok-id">boundary</span>-&gt;<span class="tok-id">policy</span>?-&gt;<span class="tok-id">label</span>() ?? <span class="tok-str">&#039;not declared&#039;</span>) : <span class="tok-str">&#039;none (uncached entry point)&#039;</span>),</span>
 <span class="src-line" id="L40"><a class="ln" href="#L40">40</a>            <span class="tok-str">&#039;&#039;</span>,</span>
 <span class="src-line" id="L41"><a class="ln" href="#L41">41</a>        ];</span>
 <span class="src-line" id="L42"><a class="ln" href="#L42">42</a></span>
@@ -151,7 +151,7 @@
 <span class="src-line" id="L115"><a class="ln" href="#L115">115</a>        }</span>
 <span class="src-line" id="L116"><a class="ln" href="#L116">116</a></span>
 <span class="src-line" id="L117"><a class="ln" href="#L117">117</a>        <span class="tok-var">$parts</span> = [</span>
-<span class="src-line" id="L118"><a class="ln" href="#L118">118</a>            <span class="tok-str">&#039;&lt;options=bold&gt;&#039;</span>.<span class="tok-var">$node</span>-&gt;<span class="tok-id">boundary</span>-&gt;<span class="tok-id">shortId</span>().<span class="tok-str">&#039;&lt;/&gt;&#039;</span>,</span>
+<span class="src-line" id="L118"><a class="ln" href="#L118">118</a>            <span class="tok-str">&#039;&lt;options=bold&gt;&#039;</span>.<span class="tok-var">$node</span>-&gt;<span class="tok-id">boundary</span>-&gt;<span class="tok-id">shortId</span>().<span class="tok-str">&#039;&lt;/&gt;&#039;</span>.(<span class="tok-var">$node</span>-&gt;<span class="tok-id">boundary</span>-&gt;<span class="tok-id">isCacheBoundary</span> ? <span class="tok-str">&#039;&#039;</span> : <span class="tok-str">&#039; (uncached entry point)&#039;</span>),</span>
 <span class="src-line" id="L119"><a class="ln" href="#L119">119</a>            <span class="tok-var">$ttl</span>,</span>
 <span class="src-line" id="L120"><a class="ln" href="#L120">120</a>            <span class="tok-var">$effect</span>-&gt;<span class="tok-id">visibilityLabel</span>(),</span>
 <span class="src-line" id="L121"><a class="ln" href="#L121">121</a>        ];</span>
@@ -198,29 +198,33 @@
 <span class="src-line" id="L162"><a class="ln" href="#L162">162</a><span class="tok-com">     */</span></span>
 <span class="src-line" id="L163"><a class="ln" href="#L163">163</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">key</span>(<span class="tok-id">BoundaryDeclaration</span> <span class="tok-var">$boundary</span>): <span class="tok-id">string</span></span>
 <span class="src-line" id="L164"><a class="ln" href="#L164">164</a>    {</span>
-<span class="src-line" id="L165"><a class="ln" href="#L165">165</a>        <span class="tok-var">$keyed</span> = [];</span>
-<span class="src-line" id="L166"><a class="ln" href="#L166">166</a>        <span class="tok-var">$ignored</span> = [];</span>
-<span class="src-line" id="L167"><a class="ln" href="#L167">167</a></span>
-<span class="src-line" id="L168"><a class="ln" href="#L168">168</a>        <span class="tok-kw">foreach</span> (<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">parameters</span> <span class="tok-kw">as</span> <span class="tok-var">$parameter</span>) {</span>
-<span class="src-line" id="L169"><a class="ln" href="#L169">169</a>            <span class="tok-kw">if</span> (<span class="tok-var">$parameter</span>-&gt;<span class="tok-id">ignored</span>) {</span>
-<span class="src-line" id="L170"><a class="ln" href="#L170">170</a>                <span class="tok-var">$ignored</span>[] = <span class="tok-str">&#039;$&#039;</span>.<span class="tok-var">$parameter</span>-&gt;<span class="tok-id">name</span>;</span>
+<span class="src-line" id="L165"><a class="ln" href="#L165">165</a>        <span class="tok-kw">if</span> (!<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">isCacheBoundary</span>) {</span>
+<span class="src-line" id="L166"><a class="ln" href="#L166">166</a>            <span class="tok-kw">return</span> <span class="tok-str">&#039;none (uncached entry point)&#039;</span>;</span>
+<span class="src-line" id="L167"><a class="ln" href="#L167">167</a>        }</span>
+<span class="src-line" id="L168"><a class="ln" href="#L168">168</a></span>
+<span class="src-line" id="L169"><a class="ln" href="#L169">169</a>        <span class="tok-var">$keyed</span> = [];</span>
+<span class="src-line" id="L170"><a class="ln" href="#L170">170</a>        <span class="tok-var">$ignored</span> = [];</span>
 <span class="src-line" id="L171"><a class="ln" href="#L171">171</a></span>
-<span class="src-line" id="L172"><a class="ln" href="#L172">172</a>                <span class="tok-kw">continue</span>;</span>
-<span class="src-line" id="L173"><a class="ln" href="#L173">173</a>            }</span>
-<span class="src-line" id="L174"><a class="ln" href="#L174">174</a></span>
-<span class="src-line" id="L175"><a class="ln" href="#L175">175</a>            <span class="tok-var">$keyed</span>[] = <span class="tok-var">$parameter</span>-&gt;<span class="tok-id">label</span>();</span>
-<span class="src-line" id="L176"><a class="ln" href="#L176">176</a>        }</span>
-<span class="src-line" id="L177"><a class="ln" href="#L177">177</a></span>
-<span class="src-line" id="L178"><a class="ln" href="#L178">178</a>        <span class="tok-var">$key</span> = <span class="tok-var">$keyed</span> === [] ? <span class="tok-str">&#039;class, method and version only&#039;</span> : <span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$keyed</span>);</span>
-<span class="src-line" id="L179"><a class="ln" href="#L179">179</a></span>
-<span class="src-line" id="L180"><a class="ln" href="#L180">180</a>        <span class="tok-kw">if</span> (<span class="tok-var">$ignored</span> !== []) {</span>
-<span class="src-line" id="L181"><a class="ln" href="#L181">181</a>            <span class="tok-var">$key</span> .= <span class="tok-str">&#039; (ignored: &#039;</span>.<span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$ignored</span>).<span class="tok-str">&#039;)&#039;</span>;</span>
-<span class="src-line" id="L182"><a class="ln" href="#L182">182</a>        }</span>
+<span class="src-line" id="L172"><a class="ln" href="#L172">172</a>        <span class="tok-kw">foreach</span> (<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">parameters</span> <span class="tok-kw">as</span> <span class="tok-var">$parameter</span>) {</span>
+<span class="src-line" id="L173"><a class="ln" href="#L173">173</a>            <span class="tok-kw">if</span> (<span class="tok-var">$parameter</span>-&gt;<span class="tok-id">ignored</span>) {</span>
+<span class="src-line" id="L174"><a class="ln" href="#L174">174</a>                <span class="tok-var">$ignored</span>[] = <span class="tok-str">&#039;$&#039;</span>.<span class="tok-var">$parameter</span>-&gt;<span class="tok-id">name</span>;</span>
+<span class="src-line" id="L175"><a class="ln" href="#L175">175</a></span>
+<span class="src-line" id="L176"><a class="ln" href="#L176">176</a>                <span class="tok-kw">continue</span>;</span>
+<span class="src-line" id="L177"><a class="ln" href="#L177">177</a>            }</span>
+<span class="src-line" id="L178"><a class="ln" href="#L178">178</a></span>
+<span class="src-line" id="L179"><a class="ln" href="#L179">179</a>            <span class="tok-var">$keyed</span>[] = <span class="tok-var">$parameter</span>-&gt;<span class="tok-id">label</span>();</span>
+<span class="src-line" id="L180"><a class="ln" href="#L180">180</a>        }</span>
+<span class="src-line" id="L181"><a class="ln" href="#L181">181</a></span>
+<span class="src-line" id="L182"><a class="ln" href="#L182">182</a>        <span class="tok-var">$key</span> = <span class="tok-var">$keyed</span> === [] ? <span class="tok-str">&#039;class, method and version only&#039;</span> : <span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$keyed</span>);</span>
 <span class="src-line" id="L183"><a class="ln" href="#L183">183</a></span>
-<span class="src-line" id="L184"><a class="ln" href="#L184">184</a>        <span class="tok-kw">return</span> <span class="tok-var">$key</span>.<span class="tok-str">&#039;  version &#039;</span>.(<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">policy</span>-&gt;<span class="tok-id">version</span> ?? <span class="tok-str">&#039;1&#039;</span>);</span>
-<span class="src-line" id="L185"><a class="ln" href="#L185">185</a>    }</span>
-<span class="src-line" id="L186"><a class="ln" href="#L186">186</a>}</span>
+<span class="src-line" id="L184"><a class="ln" href="#L184">184</a>        <span class="tok-kw">if</span> (<span class="tok-var">$ignored</span> !== []) {</span>
+<span class="src-line" id="L185"><a class="ln" href="#L185">185</a>            <span class="tok-var">$key</span> .= <span class="tok-str">&#039; (ignored: &#039;</span>.<span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$ignored</span>).<span class="tok-str">&#039;)&#039;</span>;</span>
+<span class="src-line" id="L186"><a class="ln" href="#L186">186</a>        }</span>
 <span class="src-line" id="L187"><a class="ln" href="#L187">187</a></span>
+<span class="src-line" id="L188"><a class="ln" href="#L188">188</a>        <span class="tok-kw">return</span> <span class="tok-var">$key</span>.<span class="tok-str">&#039;  version &#039;</span>.(<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">policy</span>-&gt;<span class="tok-id">version</span> ?? <span class="tok-str">&#039;1&#039;</span>);</span>
+<span class="src-line" id="L189"><a class="ln" href="#L189">189</a>    }</span>
+<span class="src-line" id="L190"><a class="ln" href="#L190">190</a>}</span>
+<span class="src-line" id="L191"><a class="ln" href="#L191">191</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

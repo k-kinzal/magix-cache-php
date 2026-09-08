@@ -82,7 +82,7 @@ final readonly class TreeRenderer
     {
         $connector = $last === null ? '' : ($last ? '`-- ' : '|-- ');
         $indent = $last === null ? $prefix : $prefix.($last ? '    ' : '|   ');
-        $lines = [$prefix.$connector.$this->summary($node)];
+        $lines = [$prefix.$connector.$this->summary($node, $last === null)];
 
         foreach ($node->effect->problems as $problem) {
             $lines[] = $indent.'    <fg=red>! '.$problem.'</>';
@@ -104,9 +104,15 @@ final readonly class TreeRenderer
 
     /**
      * Returns the single line that describes one boundary in the tree.
+     *
+     * @param bool $root Summarize called caches for an uncached root; label ordinary descendants without suggesting their own cache policy.
      */
-    public function summary(CacheNode $node): string
+    public function summary(CacheNode $node, bool $root = true): string
     {
+        if (!$root && !$node->boundary->isCacheBoundary) {
+            return '<options=bold>'.$node->boundary->shortId().'</> (uncached)';
+        }
+
         $effect = $node->effect;
         $declared = $node->boundary->policy;
         $ttl = 'ttl '.$this->restricted($this->estimate($effect->ttl), $effect, 'ttl');

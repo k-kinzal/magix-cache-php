@@ -33,8 +33,9 @@ final readonly class CacheTree
      * Returns a tree rooted at a boundary or an uncached method whose callees are composed.
      *
      * @param list<string> $visited Boundary identifiers already on the current path.
+     * @param bool $includeUncached Include ordinary calls for inspection without adding them to a cache boundary's constraints.
      */
-    public function build(BoundaryDeclaration $boundary, int $depth = 8, array $visited = []): CacheNode
+    public function build(BoundaryDeclaration $boundary, int $depth = 8, array $visited = [], bool $includeUncached = false): CacheNode
     {
         $id = $boundary->id();
 
@@ -53,30 +54,52 @@ final readonly class CacheTree
             return new CacheNode($boundary, $this->effects->calculate($boundary, $constraint, $this->strategies->resolve($boundary)), [], $notes);
         }
 
+        return $this->expand($boundary, $depth, [...$visited, $id], $includeUncached);
+    }
+
+    /**
+     * Expands calls while keeping inspection-only paths out of cache composition.
+     *
+     * @param list<string> $visited Identifiers on the current path, including this boundary.
+     */
+    public function expand(BoundaryDeclaration $boundary, int $depth, array $visited, bool $includeUncached): CacheNode
+    {
         $children = [];
+        $constraints = [];
         $notes = [];
         $seen = [];
 
         foreach ($boundary->dependencies as $dependency) {
-            $candidates = $this->catalog->candidates($dependency->class, $dependency->method, includeEntryPoints: !$boundary->isCacheBoundary);
+            $candidates = $this->catalog->candidates($dependency->class, $dependency->method, includeEntryPoints: $includeUncached || !$boundary->isCacheBoundary);
 
             if (count($candidates) > 1) {
                 $notes[] = $dependency->class.'::'.$dependency->method.' resolves to '.count($candidates).' implementations';
             }
 
             foreach ($candidates as $candidate) {
+                $composed = $candidate->isCacheBoundary || (!$boundary->isCacheBoundary && $candidate->dependencies !== []);
+
+                if (!$includeUncached && !$composed) {
+                    continue;
+                }
+
                 if (isset($seen[$candidate->id()])) {
                     continue;
                 }
 
                 $seen[$candidate->id()] = true;
-                $children[] = $this->build($candidate, $depth - 1, [...$visited, $id]);
+                $child = $this->build($candidate, $depth - 1, $visited, $includeUncached);
+                $children[] = $child;
+
+                if ($composed) {
+                    $constraints[] = $child;
+                }
             }
         }
 
         return new CacheNode(
             $boundary,
-            $this->effects->calculate($boundary, $this->effects->constrain($children), $this->strategies->resolve($boundary)),
+            $this->effects->calculate($boundary, $this->effects->constrain($constraints), $this->strategies->resolve($boundary)),
             $children,
             $notes,
         );

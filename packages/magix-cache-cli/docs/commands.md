@@ -22,7 +22,7 @@ vendor/bin/magix analyze ProductPageQuery::execute
 vendor/bin/magix analyze ProductPageQuery
 ```
 
-A reference without a method matches every boundary of the class. `analyze` also accepts uncached methods that make resolvable method calls, including controller actions. When a reference matches several methods, `analyze` renders each separately; `key` only accepts cache boundaries and asks for the fully qualified name when ambiguous.
+A reference without a method matches every boundary of the class. `analyze` also accepts concrete uncached methods, including controller actions and methods without further calls. When a reference matches several methods, `analyze` renders each separately; `key` only accepts cache boundaries and asks for the fully qualified name when ambiguous.
 
 ## magix analyze
 
@@ -116,10 +116,47 @@ The root's `key` and `policy` are `none (uncached entry point)` and `storable` i
 | `--path` | Composer autoload roots | Directory or file to scan, repeatable |
 | `--format` | `tree` | `tree`, `json`, or `mermaid` |
 | `--depth` | `8` | Maximum dependency depth to expand |
+| `--show-uncached` | off | Also show ordinary callees, including leaves and calls inside cache boundaries |
+| `--ignore` | none | Hide matching class or `Class::method` subtrees; repeatable and independent of `--show-uncached` |
+
+### Inspecting ordinary calls and hiding subtrees
+
+Use `--show-uncached` to inspect methods that have not been made into cache boundaries:
+
+```bash
+vendor/bin/magix analyze PageQuery::execute --show-uncached \
+  --ignore 'Inventory*' --ignore '*Manager'
+```
+
+Ordinary callees are labelled `uncached`; their lack of a boundary is not an error. They are followed recursively within the scanned sources and the existing `--depth` limit, including concrete methods with no further calls. This uses the same call resolution as the cache analysis: it does not infer database access, execute application code, or discover dynamically named calls and unscanned implementations. A method that calls `cached()` remains a cache boundary and still reports a missing `#[Cache]` policy as a problem.
+
+Without `--show-uncached`, the existing cache tree is retained, including intermediate uncached methods when tracing an uncached entry point. The flag adds inspection paths inside cache boundaries and ordinary leaves. It does not change the computed TTL, visibility, tags, storability, or problems of existing nodes. In particular, following an ordinary helper is not proof that its result carries cache metadata: a helper can extract a plain value with `value()`.
+
+`--ignore` applies to cached and uncached nodes alike, with or without `--show-uncached`. A match hides that node and its entire subtree; descendants are never promoted to the parent. Other paths to the same method remain visible unless they also match. Multiple patterns are combined with OR. The selected root is subject to the same filter: if all roots are ignored, the command succeeds with `[]` in JSON and an explanatory message in the text formats.
+
+Filtering happens after analysis. An ignored dependency still constrains its ancestors' TTL and visibility, contributes tags, and can cause an ancestor to be invalid. Reasons may consequently refer to a hidden dependency. Neither display option changes cache composition or the runtime. The depth limit counts actual method calls before filtering; hidden branches do not free depth for other calls.
+
+| Pattern | Matches |
+|---|---|
+| `Inventory*` | All methods on short class names beginning with `Inventory` |
+| `*Manager` | All methods on short class names ending with `Manager` |
+| `InventoryQuery::get` | One exact short class and method name |
+| `Inventory*::get*` | Both the class and method patterns |
+| `*::get*` | Methods beginning with `get` on any class |
+| `App\Query\*` | Fully qualified class names under this namespace, including nested namespaces |
+| `App\Query\InventoryQuery::get?` | A fully qualified class and a method ending in exactly one character after `get` |
+
+Patterns match complete names and are case-sensitive. Without `::`, the pattern selects a class's methods. With `::`, class and method patterns are matched separately. A class pattern containing `\` is matched against the fully qualified name; otherwise it is matched against the short class name. An optional leading `\` is accepted for fully qualified names. Patterns apply to the resolved concrete declaration names, including each candidate of an interface call.
+
+Only `*` (zero or more characters) and `?` (one character) are special. `*` also crosses namespace separators; `\` is a literal namespace separator, not a pattern escape. Regexes, character classes, negation and comma-separated lists are not supported; use another `--ignore` for another pattern. Quote patterns as shown above so the shell does not expand them.
+
+The same filtering and labels apply to tree, JSON and Mermaid output.
+
+### Structured output
 
 `--format=json` prints the whole tree, including every policy, parameter, effective value, and reason, which suits editors and other tools:
 
-Each node has a `kind` of `boundary` or `entry-point`. Entry points have `policy: null`, `key: null`, and `effective.storable: false`, while `effective` and `dependencies` contain the composed result and its inputs.
+Each node has a `kind` of `boundary`, `entry-point` (an uncached root), or `uncached` (an ordinary callee). Both uncached kinds have `policy: null`, `key: null`, and `effective.storable: false`. Their `effective` result summarizes the called caches; it does not assert that the method returns metadata. After filtering, the remaining nodes keep their original `effective` results while `dependencies` contains only visible children.
 
 ```bash
 vendor/bin/magix analyze ProductPageQuery::execute --format=json

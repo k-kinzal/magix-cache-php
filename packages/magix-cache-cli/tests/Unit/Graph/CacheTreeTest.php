@@ -41,6 +41,27 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class CacheTreeTest extends TestCase
 {
+    public function testExpandBoundsOrdinaryRecursionWithoutChangingCacheComposition(): void
+    {
+        $loop = new BoundaryDeclaration('Lookup', 'get', 'lookup.php', 1, dependencies: [new DependencyCall('Lookup', 'get', 2)], isCacheBoundary: false);
+        $root = new BoundaryDeclaration('Page', 'get', 'page.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 60), dependencies: [new DependencyCall('Lookup', 'get', 2)]);
+        $tree = new CacheTree(new Catalog([
+            new ClassDeclaration('Page', boundaries: [$root]),
+            new ClassDeclaration('Lookup', entryPoints: [$loop]),
+        ]));
+
+        $baseline = $tree->build($root);
+        $expanded = $tree->expand($root, 8, [$root->id()], true);
+        $limited = $tree->build($root, 1, includeUncached: true);
+
+        self::assertSame([], $baseline->children);
+        self::assertEquals($baseline->effect, $expanded->effect);
+        self::assertEquals($baseline->effect, $limited->effect);
+        self::assertSame(['recursive dependency, not expanded again'], $expanded->children[0]->children[0]->notes);
+        self::assertSame(['depth limit reached, dependencies not expanded'], $limited->children[0]->notes);
+        self::assertSame(TtlEstimateState::Unknown, $limited->children[0]->effect->ttl->state);
+    }
+
     public function testBuildDoesNotHighlightRestrictionsAgainstTruncatedVisibility(): void
     {
         $inner = new BoundaryDeclaration('InnerQuery', 'execute', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 60), dependencies: [new DependencyCall('InnerQuery', 'execute', 2)]);

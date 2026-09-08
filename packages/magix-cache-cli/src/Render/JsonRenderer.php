@@ -38,9 +38,10 @@ final readonly class JsonRenderer
     /**
      * Returns one cache tree as plain data.
      *
+     * @param bool $root Distinguish an uncached entry point from an ordinary callee in the kind field.
      * @return array<string, mixed>
      */
-    public function tree(CacheNode $node): array
+    public function tree(CacheNode $node, bool $root = true): array
     {
         $boundary = $node->boundary;
         $effect = $node->effect;
@@ -48,7 +49,7 @@ final readonly class JsonRenderer
 
         return [
             'boundary' => $boundary->id(),
-            'kind' => $boundary->isCacheBoundary ? 'boundary' : 'entry-point',
+            'kind' => $boundary->isCacheBoundary ? 'boundary' : ($root ? 'entry-point' : 'uncached'),
             'file' => $boundary->file,
             'line' => $boundary->line,
             'policy' => $policy === null ? null : [
@@ -83,7 +84,7 @@ final readonly class JsonRenderer
                 'problems' => $effect->problems,
             ],
             'notes' => $node->notes,
-            'dependencies' => array_map($this->tree(...), $node->children),
+            'dependencies' => array_map(fn (CacheNode $child): array => $this->tree($child, false), $node->children),
         ];
     }
 

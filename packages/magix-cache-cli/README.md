@@ -10,6 +10,7 @@ The result answers the questions that are otherwise only observable in productio
 ## Features
 
 - Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node
+- Optional ordinary method calls with `--show-uncached`, and independent subtree filters with repeatable `--ignore` patterns
 - The reason behind each effective value, such as which dependency capped a TTL or made a result private
 - Yellow highlights where local TTL, `maxTtl`, or visibility settings restrict composed metadata, making bubbling stops visible
 - Composed strategy contracts, bound to the same `create()` the runtime calls, with candidate ranges such as `30-60s` kept apart from the effective TTL

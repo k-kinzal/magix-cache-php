@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Console;
 
+use function array_filter;
 use function array_map;
 use function array_slice;
+use function array_values;
 use function count;
 use function implode;
+use function is_string;
 
 use JsonException;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\CacheTree;
+use Magix\Cache\Cli\Render\IgnorePattern;
 use Magix\Cache\Cli\Render\JsonRenderer;
 use Magix\Cache\Cli\Render\MermaidRenderer;
+use Magix\Cache\Cli\Render\TreeFilter;
 use Magix\Cache\Cli\Render\TreeRenderer;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -42,7 +47,12 @@ final readonly class AnalyzeCommand
     /**
      * Renders the cache tree of the referenced boundary.
      *
+     * Ordinary calls are optional inspection paths; ignore patterns prune
+     * displayed subtrees after all effective cache constraints are calculated.
+     *
      * @param array<array-key, mixed> $path
+     * @param array<array-key, mixed> $ignore
+     * @param bool $showUncached Include ordinary callees and leaves without changing cache composition.
      * @throws JsonException when the tree cannot be encoded as JSON
      */
     public function __invoke(
@@ -55,6 +65,10 @@ final readonly class AnalyzeCommand
         string $format = 'tree',
         #[Option(description: 'Maximum dependency depth to expand')]
         int $depth = 8,
+        #[Option(description: 'Also display ordinary method calls without changing cache composition', name: 'show-uncached')]
+        bool $showUncached = false,
+        #[Option(description: 'Hide matching class or Class::method subtrees (* and ? wildcards), repeatable')]
+        array $ignore = [],
     ): int {
         $catalog = $this->catalog->load($path);
         $matches = $catalog->search($boundary, includeEntryPoints: true);
@@ -67,7 +81,11 @@ final readonly class AnalyzeCommand
         }
 
         $tree = new CacheTree($catalog);
-        $nodes = array_map(static fn (BoundaryDeclaration $found): CacheNode => $tree->build($found, $depth), $matches);
+        $filter = new TreeFilter(array_values(array_map(static fn (string $pattern): IgnorePattern => new IgnorePattern($pattern), array_filter($ignore, is_string(...)))));
+        $nodes = array_values(array_filter(array_map(
+            static fn (BoundaryDeclaration $found): ?CacheNode => $filter->apply($tree->build($found, $depth, includeUncached: $showUncached)),
+            $matches,
+        ), static fn (?CacheNode $node): bool => $node !== null));
 
         if ($format === 'json') {
             $io->writeln((new JsonRenderer())->render($nodes));
@@ -76,6 +94,10 @@ final readonly class AnalyzeCommand
         }
 
         $renderer = $format === 'mermaid' ? new MermaidRenderer() : new TreeRenderer();
+
+        if ($nodes === []) {
+            $io->writeln('All matching roots were excluded by --ignore.');
+        }
 
         foreach ($nodes as $node) {
             $io->writeln($renderer->render($node));

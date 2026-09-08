@@ -10,10 +10,15 @@ use Magix\Cache\Cli\Console\Application;
 use Magix\Cache\Cli\Console\CatalogLoader;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Tests\Package\Cli\Fixture\Display\InspectionQuery;
+use Tests\Package\Cli\Fixture\Display\InventoryLookup;
+use Tests\Package\Cli\Fixture\Project\ProductQuery;
+use Tests\Package\Cli\Fixture\Project\ViewerQuery;
 
 #[CoversClass(AnalyzeCommand::class)]
 #[UsesNamespace('Magix\Cache\Cli')]
@@ -194,7 +199,7 @@ final class AnalyzeCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         self::assertStringContainsString('ttl          20s', $tester->getDisplay());
-        self::assertStringContainsString('ProductController::show (uncached entry point)', $tester->getDisplay());
+        self::assertStringContainsString('ProductController::show (uncached)', $tester->getDisplay());
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
     }
 
@@ -259,5 +264,133 @@ final class AnalyzeCommandTest extends TestCase
 
         self::assertStringContainsString('No cache boundaries were found', $command->suggestions([]));
         self::assertStringContainsString('and 2 more', $command->suggestions($many));
+    }
+    /**
+     * @throws JsonException
+     */
+    public function testShowsOrdinaryCallsAndLeavesWithoutComposingDetachedMetadata(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => 'InspectionQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture'], '--format' => 'json'];
+        $tester->execute($arguments);
+        $baseline = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($baseline);
+        self::assertIsArray($baseline['dependencies']);
+        self::assertSame([ViewerQuery::class.'::execute'], array_column($baseline['dependencies'], 'boundary'));
+
+        $tester->execute([...$arguments, '--show-uncached' => true]);
+        $tester->assertCommandIsSuccessful();
+        $expanded = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($expanded);
+        self::assertSame($baseline['effective'], $expanded['effective']);
+        self::assertIsArray($expanded['dependencies']);
+        self::assertSame([
+            ViewerQuery::class.'::execute', InventoryLookup::class.'::get', InspectionQuery::class.'::offset',
+        ], array_column($expanded['dependencies'], 'boundary'));
+        self::assertIsArray($expanded['dependencies'][1]);
+        self::assertSame('uncached', $expanded['dependencies'][1]['kind']);
+        self::assertNull($expanded['dependencies'][1]['policy']);
+        self::assertNull($expanded['dependencies'][1]['key']);
+        self::assertIsArray($expanded['dependencies'][1]['dependencies']);
+        self::assertSame([ProductQuery::class.'::execute'], array_column($expanded['dependencies'][1]['dependencies'], 'boundary'));
+
+        $tester->execute([...$arguments, '--show-uncached' => true, '--ignore' => ['*Lookup', 'ViewerQuery']]);
+        $filtered = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($filtered);
+        self::assertSame($expanded['effective'], $filtered['effective']);
+        self::assertIsArray($filtered['dependencies']);
+        self::assertSame([InspectionQuery::class.'::offset'], array_column($filtered['dependencies'], 'boundary'));
+    }
+
+    #[DataProvider('providerFormatsAndFlags')]
+    public function testIgnorePrunesCachedSubtreesIndependentlyOfShowUncached(string $format, bool $showUncached): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $tester->execute([
+            'boundary' => 'BubblingPageQuery::explicit',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
+            '--format' => $format,
+            '--show-uncached' => $showUncached,
+            '--ignore' => ['BubblingPageQuery::execute'],
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('BubblingPageQuery::explicit', $tester->getDisplay());
+        self::assertStringNotContainsString('ProductPageQuery::execute', $tester->getDisplay());
+        self::assertStringNotContainsString('InventoryQuery::execute', $tester->getDisplay());
+        self::assertStringContainsString('private', $tester->getDisplay());
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testIgnoredCachedDependenciesStillConstrainTheCompleteEffectiveResult(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => 'ProductPageQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'], '--format' => 'json'];
+        $tester->execute($arguments);
+        $baseline = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($baseline);
+
+        $tester->execute([...$arguments, '--ignore' => ['ProductQuery', 'ViewerQuery']]);
+        $filtered = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($filtered);
+        self::assertSame($baseline['effective'], $filtered['effective']);
+        self::assertIsArray($filtered['dependencies']);
+        self::assertCount(1, $filtered['dependencies']);
+    }
+
+    #[DataProvider('providerTextFormats')]
+    public function testTextFormatsIdentifyOrdinaryCallsAndApplyTheSameSubtreeFilter(string $format): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $arguments = ['boundary' => 'InspectionQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture'], '--format' => $format, '--show-uncached' => true];
+        $tester->execute($arguments);
+        self::assertStringContainsString('InventoryLookup::get (uncached)', $tester->getDisplay());
+        self::assertStringContainsString('InspectionQuery::offset (uncached)', $tester->getDisplay());
+        self::assertStringContainsString('ProductQuery::execute', $tester->getDisplay());
+
+        $tester->execute([...$arguments, '--ignore' => ['*Lookup']]);
+        self::assertStringNotContainsString('InventoryLookup', $tester->getDisplay());
+        self::assertStringNotContainsString('ProductQuery', $tester->getDisplay());
+        self::assertStringContainsString('InspectionQuery::offset (uncached)', $tester->getDisplay());
+    }
+
+    #[DataProvider('providerFormatsAndFlags')]
+    public function testIgnoreAlsoAppliesToTheSelectedRoot(string $format, bool $showUncached): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $tester->execute([
+            'boundary' => 'ProductController::show',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
+            '--format' => $format,
+            '--show-uncached' => $showUncached,
+            '--ignore' => ['*Controller'],
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertSame($format === 'json' ? '[]' : 'All matching roots were excluded by --ignore.', trim($tester->getDisplay()));
+    }
+
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function providerFormatsAndFlags(): iterable
+    {
+        foreach (['tree', 'json', 'mermaid'] as $format) {
+            foreach ([false, true] as $flag) {
+                yield $format.($flag ? ' expanded' : ' default') => [$format, $flag];
+            }
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function providerTextFormats(): iterable
+    {
+        yield 'tree' => ['tree'];
+        yield 'mermaid' => ['mermaid'];
     }
 }

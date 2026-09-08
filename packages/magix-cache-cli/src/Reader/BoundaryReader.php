@@ -101,6 +101,7 @@ final readonly class BoundaryReader
     /**
      * Reads an uncached method as an analysis entry point without applying cache attributes.
      *
+     * Concrete leaves are retained for inspection; abstract declarations return null.
      * Call this only after read() has established that the method has no cached() call.
      *
      * @param array<string, string> $propertyTypes
@@ -110,7 +111,7 @@ final readonly class BoundaryReader
         $parameters = $this->parameters->read($method);
         $dependencies = $this->dependencies->read($method, $class, $propertyTypes, $parameters);
 
-        if ($dependencies === []) {
+        if ($method->stmts === null) {
             return null;
         }
 

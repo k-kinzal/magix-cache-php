@@ -83,7 +83,17 @@ final class BoundaryReaderTest extends TestCase
         self::assertSame([], $entryPoint->parameters);
         self::assertSame('ProductController::show', $entryPoint->id());
         self::assertSame(['ProductQuery', 'ViewerQuery'], array_map(static fn (DependencyCall $call): string => $call->class, $entryPoint->dependencies));
-        self::assertNull((new BoundaryReader())->entryPoint(new ClassMethod('empty'), 'ProductController', 'controller.php', []));
+        self::assertNull((new BoundaryReader())->entryPoint(new ClassMethod('abstract', ['stmts' => null]), 'ProductController', 'controller.php', []));
+    }
+
+    public function testEntryPointRetainsConcreteLeavesForUncachedInspection(): void
+    {
+        $leaf = (new BoundaryReader())->entryPoint(new ClassMethod('empty'), 'ProductController', 'controller.php', []);
+
+        self::assertInstanceOf(BoundaryDeclaration::class, $leaf);
+        self::assertFalse($leaf->isCacheBoundary);
+        self::assertSame([], $leaf->dependencies);
+        self::assertNull($leaf->policy);
     }
 
     public function testReadDescribesACachedMethodWithItsAttributePolicy(): void

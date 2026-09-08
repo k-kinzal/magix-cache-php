@@ -32,6 +32,11 @@ final readonly class MermaidRenderer
         $effect = $node->effect;
         $entryPoint = $node->boundary->isCacheBoundary ? '' : ' (uncached entry point)';
         $label = $node->boundary->shortId().$entryPoint.'<br/>'.$effect->ttl->label().' - '.$effect->visibilityLabel();
+
+        if ($id !== 'n0' && !$node->boundary->isCacheBoundary) {
+            $label = $node->boundary->shortId().' (uncached)';
+        }
+
         $statements = ['    '.$id.'["'.$label.'"]'];
 
         if ($effect->localRestrictions !== []) {

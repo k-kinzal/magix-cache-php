@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Application::class)]
 #[UsesNamespace('Magix\Cache\Cli')]
 #[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
+#[UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class ApplicationTest extends TestCase
 {
     public function testConsoleRegistersEveryMagixCommand(): void

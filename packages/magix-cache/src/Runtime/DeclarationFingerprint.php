@@ -17,6 +17,7 @@ use Magix\Cache\Attribute\StaleIfError;
 use Magix\Cache\Attribute\UseStrategy;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\Metadata\CacheTokenSet;
+use Magix\Cache\Runtime\Parameter\ParameterBinding;
 use ReflectionMethod;
 
 use function sort;
@@ -58,10 +59,12 @@ final readonly class DeclarationFingerprint
         foreach ($method->getParameters() as $parameter) {
             $reducers = $parameter->getAttributes(CacheKey::class);
 
+            $binding = ParameterBinding::read($parameter);
             $parameters[] = [
                 'name' => $parameter->getName(),
                 'ignored' => $parameter->getAttributes(CacheIgnore::class) !== [],
                 'reducer' => $reducers === [] ? null : $reducers[0]->newInstance()->reduce,
+                ...($binding === null ? [] : ['binding' => $binding]),
             ];
         }
 

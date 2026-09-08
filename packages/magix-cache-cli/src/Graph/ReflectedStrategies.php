@@ -124,6 +124,8 @@ final readonly class ReflectedStrategies
                 position: $position,
                 hasDefault: $hasDefault,
                 default: $default,
+                variadic: $parameter->isVariadic(),
+                byReference: $parameter->isPassedByReference(),
             );
         }
 

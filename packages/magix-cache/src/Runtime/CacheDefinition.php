@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Runtime;
 
+use Closure;
 use InvalidArgumentException;
 use LogicException;
 use Magix\Cache\Attribute\BypassCacheErrors;
@@ -13,8 +14,12 @@ use Magix\Cache\Attribute\CacheScope;
 use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\StaleIfError;
 use Magix\Cache\Attribute\UseStrategy;
+use Magix\Cache\Cached;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\Metadata\Visibility;
+use Magix\Cache\Runtime\Parameter\ParameterBindings;
+use Magix\Cache\Runtime\Parameter\ParameterConfiguration;
+use Magix\Cache\Runtime\Parameter\StrategyBindings;
 use Magix\Cache\Strategy\StrategyDefinition;
 use ReflectionMethod;
 
@@ -42,20 +47,22 @@ final readonly class CacheDefinition
     public string $runtime;
 
     /**
-     * Strategy construction definition resolved from the #[UseStrategy] declaration.
+     * Memoized static strategy recipe; null when absent or invocation-bound.
      */
     public ?StrategyDefinition $strategy;
 
     private string $fingerprint;
 
+    private ParameterBindings $parameters;
+
     /**
      * Creates a definition from one reflected method and its declarations.
      *
-     * The declared strategy is resolved here, once per memoized declaration,
-     * by calling the static create() of the referenced class with the
-     * declared arguments.
+     * Static strategy arguments are resolved once here. Parameter bindings
+     * are validated here and evaluated by invocation(), which retains no
+     * caller values on this memoized definition.
      *
-     * @throws InvalidArgumentException when a parameter is both scoped and ignored
+     * @throws InvalidArgumentException when parameter scopes or configuration bindings conflict
      * @throws LogicException when the declared strategy cannot be resolved
      */
     public function __construct(
@@ -65,7 +72,7 @@ final readonly class CacheDefinition
         public ?StaleIfError $staleIfError = null,
         public ?DynamicTtl $dynamicTtl = null,
         public ?BypassCacheErrors $bypassCacheErrors = null,
-        ?UseStrategy $useStrategy = null,
+        private ?UseStrategy $useStrategy = null,
     ) {
         $visibility = Visibility::Shared;
 
@@ -88,7 +95,10 @@ final readonly class CacheDefinition
 
         $this->policy = $declaration->policy()->restrictVisibility($visibility);
         $this->runtime = $declaration->runtime;
-        $this->strategy = $useStrategy?->resolve();
+        $this->parameters = new ParameterBindings($method);
+        $bindings = $this->parameters->strategyArguments();
+        (new StrategyBindings())->validate($useStrategy, $bindings);
+        $this->strategy = $bindings === [] ? $useStrategy?->resolve() : null;
         $this->fingerprint = (new DeclarationFingerprint())->calculate(
             $method,
             $this->policy,
@@ -106,7 +116,67 @@ final readonly class CacheDefinition
      */
     public function keyContext(array $arguments): CacheKeyContext
     {
+        $values = $this->parameters->bind($arguments);
+
+        return $this->context($arguments, $values, $this->strategyFor($values));
+    }
+
+    /**
+     * Binds configuration before lookup without retaining invocation values.
+     *
+     * @template T
+     * @param array<array-key, mixed> $arguments
+     * @param Closure(): Cached<T> $origin
+     * @return CacheInvocation<T>
+     * @throws InvalidArgumentException when parameter values do not satisfy their cache constraints
+     * @throws LogicException when the strategy factory does not produce a construction definition
+     */
+    public function invocation(array $arguments, Closure $origin): CacheInvocation
+    {
+        $values = $this->parameters->bind($arguments);
+        $strategy = $this->strategyFor($values);
+
+        return new CacheInvocation(
+            context: $this->context($arguments, $values, $strategy),
+            policy: $values->policy($this->policy),
+            origin: $origin,
+            staleIfError: $this->staleIfError,
+            dynamicTtl: $this->dynamicTtl,
+            bypassCacheErrors: $this->bypassCacheErrors,
+            strategy: $strategy,
+            parameterTtl: $values->ttl,
+        );
+    }
+
+    /**
+     * Builds a fresh recipe only when create() has invocation arguments.
+     *
+     * @throws LogicException when the strategy factory does not produce a construction definition
+     */
+    public function strategyFor(ParameterConfiguration $values): ?StrategyDefinition
+    {
+        return $values->strategyArguments === []
+            ? $this->strategy
+            : $this->useStrategy?->resolve($values->strategyArguments);
+    }
+
+    /**
+     * Includes evaluated settings even when a key reducer omits them.
+     *
+     * @param array<array-key, mixed> $arguments
+     */
+    public function context(array $arguments, ParameterConfiguration $values, ?StrategyDefinition $strategy): CacheKeyContext
+    {
         $keyArguments = (new CacheKeyArgumentBinder())->bind($this->method, $arguments);
+
+        if ($this->parameters->bindings !== []) {
+            $keyArguments['@configuration'] = [
+                'ttl' => $values->ttl,
+                'tags' => $values->tags,
+                'visibility' => $values->visibility,
+                'strategy' => $strategy,
+            ];
+        }
 
         return new CacheKeyContext(
             namespace: '',

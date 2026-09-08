@@ -9,6 +9,8 @@ use Magix\Cache\Cli\Declaration\Catalog;
 use Magix\Cache\Cli\Declaration\ClassDeclaration;
 use Magix\Cache\Cli\Declaration\ContractReference;
 use Magix\Cache\Cli\Declaration\ContractSource;
+use Magix\Cache\Cli\Declaration\KeyParameter;
+use Magix\Cache\Cli\Declaration\ParameterConfiguration;
 use Magix\Cache\Cli\Declaration\StrategyArgument;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\StrategyInstantiation;
@@ -29,9 +31,11 @@ use Magix\Cache\Strategy\Contract\Ttl;
 use Magix\Cache\Strategy\KeySpreadExpirationStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(StrategyResolver::class)]
+#[UsesNamespace('Magix\Cache')]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(Catalog::class)]
 #[UsesClass(ClassDeclaration::class)]
@@ -411,5 +415,34 @@ final class StrategyResolverTest extends TestCase
 
         self::assertSame(TtlEstimateState::Invalid, $step->ttl->state);
         self::assertSame(['App\Factory is not a constructible CacheStrategy for StrategyDefinition::of()'], $problems);
+    }
+
+    public function testResolvePropagatesInvocationArgumentsThroughChildContracts(): void
+    {
+        $composite = new ClassDeclaration('App\Composite', strategy: new StrategyDeclaration(
+            name: 'App\Composite',
+            createParameters: [new StrategyParameter('min', 0, true, 30)],
+            hasCreate: true,
+            composed: [new StrategyInstantiation(KeySpreadExpirationStrategy::class, [
+                new StrategyArgument('minimum', Unresolved::Value, 'min'),
+                new StrategyArgument('maximum', 60),
+            ])],
+        ));
+        $boundary = new BoundaryDeclaration(
+            'Query',
+            'fetch',
+            'a.php',
+            1,
+            parameters: [new KeyParameter('ttl', 'int', configuration: new ParameterConfiguration(strategyArgument: 'min'))],
+            useStrategy: new UseStrategyDeclaration('App\Composite'),
+        );
+        $effect = (new StrategyResolver(new Catalog([$composite])))->resolve($boundary);
+
+        self::assertNotNull($effect);
+        self::assertSame('Composite::create(min: $ttl)', $effect->label);
+        self::assertSame(TtlEstimateState::Unknown, $effect->ttl->state);
+        self::assertNull($effect->ttl->lowerBound, 'the factory default is not the invocation value');
+        self::assertSame(60, $effect->ttl->upperBound);
+        self::assertSame([], $effect->problems);
     }
 }

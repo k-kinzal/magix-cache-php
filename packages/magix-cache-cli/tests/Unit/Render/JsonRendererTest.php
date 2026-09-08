@@ -80,7 +80,7 @@ final class JsonRendererTest extends TestCase
             ['source' => 'MethodAttribute', 'ttl' => '120s', 'maxTtl' => null, 'tags' => ['page'], 'visibility' => 'shared', 'version' => '1', 'runtime' => 'default'],
             $tree['policy'],
         );
-        self::assertSame([['name' => 'viewerId', 'type' => 'int', 'ignored' => false, 'scope' => 'private', 'reducer' => null]], $tree['key']);
+        self::assertSame([['name' => 'viewerId', 'type' => 'int', 'ignored' => false, 'scope' => 'private', 'reducer' => null, 'configuration' => null]], $tree['key']);
         self::assertArrayHasKey('effective', $tree);
         self::assertArrayHasKey('dependencies', $tree);
     }

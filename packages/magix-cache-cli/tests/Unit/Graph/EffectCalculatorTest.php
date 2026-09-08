@@ -6,6 +6,7 @@ namespace Tests\Package\Cli\Unit\Graph;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\KeyParameter;
+use Magix\Cache\Cli\Declaration\ParameterConfiguration;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Graph\CacheEffect;
@@ -19,9 +20,11 @@ use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(EffectCalculator::class)]
+#[UsesNamespace('Magix\Cache')]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
 #[UsesClass(CacheNode::class)]
@@ -368,5 +371,63 @@ final class EffectCalculatorTest extends TestCase
 
         self::assertSame(['shared', 'extra'], $calculator->problems(['shared'], $strategy));
         self::assertSame(['own'], $calculator->problems(['own'], null));
+    }
+
+    public function testCalculateParameterTtlSuppliesAutoAndPreservesProvenCaps(): void
+    {
+        $calculator = new EffectCalculator();
+        $parameter = new KeyParameter('ttl', 'int', configuration: new ParameterConfiguration(ttl: true));
+        $auto = new BoundaryDeclaration(
+            'Query',
+            'fetch',
+            'a.php',
+            1,
+            policy: new PolicyDeclaration(source: PolicySource::MethodAttribute, ttl: Ttl::Auto),
+            parameters: [$parameter],
+        );
+        $effect = $calculator->calculate($auto, new DependencyConstraint());
+
+        self::assertSame(TtlEstimateState::Unknown, $effect->ttl->state);
+        self::assertSame([], $effect->problems);
+        self::assertStringContainsString('$ttl', $effect->ttl->reason ?? '');
+        $capped = new BoundaryDeclaration(
+            'Query',
+            'fetch',
+            'a.php',
+            1,
+            policy: new PolicyDeclaration(source: PolicySource::MethodAttribute, ttl: 60),
+            parameters: [$parameter],
+        );
+        $bounded = $calculator->calculate($capped, new DependencyConstraint(TtlEstimate::known(20)));
+
+        self::assertSame(TtlEstimateState::Unknown, $bounded->ttl->state);
+        self::assertSame(20, $bounded->ttl->upperBound);
+        self::assertSame(0, $bounded->ttl->lowerBound);
+        self::assertStringContainsString('$ttl', $bounded->ttl->reason ?? '');
+    }
+
+    public function testConstrainPropagatesUnknownParameterMetadataToParents(): void
+    {
+        $calculator = new EffectCalculator();
+        $child = new BoundaryDeclaration(
+            'Child',
+            'fetch',
+            'a.php',
+            1,
+            policy: new PolicyDeclaration(source: PolicySource::MethodAttribute, ttl: 60),
+            parameters: [
+                new KeyParameter('tags', 'array', configuration: new ParameterConfiguration(tags: true)),
+                new KeyParameter('visibility', Visibility::class, configuration: new ParameterConfiguration(visibility: true)),
+            ],
+        );
+        $childEffect = $calculator->calculate($child, new DependencyConstraint());
+        $constraint = $calculator->constrain([new CacheNode($child, $childEffect)]);
+        $parent = new BoundaryDeclaration('ParentQuery', 'fetch', 'b.php', 1, policy: new PolicyDeclaration(source: PolicySource::MethodAttribute, ttl: 30));
+        $effect = $calculator->calculate($parent, $constraint);
+
+        self::assertTrue($effect->visibilityUnknown);
+        self::assertTrue($effect->tagsUnknown);
+        self::assertFalse($effect->storable);
+        self::assertSame(30, $effect->ttl->seconds);
     }
 }

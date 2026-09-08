@@ -56,6 +56,7 @@ final readonly class ParameterReader
                 reducer: $this->reducer($parameter->attrGroups),
                 variadic: $parameter->variadic,
                 optional: $parameter->default !== null || $parameter->variadic,
+                configuration: (new ParameterConfigurationReader())->read($parameter->attrGroups),
             );
         }
 

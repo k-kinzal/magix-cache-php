@@ -18,6 +18,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[UsesNamespace('Magix\Cache\Cli')]
 #[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
+#[UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class AnalyzeCommandTest extends TestCase
 {
     public function testAnalyzeRendersTheComposedTreeOfABoundary(): void

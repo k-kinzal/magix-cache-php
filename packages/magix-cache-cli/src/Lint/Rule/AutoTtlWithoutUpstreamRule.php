@@ -7,6 +7,7 @@ namespace Magix\Cache\Cli\Lint\Rule;
 use Magix\Cache\Cli\Declaration\Catalog;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\EffectCalculator;
+use Magix\Cache\Cli\Graph\ParameterEffects;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
 use Magix\Cache\Cli\Lint\Diagnostic;
 use Magix\Cache\Cli\Lint\LintRule;
@@ -43,6 +44,10 @@ final readonly class AutoTtlWithoutUpstreamRule implements LintRule
         $declared = $boundary->policy?->ttl;
 
         if (!$declared instanceof Ttl || $boundary->suppliesMetadata || $boundary->hasDynamicTtl) {
+            return [];
+        }
+
+        if ((new ParameterEffects())->ttl($boundary) !== null || $node->effect->strategy?->addsConstraint === true) {
             return [];
         }
 

@@ -63,4 +63,18 @@ final class OriginConstraintsTest extends TestCase
 
         self::assertSame(105.0, $metadata->expiresAt);
     }
+
+    public function testApplyUsesOneBaseTimeForParameterDynamicAndPolicyConstraints(): void
+    {
+        $metadata = (new OriginConstraints())->apply(
+            new CachePolicy(ttl: 60),
+            new FixedTtlResolver(20),
+            Cached::of('value', new CacheMetadata(expiresAt: 150.0)),
+            'key',
+            100.0,
+            parameterTtl: 5,
+        );
+
+        self::assertSame(105.0, $metadata->expiresAt);
+    }
 }

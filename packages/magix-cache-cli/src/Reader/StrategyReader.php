@@ -109,6 +109,8 @@ final readonly class StrategyReader
                 position: $position,
                 hasDefault: $parameter->default !== null,
                 default: $default === LiteralReader::UNRESOLVED ? Unresolved::Value : $default,
+                variadic: $parameter->variadic,
+                byReference: $parameter->byRef,
             );
         }
 

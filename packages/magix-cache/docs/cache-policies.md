@@ -199,3 +199,11 @@ The version is part of the default cache key. A fingerprint of the effective dec
 ```
 
 Versions must be non-empty strings. Changing the version leaves old backend entries in place until their physical expiration; it only moves new reads and writes to a different key.
+
+## Constraints From Parameters
+
+Use `#[CacheTtl]`, `#[CacheTags]`, and `#[CacheVisibility]` on method parameters
+when callers supply these values. Their constraints compose with this policy
+and dependencies through the same fixed meet law. See
+[Parameter Configuration](parameter-configuration.md) for binding, validation,
+key behavior and static analysis.

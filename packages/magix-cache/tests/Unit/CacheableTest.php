@@ -14,10 +14,13 @@ use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixture\CachedQuery;
+use Tests\Fixture\FailingCache;
 use Tests\Fixture\FirstSourceQuery;
 use Tests\Fixture\FixedTtlResolver;
 use Tests\Fixture\MemoryCache;
 use Tests\Fixture\MutableClock;
+use Tests\Fixture\ParameterQuery;
+use Tests\Fixture\ParameterStrategy;
 use Tests\Fixture\SecondSourceQuery;
 use Tests\Fixture\StrategyQuery;
 
@@ -29,12 +32,14 @@ final class CacheableTest extends TestCase
     protected function setUp(): void
     {
         CacheRuntimeRegistry::reset();
+        ParameterStrategy::$factories = 0;
     }
 
     #[Override]
     protected function tearDown(): void
     {
         CacheRuntimeRegistry::reset();
+        ParameterStrategy::$factories = 0;
     }
 
     public function testCachedRunsTheDeclaredStrategyComposition(): void
@@ -156,5 +161,86 @@ final class CacheableTest extends TestCase
         self::assertEquals($firstUser, $firstUserAgain);
         self::assertSame('personal:2', $secondUser->value());
         self::assertSame(2, $query->calls);
+    }
+
+    public function testCachedBindsDefaultsNamesAndMetadataConstraints(): void
+    {
+        CacheRuntimeRegistry::register('default', new CacheRuntime(new MemoryCache(), new MutableClock(100.0)));
+        $query = new ParameterQuery();
+        $default = $query->fetch();
+        $same = $query->fetch(visibility: Visibility::Shared, tags: [], ttl: 30);
+        $restricted = $query->fetch(tags: ['dynamic', 'static'], visibility: Visibility::Private, ttl: 90);
+
+        self::assertEquals($default, $same);
+        self::assertSame(130.0, $default->metadata->expiresAt);
+        self::assertSame(160.0, $restricted->metadata->expiresAt);
+        self::assertSame(['dynamic', 'static'], $restricted->metadata->tags);
+        self::assertSame(Visibility::Private, $restricted->metadata->visibility);
+        self::assertSame(2, $query->calls);
+    }
+
+    public function testCachedParameterTtlSuppliesAutoAndZeroPreventsStorage(): void
+    {
+        $cache = new MemoryCache();
+        CacheRuntimeRegistry::register('default', new CacheRuntime($cache, new MutableClock(100.0)));
+        $query = new ParameterQuery();
+
+        self::assertSame(120.0, $query->auto(20)->metadata->expiresAt);
+        self::assertSame(100.0, $query->auto(0)->metadata->expiresAt);
+        $query->auto(0);
+        self::assertSame(3, $query->calls);
+    }
+
+    public function testCachedParameterNoStorePreventsLookupAndStorage(): void
+    {
+        $cache = new FailingCache();
+        CacheRuntimeRegistry::register('default', new CacheRuntime($cache, new MutableClock(100.0)));
+        $query = new ParameterQuery();
+        $first = $query->fetch(visibility: Visibility::NoStore);
+        $second = $query->fetch(visibility: Visibility::NoStore);
+
+        self::assertSame(Visibility::NoStore, $first->metadata->visibility);
+        self::assertSame(2, $second->value());
+        self::assertSame(2, $query->calls);
+    }
+
+    public function testCachedParameterTtlsMeetDependenciesAndEachOther(): void
+    {
+        CacheRuntimeRegistry::register('default', new CacheRuntime(new MemoryCache(), new MutableClock(100.0)));
+        $query = new ParameterQuery();
+        $dependency = Cached::of('dependency', new CacheMetadata(expiresAt: 120.0));
+
+        self::assertSame(120.0, $query->composed($dependency, 90)->metadata->expiresAt);
+        self::assertSame(105.0, $query->composed($dependency, 90, 5)->metadata->expiresAt);
+    }
+
+    public function testCachedStrategyArgumentsRebuildOnHitsAndSurviveKeyReduction(): void
+    {
+        CacheRuntimeRegistry::register('default', new CacheRuntime(new MemoryCache(), new MutableClock(100.0)));
+        $query = new ParameterQuery();
+        $first = $query->strategy(30);
+        $hit = $query->strategy();
+        $different = $query->strategy(10);
+
+        self::assertEquals($first, $hit);
+        self::assertSame(130.0, $first->metadata->expiresAt);
+        self::assertSame(110.0, $different->metadata->expiresAt);
+        self::assertSame(2, $query->calls);
+        self::assertSame(3, ParameterStrategy::$factories);
+        self::assertContains('bound:1:1', $different->metadata->tags);
+    }
+
+    public function testCachedStrategyBindingsAreIndependentAcrossNestedCalls(): void
+    {
+        CacheRuntimeRegistry::register('default', new CacheRuntime(new MemoryCache(), new MutableClock(100.0)));
+        $query = new ParameterQuery();
+        $outer = $query->nested(60);
+        $subsequent = $query->nested(30, true);
+        $both = $query->both(15);
+
+        self::assertSame(110.0, $outer->metadata->expiresAt);
+        self::assertSame(130.0, $subsequent->metadata->expiresAt);
+        self::assertSame(115.0, $both->metadata->expiresAt);
+        self::assertContains('both:1:1', $both->metadata->tags);
     }
 }

@@ -73,7 +73,7 @@ public function execute(int $productId): Cached
 }
 ```
 
-The declaration resolver calls `ProductCacheStrategy::create(min: 60)` once to memoize its construction definition. Executable instances are created for every invocation, including cache hits. A method-level `#[UseStrategy]` replaces a class-level one as a whole, and `enabled: false` disables a class-level default. The strategy class and its arguments are part of the declaration fingerprint, so changing them separates the stored entries.
+With static arguments, the declaration resolver calls `ProductCacheStrategy::create(min: 60)` once to memoize its construction definition. A method parameter annotated with `#[StrategyArgument('min')]` instead supplies the value for each invocation; its factory runs on every invocation, including hits. See [Parameter Configuration](parameter-configuration.md). Executable instances are created for every invocation, including cache hits. A method-level `#[UseStrategy]` replaces a class-level one as a whole, and `enabled: false` disables a class-level default. The strategy class and its arguments are part of the declaration fingerprint, so changing them separates the stored entries.
 
 ## Publishing a Contract
 

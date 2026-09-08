@@ -22,6 +22,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesClass(\Magix\Cache\Strategy\Contract\ConstructorArg::class)]
 #[UsesClass(\Magix\Cache\Strategy\Contract\Ttl::class)]
+#[UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class LintCommandTest extends TestCase
 {
     public function testLintFailsWhenABoundaryCannotWork(): void

@@ -73,7 +73,9 @@ final readonly class StrategyResolver
             return new StrategyEffect($use->label(), TtlEstimate::invalid($problem), [], null, [$problem]);
         }
 
+        [$use, $bindingProblems] = (new ParameterStrategyBinding())->bind($boundary, $use, $declaration);
         [$environment, $problems] = $this->binding->bindCreate($declaration, $use->arguments);
+        $problems = [...$problems, ...$bindingProblems];
         $composed = $this->composition($declaration, $environment);
         $ttl = $problems === [] ? $composed->ttl : TtlEstimate::invalid($problems[0]);
 

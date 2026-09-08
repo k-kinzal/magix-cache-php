@@ -101,7 +101,7 @@
 <span class="src-line" id="L65"><a class="ln" href="#L65">65</a>            )];</span>
 <span class="src-line" id="L66"><a class="ln" href="#L66">66</a>        }</span>
 <span class="src-line" id="L67"><a class="ln" href="#L67">67</a></span>
-<span class="src-line" id="L68"><a class="ln" href="#L68">68</a>        <span class="tok-kw">if</span> (<span class="tok-var">$upstream</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span>) {</span>
+<span class="src-line" id="L68"><a class="ln" href="#L68">68</a>        <span class="tok-kw">if</span> (<span class="tok-var">$upstream</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> &amp;&amp; !<span class="tok-var">$upstream</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>()) {</span>
 <span class="src-line" id="L69"><a class="ln" href="#L69">69</a>            <span class="tok-kw">return</span> [<span class="tok-kw">new</span> <span class="tok-id">Diagnostic</span>(</span>
 <span class="src-line" id="L70"><a class="ln" href="#L70">70</a>                <span class="tok-id">rule</span>: <span class="tok-str">&#039;auto-ttl-without-upstream&#039;</span>,</span>
 <span class="src-line" id="L71"><a class="ln" href="#L71">71</a>                <span class="tok-id">severity</span>: <span class="tok-id">Severity</span>::<span class="tok-id">Notice</span>,</span>

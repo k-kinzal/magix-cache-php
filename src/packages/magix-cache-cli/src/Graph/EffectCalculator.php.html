@@ -206,9 +206,9 @@
 <span class="src-line" id="L170"><a class="ln" href="#L170">170</a>            <span class="tok-var">$estimate</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">derived</span>(<span class="tok-var">$declared</span>, <span class="tok-var">$policy</span>-&gt;<span class="tok-id">maxTtl</span>, <span class="tok-var">$boundary</span>, <span class="tok-var">$combined</span>, <span class="tok-var">$source</span>, <span class="tok-var">$strategy</span>?-&gt;<span class="tok-id">addsConstraint</span> === <span class="tok-id">true</span> || <span class="tok-var">$parameterTtl</span> !== <span class="tok-id">null</span>);</span>
 <span class="src-line" id="L171"><a class="ln" href="#L171">171</a>        }</span>
 <span class="src-line" id="L172"><a class="ln" href="#L172">172</a></span>
-<span class="src-line" id="L173"><a class="ln" href="#L173">173</a>        <span class="tok-kw">if</span> (<span class="tok-var">$candidate</span> !== <span class="tok-id">null</span> &amp;&amp; <span class="tok-var">$upstream</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span></span>
+<span class="src-line" id="L173"><a class="ln" href="#L173">173</a>        <span class="tok-kw">if</span> (<span class="tok-var">$candidate</span> !== <span class="tok-id">null</span> &amp;&amp; <span class="tok-var">$upstream</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> &amp;&amp; !<span class="tok-var">$upstream</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>()</span>
 <span class="src-line" id="L174"><a class="ln" href="#L174">174</a>            &amp;&amp; <span class="tok-var">$estimate</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> &amp;&amp; <span class="tok-var">$estimate</span>-&gt;<span class="tok-id">reason</span> === <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L175"><a class="ln" href="#L175">175</a>            <span class="tok-var">$estimate</span> = <span class="tok-id">TtlEstimate</span>::<span class="tok-id">unknown</span>(<span class="tok-var">$estimate</span>-&gt;<span class="tok-id">upperBound</span>, <span class="tok-str">&#039;an upstream expiration may shorten the lifetime&#039;</span>, <span class="tok-var">$estimate</span>-&gt;<span class="tok-id">lowerBound</span>);</span>
+<span class="src-line" id="L175"><a class="ln" href="#L175">175</a>            <span class="tok-var">$estimate</span> = <span class="tok-var">$estimate</span>-&gt;<span class="tok-id">withCondition</span>(<span class="tok-str">&#039;an upstream expiration may shorten the lifetime&#039;</span>);</span>
 <span class="src-line" id="L176"><a class="ln" href="#L176">176</a>        }</span>
 <span class="src-line" id="L177"><a class="ln" href="#L177">177</a></span>
 <span class="src-line" id="L178"><a class="ln" href="#L178">178</a>        <span class="tok-kw">if</span> (<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">hasDynamicTtl</span>) {</span>
@@ -250,11 +250,11 @@
 <span class="src-line" id="L214"><a class="ln" href="#L214">214</a>                : <span class="tok-id">TtlEstimate</span>::<span class="tok-id">known</span>(<span class="tok-var">$met</span>-&gt;<span class="tok-id">seconds</span>, <span class="tok-str">&#039;declared &#039;</span>.<span class="tok-var">$declared</span>.<span class="tok-str">&#039;s, capped by &#039;</span>.<span class="tok-var">$source</span>);</span>
 <span class="src-line" id="L215"><a class="ln" href="#L215">215</a>        }</span>
 <span class="src-line" id="L216"><a class="ln" href="#L216">216</a></span>
-<span class="src-line" id="L217"><a class="ln" href="#L217">217</a>        <span class="tok-kw">return</span> <span class="tok-id">TtlEstimate</span>::<span class="tok-id">unknown</span>(</span>
-<span class="src-line" id="L218"><a class="ln" href="#L218">218</a>            <span class="tok-id">upperBound</span>: <span class="tok-var">$met</span>-&gt;<span class="tok-id">upperBound</span>,</span>
-<span class="src-line" id="L219"><a class="ln" href="#L219">219</a>            <span class="tok-id">condition</span>: <span class="tok-str">&#039;an upstream expiration may shorten the declared &#039;</span>.<span class="tok-var">$declared</span>.<span class="tok-str">&#039;s&#039;</span>,</span>
-<span class="src-line" id="L220"><a class="ln" href="#L220">220</a>            <span class="tok-id">lowerBound</span>: <span class="tok-var">$met</span>-&gt;<span class="tok-id">lowerBound</span>,</span>
-<span class="src-line" id="L221"><a class="ln" href="#L221">221</a>        );</span>
+<span class="src-line" id="L217"><a class="ln" href="#L217">217</a>        <span class="tok-kw">if</span> (<span class="tok-var">$upstream</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>() &amp;&amp; <span class="tok-var">$met</span>-&gt;<span class="tok-id">reason</span> === <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L218"><a class="ln" href="#L218">218</a>            <span class="tok-kw">return</span> <span class="tok-var">$met</span>;</span>
+<span class="src-line" id="L219"><a class="ln" href="#L219">219</a>        }</span>
+<span class="src-line" id="L220"><a class="ln" href="#L220">220</a></span>
+<span class="src-line" id="L221"><a class="ln" href="#L221">221</a>        <span class="tok-kw">return</span> <span class="tok-var">$met</span>-&gt;<span class="tok-id">withCondition</span>(<span class="tok-str">&#039;an upstream expiration may shorten the declared &#039;</span>.<span class="tok-var">$declared</span>.<span class="tok-str">&#039;s&#039;</span>);</span>
 <span class="src-line" id="L222"><a class="ln" href="#L222">222</a>    }</span>
 <span class="src-line" id="L223"><a class="ln" href="#L223">223</a></span>
 <span class="src-line" id="L224"><a class="ln" href="#L224">224</a>    <span class="tok-com">/**</span></span>
@@ -284,71 +284,67 @@
 <span class="src-line" id="L248"><a class="ln" href="#L248">248</a>        <span class="tok-kw">if</span> (<span class="tok-var">$upstream</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span>) {</span>
 <span class="src-line" id="L249"><a class="ln" href="#L249">249</a>            <span class="tok-var">$capped</span> = <span class="tok-var">$cap</span> === <span class="tok-id">null</span> ? <span class="tok-var">$upstream</span> : <span class="tok-var">$upstream</span>-&gt;<span class="tok-id">meet</span>(<span class="tok-id">TtlEstimate</span>::<span class="tok-id">known</span>(<span class="tok-var">$cap</span>));</span>
 <span class="src-line" id="L250"><a class="ln" href="#L250">250</a></span>
-<span class="src-line" id="L251"><a class="ln" href="#L251">251</a>            <span class="tok-kw">if</span> (<span class="tok-var">$strategyAddsConstraint</span>) {</span>
+<span class="src-line" id="L251"><a class="ln" href="#L251">251</a>            <span class="tok-kw">if</span> (<span class="tok-var">$strategyAddsConstraint</span> || <span class="tok-var">$upstream</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>()) {</span>
 <span class="src-line" id="L252"><a class="ln" href="#L252">252</a>                <span class="tok-kw">return</span> <span class="tok-var">$capped</span>;</span>
 <span class="src-line" id="L253"><a class="ln" href="#L253">253</a>            }</span>
 <span class="src-line" id="L254"><a class="ln" href="#L254">254</a></span>
-<span class="src-line" id="L255"><a class="ln" href="#L255">255</a>            <span class="tok-kw">return</span> <span class="tok-id">TtlEstimate</span>::<span class="tok-id">unknown</span>(</span>
-<span class="src-line" id="L256"><a class="ln" href="#L256">256</a>                <span class="tok-id">upperBound</span>: <span class="tok-var">$capped</span>-&gt;<span class="tok-id">seconds</span> ?? <span class="tok-var">$capped</span>-&gt;<span class="tok-id">upperBound</span>,</span>
-<span class="src-line" id="L257"><a class="ln" href="#L257">257</a>                <span class="tok-id">condition</span>: <span class="tok-str">&#039;requires a finite upstream expiration at runtime&#039;</span>,</span>
-<span class="src-line" id="L258"><a class="ln" href="#L258">258</a>                <span class="tok-id">lowerBound</span>: <span class="tok-var">$capped</span>-&gt;<span class="tok-id">seconds</span> ?? <span class="tok-var">$capped</span>-&gt;<span class="tok-id">lowerBound</span>,</span>
-<span class="src-line" id="L259"><a class="ln" href="#L259">259</a>            );</span>
-<span class="src-line" id="L260"><a class="ln" href="#L260">260</a>        }</span>
-<span class="src-line" id="L261"><a class="ln" href="#L261">261</a></span>
-<span class="src-line" id="L262"><a class="ln" href="#L262">262</a>        <span class="tok-kw">if</span> (<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">suppliesMetadata</span> || <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">hasDynamicTtl</span>) {</span>
-<span class="src-line" id="L263"><a class="ln" href="#L263">263</a>            <span class="tok-kw">return</span> <span class="tok-id">TtlEstimate</span>::<span class="tok-id">unknown</span>(</span>
-<span class="src-line" id="L264"><a class="ln" href="#L264">264</a>                <span class="tok-id">upperBound</span>: <span class="tok-var">$cap</span>,</span>
-<span class="src-line" id="L265"><a class="ln" href="#L265">265</a>                <span class="tok-id">condition</span>: <span class="tok-str">&#039;requires the boundary to supply a finite expiration at runtime&#039;</span>,</span>
-<span class="src-line" id="L266"><a class="ln" href="#L266">266</a>            );</span>
-<span class="src-line" id="L267"><a class="ln" href="#L267">267</a>        }</span>
-<span class="src-line" id="L268"><a class="ln" href="#L268">268</a></span>
-<span class="src-line" id="L269"><a class="ln" href="#L269">269</a>        <span class="tok-kw">return</span> <span class="tok-id">TtlEstimate</span>::<span class="tok-id">invalid</span>(</span>
-<span class="src-line" id="L270"><a class="ln" href="#L270">270</a>            <span class="tok-str">&#039;Ttl::&#039;</span>.<span class="tok-var">$declared</span>-&gt;<span class="tok-id">name</span>.<span class="tok-str">&#039; has no dependency with a finite expiration, so applying the policy throws a LogicException&#039;</span>,</span>
-<span class="src-line" id="L271"><a class="ln" href="#L271">271</a>        );</span>
-<span class="src-line" id="L272"><a class="ln" href="#L272">272</a>    }</span>
-<span class="src-line" id="L273"><a class="ln" href="#L273">273</a></span>
-<span class="src-line" id="L274"><a class="ln" href="#L274">274</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L275"><a class="ln" href="#L275">275</a><span class="tok-com">     * Reports whether the boundary provably stores its result.</span></span>
-<span class="src-line" id="L276"><a class="ln" href="#L276">276</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L277"><a class="ln" href="#L277">277</a><span class="tok-com">     * A range with a positive proven lower bound and no runtime condition</span></span>
-<span class="src-line" id="L278"><a class="ln" href="#L278">278</a><span class="tok-com">     * stores; a lifetime under a runtime condition cannot be proven to.</span></span>
-<span class="src-line" id="L279"><a class="ln" href="#L279">279</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L280"><a class="ln" href="#L280">280</a><span class="tok-com">     * @param list&lt;string&gt; $problems</span></span>
-<span class="src-line" id="L281"><a class="ln" href="#L281">281</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L282"><a class="ln" href="#L282">282</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">storable</span>(<span class="tok-id">TtlEstimate</span> <span class="tok-var">$estimate</span>, <span class="tok-id">Visibility</span> <span class="tok-var">$visibility</span>, <span class="tok-kw">array</span> <span class="tok-var">$problems</span>): <span class="tok-id">bool</span></span>
-<span class="src-line" id="L283"><a class="ln" href="#L283">283</a>    {</span>
-<span class="src-line" id="L284"><a class="ln" href="#L284">284</a>        <span class="tok-var">$floor</span> = <span class="tok-var">$estimate</span>-&gt;<span class="tok-id">seconds</span></span>
-<span class="src-line" id="L285"><a class="ln" href="#L285">285</a>            ?? (<span class="tok-var">$estimate</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> &amp;&amp; <span class="tok-var">$estimate</span>-&gt;<span class="tok-id">reason</span> === <span class="tok-id">null</span> ? <span class="tok-var">$estimate</span>-&gt;<span class="tok-id">lowerBound</span> : <span class="tok-id">null</span>);</span>
-<span class="src-line" id="L286"><a class="ln" href="#L286">286</a></span>
-<span class="src-line" id="L287"><a class="ln" href="#L287">287</a>        <span class="tok-kw">return</span> <span class="tok-var">$floor</span> !== <span class="tok-id">null</span> &amp;&amp; <span class="tok-var">$floor</span> &gt; <span class="tok-num">0</span> &amp;&amp; <span class="tok-var">$visibility</span> !== <span class="tok-id">Visibility</span>::<span class="tok-id">NoStore</span> &amp;&amp; <span class="tok-var">$problems</span> === [];</span>
-<span class="src-line" id="L288"><a class="ln" href="#L288">288</a>    }</span>
-<span class="src-line" id="L289"><a class="ln" href="#L289">289</a></span>
-<span class="src-line" id="L290"><a class="ln" href="#L290">290</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L291"><a class="ln" href="#L291">291</a><span class="tok-com">     * Returns cache tags deduplicated and sorted the way the runtime stores them.</span></span>
-<span class="src-line" id="L292"><a class="ln" href="#L292">292</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L293"><a class="ln" href="#L293">293</a><span class="tok-com">     * @param list&lt;string&gt; $tags</span></span>
-<span class="src-line" id="L294"><a class="ln" href="#L294">294</a><span class="tok-com">     * @return list&lt;string&gt;</span></span>
-<span class="src-line" id="L295"><a class="ln" href="#L295">295</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L296"><a class="ln" href="#L296">296</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">tags</span>(<span class="tok-kw">array</span> <span class="tok-var">$tags</span>): <span class="tok-kw">array</span></span>
-<span class="src-line" id="L297"><a class="ln" href="#L297">297</a>    {</span>
-<span class="src-line" id="L298"><a class="ln" href="#L298">298</a>        <span class="tok-var">$unique</span> = <span class="tok-id">array_values</span>(<span class="tok-id">array_unique</span>(<span class="tok-var">$tags</span>));</span>
-<span class="src-line" id="L299"><a class="ln" href="#L299">299</a>        <span class="tok-id">sort</span>(<span class="tok-var">$unique</span>);</span>
-<span class="src-line" id="L300"><a class="ln" href="#L300">300</a></span>
-<span class="src-line" id="L301"><a class="ln" href="#L301">301</a>        <span class="tok-kw">return</span> <span class="tok-var">$unique</span>;</span>
-<span class="src-line" id="L302"><a class="ln" href="#L302">302</a>    }</span>
-<span class="src-line" id="L303"><a class="ln" href="#L303">303</a></span>
-<span class="src-line" id="L304"><a class="ln" href="#L304">304</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L305"><a class="ln" href="#L305">305</a><span class="tok-com">     * Returns the effect problems including those of the declared strategy.</span></span>
-<span class="src-line" id="L306"><a class="ln" href="#L306">306</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L307"><a class="ln" href="#L307">307</a><span class="tok-com">     * @param list&lt;string&gt; $problems</span></span>
-<span class="src-line" id="L308"><a class="ln" href="#L308">308</a><span class="tok-com">     * @return list&lt;string&gt;</span></span>
-<span class="src-line" id="L309"><a class="ln" href="#L309">309</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L310"><a class="ln" href="#L310">310</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">problems</span>(<span class="tok-kw">array</span> <span class="tok-var">$problems</span>, ?<span class="tok-id">StrategyEffect</span> <span class="tok-var">$strategy</span>): <span class="tok-kw">array</span></span>
-<span class="src-line" id="L311"><a class="ln" href="#L311">311</a>    {</span>
-<span class="src-line" id="L312"><a class="ln" href="#L312">312</a>        <span class="tok-kw">return</span> <span class="tok-id">array_values</span>(<span class="tok-id">array_unique</span>([...<span class="tok-var">$problems</span>, ...(<span class="tok-var">$strategy</span>-&gt;<span class="tok-id">problems</span> ?? [])]));</span>
-<span class="src-line" id="L313"><a class="ln" href="#L313">313</a>    }</span>
-<span class="src-line" id="L314"><a class="ln" href="#L314">314</a>}</span>
-<span class="src-line" id="L315"><a class="ln" href="#L315">315</a></span>
+<span class="src-line" id="L255"><a class="ln" href="#L255">255</a>            <span class="tok-kw">return</span> <span class="tok-var">$capped</span>-&gt;<span class="tok-id">withCondition</span>(<span class="tok-str">&#039;requires a finite upstream expiration at runtime&#039;</span>);</span>
+<span class="src-line" id="L256"><a class="ln" href="#L256">256</a>        }</span>
+<span class="src-line" id="L257"><a class="ln" href="#L257">257</a></span>
+<span class="src-line" id="L258"><a class="ln" href="#L258">258</a>        <span class="tok-kw">if</span> (<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">suppliesMetadata</span> || <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">hasDynamicTtl</span>) {</span>
+<span class="src-line" id="L259"><a class="ln" href="#L259">259</a>            <span class="tok-kw">return</span> <span class="tok-id">TtlEstimate</span>::<span class="tok-id">unknown</span>(</span>
+<span class="src-line" id="L260"><a class="ln" href="#L260">260</a>                <span class="tok-id">upperBound</span>: <span class="tok-var">$cap</span>,</span>
+<span class="src-line" id="L261"><a class="ln" href="#L261">261</a>                <span class="tok-id">condition</span>: <span class="tok-str">&#039;requires the boundary to supply a finite expiration at runtime&#039;</span>,</span>
+<span class="src-line" id="L262"><a class="ln" href="#L262">262</a>            );</span>
+<span class="src-line" id="L263"><a class="ln" href="#L263">263</a>        }</span>
+<span class="src-line" id="L264"><a class="ln" href="#L264">264</a></span>
+<span class="src-line" id="L265"><a class="ln" href="#L265">265</a>        <span class="tok-kw">return</span> <span class="tok-id">TtlEstimate</span>::<span class="tok-id">invalid</span>(</span>
+<span class="src-line" id="L266"><a class="ln" href="#L266">266</a>            <span class="tok-str">&#039;Ttl::&#039;</span>.<span class="tok-var">$declared</span>-&gt;<span class="tok-id">name</span>.<span class="tok-str">&#039; has no dependency with a finite expiration, so applying the policy throws a LogicException&#039;</span>,</span>
+<span class="src-line" id="L267"><a class="ln" href="#L267">267</a>        );</span>
+<span class="src-line" id="L268"><a class="ln" href="#L268">268</a>    }</span>
+<span class="src-line" id="L269"><a class="ln" href="#L269">269</a></span>
+<span class="src-line" id="L270"><a class="ln" href="#L270">270</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L271"><a class="ln" href="#L271">271</a><span class="tok-com">     * Reports whether the boundary provably stores its result.</span></span>
+<span class="src-line" id="L272"><a class="ln" href="#L272">272</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L273"><a class="ln" href="#L273">273</a><span class="tok-com">     * A range with a positive proven lower bound and no runtime condition</span></span>
+<span class="src-line" id="L274"><a class="ln" href="#L274">274</a><span class="tok-com">     * stores; a lifetime under a runtime condition cannot be proven to.</span></span>
+<span class="src-line" id="L275"><a class="ln" href="#L275">275</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L276"><a class="ln" href="#L276">276</a><span class="tok-com">     * @param list&lt;string&gt; $problems</span></span>
+<span class="src-line" id="L277"><a class="ln" href="#L277">277</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L278"><a class="ln" href="#L278">278</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">storable</span>(<span class="tok-id">TtlEstimate</span> <span class="tok-var">$estimate</span>, <span class="tok-id">Visibility</span> <span class="tok-var">$visibility</span>, <span class="tok-kw">array</span> <span class="tok-var">$problems</span>): <span class="tok-id">bool</span></span>
+<span class="src-line" id="L279"><a class="ln" href="#L279">279</a>    {</span>
+<span class="src-line" id="L280"><a class="ln" href="#L280">280</a>        <span class="tok-var">$floor</span> = <span class="tok-var">$estimate</span>-&gt;<span class="tok-id">seconds</span></span>
+<span class="src-line" id="L281"><a class="ln" href="#L281">281</a>            ?? (<span class="tok-var">$estimate</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> &amp;&amp; <span class="tok-var">$estimate</span>-&gt;<span class="tok-id">reason</span> === <span class="tok-id">null</span> ? <span class="tok-var">$estimate</span>-&gt;<span class="tok-id">lowerBound</span> : <span class="tok-id">null</span>);</span>
+<span class="src-line" id="L282"><a class="ln" href="#L282">282</a></span>
+<span class="src-line" id="L283"><a class="ln" href="#L283">283</a>        <span class="tok-kw">return</span> <span class="tok-var">$floor</span> !== <span class="tok-id">null</span> &amp;&amp; <span class="tok-var">$floor</span> &gt; <span class="tok-num">0</span> &amp;&amp; <span class="tok-var">$visibility</span> !== <span class="tok-id">Visibility</span>::<span class="tok-id">NoStore</span> &amp;&amp; <span class="tok-var">$problems</span> === [];</span>
+<span class="src-line" id="L284"><a class="ln" href="#L284">284</a>    }</span>
+<span class="src-line" id="L285"><a class="ln" href="#L285">285</a></span>
+<span class="src-line" id="L286"><a class="ln" href="#L286">286</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L287"><a class="ln" href="#L287">287</a><span class="tok-com">     * Returns cache tags deduplicated and sorted the way the runtime stores them.</span></span>
+<span class="src-line" id="L288"><a class="ln" href="#L288">288</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L289"><a class="ln" href="#L289">289</a><span class="tok-com">     * @param list&lt;string&gt; $tags</span></span>
+<span class="src-line" id="L290"><a class="ln" href="#L290">290</a><span class="tok-com">     * @return list&lt;string&gt;</span></span>
+<span class="src-line" id="L291"><a class="ln" href="#L291">291</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L292"><a class="ln" href="#L292">292</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">tags</span>(<span class="tok-kw">array</span> <span class="tok-var">$tags</span>): <span class="tok-kw">array</span></span>
+<span class="src-line" id="L293"><a class="ln" href="#L293">293</a>    {</span>
+<span class="src-line" id="L294"><a class="ln" href="#L294">294</a>        <span class="tok-var">$unique</span> = <span class="tok-id">array_values</span>(<span class="tok-id">array_unique</span>(<span class="tok-var">$tags</span>));</span>
+<span class="src-line" id="L295"><a class="ln" href="#L295">295</a>        <span class="tok-id">sort</span>(<span class="tok-var">$unique</span>);</span>
+<span class="src-line" id="L296"><a class="ln" href="#L296">296</a></span>
+<span class="src-line" id="L297"><a class="ln" href="#L297">297</a>        <span class="tok-kw">return</span> <span class="tok-var">$unique</span>;</span>
+<span class="src-line" id="L298"><a class="ln" href="#L298">298</a>    }</span>
+<span class="src-line" id="L299"><a class="ln" href="#L299">299</a></span>
+<span class="src-line" id="L300"><a class="ln" href="#L300">300</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L301"><a class="ln" href="#L301">301</a><span class="tok-com">     * Returns the effect problems including those of the declared strategy.</span></span>
+<span class="src-line" id="L302"><a class="ln" href="#L302">302</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L303"><a class="ln" href="#L303">303</a><span class="tok-com">     * @param list&lt;string&gt; $problems</span></span>
+<span class="src-line" id="L304"><a class="ln" href="#L304">304</a><span class="tok-com">     * @return list&lt;string&gt;</span></span>
+<span class="src-line" id="L305"><a class="ln" href="#L305">305</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L306"><a class="ln" href="#L306">306</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">problems</span>(<span class="tok-kw">array</span> <span class="tok-var">$problems</span>, ?<span class="tok-id">StrategyEffect</span> <span class="tok-var">$strategy</span>): <span class="tok-kw">array</span></span>
+<span class="src-line" id="L307"><a class="ln" href="#L307">307</a>    {</span>
+<span class="src-line" id="L308"><a class="ln" href="#L308">308</a>        <span class="tok-kw">return</span> <span class="tok-id">array_values</span>(<span class="tok-id">array_unique</span>([...<span class="tok-var">$problems</span>, ...(<span class="tok-var">$strategy</span>-&gt;<span class="tok-id">problems</span> ?? [])]));</span>
+<span class="src-line" id="L309"><a class="ln" href="#L309">309</a>    }</span>
+<span class="src-line" id="L310"><a class="ln" href="#L310">310</a>}</span>
+<span class="src-line" id="L311"><a class="ln" href="#L311">311</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

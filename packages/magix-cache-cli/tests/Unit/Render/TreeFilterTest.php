@@ -6,6 +6,7 @@ namespace Tests\Package\Cli\Unit\Render;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Graph\CacheEffect;
+use Magix\Cache\Cli\Graph\CacheGap;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\IgnorePattern;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(IgnorePattern::class)]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
+#[UsesClass(CacheGap::class)]
 #[UsesClass(CacheNode::class)]
 #[UsesClass(TtlEstimate::class)]
 final class TreeFilterTest extends TestCase
@@ -31,11 +33,14 @@ final class TreeFilterTest extends TestCase
         $cached = new CacheNode(new BoundaryDeclaration('HiddenQuery', 'get', 'hidden.php', 1), $effect, [$stock]);
         $root = new CacheNode(new BoundaryDeclaration('PageQuery', 'get', 'page.php', 1), $effect, [$manager, $cached, $stock], ['an existing note']);
 
+        $root = new CacheNode($root->boundary, $effect, $root->children, $root->notes, [new CacheGap([$root->boundary, $manager->boundary, $stock->boundary])]);
+
         $visible = (new TreeFilter([new IgnorePattern('*Manager'), new IgnorePattern('HiddenQuery')]))->apply($root);
 
         self::assertNotNull($visible);
         self::assertSame($effect, $visible->effect);
         self::assertSame($root->notes, $visible->notes);
+        self::assertSame($root->gaps, $visible->gaps);
         self::assertCount(1, $visible->children);
         self::assertSame($stock->boundary, $visible->children[0]->boundary);
         self::assertCount(3, $root->children);

@@ -26,6 +26,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Catalog::class)]
 #[UsesClass(CacheEffect::class)]
 #[UsesClass(CacheNode::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\CacheGap::class)]
 #[UsesClass(ClassDeclaration::class)]
 #[UsesClass(DependencyCall::class)]
 #[UsesClass(DependencyConstraint::class)]

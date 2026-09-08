@@ -37,16 +37,17 @@ final readonly class EffectCalculator
      * An empty collection contributes the unconstrained identity.
      *
      * @param list<CacheNode> $children
+     * @param bool $hasGaps An ordinary path reaches a cache child, but its metadata propagation has not been analyzed.
      */
-    public function constrain(array $children): DependencyConstraint
+    public function constrain(array $children, bool $hasGaps = false): DependencyConstraint
     {
-        $ttl = TtlEstimate::unconstrained();
+        $ttl = $hasGaps ? TtlEstimate::unknown(condition: 'cache propagation through uncached methods is unanalyzed') : TtlEstimate::unconstrained();
         $ttlSource = null;
         $visibility = Visibility::Shared;
         $visibilitySource = null;
         $tags = [];
-        $visibilityUnknown = false;
-        $tagsUnknown = false;
+        $visibilityUnknown = $hasGaps;
+        $tagsUnknown = $hasGaps;
 
         foreach ($children as $child) {
             $effect = $child->effect;

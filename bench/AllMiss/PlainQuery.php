@@ -19,13 +19,17 @@ final readonly class PlainQuery
     /**
      * Evaluates every leaf and adds child totals up to the root.
      */
-    public function execute(int $id, int $depth): int
+    public function execute(int $id, int $depth, int $width = 2): int
     {
         if ($depth === 0) {
             return $this->catalog->total($id);
         }
 
-        return $this->execute($id * 2, $depth - 1)
-            + $this->execute($id * 2 + 1, $depth - 1);
+        $total = $this->execute($id * $width, $depth - 1, $width);
+        for ($child = 1; $child < $width; ++$child) {
+            $total += $this->execute($id * $width + $child, $depth - 1, $width);
+        }
+
+        return $total;
     }
 }

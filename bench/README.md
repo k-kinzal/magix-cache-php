@@ -15,21 +15,37 @@ It is informational, with no merge-target comparison or regression gate.
 
 ## Workload
 
-| Parameter set | Tree depth | Cache boundaries | Origin calculations |
-|---|---:|---:|---:|
-| `single-1-boundary` | 0 | 1 | 1 |
-| `composed-3-boundaries` | 1 | 3 | 2 |
-| `composed-15-boundaries` | 3 | 15 | 8 |
+The larger trees model adding Magix Cache throughout a legacy read-model call
+tree during refactoring. They keep the number of boundaries near 100 while
+varying depth and fan-out, so the comparison includes both long call paths and
+many sibling queries. The smaller cases show how the cost grows with adoption.
+
+| Parameter set | Levels, including root | Children per parent | Cache boundaries | Leaves / origin calculations |
+|---|---:|---:|---:|---:|
+| `single-1-boundary` | 1 | — | 1 | 1 |
+| `composed-3-boundaries` | 2 | 2 | 3 | 2 |
+| `composed-15-boundaries` | 4 | 2 | 15 | 8 |
+| `deep-wide-127-boundaries` | 7 | 2 | 127 | 64 |
+| `deep-wide-121-boundaries` | 5 | 3 | 121 | 81 |
+| `wide-111-boundaries` | 3 | 10 | 111 | 100 |
+
+`depth` in the PHP parameter sets counts edges, so the number of levels is
+`depth + 1`. For fan-out `width`, the tree has `width ** depth` leaves and
+`1 + width + ... + width ** depth` boundaries. These are boundary invocations
+and distinct cache keys within a tree, all using the same query class; they do
+not model 100 distinct classes or their initial attribute resolution.
 
 Each leaf totals 32 fixed catalog prices with deterministic quantities derived
-from the input ID. Each parent adds its two children's totals. `PlainQuery`
+from the input ID. Each parent adds all its children's totals. `PlainQuery`
 returns integers and has no Magix Cache calls. `MagixQuery` wraps every node in
-`Cacheable::cached()` with `#[Cache(ttl: 60)]`, and parents use `combine2()->map()`.
+`Cacheable::cached()` with `#[Cache(ttl: 60)]`, and parents fold their children
+with `combine2()->map()`, meeting the metadata of every child.
 Both subjects consume the final integer into the same observable result field.
 
 Each revolution increments the root ID, including warm-up revolutions. Child IDs
-are `2 * id` and `2 * id + 1`; at any given depth, distinct roots therefore have
-disjoint child IDs. Both ID and depth enter the default cache key. Every lookup
+are `width * id + child`, with `child` ranging from zero to `width - 1`; at any
+given depth, distinct roots therefore have disjoint child IDs. ID, depth, and
+width enter the default cache key. Every lookup
 misses even after previous revolutions have populated the cache.
 
 `MemoryCache` implements the core storage port with an array: it really retains
@@ -52,8 +68,11 @@ entries accumulate only within that sample. Warm-up primes class loading and
 declaration memoization using different keys from the measured calls. These are
 **warm-declaration misses**, not cold PHP process or first-declaration timings.
 
-The plain subject uses 100,000 revolutions and the Magix subject 5,000, keeping
-timing intervals useful without retaining excessive cache data. The origin's
+Small trees use 100,000 plain revolutions and 5,000 Magix revolutions. The large
+subjects use 10,000 and 500 respectively, keeping timing intervals useful without
+retaining excessive cache data. Even the 127-boundary case retains only 63,754
+entries in a full-run sample (500 measured trees plus two warm-up trees).
+The origin's
 five-ID quantity cycle is identical in both subjects. PHPBench normalizes times
 per revolution. Full runs use 10 iterations, two warm-up revolutions, and a 5%
 retry threshold; quick runs use three iterations, one warm-up revolution, and a
@@ -74,7 +93,11 @@ workload and displays:
 All comparisons use modes from the same run. Pay attention to `rstdev` and repeat
 full runs on an idle machine. The origin is deliberately cheap in-process work:
 the ratio describes these fixtures, not the slowdown of an application with
-database or network work. The additional time is usually the more useful number.
+database or network work. For a legacy migration, `additional` is the total
+added latency for one tree in this all-miss scenario; use that absolute cost
+alongside the application's existing request latency. Every node in these
+fixtures has a cache boundary. They do not simulate a mixture of migrated and
+unmigrated nodes or any cache-hit benefit.
 Backend, serialization, actual system-clock construction, hit-rate benefits, and
 request bootstrap costs require separate measurements.
 
@@ -89,6 +112,13 @@ For a single workload, keep both subjects selected so they can be paired:
 
 ```bash
 composer bench -- --variant=single-1-boundary
+```
+
+To measure the large refactoring scenarios only, keeping both implementations:
+
+```bash
+composer bench -- --filter=Large
+composer bench -- --variant=deep-wide-127-boundaries
 ```
 
 For one subject in isolation, use PHPBench's aggregate report directly:

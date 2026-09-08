@@ -28,16 +28,21 @@ final class MagixQuery
      * @return Cached<int>
      */
     #[Cache(ttl: 60)]
-    public function execute(int $id, int $depth): Cached
+    public function execute(int $id, int $depth, int $width = 2): Cached
     {
-        return $this->cached(function () use ($id, $depth): Cached {
+        return $this->cached(function () use ($id, $depth, $width): Cached {
             if ($depth === 0) {
                 return Cached::of($this->catalog->total($id));
             }
 
-            return $this->execute($id * 2, $depth - 1)
-                ->combine2($this->execute($id * 2 + 1, $depth - 1))
-                ->map(static fn (int $left, int $right): int => $left + $right);
+            $total = $this->execute($id * $width, $depth - 1, $width);
+            for ($child = 1; $child < $width; ++$child) {
+                $total = $total
+                    ->combine2($this->execute($id * $width + $child, $depth - 1, $width))
+                    ->map(static fn (int $left, int $right): int => $left + $right);
+            }
+
+            return $total;
         });
     }
 }

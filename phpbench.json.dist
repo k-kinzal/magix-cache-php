@@ -28,10 +28,10 @@
                     ],
                     "row": {
                         "workload": "first(partition[\"variant_name\"])",
-                        "plain": "mode(partition[subject_name = \"benchWithoutMagixCache\"][\"result_time_avg\"]) as time",
-                        "all_miss": "mode(partition[subject_name = \"benchMagixCacheAllMiss\"][\"result_time_avg\"]) as time",
-                        "additional": "(mode(partition[subject_name = \"benchMagixCacheAllMiss\"][\"result_time_avg\"]) - mode(partition[subject_name = \"benchWithoutMagixCache\"][\"result_time_avg\"])) as time",
-                        "ratio": "format(\"%.2fx\", mode(partition[subject_name = \"benchMagixCacheAllMiss\"][\"result_time_avg\"]) / mode(partition[subject_name = \"benchWithoutMagixCache\"][\"result_time_avg\"]))"
+                        "plain": "mode(partition[(subject_name = \"benchWithoutMagixCache\" or subject_name = \"benchWithoutMagixCacheLarge\")][\"result_time_avg\"]) as time",
+                        "all_miss": "mode(partition[(subject_name = \"benchMagixCacheAllMiss\" or subject_name = \"benchMagixCacheAllMissLarge\")][\"result_time_avg\"]) as time",
+                        "additional": "(mode(partition[(subject_name = \"benchMagixCacheAllMiss\" or subject_name = \"benchMagixCacheAllMissLarge\")][\"result_time_avg\"]) - mode(partition[(subject_name = \"benchWithoutMagixCache\" or subject_name = \"benchWithoutMagixCacheLarge\")][\"result_time_avg\"])) as time",
+                        "ratio": "format(\"%.2fx\", mode(partition[(subject_name = \"benchMagixCacheAllMiss\" or subject_name = \"benchMagixCacheAllMissLarge\")][\"result_time_avg\"]) / mode(partition[(subject_name = \"benchWithoutMagixCache\" or subject_name = \"benchWithoutMagixCacheLarge\")][\"result_time_avg\"]))"
                     }
                 }
             ]

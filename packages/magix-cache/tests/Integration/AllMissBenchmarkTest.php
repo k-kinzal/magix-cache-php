@@ -34,7 +34,7 @@ final class AllMissBenchmarkTest extends TestCase
     }
 
     #[DataProvider('providerTrees')]
-    public function testNewInputsMissAndStoreEveryBoundaryWithTheSameResult(int $depth, int $boundaries): void
+    public function testNewInputsMissAndStoreEveryBoundaryWithTheSameResult(int $depth, int $width, int $boundaries): void
     {
         $cache = new MemoryCache();
         $observer = new RecordingObserver();
@@ -43,29 +43,32 @@ final class AllMissBenchmarkTest extends TestCase
         $plain = new PlainQuery($catalog);
         $magix = new MagixQuery($catalog);
 
-        self::assertSame($plain->execute(1, $depth), $magix->execute(1, $depth)->value());
-        self::assertSame($plain->execute(2, $depth), $magix->execute(2, $depth)->value());
-        self::assertSame($plain->execute(3, $depth), $magix->execute(3, $depth)->value());
+        self::assertSame($plain->execute(1, $depth, $width), $magix->execute(1, $depth, $width)->value());
+        self::assertSame($plain->execute(2, $depth, $width), $magix->execute(2, $depth, $width)->value());
+        self::assertSame($plain->execute(3, $depth, $width), $magix->execute(3, $depth, $width)->value());
         self::assertCount(3 * $boundaries, array_filter($observer->events, static fn (CacheEvent $event): bool => $event === CacheEvent::Miss));
         self::assertCount(3 * $boundaries, array_filter($observer->events, static fn (CacheEvent $event): bool => $event === CacheEvent::Stored));
         self::assertCount(6 * $boundaries, $observer->events, 'Every boundary only misses and stores, including subsequent revolutions.');
         self::assertSame(3 * $boundaries, $cache->count());
 
-        self::assertSame($plain->execute(2, $depth), $magix->execute(2, $depth)->value());
+        self::assertSame($plain->execute(2, $depth, $width), $magix->execute(2, $depth, $width)->value());
         self::assertSame(CacheEvent::FreshHit, array_slice($observer->events, -1)[0] ?? null);
         self::assertCount(6 * $boundaries + 1, $observer->events, 'A repeated root key really hits the in-memory cache.');
         self::assertSame(3 * $boundaries, $cache->count());
     }
 
     /**
-     * @return array<string, array{int, int}>
+     * @return array<string, array{int, int, int}>
      */
     public static function providerTrees(): array
     {
         return [
-            'single' => [0, 1],
-            'two levels' => [1, 3],
-            'four levels' => [3, 15],
+            'single' => [0, 2, 1],
+            'two levels' => [1, 2, 3],
+            'four levels' => [3, 2, 15],
+            'seven levels with 64 leaves' => [6, 2, 127],
+            'five levels with 81 leaves' => [4, 3, 121],
+            'three levels with 100 leaves' => [2, 10, 111],
         ];
     }
 }

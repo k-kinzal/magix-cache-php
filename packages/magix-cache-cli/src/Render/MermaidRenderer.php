@@ -35,8 +35,6 @@ final readonly class MermaidRenderer
         $statements = ['    '.$id.'["'.$label.'"]'];
 
         if ($effect->localRestrictions !== []) {
-            $fields = implode(', ', array_keys($effect->localRestrictions));
-            $statements[0] = '    '.$id.'["'.$label.'<br/>local restriction: '.$fields.'"]';
             $statements[] = '    style '.$id.' fill:#fff3cd,stroke:#b58100,color:#664d03';
         }
 

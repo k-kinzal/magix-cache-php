@@ -32,7 +32,7 @@ final readonly class TreeRenderer
             ...$this->strategy($effect),
             '  ttl          '.$this->ttl($effect),
             '  visibility   '.$this->restricted($effect->visibilityLabel(), $effect, 'visibility')
-                .($effect->visibilityReason === null || isset($effect->localRestrictions['visibility']) ? '' : ' ('.$effect->visibilityReason.')'),
+                .($effect->visibilityReason === null ? '' : ' ('.$effect->visibilityReason.')'),
             '  storable     '.($effect->storable ? 'yes' : 'no'),
             '  tags         '.$effect->tagsLabel(),
             '  key          '.$this->key($node->boundary),
@@ -132,25 +132,25 @@ final readonly class TreeRenderer
      */
     public function ttl(CacheEffect $effect): string
     {
-        return $this->restricted($this->labelled($effect->ttl), $effect, 'ttl');
+        $ttl = $this->restricted($this->estimate($effect->ttl), $effect, 'ttl');
+
+        return $effect->ttl->reason === null ? $ttl : $ttl.' ('.$effect->ttl->reason.')';
     }
 
     /**
-     * Highlights a locally restricted field, retaining the reason without ANSI.
+     * Highlights a locally restricted field without adding text to the report.
      *
      * @param 'ttl'|'visibility' $field
      */
     public function restricted(string $label, CacheEffect $effect, string $field): string
     {
-        $reason = $effect->localRestrictions[$field] ?? null;
-
-        if ($reason === null) {
+        if (!isset($effect->localRestrictions[$field])) {
             return $label;
         }
 
         $label = $field === 'ttl' ? $effect->ttl->label() : $label;
 
-        return '<fg=yellow>'.$label.' [local restriction: '.$reason.']</>';
+        return '<fg=yellow>'.$label.'</>';
     }
 
     /**

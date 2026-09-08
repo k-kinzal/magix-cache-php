@@ -32,7 +32,8 @@ final class AnalyzeCommandTest extends TestCase
         ], ['decorated' => true]);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringContainsString("\033[33m30/300s [local restriction: local ttl 300s; composed 30/600-900s]\033[39m", $tester->getDisplay());
+        self::assertStringContainsString("\033[33m30/300s\033[39m", $tester->getDisplay());
+        self::assertStringNotContainsString('local restriction:', $tester->getDisplay());
         self::assertStringContainsString('TimedQuery::execute', $tester->getDisplay());
     }
 
@@ -44,15 +45,17 @@ final class AnalyzeCommandTest extends TestCase
         $tester->execute($arguments, ['decorated' => true]);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringContainsString("\033[33m10s [local restriction: local ttl 10s; composed 60s]\033[39m", $tester->getDisplay());
-        self::assertStringContainsString("\033[33mprivate [local restriction:", $tester->getDisplay());
+        self::assertStringContainsString("\033[33m10s\033[39m", $tester->getDisplay());
+        self::assertStringContainsString("\033[33mprivate\033[39m", $tester->getDisplay());
         self::assertStringContainsString("\033[32m60s\033[39m", $tester->getDisplay());
+        self::assertStringNotContainsString('local restriction:', $tester->getDisplay());
 
         $tester->execute([...$arguments, 'boundary' => 'RestrictedPageQuery::show'], ['decorated' => false]);
 
         $tester->assertCommandIsSuccessful();
         self::assertStringContainsString('ttl          10s', $tester->getDisplay());
-        self::assertStringContainsString('RestrictedPageQuery::execute  ttl 10s [local restriction:', $tester->getDisplay());
+        self::assertStringContainsString('RestrictedPageQuery::execute  ttl 10s  private  tags inventory', $tester->getDisplay());
+        self::assertStringNotContainsString('local restriction:', $tester->getDisplay());
         self::assertStringNotContainsString("\033[", $tester->getDisplay());
         self::assertStringNotContainsString('<fg=', $tester->getDisplay());
     }
@@ -60,7 +63,7 @@ final class AnalyzeCommandTest extends TestCase
     /**
      * @throws JsonException
      */
-    public function testAnalyzeExportsRestrictionReasonsAndStylesOnlyTheAffectedMermaidNode(): void
+    public function testAnalyzeKeepsJsonUnannotatedAndStylesOnlyTheAffectedMermaidNode(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $arguments = ['boundary' => 'RestrictedPageQuery::show', '--path' => ['packages/magix-cache-cli/tests/Fixture/Project']];
@@ -70,19 +73,17 @@ final class AnalyzeCommandTest extends TestCase
 
         self::assertIsArray($data);
         self::assertIsArray($data['effective']);
-        self::assertSame([], $data['effective']['localRestrictions']);
+        self::assertArrayNotHasKey('localRestrictions', $data['effective']);
         self::assertIsArray($data['dependencies']);
         self::assertIsArray($data['dependencies'][0]);
         self::assertIsArray($data['dependencies'][0]['effective']);
-        self::assertSame([
-            'ttl' => 'local ttl 10s; composed 60s',
-            'visibility' => 'declared by the policy; composed shared',
-        ], $data['dependencies'][0]['effective']['localRestrictions']);
+        self::assertArrayNotHasKey('localRestrictions', $data['dependencies'][0]['effective']);
 
         $tester->execute([...$arguments, '--format' => 'mermaid']);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringContainsString('local restriction: ttl, visibility', $tester->getDisplay());
+        self::assertStringContainsString('n0_0["RestrictedPageQuery::execute<br/>10s - private"]', $tester->getDisplay());
+        self::assertStringNotContainsString('local restriction:', $tester->getDisplay());
         self::assertStringContainsString('style n0_0 fill:#fff3cd', $tester->getDisplay());
         self::assertStringNotContainsString('style n0 ', $tester->getDisplay());
         self::assertStringNotContainsString('style n0_0_0 ', $tester->getDisplay());

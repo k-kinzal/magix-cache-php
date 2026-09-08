@@ -70,7 +70,7 @@ When a parent only composes cached children, `#[Cache]` with no arguments is eno
 
 Every method argument is included in the cache key by default. On a hit, the stored value and metadata are returned as `Cached` without running the compute closure.
 
-Use `map()`, `flatMap()`, and `combine2()` through `combine5()` to compose nested values. Their metadata can only become stricter: expiration moves earlier, cacheability uses logical AND, visibility becomes more restrictive, and tags and diagnostic reasons are combined. A declared TTL is always bounded by the upstream expiration, so no boundary can extend what a dependency imposed.
+Use `map()`, `flatMap()`, and `combine2()` through `combine5()` to compose values. `flatten()` removes one nested `Cached` layer, `zip()` and `unzip()` combine and split typed pairs, and `Cached::sequence()` / `Cached::traverse()` collect a variable number of results. Access the original PHP value explicitly with `value()`; `Cached` does not forward magic access. Their metadata can only become stricter: expiration moves earlier, cacheability uses logical AND, visibility becomes more restrictive, and tags and diagnostic reasons are combined. A declared TTL is always bounded by the upstream expiration, so no boundary can extend what a dependency imposed.
 
 ## Documentation
 

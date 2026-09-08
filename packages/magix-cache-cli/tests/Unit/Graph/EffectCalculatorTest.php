@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Graph;
 
+use Magix\Cache\Cli\Console\CatalogLoader;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\KeyParameter;
 use Magix\Cache\Cli\Declaration\ParameterConfiguration;
@@ -11,6 +12,7 @@ use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\CacheTree;
 use Magix\Cache\Cli\Graph\DependencyConstraint;
 use Magix\Cache\Cli\Graph\EffectCalculator;
 use Magix\Cache\Cli\Graph\StrategyEffect;
@@ -19,6 +21,7 @@ use Magix\Cache\Cli\Graph\TtlEstimateState;
 use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
@@ -465,5 +468,50 @@ final class EffectCalculatorTest extends TestCase
         self::assertTrue($effect->tagsUnknown);
         self::assertFalse($effect->storable);
         self::assertSame(30, $effect->ttl->seconds);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function providerCompositionOperations(): iterable
+    {
+        yield 'nested cached values' => ['flatten'];
+        yield 'typed pair' => ['zip'];
+        yield 'pair projection' => ['unzip'];
+        yield 'collection' => ['sequence'];
+        yield 'mapped collection' => ['traverse'];
+    }
+
+    #[DataProvider('providerCompositionOperations')]
+    public function testConstrainKeepsDependenciesThroughFunctionalComposition(string $operation): void
+    {
+        $catalog = (new CatalogLoader(dirname(__DIR__, 5)))
+            ->load(['packages/magix-cache-cli/tests/Fixture/FunctionalComposition']);
+        $boundaries = $catalog->search('Page::'.$operation);
+        self::assertCount(1, $boundaries);
+
+        $node = (new CacheTree($catalog))->build($boundaries[0]);
+
+        self::assertCount(2, $node->children);
+        self::assertSame(20, $node->effect->ttl->seconds);
+        self::assertSame(Visibility::Private, $node->effect->visibility);
+        self::assertSame(['page', 'product', 'viewer'], $node->effect->tags);
+        self::assertSame([], $node->effect->problems);
+    }
+
+    public function testCalculateReportsThatAnEmptySequenceCannotSupplyAnAutomaticTtl(): void
+    {
+        $catalog = (new CatalogLoader(dirname(__DIR__, 5)))
+            ->load(['packages/magix-cache-cli/tests/Fixture/FunctionalComposition']);
+        $boundaries = $catalog->search('Page::emptySequence');
+        self::assertCount(1, $boundaries);
+
+        $node = (new CacheTree($catalog))->build($boundaries[0]);
+
+        self::assertSame([], $node->children);
+        self::assertSame(TtlEstimateState::Invalid, $node->effect->ttl->state);
+        self::assertSame([
+            'Ttl::Auto has no dependency with a finite expiration, so applying the policy throws a LogicException',
+        ], $node->effect->problems);
     }
 }

@@ -19,7 +19,7 @@ final class KeyDto
     }
 
     /**
-     * Returns a method-forwarding fixture label.
+     * Returns a label for the fixture.
      */
     public function label(): string
     {

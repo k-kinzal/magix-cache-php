@@ -185,6 +185,51 @@ Result:    expires in 20s, Private, tags [inventory, products]
 
 An uncacheable or `NoStore` dependency makes the composed result uncacheable or `NoStore`. A later policy cannot loosen those constraints.
 
+## Metadata Invariance Across Cache Hits
+
+**A cache hit returns the value with the complete metadata evaluated when it was stored.** It preserves `expiresAt`, `cacheable`, `visibility`, `tags`, and `reasons`. It does not restart a TTL, reapply the boundary's policy, or rerun its origin constraints. The bundled PSR-6 and PSR-16 adapters store the metadata with the value, including fractional absolute expiration times; rounding physical retention does not round the metadata.
+
+Consequently, replacing any evaluated subtree with a hit for that same result preserves the metadata that bubbles to its ancestors. This holds for any depth, fan-out, shared dependency, and mixture of hits and misses, provided:
+
+- The compared executions have the same effective keys, declarations, source values and source metadata, and the same evaluated strategy and dynamic-TTL constraints.
+- Recomputed relative lifetimes use the same base times for exact expiration equality.
+- Dependencies stay inside the composition API. Extracting `value()` and wrapping it again without its metadata breaks the premise.
+- Custom storage and strategies preserve the metadata associated with the result they return. A custom strategy that invents a different `CacheRead` or `CacheAnswer` must supply the constraints of that answer.
+
+This is equality of metadata values (`CacheMetadata::equals()`), not PHP object identity. Deserialization may create a new metadata object.
+
+### Why Subtree Replacement Preserves Constraints
+
+Write `M ∧ N` for `M->meet(N)`, and let `C` be the constraints evaluated at a boundary. Its result carries:
+
+```text
+M_boundary = M_child1 ∧ ... ∧ M_childN ∧ C
+restore(store(value, M_boundary)).metadata = M_boundary
+```
+
+The storage round trip preserves every input to the parent's meet. Replacing one child therefore leaves that parent's result unchanged; applying the same argument up the graph proves the result for any combination of subtree hits. Associativity makes grouping irrelevant, commutativity makes constraint order irrelevant, and idempotence (`M ∧ M = M`) makes repeated shared dependencies harmless. These are laws of metadata composition; the value transforms still follow their declared order and behavior.
+
+An uncacheable, `NoStore`, or already expired dependency cannot be stored along with its ancestors. Other branches may still hit, and their reuse cannot erase that dependency's restrictions. A retained stale result keeps all its original metadata, including the expired deadline, so composing it cannot produce a fresh, storable parent.
+
+### Time and Source Generations
+
+A hit preserves an **absolute expiration**, not a fresh full TTL. An entry expiring at `120` has 20 seconds remaining at time `100` and 15 seconds remaining at time `105`.
+
+Recomputing a boundary at a new time can legitimately change its own deadline:
+
+| At time 105, child expires at 120 | Parent with TTL 10, originally computed at time 100 |
+|---|---|
+| Parent hit | Keeps expiration 110 |
+| Parent miss, child hit | New parent expiration is `min(120, 105 + 10) = 115` |
+
+Both results respect the child. They do not have equal expirations because the parent was evaluated at different base times. If the only changed constraints are finite expiration times, each differing by at most `ε`, taking their minimum changes the composed expiration by at most `ε`; depth does not accumulate that error. There is no general error bound when source metadata, selected lifetimes, or strategy decisions change.
+
+In particular, a hit represents the stored source generation. If an origin would now return different tags, visibility, cacheability, or data, a hit cannot discover those changes without revalidation. Source consistency and invalidation across generations remain application responsibilities. The guarantee is preservation of the constraints of the reused result, not equality with arbitrary future origin executions.
+
+### Regression Coverage
+
+[`MetadataBubblingTest`](../tests/Integration/MetadataBubblingTest.php) exercises the public attributed API through seven boundaries, including a shared leaf. It enumerates all 128 retained-entry subsets for storable graphs and every subset of the remaining storable branches when one dependency prevents storage. Each layout is checked against the same cold result and the metadata and retention written by recomputed subtrees, using memory, serialized PSR-6, and serialized PSR-16 storage. Separate cases cover elapsed time, parent recomputation, and stale fallback. These tests run with `composer test`.
+
 ## Apply the Parent Policy
 
 Composition happens inside the origin closure. The enclosing cache boundary applies its policy afterward:

@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace Magix\Cache;
 
-use function array_key_exists;
+use function array_is_list;
 
-use BadMethodCallException;
 use Closure;
 
-use function get_object_vars;
+use function count;
 use function is_array;
-use function is_callable;
-use function is_object;
-use function is_string;
 
 use LogicException;
 use Magix\Cache\Composition\Capability2;
@@ -21,19 +17,17 @@ use Magix\Cache\Composition\Capability3;
 use Magix\Cache\Composition\Capability4;
 use Magix\Cache\Composition\Capability5;
 use Magix\Cache\Metadata\CacheMetadata;
-use Stringable;
 
 /**
  * Carries an evaluated value together with its cache constraints.
  *
  * The composition API preserves the constraints of every dependency it is
- * given: map keeps this value's metadata, flatMap and combineN meet the
- * metadata of all inputs. Extracting a value with value() detaches it from
- * its constraints, so a dependency obtained inside map must be chained with
- * flatMap or combineN instead.
+ * given: map and unzip keep this value's metadata; flatMap, flatten, zip,
+ * sequence, traverse and combineN meet the metadata of all inputs. Extracting
+ * a value with value() detaches it from its constraints, so a dependency
+ * obtained inside map must be chained with flatMap or combineN instead.
  *
  * @template-covariant T
- * @mixin T
  */
 final readonly class Cached
 {
@@ -76,7 +70,7 @@ final readonly class Cached
     }
 
     /**
-     * Transforms the value once, in place, and keeps these constraints.
+     * Transforms the value now, once, and keeps these constraints.
      *
      * The result of the transform is treated as a plain value: a Cached
      * returned from it is not flattened. Use flatMap for a new dependency.
@@ -102,6 +96,109 @@ final readonly class Cached
         $next = $transform($this->value);
 
         return new self($next->value, $this->metadata->meet($next->metadata));
+    }
+
+    /**
+     * Removes exactly one Cached layer and meets both sets of constraints.
+     *
+     * Cached<Cached<U>> becomes Cached<U>; deeper layers remain wrapped.
+     *
+     * @return self<template-type<T, self, 'T'>>
+     * @throws LogicException when the wrapped value is not a Cached result
+     */
+    public function flatten(): self
+    {
+        $inner = $this->value;
+
+        if (!$inner instanceof self) {
+            throw new LogicException('flatten() requires a Cached value inside this Cached result.');
+        }
+
+        return new self($inner->value, $this->metadata->meet($inner->metadata));
+    }
+
+    /**
+     * Pairs two values while meeting the constraints of both dependencies.
+     *
+     * @template U
+     * @param self<U> $other
+     * @return self<array{T, U}>
+     */
+    public function zip(self $other): self
+    {
+        return new self([$this->value, $other->value], $this->metadata->meet($other->metadata));
+    }
+
+    /**
+     * Splits a pair into two cached values, each keeping all its constraints.
+     *
+     * Neither projection can recover the weaker metadata from before zip().
+     *
+     * @return array{self<T[0]>, self<T[1]>}
+     * @throws LogicException when the wrapped value is not a two-element list
+     */
+    public function unzip(): array
+    {
+        $pair = $this->value;
+
+        if (!is_array($pair) || !array_is_list($pair) || count($pair) !== 2) {
+            throw new LogicException('unzip() requires a two-element list inside this Cached result.');
+        }
+
+        return [new self($pair[0], $this->metadata), new self($pair[1], $this->metadata)];
+    }
+
+    /**
+     * Collects cached values into one array and meets every item's constraints.
+     *
+     * The iterable is consumed now, once, preserving its keys. Repeated keys
+     * keep the last value, but the constraints of every item still contribute.
+     * Empty input produces an empty array with top() metadata.
+     *
+     * @template K of array-key
+     * @template U = never
+     * @param iterable<K, self<U>> $items
+     * @return self<array<K, U>>
+     */
+    public static function sequence(iterable $items): self
+    {
+        $values = [];
+        $metadata = CacheMetadata::top();
+
+        foreach ($items as $key => $item) {
+            $values[$key] = $item->value;
+            $metadata = $metadata->meet($item->metadata);
+        }
+
+        return new self($values, $metadata);
+    }
+
+    /**
+     * Maps each input to a Cached result and collects their met constraints.
+     *
+     * Evaluation is eager, once per item in iteration order, preserving keys.
+     * Repeated keys keep the last value and all constraints. Empty input
+     * produces an empty array with top() metadata without calling transform.
+     *
+     * @template K of array-key
+     * @template V
+     * @template U
+     * @param iterable<K, V> $items
+     * @param Closure(V): self<U> $transform
+     * @return self<array<K, U>>
+     */
+    public static function traverse(iterable $items, Closure $transform): self
+    {
+        $values = [];
+        $metadata = CacheMetadata::top();
+
+        foreach ($items as $key => $item) {
+            $next = $transform($item);
+            $values[$key] = $next->value;
+            $metadata = $metadata->meet($next->metadata);
+        }
+
+        return new self($values, $metadata);
     }
 
     /**
@@ -162,77 +259,5 @@ final readonly class Cached
     public function combine5(self $second, self $third, self $fourth, self $fifth): Capability5
     {
         return new Capability5($this, $second, $third, $fourth, $fifth);
-    }
-
-    /**
-     * Forwards inaccessible property reads to an object or string-keyed array.
-     *
-     * Forwarding is for final observation only: the value it reaches no longer
-     * carries these constraints. Cached's own members take precedence.
-     *
-     * @throws LogicException when the wrapped value exposes no such property
-     */
-    public function __get(string $name): mixed
-    {
-        if (is_array($this->value) && array_key_exists($name, $this->value)) {
-            return $this->value[$name];
-        }
-
-        if (!is_object($this->value)) {
-            throw new LogicException('Cannot read $'.$name.' from a cached non-object value.');
-        }
-
-        $properties = get_object_vars($this->value);
-
-        if (!array_key_exists($name, $properties)) {
-            throw new LogicException('Cached object has no public property $'.$name.'.');
-        }
-
-        return $properties[$name];
-    }
-
-    /**
-     * Forwards isset() checks to an object or string-keyed array.
-     */
-    public function __isset(string $name): bool
-    {
-        if (is_array($this->value)) {
-            return isset($this->value[$name]);
-        }
-
-        return is_object($this->value) && isset(get_object_vars($this->value)[$name]);
-    }
-
-    /**
-     * Forwards unknown method calls to the wrapped object.
-     *
-     * @param list<mixed> $arguments
-     * @throws BadMethodCallException when the wrapped value exposes no such method
-     */
-    public function __call(string $name, array $arguments): mixed
-    {
-        if (!is_object($this->value) || !is_callable([$this->value, $name])) {
-            throw new BadMethodCallException('Cached value cannot handle method '.$name.'().');
-        }
-
-        return Closure::fromCallable([$this->value, $name])(...$arguments);
-    }
-
-    /**
-     * Forwards string conversion to a string or Stringable wrapped value.
-     *
-     * @throws LogicException when the wrapped value has no string representation
-     */
-    public function __toString(): string
-    {
-        if (is_string($this->value)) {
-            return $this->value;
-        }
-
-        if ($this->value instanceof Stringable) {
-            return (string) $this->value;
-        }
-
-        throw new LogicException('Cached value cannot be converted to string.');
     }
 }

@@ -75,6 +75,8 @@ The composition rules are the ones the runtime applies: the earliest expiration 
 
 Because the analysis is static, the effective TTL is an honest estimate rather than a guess. A lifetime is reported as a number only when it is statically determined; a boundary that is provably without expiration is `unconstrained`; anything that depends on runtime values, such as a `#[DynamicTtl]` resolver or an upstream the analyzer cannot see, is `unknown`, together with the tightest provable upper bound such as `unknown (≤30s)`; and a declaration that throws at runtime is `invalid`. A call that resolves to several implementations expands into all of them.
 
+The call graph follows dependencies inside composition callbacks, including `traverse()`, and preserves both dependencies when `unzip()` selects one side of a pair. It does not prove which callbacks execute or whether an iterable is non-empty. Check the empty collection path separately: `sequence()` and `traverse()` return unconstrained metadata for empty input, so an automatic parent TTL still needs a finite constraint from elsewhere on that path.
+
 `magix key` is the one exception: it loads the referenced class through the Composer autoloader and runs its `#[CacheKey]` reducers and strategy factories. It computes the default hash strategy's key with the runtime's default namespace, `magix`; supply `--namespace` when the application configures another namespace. The boundary body is not called and no cache entries are read or written.
 
 ## Documentation

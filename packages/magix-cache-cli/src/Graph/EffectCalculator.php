@@ -31,6 +31,11 @@ final readonly class EffectCalculator
     /**
      * Returns the constraints the dependencies of a boundary impose on it.
      *
+     * flatten, zip, sequence and traverse use this same meet of all inputs.
+     * unzip preserves the whole pair's constraints on either projection, so
+     * selecting one side must not remove a discovered dependency here.
+     * An empty collection contributes the unconstrained identity.
+     *
      * @param list<CacheNode> $children
      */
     public function constrain(array $children): DependencyConstraint

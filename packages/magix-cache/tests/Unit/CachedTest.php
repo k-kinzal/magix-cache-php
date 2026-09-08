@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use function array_diff;
+
+use Generator;
 use Magix\Cache\Cached;
 use Magix\Cache\Composition\Capability2;
 use Magix\Cache\Composition\Capability3;
@@ -161,16 +164,204 @@ final class CachedTest extends TestCase
         self::assertSame([1, 'two', true, 4.0, null], $result->value());
     }
 
-    public function testMagicAccessForwardsPropertiesAndMethods(): void
+    public function testValueSupportsExplicitObjectAndStringAccess(): void
     {
         $cached = Cached::of(new KeyDto(7));
 
-        self::assertSame(7, $cached->id);
-        self::assertSame('key:7', $cached->label());
+        self::assertSame(7, $cached->value()->id);
+        self::assertSame('key:7', $cached->value()->label());
+        self::assertSame('text', Cached::of('text')->value());
     }
 
-    public function testMagicAccessSupportsStrings(): void
+    public function testMapSupportsArrayFunctionsAndPreservesTheirResultKeys(): void
     {
-        self::assertSame('text', (string) Cached::of('text'));
+        $items = Cached::of([1, 2, 3], new CacheMetadata(expiresAt: 120.0, tags: ['items']));
+        $excluded = Cached::of([2], new CacheMetadata(expiresAt: 110.0, tags: ['excluded']));
+        $difference = $items->combine2($excluded)->map(
+            static fn (array $items, array $excluded): array => array_diff($items, $excluded),
+        );
+        self::assertSame([0 => 1, 2 => 3], $difference->value());
+        self::assertSame(110.0, $difference->metadata->expiresAt);
+        self::assertSame(['excluded', 'items'], $difference->metadata->tags);
+    }
+
+    public function testFlattenMeetsAllConstraintsAndKeepsExpiredDependenciesExpired(): void
+    {
+        $outerMetadata = new CacheMetadata(expiresAt: 120.0, tags: ['outer'], visibility: Visibility::Private);
+        $innerMetadata = new CacheMetadata(
+            expiresAt: 90.0,
+            cacheable: false,
+            tags: ['inner'],
+            visibility: Visibility::NoStore,
+            reasons: ['stale'],
+        );
+        $inner = Cached::of(null, $innerMetadata);
+        $nested = Cached::of($inner, $outerMetadata);
+
+        $flattened = $nested->flatten();
+
+        self::assertSame(null, $flattened->value());
+        self::assertTrue((new CacheMetadata(
+            expiresAt: 90.0,
+            cacheable: false,
+            tags: ['inner', 'outer'],
+            visibility: Visibility::NoStore,
+            reasons: ['stale'],
+        ))->equals($flattened->metadata));
+        self::assertFalse($flattened->metadata->isStorable(100.0));
+        self::assertSame($inner, $nested->value());
+        self::assertSame($outerMetadata, $nested->metadata);
+        self::assertSame($innerMetadata, $inner->metadata);
+    }
+
+    public function testFlattenRemovesOnlyOneLayerAndMatchesFlatMap(): void
+    {
+        $inner = Cached::of('product', new CacheMetadata(expiresAt: 110.0, tags: ['inner']));
+        $middle = Cached::of($inner, new CacheMetadata(expiresAt: 120.0, tags: ['middle']));
+        $outer = Cached::of($middle, new CacheMetadata(expiresAt: 130.0, tags: ['outer']));
+
+        $once = $outer->flatten();
+        $twice = $once->flatten();
+        $bound = $outer->flatMap(static fn (Cached $value): Cached => $value)->flatten();
+
+        self::assertSame($inner, $once->value());
+        self::assertSame(120.0, $once->metadata->expiresAt);
+        self::assertSame(['middle', 'outer'], $once->metadata->tags);
+        self::assertSame('product', $twice->value());
+        self::assertSame(110.0, $twice->metadata->expiresAt);
+        self::assertSame(['inner', 'middle', 'outer'], $twice->metadata->tags);
+        self::assertSame($bound->value(), $twice->value());
+        self::assertTrue($bound->metadata->equals($twice->metadata));
+    }
+
+    public function testZipPairsDifferentTypesAndMeetsAllConstraints(): void
+    {
+        $first = Cached::of(42, new CacheMetadata(expiresAt: 120.0, tags: ['product'], reasons: ['first']));
+        $second = Cached::of(null, new CacheMetadata(
+            expiresAt: 90.0,
+            cacheable: false,
+            tags: ['viewer'],
+            visibility: Visibility::NoStore,
+            reasons: ['second'],
+        ));
+
+        $pair = $first->zip($second);
+
+        self::assertSame([42, null], $pair->value());
+        self::assertTrue((new CacheMetadata(
+            expiresAt: 90.0,
+            cacheable: false,
+            tags: ['product', 'viewer'],
+            visibility: Visibility::NoStore,
+            reasons: ['first', 'second'],
+        ))->equals($pair->metadata));
+    }
+
+    public function testUnzipKeepsTheWholePairsConstraintsOnEachProjection(): void
+    {
+        $pair = Cached::of(42, new CacheMetadata(expiresAt: 120.0, tags: ['product']))
+            ->zip(Cached::of(null, new CacheMetadata(expiresAt: 90.0, tags: ['viewer'], visibility: Visibility::Private)));
+
+        [$first, $second] = $pair->unzip();
+
+        self::assertSame(42, $first->value());
+        self::assertSame(null, $second->value());
+        self::assertSame($pair->metadata, $first->metadata);
+        self::assertSame($pair->metadata, $second->metadata);
+        self::assertFalse($first->metadata->isStorable(100.0));
+        self::assertTrue($pair->metadata->equals($first->zip($second)->metadata));
+    }
+
+    public function testSequenceCollectsArraysWithoutLosingKeysOrConstraints(): void
+    {
+        $result = Cached::sequence([
+            'featured' => Cached::of('product', new CacheMetadata(expiresAt: 120.0, tags: ['product'])),
+            7 => Cached::of('inventory', new CacheMetadata(expiresAt: 110.0, tags: ['stock'], visibility: Visibility::Private)),
+        ]);
+
+        self::assertSame(['featured' => 'product', 7 => 'inventory'], $result->value());
+        self::assertSame(110.0, $result->metadata->expiresAt);
+        self::assertSame(['product', 'stock'], $result->metadata->tags);
+        self::assertSame(Visibility::Private, $result->metadata->visibility);
+    }
+
+    public function testSequenceConsumesGeneratorsOnceAndKeepsConstraintsOfOverwrittenKeys(): void
+    {
+        $items = (static function (): Generator {
+            yield 'same' => Cached::of('old', new CacheMetadata(
+                expiresAt: 90.0,
+                cacheable: false,
+                tags: ['old'],
+                visibility: Visibility::NoStore,
+                reasons: ['stale'],
+            ));
+            yield 'same' => Cached::of('new', new CacheMetadata(expiresAt: 120.0, tags: ['new']));
+            yield 7 => Cached::of(null);
+        })();
+
+        $result = Cached::sequence($items);
+
+        self::assertFalse($items->valid());
+        self::assertSame(['same' => 'new', 7 => null], $result->value());
+        self::assertSame(['same' => 'new', 7 => null], $result->value());
+        self::assertTrue((new CacheMetadata(
+            expiresAt: 90.0,
+            cacheable: false,
+            tags: ['new', 'old'],
+            visibility: Visibility::NoStore,
+            reasons: ['stale'],
+        ))->equals($result->metadata));
+    }
+
+    public function testSequenceOfEmptyInputHasIdentityMetadata(): void
+    {
+        $result = Cached::sequence([]);
+
+        self::assertSame([], $result->value());
+        self::assertTrue(CacheMetadata::top()->equals($result->metadata));
+    }
+
+    public function testTraverseEagerlyMapsEveryItemOnceInOrderAndMeetsAllConstraints(): void
+    {
+        $calls = [];
+        $result = Cached::traverse(
+            ['featured' => 3, 7 => 1, 'last' => 2],
+            static function (int $id) use (&$calls): Cached {
+                $calls[] = $id;
+
+                return Cached::of('product:'.$id, new CacheMetadata(
+                    expiresAt: 100.0 + $id,
+                    cacheable: $id !== 1,
+                    tags: ['product:'.$id],
+                    visibility: $id === 1 ? Visibility::NoStore : Visibility::Shared,
+                    reasons: $id === 1 ? ['restricted'] : [],
+                ));
+            },
+        );
+
+        self::assertSame([3, 1, 2], $calls);
+        self::assertSame(['featured' => 'product:3', 7 => 'product:1', 'last' => 'product:2'], $result->value());
+        self::assertSame([3, 1, 2], $calls);
+        self::assertTrue((new CacheMetadata(
+            expiresAt: 101.0,
+            cacheable: false,
+            tags: ['product:1', 'product:2', 'product:3'],
+            visibility: Visibility::NoStore,
+            reasons: ['restricted'],
+        ))->equals($result->metadata));
+    }
+
+    public function testTraverseOfEmptyInputDoesNotCallTheTransform(): void
+    {
+        $calls = 0;
+        $result = Cached::traverse([], static function (int $id) use (&$calls): Cached {
+            ++$calls;
+
+            return Cached::of($id);
+        });
+
+        self::assertSame(0, $calls);
+        self::assertSame([], $result->value());
+        self::assertTrue(CacheMetadata::top()->equals($result->metadata));
     }
 }

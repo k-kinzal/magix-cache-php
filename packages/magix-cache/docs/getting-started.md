@@ -111,21 +111,23 @@ The cache key includes the runtime namespace, the concrete class, the declaring 
 
 ## Read the Result
 
-Use `value()` whenever PHP needs the original type explicitly:
+Use `value()` to access the original value:
 
 ```php
 /** @var Product $product */
 $product = $query->execute(42)->value();
 ```
 
-`Cached` also forwards public property reads, public method calls, `isset()`, and string conversion where the wrapped value supports them:
+`Cached` does not forward property reads, method calls, `isset()`, or string conversion. Access the wrapped value explicitly:
 
 ```php
 $result = $query->execute(42);
 
-echo $result->name;
-echo $result->displayName();
+echo $result->value()->name;
+echo $result->value()->displayName();
 ```
+
+`value()` detaches the value from its cache constraints. When creating another cached result, use `map()`, `flatMap()`, or the [composition operations](cache-composition.md) to preserve them.
 
 The cache constraints are available through the immutable `metadata` property:
 

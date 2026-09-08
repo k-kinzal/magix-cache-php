@@ -72,24 +72,22 @@
 <span class="src-line" id="L35" data-diff="same"><a class="ln" href="#L35">35</a>        <span class="tok-var">$statements</span> = [<span class="tok-str">&#039;    &#039;</span>.<span class="tok-var">$id</span>.<span class="tok-str">&#039;[&quot;&#039;</span>.<span class="tok-var">$label</span>.<span class="tok-str">&#039;&quot;]&#039;</span>];</span>
 <span class="src-line" id="L36" data-diff="added"><a class="ln" href="#L36">36</a></span>
 <span class="src-line" id="L37" data-diff="added"><a class="ln" href="#L37">37</a>        <span class="tok-kw">if</span> (<span class="tok-var">$effect</span>-&gt;<span class="tok-id">localRestrictions</span> !== []) {</span>
-<span class="src-line" id="L38" data-diff="added"><a class="ln" href="#L38">38</a>            <span class="tok-var">$fields</span> = <span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-id">array_keys</span>(<span class="tok-var">$effect</span>-&gt;<span class="tok-id">localRestrictions</span>));</span>
-<span class="src-line" id="L39" data-diff="added"><a class="ln" href="#L39">39</a>            <span class="tok-var">$statements</span>[<span class="tok-num">0</span>] = <span class="tok-str">&#039;    &#039;</span>.<span class="tok-var">$id</span>.<span class="tok-str">&#039;[&quot;&#039;</span>.<span class="tok-var">$label</span>.<span class="tok-str">&#039;&lt;br/&gt;local restriction: &#039;</span>.<span class="tok-var">$fields</span>.<span class="tok-str">&#039;&quot;]&#039;</span>;</span>
-<span class="src-line" id="L40" data-diff="added"><a class="ln" href="#L40">40</a>            <span class="tok-var">$statements</span>[] = <span class="tok-str">&#039;    style &#039;</span>.<span class="tok-var">$id</span>.<span class="tok-str">&#039; fill:#fff3cd,stroke:#b58100,color:#664d03&#039;</span>;</span>
-<span class="src-line" id="L41" data-diff="added"><a class="ln" href="#L41">41</a>        }</span>
-<span class="src-line" id="L42" data-diff="added"><a class="ln" href="#L42">42</a></span>
-<span class="src-line" id="L43" data-diff="same"><a class="ln" href="#L43">43</a>        <span class="tok-var">$position</span> = <span class="tok-num">0</span>;</span>
-<span class="src-line" id="L44" data-diff="same"><a class="ln" href="#L44">44</a></span>
-<span class="src-line" id="L45" data-diff="same"><a class="ln" href="#L45">45</a>        <span class="tok-kw">foreach</span> (<span class="tok-var">$node</span>-&gt;<span class="tok-id">children</span> <span class="tok-kw">as</span> <span class="tok-var">$child</span>) {</span>
-<span class="src-line" id="L46" data-diff="same"><a class="ln" href="#L46">46</a>            <span class="tok-var">$childId</span> = <span class="tok-var">$id</span>.<span class="tok-str">&#039;_&#039;</span>.<span class="tok-var">$position</span>;</span>
-<span class="src-line" id="L47" data-diff="same"><a class="ln" href="#L47">47</a>            ++<span class="tok-var">$position</span>;</span>
-<span class="src-line" id="L48" data-diff="same"><a class="ln" href="#L48">48</a>            <span class="tok-var">$statements</span> = <span class="tok-id">array_merge</span>(<span class="tok-var">$statements</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">statements</span>(<span class="tok-var">$child</span>, <span class="tok-var">$childId</span>));</span>
-<span class="src-line" id="L49" data-diff="same"><a class="ln" href="#L49">49</a>            <span class="tok-var">$statements</span>[] = <span class="tok-str">&#039;    &#039;</span>.<span class="tok-var">$id</span>.<span class="tok-str">&#039; --&gt; &#039;</span>.<span class="tok-var">$childId</span>;</span>
-<span class="src-line" id="L50" data-diff="same"><a class="ln" href="#L50">50</a>        }</span>
-<span class="src-line" id="L51" data-diff="same"><a class="ln" href="#L51">51</a></span>
-<span class="src-line" id="L52" data-diff="same"><a class="ln" href="#L52">52</a>        <span class="tok-kw">return</span> <span class="tok-var">$statements</span>;</span>
-<span class="src-line" id="L53" data-diff="same"><a class="ln" href="#L53">53</a>    }</span>
-<span class="src-line" id="L54" data-diff="same"><a class="ln" href="#L54">54</a>}</span>
-<span class="src-line" id="L55" data-diff="same"><a class="ln" href="#L55">55</a></span>
+<span class="src-line" id="L38" data-diff="added"><a class="ln" href="#L38">38</a>            <span class="tok-var">$statements</span>[] = <span class="tok-str">&#039;    style &#039;</span>.<span class="tok-var">$id</span>.<span class="tok-str">&#039; fill:#fff3cd,stroke:#b58100,color:#664d03&#039;</span>;</span>
+<span class="src-line" id="L39" data-diff="added"><a class="ln" href="#L39">39</a>        }</span>
+<span class="src-line" id="L40" data-diff="added"><a class="ln" href="#L40">40</a></span>
+<span class="src-line" id="L41" data-diff="same"><a class="ln" href="#L41">41</a>        <span class="tok-var">$position</span> = <span class="tok-num">0</span>;</span>
+<span class="src-line" id="L42" data-diff="same"><a class="ln" href="#L42">42</a></span>
+<span class="src-line" id="L43" data-diff="same"><a class="ln" href="#L43">43</a>        <span class="tok-kw">foreach</span> (<span class="tok-var">$node</span>-&gt;<span class="tok-id">children</span> <span class="tok-kw">as</span> <span class="tok-var">$child</span>) {</span>
+<span class="src-line" id="L44" data-diff="same"><a class="ln" href="#L44">44</a>            <span class="tok-var">$childId</span> = <span class="tok-var">$id</span>.<span class="tok-str">&#039;_&#039;</span>.<span class="tok-var">$position</span>;</span>
+<span class="src-line" id="L45" data-diff="same"><a class="ln" href="#L45">45</a>            ++<span class="tok-var">$position</span>;</span>
+<span class="src-line" id="L46" data-diff="same"><a class="ln" href="#L46">46</a>            <span class="tok-var">$statements</span> = <span class="tok-id">array_merge</span>(<span class="tok-var">$statements</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">statements</span>(<span class="tok-var">$child</span>, <span class="tok-var">$childId</span>));</span>
+<span class="src-line" id="L47" data-diff="same"><a class="ln" href="#L47">47</a>            <span class="tok-var">$statements</span>[] = <span class="tok-str">&#039;    &#039;</span>.<span class="tok-var">$id</span>.<span class="tok-str">&#039; --&gt; &#039;</span>.<span class="tok-var">$childId</span>;</span>
+<span class="src-line" id="L48" data-diff="same"><a class="ln" href="#L48">48</a>        }</span>
+<span class="src-line" id="L49" data-diff="same"><a class="ln" href="#L49">49</a></span>
+<span class="src-line" id="L50" data-diff="same"><a class="ln" href="#L50">50</a>        <span class="tok-kw">return</span> <span class="tok-var">$statements</span>;</span>
+<span class="src-line" id="L51" data-diff="same"><a class="ln" href="#L51">51</a>    }</span>
+<span class="src-line" id="L52" data-diff="same"><a class="ln" href="#L52">52</a>}</span>
+<span class="src-line" id="L53" data-diff="same"><a class="ln" href="#L53">53</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

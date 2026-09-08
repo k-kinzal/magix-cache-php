@@ -21,9 +21,10 @@ final class ApplicationTest extends TestCase
         $application = (new Application(dirname(__DIR__, 5)))->console();
 
         self::assertTrue($application->has('analyze'));
-        self::assertTrue($application->has('boundaries'));
-        self::assertTrue($application->has('ls'));
-        self::assertTrue($application->has('lint'));
+        self::assertFalse($application->has('boundaries'));
+        self::assertFalse($application->has('ls'));
+        self::assertFalse($application->has('lint'));
+        self::assertTrue($application->has('list'));
         self::assertTrue($application->has('key'));
         self::assertSame('magix', $application->getName());
     }

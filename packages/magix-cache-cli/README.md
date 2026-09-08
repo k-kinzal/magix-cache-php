@@ -12,10 +12,8 @@ The result answers the questions that are otherwise only observable in productio
 - Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node
 - The reason behind each effective value, such as which dependency capped a TTL or made a result private
 - Composed strategy contracts, bound to the same `create()` the runtime calls, with candidate ranges such as `30-60s` kept apart from the effective TTL
-- An inventory of every boundary in a project as a table or as JSON
-- Static rules that report boundaries that throw, never store, or share a private entry between viewers
-- The exact cache key of a call, so an entry can be found in the backend
-- Tree, table, JSON, and Mermaid output for terminals, editors, and documentation
+- The default hash strategy's cache key for a call in the configured runtime namespace
+- Tree, JSON, and Mermaid output for terminals, editors, and documentation
 
 ## Requirements
 
@@ -59,41 +57,29 @@ The boundary declares 120 seconds, but `ProductQuery` expires after 20, and `Vie
 | Command | Purpose |
 |---|---|
 | `magix analyze <boundary>` | Expands a cache boundary or uncached controller action into its composed cache tree |
-| `magix boundaries` | Lists every boundary of the project with its effective values |
-| `magix lint` | Reports boundaries that cannot behave the way they are declared |
 | `magix key <boundary> [arguments]` | Prints the cache key one call produces |
 
 Every command scans the Composer autoload roots of the current directory by default. Use `--path` once per directory or file to scan something else:
 
 ```bash
-vendor/bin/magix lint --path=src/Query --path=modules
+vendor/bin/magix analyze ProductPageQuery::execute --path=src/Query --path=modules
 ```
 
-See [Commands](docs/commands.md) for every option and [Lint Rules](docs/lint-rules.md) for what `magix lint` reports.
-
-## Continuous Integration
-
-`magix lint` exits with a failure when it finds an error, which makes it usable as a build step. Add `--strict` to fail on warnings as well:
-
-```yaml
-- name: Check cache boundaries
-  run: vendor/bin/magix lint --strict
-```
+See [Commands](docs/commands.md) for every option. `magix list` lists the available commands.
 
 ## How It Works
 
-The commands never execute application code. Each PHP file below the scanned paths is parsed, and every method that calls `$this->cached()` becomes a boundary. The `#[Cache]` declaration, behavior attributes such as `#[DynamicTtl]`, and parameter attributes are read from the syntax tree, and calls to other boundaries are resolved through the declared types of properties, local variables, and interfaces.
+`magix analyze` never executes application code. Each PHP file below the scanned paths is parsed, and every method that calls `$this->cached()` becomes a boundary. The `#[Cache]` declaration, behavior attributes such as `#[DynamicTtl]`, and parameter attributes are read from the syntax tree, and calls to other boundaries are resolved through the declared types of properties, local variables, and interfaces.
 
 The composition rules are the ones the runtime applies: the earliest expiration wins, cacheability is combined with logical AND, the strictest visibility wins, and tags are unioned. A fixed TTL is always bounded by the expiration its dependencies impose.
 
 Because the analysis is static, the effective TTL is an honest estimate rather than a guess. A lifetime is reported as a number only when it is statically determined; a boundary that is provably without expiration is `unconstrained`; anything that depends on runtime values, such as a `#[DynamicTtl]` resolver or an upstream the analyzer cannot see, is `unknown`, together with the tightest provable upper bound such as `unknown (≤30s)`; and a declaration that throws at runtime is `invalid`. A call that resolves to several implementations expands into all of them.
 
-`magix key` is the one exception: it loads the referenced class through the Composer autoloader so that `#[CacheKey]` reducers produce the same key as the runtime.
+`magix key` is the one exception: it loads the referenced class through the Composer autoloader and runs its `#[CacheKey]` reducers and strategy factories. It computes the default hash strategy's key with the runtime's default namespace, `magix`; supply `--namespace` when the application configures another namespace. The boundary body is not called and no cache entries are read or written.
 
 ## Documentation
 
 - [Commands](docs/commands.md): Every command, option, and output format
-- [Lint Rules](docs/lint-rules.md): What each rule reports and how to resolve it
 - [MagixCache](../magix-cache/README.md): The library these commands analyze
 - [Package Overview](../../README.md): View every package in this monorepo
 
@@ -108,15 +94,15 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Parameter Configuration
 
-`magix analyze` and `magix lint` understand `CacheTtl`, `CacheTags`,
+`magix analyze` understands `CacheTtl`, `CacheTags`,
 `CacheVisibility`, and `StrategyArgument` on boundary parameters. Configuration
 values remain runtime-dependent even when defaults are declared. TTL caps are
 preserved, strategy labels show their source parameters, and dynamic visibility
 and tags remain explicit throughout the dependency tree. JSON includes
 `visibilityUnknown` and `tagsUnknown` alongside the proven metadata bounds.
 
-`invalid-parameter-binding` reports invalid source declarations;
-`unresolved-strategy` reports missing or conflicting factory destinations.
+The analysis reports invalid parameter declarations and missing or conflicting
+factory destinations in the affected node's problems.
 `magix key` uses the runtime binding and key construction, including the evaluated
 configuration component. See the core package's
 [Parameter Configuration](../magix-cache/docs/parameter-configuration.md) guide.

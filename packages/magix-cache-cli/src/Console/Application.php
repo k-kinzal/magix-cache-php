@@ -37,8 +37,6 @@ final readonly class Application
         $console = new ConsoleApplication('magix', self::VERSION);
 
         $console->addCommand(new AnalyzeCommand($loader));
-        $console->addCommand(new BoundariesCommand($loader));
-        $console->addCommand(new LintCommand($loader));
         $console->addCommand(new KeyCommand($loader));
 
         return $console;

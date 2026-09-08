@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commands — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/pr/8/k-kinzal/magix-cache-cli/doc/docs/commands.md.html">
+<meta name="description" content="Commands, a document of the k-kinzal/magix-cache-cli package.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="Commands — magix-cache-php">
+<meta property="og:description" content="Commands, a document of the k-kinzal/magix-cache-cli package.">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/pr/8/k-kinzal/magix-cache-cli/doc/docs/commands.md.html">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/pr/8/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}document.documentElement.dataset.diffMode=localStorage.getItem("docgen-diff-mode")||"inline"}catch(e){}</script>
+</head>
+<body data-root="../../../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../index.html">magix-cache-php</a></div><div class="sb-pkg"><a href="../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></div><nav class="sb-block"><div class="sb-title">Package</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache-cli/all-items.html">All items</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache-cli/index.html#documents">Documents</a></li></ul><div class="sb-kind" data-diff="modified">Layers</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache-cli/layer.CliConsole.html">CliConsole</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache-cli/layer.CliDeclaration.html">CliDeclaration</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache-cli/layer.CliGraph.html">CliGraph</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache-cli/layer.CliKey.html">CliKey</a></li><li data-diff="removed"><a href="../../../../k-kinzal/magix-cache-cli/layer.CliLint.html">CliLint</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache-cli/layer.CliReader.html">CliReader</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache-cli/layer.CliRender.html">CliRender</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache-cli/layer.CliSource.html">CliSource</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Namespaces</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Console/index.html" title="Magix\Cache\Cli\Console">Magix\Cache\Cli\Console</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Declaration/index.html" title="Magix\Cache\Cli\Declaration">Magix\Cache\Cli\Declaration</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Graph/index.html" title="Magix\Cache\Cli\Graph">Magix\Cache\Cli\Graph</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Key/index.html" title="Magix\Cache\Cli\Key">Magix\Cache\Cli\Key</a></li><li data-diff="removed"><a href="../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Lint/index.html" title="Magix\Cache\Cli\Lint">Magix\Cache\Cli\Lint</a></li><li data-diff="removed"><a href="../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Lint/Rule/index.html" title="Magix\Cache\Cli\Lint\Rule">Magix\Cache\Cli\Lint\Rule</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Reader/index.html" title="Magix\Cache\Cli\Reader">Magix\Cache\Cli\Reader</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Render/index.html" title="Magix\Cache\Cli\Render">Magix\Cache\Cli\Render</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Source/index.html" title="Magix\Cache\Cli\Source">Magix\Cache\Cli\Source</a></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><a href="../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a><span class="crumb-sep">::</span><span class="crumb-current">docs/commands.md</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<span class="diff-range" title="Comparing 4aa08a7 to working tree">4aa08a7 <span class="diff-arrow">→</span> working tree</span><div class="diff-modes" id="diff-modes" role="group" aria-label="Diff display mode"><button type="button" class="diff-mode" data-diff-mode="off" title="Documentation of the head revision, without diff marks">Off</button><button type="button" class="diff-mode" data-diff-mode="inline" title="Every page with additions and removals marked">Diff</button><button type="button" class="diff-mode" data-diff-mode="changes" title="Only what the head revision added, changed, or removed">Changes</button></div><a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<p class="diff-empty" id="diff-empty" data-changes="Nothing on this page changed between 4aa08a7 and working tree." data-off="This page documents what 4aa08a7 had and working tree no longer has. Switch to Diff to read it." hidden></p>
+<div class="symbol-head"><h1><span class="chip chip-kind k-document">document</span>Commands</h1><div class="symbol-meta"><span class="src-link">docs/commands.md</span></div></div>
+<section class="readme" data-diff="modified"><div class="doc-block" data-diff="same"><h2>Commands</h2>
+</div><div class="doc-block" data-diff="same"><p>This guide documents every <code>magix</code> command, its options, and its output.</p>
+</div><div class="doc-block" data-diff="same"><h3>Scanned Paths</h3>
+</div><div class="doc-block" data-diff="removed"><p>Every command reads PHP files without executing them. By default the directories declared in the <code>autoload</code> section of the <code>composer.json</code> in the current directory are scanned, and <code>vendor</code>, <code>node_modules</code>, and <code>.git</code> are always skipped.</p>
+</div><div class="doc-block" data-diff="added"><p>Every command scans PHP files as source. <code>key</code> additionally loads the selected class and executes its key reducers and strategy factories. By default the directories declared in the <code>autoload</code> section of the <code>composer.json</code> in the current directory are scanned, and <code>vendor</code>, <code>node_modules</code>, and <code>.git</code> are always skipped.</p>
+</div><div class="doc-block" data-diff="same"><p>Use <code>--path</code> to scan something else. The option can be repeated and accepts directories and single files:</p>
+</div><div class="doc-block" data-diff="removed"><pre class="code-block"><code>vendor/bin/magix boundaries --path=src/Query --path=modules/Checkout/src</code></pre>
+</div><div class="doc-block" data-diff="added"><pre class="code-block"><code>vendor/bin/magix analyze ProductPageQuery::execute --path=src/Query --path=modules/Checkout/src</code></pre>
+</div><div class="doc-block" data-diff="same"><h3>Boundary References</h3>
+</div><div class="doc-block" data-diff="same"><p>Commands that take a boundary accept the fully qualified name, the short class name, or the class alone:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>vendor/bin/magix analyze &#039;App\Query\ProductPageQuery::execute&#039;
+vendor/bin/magix analyze ProductPageQuery::execute
+vendor/bin/magix analyze ProductPageQuery</code></pre>
+</div><div class="doc-block" data-diff="same"><p>A reference without a method matches every boundary of the class. <code>analyze</code> also accepts uncached methods that make resolvable method calls, including controller actions. When a reference matches several methods, <code>analyze</code> renders each separately; <code>key</code> only accepts cache boundaries and asks for the fully qualified name when ambiguous.</p>
+</div><div class="doc-block" data-diff="same"><h3>magix analyze</h3>
+</div><div class="doc-block" data-diff="same"><p>Expands a cache boundary or an uncached entry point into its cache dependency tree.</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>vendor/bin/magix analyze ProductPageQuery::execute</code></pre>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>App\Query\ProductPageQuery::execute
+  src/Query/ProductPageQuery.php:34
+
+  ttl          20s (declared 120s, capped by ProductQuery::execute)
+  visibility   private (restricted by ViewerQuery::execute)
+  storable     yes
+  tags         inventory, page, product, viewer
+  key          $productId, $viewerId (ignored: $trace)  version 1
+  policy       #[Cache(ttl: 120s, tags: [page])]
+
+ProductPageQuery::execute  ttl 20s (declared 120s)  private  tags inventory,page,product,viewer
+|-- ProductQuery::execute  ttl 20s  shared  tags product
+|-- InventoryQuery::execute  ttl 60s  shared  tags inventory
+`-- ViewerQuery::execute  ttl 30s  private  tags viewer</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The header block describes the boundary itself:</p>
+</div><div class="doc-block" data-diff="same"><div class="table-wrap"><table><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody><tr><td><code>ttl</code></td><td>Expiration after composition, followed by the reason it differs from the declaration. A number appears only when it is statically determined; a proven range keeps its bounds — <code>30-60s</code>, <code>30-?s</code> (the <code>?</code> is undetermined, not unlimited), <code>≤60s</code> — and otherwise the estimate is <code>unconstrained</code> (provably no expiration), <code>unknown</code> with the runtime condition, or <code>invalid</code> when the declaration throws at runtime</td></tr><tr><td><code>strategy</code></td><td>The <code>#[UseStrategy]</code> construction, one line per composed strategy with its contracted candidate range, and <code>(assumed)</code> where an explicit <code>#[AssumeTtl]</code> replaced the contract. Only shown when a strategy is declared</td></tr><tr><td><code>strategy ttl</code></td><td>The candidate constraint the composition adds on the normal origin path, before dependencies and the policy cap it; disjoint alternatives stay distinct, such as <code>30/600-900s</code></td></tr><tr><td><code>visibility</code></td><td><code>shared</code>, <code>private</code>, or <code>nostore</code> after composition, followed by what restricted it</td></tr><tr><td><code>storable</code></td><td>Whether the runtime writes an entry for this boundary at all</td></tr><tr><td><code>tags</code></td><td>Policy tags unioned with the tags of every dependency</td></tr><tr><td><code>key</code></td><td>The parameters that form the key, the ignored ones, and the policy version</td></tr><tr><td><code>policy</code></td><td>The declaration as it is written in the source</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="same"><p>Lines below the header show each boundary of the tree, with <code>!</code> for a problem that makes the boundary fail and <code>~</code> for a note about how the tree was resolved.</p>
+</div><div class="doc-block" data-diff="removed"><p>Disjoint lifetime contracts such as <code>#[Ttl(30, new TtlRange(min: 600, max: 900))]</code> render as <code>30/600-900s</code> in the tree, inventory table, and Mermaid output. Parent policies cap each alternative separately: a 300-second parent yields <code>30/300s</code>, while an automatic parent preserves <code>30/600-900s</code>. The analyzer does not infer the conditions selecting the alternatives or correlations between separate strategies.</p>
+</div><div class="doc-block" data-diff="added"><p>Disjoint lifetime contracts such as <code>#[Ttl(30, new TtlRange(min: 600, max: 900))]</code> render as <code>30/600-900s</code> in the tree and Mermaid output. Parent policies cap each alternative separately: a 300-second parent yields <code>30/300s</code>, while an automatic parent preserves <code>30/600-900s</code>. The analyzer does not infer the conditions selecting the alternatives or correlations between separate strategies.</p>
+</div><div class="doc-block" data-diff="same"><p>JSON retains the existing <code>state</code>, <code>seconds</code>, <code>lowerBound</code>, <code>upperBound</code>, and <code>reason</code> fields. When alternatives remain disjoint it also includes a normalized <code>ranges</code> list, for example <code>[{&quot;min&quot;: 30, &quot;max&quot;: 30}, {&quot;min&quot;: 600, &quot;max&quot;: 900}]</code>. The enclosing bounds alone do not describe the gaps. An unknown estimate with a proven finite expiration also includes <code>&quot;finite&quot;: true</code>; an unknown numeric lifetime is not the same as an expiration that might be absent. Single intervals and determined values do not need a <code>ranges</code> field.</p>
+</div><div class="doc-block" data-diff="same"><p>An action that gathers several cached results for a view does not need <code>#[Cache]</code> or <code>cached()</code> to be analyzed:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">show</span>(<span class="tok-id">int</span> <span class="tok-var">$productId</span>, <span class="tok-id">int</span> <span class="tok-var">$viewerId</span>): <span class="tok-id">View</span>
+{
+    <span class="tok-var">$product</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">products</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>);
+    <span class="tok-var">$stock</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">inventory</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>);
+    <span class="tok-var">$viewer</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">viewer</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$viewerId</span>);
+
+    <span class="tok-kw">return</span> <span class="tok-id">view</span>(<span class="tok-str">&#039;product&#039;</span>, [
+        <span class="tok-str">&#039;product&#039;</span> =&gt; <span class="tok-var">$product</span>-&gt;<span class="tok-id">value</span>(),
+        <span class="tok-str">&#039;stock&#039;</span> =&gt; <span class="tok-var">$stock</span>-&gt;<span class="tok-id">value</span>(),
+        <span class="tok-str">&#039;viewer&#039;</span> =&gt; <span class="tok-var">$viewer</span>-&gt;<span class="tok-id">value</span>(),
+    ]);
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>vendor/bin/magix analyze ProductController::show</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The root is labelled <code>uncached entry point</code>. Its TTL is the shortest lifetime of the called boundaries, visibility is the strictest, and tags are unioned. For the three queries above, it reports <code>20s</code>, <code>private</code>, and <code>inventory, product, viewer</code>. Unknown bounds and runtime metadata stay unknown. Calls through uncached methods are followed until cache boundaries are reached; those boundaries retain their usual policy analysis. Query objects can be resolved through typed properties, typed action parameters, local constructor assignments, and static calls.</p>
+</div><div class="doc-block" data-diff="removed"><p>The root&#039;s <code>key</code> and <code>policy</code> are <code>none (uncached entry point)</code> and <code>storable</code> is <code>no</code>, because the action itself does not write a cache entry. This report summarizes the called caches; it does not attach metadata to values extracted with <code>value()</code> or configure HTTP caching for the view. Methods that actually call <code>cached()</code> still require a cache policy. Uncached entry points are excluded from <code>boundaries</code>, <code>key</code>, and lint targets.</p>
+</div><div class="doc-block" data-diff="added"><p>The root&#039;s <code>key</code> and <code>policy</code> are <code>none (uncached entry point)</code> and <code>storable</code> is <code>no</code>, because the action itself does not write a cache entry. This report summarizes the called caches; it does not attach metadata to values extracted with <code>value()</code> or configure HTTP caching for the view. Methods that actually call <code>cached()</code> still require a cache policy. Uncached entry points cannot be selected by <code>key</code>.</p>
+</div><div class="doc-block" data-diff="same"><div class="table-wrap"><table><thead><tr><th>Option</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>--path</code></td><td>Composer autoload roots</td><td>Directory or file to scan, repeatable</td></tr><tr><td><code>--format</code></td><td><code>tree</code></td><td><code>tree</code>, <code>json</code>, or <code>mermaid</code></td></tr><tr><td><code>--depth</code></td><td><code>8</code></td><td>Maximum dependency depth to expand</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="same"><p><code>--format=json</code> prints the whole tree, including every policy, parameter, effective value, and reason, which suits editors and other tools:</p>
+</div><div class="doc-block" data-diff="same"><p>Each node has a <code>kind</code> of <code>boundary</code> or <code>entry-point</code>. Entry points have <code>policy: null</code>, <code>key: null</code>, and <code>effective.storable: false</code>, while <code>effective</code> and <code>dependencies</code> contain the composed result and its inputs.</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>vendor/bin/magix analyze ProductPageQuery::execute --format=json</code></pre>
+</div><div class="doc-block" data-diff="same"><p><code>--format=mermaid</code> prints a flowchart that can be embedded in documentation:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>flowchart TD
+    n0[&quot;ProductPageQuery::execute&lt;br/&gt;20s - private&quot;]
+    n0_0[&quot;ProductQuery::execute&lt;br/&gt;20s - shared&quot;]
+    n0 --&gt; n0_0</code></pre>
+</div><div class="doc-block" data-diff="removed"><h3>magix boundaries</h3>
+</div><div class="doc-block" data-diff="removed"><p>Lists every boundary of the project with its effective values. The alias <code>ls</code> does the same.</p>
+</div><div class="doc-block" data-diff="removed"><pre class="code-block"><code>vendor/bin/magix boundaries --filter=Query</code></pre>
+</div><div class="doc-block" data-diff="removed"><pre class="code-block"><code>BOUNDARY                             TTL  VISIBILITY  STORABLE  TAGS              DEPS  LOCATION
+App\Query\InventoryQuery::execute     60s  shared      yes       inventory         0     src/Query/InventoryQuery.php:23
+App\Query\ProductPageQuery::execute   20s  private     yes       inventory,page    3     src/Query/ProductPageQuery.php:34
+App\Query\ViewerQuery::execute        30s  private     yes       viewer            0     src/Query/ViewerQuery.php:25
+
+3 boundaries</code></pre>
+</div><div class="doc-block" data-diff="removed"><div class="table-wrap"><table><thead><tr><th>Option</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>--path</code></td><td>Composer autoload roots</td><td>Directory or file to scan, repeatable</td></tr><tr><td><code>--format</code></td><td><code>table</code></td><td><code>table</code> or <code>json</code></td></tr><tr><td><code>--filter</code></td><td>none</td><td>Only list boundaries whose identifier contains this text</td></tr><tr><td><code>--depth</code></td><td><code>8</code></td><td>Maximum dependency depth used to compute effective values</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="removed"><h3>magix lint</h3>
+</div><div class="doc-block" data-diff="removed"><p>Applies every rule to every boundary and reports what cannot work as declared.</p>
+</div><div class="doc-block" data-diff="removed"><pre class="code-block"><code>vendor/bin/magix lint</code></pre>
+</div><div class="doc-block" data-diff="removed"><pre class="code-block"><code>src/Query/DashboardQuery.php:36  warning  unscoped-private-key
+  App\Query\DashboardQuery::execute: ViewerQuery::execute is private through $viewerId, but this boundary keys its own entry without that value.
+  hint: Accept the value as a parameter and pass it on, or mark it with #[CacheScope] here as well.
+
+1 findings, 0 errors, 1 warnings</code></pre>
+</div><div class="doc-block" data-diff="removed"><div class="table-wrap"><table><thead><tr><th>Option</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>--path</code></td><td>Composer autoload roots</td><td>Directory or file to scan, repeatable</td></tr><tr><td><code>--format</code></td><td><code>text</code></td><td><code>text</code> or <code>json</code></td></tr><tr><td><code>--strict</code></td><td>off</td><td>Fail when warnings are reported as well</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="removed"><p>The command exits with <code>1</code> when an error is found, and with <code>1</code> for warnings when <code>--strict</code> is used. Notices never fail the run. See <a href="../../../../k-kinzal/magix-cache-cli/doc/docs/lint-rules.md.html">Lint Rules</a> for every rule.</p>
+</div><div class="doc-block" data-diff="same"><h3>magix key</h3>
+</div><div class="doc-block" data-diff="same"><p>Prints the cache key one call produces. Arguments are given in parameter order and are read as JSON values, so <code>42</code> is an integer, <code>&quot;en&quot;</code> and <code>en</code> are strings, and <code>{&quot;id&quot;:1}</code> is an array.</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>vendor/bin/magix key ProductQuery::execute 42</code></pre>
+</div><div class="doc-block" data-diff="removed"><pre class="code-block"><code>App\Query\ProductQuery::execute
+  version    1
+  arguments  productId=42
+  key        bfc136b0201bb228f9340e6eb474254677bb24f1037a4912ef0f74463ef8173a</code></pre>
+</div><div class="doc-block" data-diff="removed"><p>The arguments line shows the values after <code>#[CacheIgnore]</code> and <code>#[CacheKey]</code> are applied, and the key is the one <code>HashCacheKeyStrategy</code> derives, which makes the entry findable in the cache backend.</p>
+</div><div class="doc-block" data-diff="removed"><div class="table-wrap"><table><thead><tr><th>Option</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>--path</code></td><td>Composer autoload roots</td><td>Directory or file to scan, repeatable</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="removed"><blockquote><p>[!NOTE] This command loads the referenced class through the Composer autoloader so that <code>#[CacheKey]</code> reducers run, and it reports the key of the default strategy. A custom <code>CacheKeyStrategy</code> installed on the runtime produces a different key.</p>
+</blockquote>
+</div><div class="doc-block" data-diff="added"><pre class="code-block"><code>App\Query\ProductQuery::execute
+  version    1
+  namespace  magix
+  arguments  productId=42
+  key        bfc136b0201bb228f9340e6eb474254677bb24f1037a4912ef0f74463ef8173a</code></pre>
+</div><div class="doc-block" data-diff="added"><p>The arguments line shows the values after <code>#[CacheIgnore]</code> and <code>#[CacheKey]</code> are applied. The key is the one <code>HashCacheKeyStrategy</code> derives using the runtime namespace, <code>magix</code> by default. If the application configures <code>new CacheRuntime($cache, namespace: &#039;catalog-v2&#039;)</code>, supply the same namespace:</p>
+</div><div class="doc-block" data-diff="added"><pre class="code-block"><code>vendor/bin/magix key ProductQuery::execute 42 --namespace=catalog-v2</code></pre>
+</div><div class="doc-block" data-diff="added"><p>The namespace is a runtime setting, separate from the runtime reference named in <code>#[Cache(runtime: &#039;...&#039;)]</code>. This command does not bootstrap the application or read registered runtimes, so a custom namespace must be supplied explicitly. An explicitly empty namespace is supported with <code>--namespace=</code>.</p>
+</div><div class="doc-block" data-diff="added"><div class="table-wrap"><table><thead><tr><th>Option</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>--path</code></td><td>Composer autoload roots</td><td>Directory or file to scan, repeatable</td></tr><tr><td><code>--namespace</code></td><td><code>magix</code></td><td>Key namespace configured on <code>CacheRuntime</code></td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="added"><blockquote><p>[!NOTE] This command loads the referenced class through the Composer autoloader and runs its <code>#[CacheKey]</code> reducers and strategy factories. It does not call the boundary body or read or write cache entries. It reports the default hash strategy&#039;s key; a custom <code>CacheKeyStrategy</code> installed on the runtime is not loaded and may produce a different key.</p>
+</blockquote>
+</div></section>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../../../assets/search-index.js" defer></script>
+<script src="../../../../assets/app.js" defer></script>
+</body>
+</html>

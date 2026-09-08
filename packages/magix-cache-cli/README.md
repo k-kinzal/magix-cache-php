@@ -53,6 +53,8 @@ ProductPageQuery::execute  ttl 20s (declared 120s)  private  tags inventory,page
 
 The boundary declares 120 seconds, but `ProductQuery` expires after 20, and `ViewerQuery` is personalized, so the page is stored privately for 20 seconds. Nothing needs to be executed to see this.
 
+For a parent that only bubbles up child constraints, declare `#[Cache]` without a TTL. The tree shows the effective values directly, without a `(declared Ttl::Auto)` annotation, and the policy row uses `#[Cache]` (or includes any additional options). Explicit `ttl: Ttl::Auto` renders the same way. Fixed TTL declarations, upstream caps, and unknown or invalid lifetime diagnostics remain visible; JSON retains the normalized TTL mode in `policy.ttl`.
+
 ## Commands
 
 | Command | Purpose |

@@ -92,19 +92,24 @@ final class CacheableTest extends TestCase
         self::assertSame(1, $second->calls);
     }
 
-    public function testCachedPropagatesAutoDependencyExpiration(): void
+    public function testBareCacheAttributePropagatesDependencyMetadata(): void
     {
         $now = 4_000_000_000.0;
         CacheRuntimeRegistry::register(
             CacheRuntimeRegistry::DEFAULT_NAME,
             new CacheRuntime(new MemoryCache(), new MutableClock($now)),
         );
-        $dependency = Cached::of('dependency', new CacheMetadata(expiresAt: $now + 15.0));
+        $dependency = Cached::of('dependency', new CacheMetadata(
+            expiresAt: $now + 15.0,
+            visibility: Visibility::Private,
+            tags: ['dependency'],
+            reasons: ['from-child'],
+        ));
 
         $result = (new CachedQuery())->auto($dependency);
 
         self::assertSame('auto', $result->value());
-        self::assertSame($now + 15.0, $result->metadata->expiresAt);
+        self::assertEquals($dependency->metadata, $result->metadata);
     }
 
     public function testCachedAppliesTheDeclaredDynamicTtlResolver(): void

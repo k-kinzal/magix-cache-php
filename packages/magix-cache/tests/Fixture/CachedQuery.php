@@ -47,7 +47,7 @@ final class CachedQuery
      * @param Cached<string> $dependency
      * @return Cached<string>
      */
-    #[Cache(ttl: Ttl::Auto)]
+    #[Cache]
     public function auto(Cached $dependency): Cached
     {
         return $this->cached(fn (): Cached => Cached::of('auto', $dependency->metadata));

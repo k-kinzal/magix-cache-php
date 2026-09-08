@@ -66,6 +66,8 @@ final class ProductQuery
 
 `cached()` takes exactly one closure, which must return a `Cached` value — wrap even a plain leaf value explicitly with `Cached::of()`. Policy and behaviors come from attributes alone: `#[Cache]` on the method wins over the concrete class as a whole, and there is no per-call override.
 
+When a parent only composes cached children, `#[Cache]` with no arguments is enough. The composed expiration, cacheability, visibility, tags, and reasons bubble up with the returned `Cached` value. Add policy options only when the parent needs additional constraints or configuration.
+
 Every method argument is included in the cache key by default. On a hit, the stored value and metadata are returned as `Cached` without running the compute closure.
 
 Use `map()`, `flatMap()`, and `combine2()` through `combine5()` to compose nested values. Their metadata can only become stricter: expiration moves earlier, cacheability uses logical AND, visibility becomes more restrictive, and tags and diagnostic reasons are combined. A declared TTL is always bounded by the upstream expiration, so no boundary can extend what a dependency imposed.

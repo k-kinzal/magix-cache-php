@@ -9,6 +9,7 @@ use Magix\Cache\Cache\Cache;
 use Magix\Cache\Clock\SystemClock;
 use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\CacheInvocation;
+use Magix\Cache\Runtime\CacheKeyContext;
 use Magix\Cache\Runtime\CacheKeyStrategy;
 use Magix\Cache\Runtime\Extension\CacheEvent;
 use Magix\Cache\Runtime\Extension\CacheObserver;
@@ -59,7 +60,7 @@ final readonly class CacheRuntime
         private Cache $cache,
         private ClockInterface $clock = new SystemClock(),
         private CacheKeyStrategy $keyStrategy = new HashCacheKeyStrategy(),
-        private string $namespace = 'magix',
+        private string $namespace = CacheKeyContext::DEFAULT_NAMESPACE,
         array $ttlResolvers = [],
         array $errorClassifiers = [],
         private ?CacheObserver $observer = null,

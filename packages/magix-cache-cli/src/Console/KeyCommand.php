@@ -28,7 +28,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(
     name: 'key',
     description: 'Prints the cache key a call to one boundary produces',
-    help: 'Binds the given arguments the way Cacheable does and hashes them with the default key strategy, which makes an entry findable in the cache backend.',
+    help: 'Binds the given arguments the way Cacheable does and hashes them with the default key strategy. Set --namespace to the namespace configured on the runtime. The boundary body is not executed.',
 )]
 final readonly class KeyCommand
 {
@@ -50,6 +50,7 @@ final readonly class KeyCommand
      *
      * @param array<array-key, mixed> $arguments
      * @param array<array-key, mixed> $path
+     * @param string $namespace Key namespace configured on the runtime that stores this boundary.
      */
     public function __invoke(
         SymfonyStyle $io,
@@ -59,6 +60,8 @@ final readonly class KeyCommand
         array $arguments = [],
         #[Option(description: 'Directory or file to scan, repeatable', name: 'path')]
         array $path = [],
+        #[Option(description: 'Key namespace configured on CacheRuntime')]
+        string $namespace = CacheKeyResolver::DEFAULT_NAMESPACE,
     ): int {
         $matches = $this->catalog->load($path)->search($boundary);
 
@@ -82,7 +85,7 @@ final readonly class KeyCommand
 
         try {
             $bound = $this->keys->arguments($found->class, $found->method, $values);
-            $key = $this->keys->resolve($found->class, $found->method, $values);
+            $key = $this->keys->resolve($found->class, $found->method, $values, $namespace);
         } catch (CacheKeyUnresolvable $failure) {
             $io->error($failure->getMessage());
 
@@ -91,14 +94,25 @@ final readonly class KeyCommand
 
         $io->writeln($found->id());
         $io->writeln('  version    '.$found->policy->version);
-        $io->writeln('  arguments  '.($bound === [] ? 'none' : implode(', ', array_map(
-            static fn (string $name, mixed $value): string => $name.'='.json_encode($value, JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR),
-            array_keys($bound),
-            $bound,
-        ))));
+        $io->writeln('  namespace  '.$namespace);
+        $io->writeln('  arguments  '.$this->describeArguments($bound));
         $io->writeln('  key        '.$key);
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Describes the key arguments after ignored and reduced parameters are applied.
+     *
+     * @param array<string, mixed> $arguments
+     */
+    public function describeArguments(array $arguments): string
+    {
+        return $arguments === [] ? 'none' : implode(', ', array_map(
+            static fn (string $name, mixed $value): string => $name.'='.json_encode($value, JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR),
+            array_keys($arguments),
+            $arguments,
+        ));
     }
 
     /**

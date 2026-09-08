@@ -4,37 +4,59 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Console;
 
+use Magix\Cache\Cached;
+use Magix\Cache\CacheRuntime;
 use Magix\Cache\Cli\Console\Application;
 use Magix\Cache\Cli\Console\CatalogLoader;
 use Magix\Cache\Cli\Console\KeyCommand;
 use Magix\Cache\Runtime\CacheDefinitionResolver;
-use Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Tests\Fixture\MemoryCache;
 use Tests\Package\Cli\Fixture\Project\ProductQuery;
 
 #[CoversClass(KeyCommand::class)]
 #[UsesNamespace('Magix\Cache')]
 final class KeyCommandTest extends TestCase
 {
-    public function testKeyPrintsTheHashOfOneCall(): void
+    /**
+     * @return iterable<string, array{string|null}>
+     */
+    public static function providerRuntimeNamespaces(): iterable
+    {
+        yield 'default runtime' => [null];
+        yield 'custom namespace' => ['catalog-v2'];
+        yield 'empty namespace' => [''];
+    }
+
+    #[DataProvider('providerRuntimeNamespaces')]
+    public function testDescribeArgumentsAndKeyMatchTheCallStoredByTheRuntime(?string $namespace): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('key'));
-        $expected = (new HashCacheKeyStrategy())->generate(
-            (new CacheDefinitionResolver())->resolve(new ProductQuery(), 'execute')->keyContext([42]),
+        $cache = new MemoryCache();
+        $runtime = $namespace === null ? new CacheRuntime($cache) : new CacheRuntime($cache, namespace: $namespace);
+        $runtime->execute(
+            (new CacheDefinitionResolver())->resolve(new ProductQuery(), 'execute')->invocation(
+                [42],
+                static fn (): Cached => Cached::of(['id' => 42]),
+            ),
         );
 
         $tester->execute([
             'boundary' => 'ProductQuery::execute',
             'arguments' => ['42'],
             '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
+            ...($namespace === null ? [] : ['--namespace' => $namespace]),
         ]);
 
         $tester->assertCommandIsSuccessful();
         self::assertStringContainsString('productId=42', $tester->getDisplay());
-        self::assertStringContainsString($expected, $tester->getDisplay());
+        self::assertSame(1, preg_match('/^\s+key\s+(\S+)$/m', $tester->getDisplay(), $matches));
+        $key = $matches[1] ?? self::fail('No cache key was printed.');
+        self::assertSame(['id' => 42], $cache->get($key, static fn (): array => ['id' => 0])?->value());
     }
 
     public function testKeyFailsForAnUnknownBoundary(): void

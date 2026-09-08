@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Tests\Package\Cli\Unit\Key;
 
 use Magix\Cache\Cached;
+use Magix\Cache\CacheRuntime;
 use Magix\Cache\Cli\Key\CacheKeyResolver;
 use Magix\Cache\Cli\Key\CacheKeyUnresolvable;
 use Magix\Cache\Runtime\CacheDefinitionResolver;
-use Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
+use Tests\Fixture\MemoryCache;
 use Tests\Package\Cli\Fixture\ParameterQuery;
 use Tests\Package\Cli\Fixture\Project\ProductQuery;
 
@@ -78,22 +79,30 @@ final class CacheKeyResolverTest extends TestCase
 
     public function testResolveMatchesTheKeyTheRuntimeDerives(): void
     {
-        $expected = (new HashCacheKeyStrategy())->generate(
-            (new CacheDefinitionResolver())->resolve(new ProductQuery(), 'execute')->keyContext([42]),
+        $cache = new MemoryCache();
+        (new CacheRuntime($cache))->execute(
+            (new CacheDefinitionResolver())->resolve(new ProductQuery(), 'execute')->invocation(
+                [42],
+                static fn (): Cached => Cached::of(['id' => 42]),
+            ),
         );
 
         $key = (new CacheKeyResolver())->resolve(ProductQuery::class, 'execute', [42]);
 
-        self::assertSame($expected, $key);
+        self::assertSame(['id' => 42], $cache->get($key, static fn (): array => ['id' => 0])?->value());
     }
 
     public function testResolveMatchesAnInvocationWithParameterConfigurationAndDefaults(): void
     {
         $definition = (new CacheDefinitionResolver())->resolve(new ParameterQuery(), 'fetch');
         $invocation = $definition->invocation([10], static fn (): Cached => Cached::of('origin'));
-        $expected = (new HashCacheKeyStrategy())->generate($invocation->context);
+        $cache = new MemoryCache();
+        (new CacheRuntime($cache, namespace: 'parameters'))->execute($invocation);
 
-        self::assertSame($expected, (new CacheKeyResolver())->resolve(ParameterQuery::class, 'fetch', [10]));
-        self::assertNotSame($expected, (new CacheKeyResolver())->resolve(ParameterQuery::class, 'fetch', [20]));
+        $resolver = new CacheKeyResolver();
+        $key = $resolver->resolve(ParameterQuery::class, 'fetch', [10], namespace: 'parameters');
+
+        self::assertSame('origin', $cache->get($key, static fn (): string => '')?->value());
+        self::assertNull($cache->get($resolver->resolve(ParameterQuery::class, 'fetch', [20], namespace: 'parameters'), static fn (): string => ''));
     }
 }

@@ -15,6 +15,11 @@ namespace Magix\Cache\Runtime;
 final readonly class CacheKeyContext
 {
     /**
+     * Key namespace used when a runtime does not configure another one.
+     */
+    public const string DEFAULT_NAMESPACE = 'magix';
+
+    /**
      * Creates a cache-key context.
      *
      * @param string $class The concrete class the boundary was invoked on.

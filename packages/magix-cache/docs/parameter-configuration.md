@@ -130,8 +130,8 @@ Dynamic visibility is shown as the proven restriction `or stricter`; dynamic
 tags are shown separately from known tags as `+ runtime tags`. JSON exposes
 `visibilityUnknown` and `tagsUnknown`, and these flags propagate to parents.
 
-`invalid-parameter-binding` reports ignored or variadic sources, repeated
-attributes, incompatible constraint types, duplicate destinations and missing
-active strategies. `unresolved-strategy` reports destinations that do not exist
-or conflict with the factory configuration. Actual runtime values still undergo
+`magix analyze` reports ignored or variadic sources, repeated attributes,
+incompatible constraint types, duplicate destinations, missing active strategies,
+and destinations that do not exist or conflict with the factory configuration
+in the affected node's problems. Actual runtime values still undergo
 the same boundary validation as any other library input.

@@ -12,7 +12,6 @@ use Magix\Cache\Cli\Declaration\KeyParameter;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Graph\CacheTree;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
-use Magix\Cache\Cli\Lint\CacheLinter;
 use Magix\Cache\Cli\Reader\ArgumentReader;
 use Magix\Cache\Cli\Reader\AttributeReader;
 use Magix\Cache\Cli\Reader\BoundaryReader;
@@ -73,13 +72,11 @@ final class SourceParserTest extends TestCase
         self::assertSame([], $node->effect->problems);
         self::assertTrue($node->effect->ttl->hasFiniteExpiration());
         self::assertStringContainsString($label, (new TreeRenderer())->render($node));
-        self::assertStringContainsString($label, (new \Magix\Cache\Cli\Render\BoundaryTableRenderer())->render([$node]));
         self::assertStringContainsString($label, (new \Magix\Cache\Cli\Render\MermaidRenderer())->render($node));
         $json = (new JsonRenderer())->tree($node);
         self::assertIsArray($json['effective']);
         self::assertSame($node->effect->ttl->jsonSerialize(), $json['effective']['ttl']);
 
-        self::assertSame([], (new CacheLinter())->inspect($catalog));
         $child = $tree->build($catalog->candidates(\Tests\Package\Cli\Fixture\TtlAlternatives\TimedQuery::class, 'execute')[0]);
         self::assertSame('30/600-900s', $child->effect->strategy?->ttl->label());
         self::assertTrue($child->effect->storable);
@@ -116,7 +113,7 @@ final class SourceParserTest extends TestCase
         self::assertSame('src/ProductQuery.php', $declarations[0]->boundaries[0]->file);
     }
 
-    public function testParseCarriesParameterConfigurationThroughAnalysisRenderingAndLint(): void
+    public function testParseCarriesParameterConfigurationThroughAnalysisAndRendering(): void
     {
         $parser = new SourceParser();
         $directory = dirname(__DIR__, 2).'/Fixture/';
@@ -141,7 +138,7 @@ final class SourceParserTest extends TestCase
         $json = (new JsonRenderer())->tree($node);
         self::assertIsArray($json['effective']);
         self::assertTrue($json['effective']['tagsUnknown']);
-        self::assertSame([], (new CacheLinter())->inspect($catalog));
+        self::assertSame([], $node->effect->problems);
         self::assertSame($before, ParameterizedStrategy::$calls, 'static analysis never executes create()');
     }
 }

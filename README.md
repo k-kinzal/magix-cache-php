@@ -80,7 +80,7 @@ ProductPageQuery::execute  ttl 20s (declared 120s)  private  tags inventory,page
 
 Because the analysis is static, a TTL is not always a single number: it may be reported as a known value, as unconstrained, or as a conditional upper bound such as "≤30s, requires a finite upstream expiration at runtime".
 
-`magix boundaries` lists every boundary of a project, `magix lint` fails a build when a declaration cannot hold at runtime — for example a derived TTL with no upstream expiration, or a private entry shared between viewers — and `magix key` prints the key of one call so an entry can be found in the backend. See [packages/magix-cache-cli/README.md](packages/magix-cache-cli/README.md).
+`magix analyze` explains the composed cache tree of a query or uncached entry point, and `magix key` prints the default hash strategy's key for one call in the configured namespace. See [packages/magix-cache-cli/README.md](packages/magix-cache-cli/README.md).
 
 ## Development
 

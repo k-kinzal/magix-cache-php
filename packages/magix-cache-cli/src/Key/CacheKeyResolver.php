@@ -10,6 +10,7 @@ use function count;
 use Magix\Cache\Runtime\CacheDefinition;
 use Magix\Cache\Runtime\CacheDefinitionResolver;
 use Magix\Cache\Runtime\CacheKeyArgumentBinder;
+use Magix\Cache\Runtime\CacheKeyContext;
 use Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy;
 use ReflectionClass;
 use ReflectionException;
@@ -20,6 +21,11 @@ use ReflectionMethod;
  */
 final readonly class CacheKeyResolver
 {
+    /**
+     * Default namespace exposed to the CLI from the runtime's key contract.
+     */
+    public const string DEFAULT_NAMESPACE = CacheKeyContext::DEFAULT_NAMESPACE;
+
     /**
      * Creates a key resolver.
      */
@@ -99,15 +105,16 @@ final readonly class CacheKeyResolver
     }
 
     /**
-     * Returns the key the default strategy derives for one call.
+     * Returns the default hash strategy's key in the configured runtime namespace.
      *
      * @param list<mixed> $arguments
+     * @param string $namespace Match CacheRuntime's namespace; defaults to the runtime default.
      * @throws CacheKeyUnresolvable when the boundary cannot be loaded or the call does not match its parameters
      */
-    public function resolve(string $class, string $method, array $arguments): string
+    public function resolve(string $class, string $method, array $arguments, string $namespace = self::DEFAULT_NAMESPACE): string
     {
         $this->arguments($class, $method, $arguments);
 
-        return $this->strategy->generate($this->definition($class, $method)->keyContext($arguments));
+        return $this->strategy->generate($this->definition($class, $method)->keyContext($arguments)->withNamespace($namespace));
     }
 }

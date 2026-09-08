@@ -70,10 +70,6 @@ deptrac:
       collectors:
         - type: directory
           value: packages/magix-cache-cli/src/Render/.*
-    - name: CliLint
-      collectors:
-        - type: directory
-          value: packages/magix-cache-cli/src/Lint/.*
     - name: CliKey
       collectors:
         - type: directory
@@ -120,7 +116,6 @@ deptrac:
       - CliDeclaration
       - CliGraph
       - CliKey
-      - CliLint
       - CliRender
       - CliSource
     CliSource:
@@ -142,11 +137,6 @@ deptrac:
       - Runtime
       - Strategy
     CliRender:
-      - CliDeclaration
-      - CliGraph
-      - Metadata
-      - Runtime
-    CliLint:
       - CliDeclaration
       - CliGraph
       - Metadata

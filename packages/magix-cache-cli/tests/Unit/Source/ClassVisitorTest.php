@@ -48,6 +48,46 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Reader\ParameterConfigurationReader::class)]
 final class ClassVisitorTest extends TestCase
 {
+    public function testCommentsUseClassDefaultsAndMethodOverridesWithoutInheritingParentComments(): void
+    {
+        $code = <<<'SOURCE'
+            <?php
+            use Magix\Cache\Attribute\CacheComment as Memo;
+
+            #[Memo('class default')]
+            class ParentQuery
+            {
+                public function execute() { return $this->cached(fn () => 1); }
+                public function show() { return $this->execute(); }
+                #[Memo(comment: 'method note')]
+                public function method() { return $this->cached(fn () => 1); }
+                #[Memo('')]
+                public function hidden() { return $this->cached(fn () => 1); }
+            }
+
+            class ChildQuery extends ParentQuery
+            {
+                public function execute() { return $this->cached(fn () => 1); }
+                public function show() { return $this->execute(); }
+            }
+            SOURCE;
+        $statements = (new NodeTraverser(new NameResolver()))->traverse(
+            (new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? [],
+        );
+        $visitor = new ClassVisitor('queries.php');
+        (new NodeTraverser($visitor))->traverse($statements);
+
+        $declarations = $visitor->declarations();
+
+        self::assertCount(2, $declarations);
+        self::assertSame('class default', $declarations[0]->boundaries[0]->comment);
+        self::assertSame('class default', $declarations[0]->entryPoints[0]->comment);
+        self::assertSame('method note', $declarations[0]->boundaries[1]->comment);
+        self::assertSame('', $declarations[0]->boundaries[2]->comment);
+        self::assertNull($declarations[1]->boundaries[0]->comment);
+        self::assertNull($declarations[1]->entryPoints[0]->comment);
+    }
+
     public function testEnterNodeCollectsBoundariesWithTheClassPolicy(): void
     {
         $code = <<<'SOURCE'

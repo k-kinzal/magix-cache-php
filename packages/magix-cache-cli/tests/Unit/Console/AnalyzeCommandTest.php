@@ -22,6 +22,94 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class AnalyzeCommandTest extends TestCase
 {
+    public function testTreeShowsMigrationCommentsOnEntryPointsAndNestedBoundaries(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $tester->execute(['boundary' => 'MigrationQuery::show', '--path' => ['packages/magix-cache-cli/tests/Fixture/Comments']]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString("    # 移行状況を確認する入口\n|-- MigrationQuery::stopped", $tester->getDisplay());
+        self::assertStringContainsString('|       # 既存準拠で NoStore。本来は Bubbling を止める必要なし', $tester->getDisplay());
+        self::assertStringContainsString('        # 既存は NoStore。Bubbling を有効にして検証中', $tester->getDisplay());
+        self::assertStringContainsString('        # <info>比較</info> & "確認" #35;', $tester->getDisplay());
+        self::assertStringContainsString('            # 移行中の既定メモ', $tester->getDisplay());
+        self::assertStringContainsString('nostore [local restriction:', $tester->getDisplay());
+        self::assertStringNotContainsString("\033[", $tester->getDisplay());
+
+        $tester->execute(['boundary' => 'MigrationQuery::bubbling', '--path' => ['packages/magix-cache-cli/tests/Fixture/Comments']], ['decorated' => true]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString("\033[36m# <info>比較</info> & \"確認\" #35;\033[39m", $tester->getDisplay());
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testJsonKeepsCommentsSeparateFromCacheEffectsAndAnalysisNotes(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $tester->execute([
+            'boundary' => 'MigrationQuery::show',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Comments'],
+            '--format' => 'json',
+        ], ['decorated' => true]);
+
+        $tester->assertCommandIsSuccessful();
+        $data = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
+        self::assertSame('移行状況を確認する入口', $data['comment']);
+        self::assertSame([], $data['notes']);
+        self::assertIsArray($data['dependencies']);
+        $stopped = $data['dependencies'][0];
+        $bubbling = $data['dependencies'][1];
+        self::assertIsArray($stopped);
+        self::assertIsArray($bubbling);
+        self::assertSame('既存準拠で NoStore。本来は Bubbling を止める必要なし', $stopped['comment']);
+        self::assertSame("既存は NoStore。Bubbling を有効にして検証中\n<info>比較</info> & \"確認\" #35;", $bubbling['comment']);
+        self::assertIsArray($stopped['effective']);
+        self::assertIsArray($bubbling['effective']);
+        self::assertFalse($stopped['effective']['storable']);
+        self::assertTrue($bubbling['effective']['storable']);
+        self::assertSame('shared', $bubbling['effective']['visibility']);
+        self::assertSame([], $bubbling['effective']['problems']);
+    }
+
+    public function testMermaidIncludesCommentsWithEscapedTextAndLineBreaks(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $tester->execute([
+            'boundary' => 'MigrationQuery::show',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Comments'],
+            '--format' => 'mermaid',
+        ], ['decorated' => true]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('<br/>comment: 移行状況を確認する入口', $tester->getDisplay());
+        self::assertStringContainsString('<br/>comment: 既存準拠で NoStore。本来は Bubbling を止める必要なし<br/>local restriction: visibility', $tester->getDisplay());
+        self::assertStringContainsString('<br/>#lt;info#gt;比較#lt;/info#gt; #38; #quot;確認#quot; #35;35;', $tester->getDisplay());
+        self::assertStringNotContainsString("\033[", $tester->getDisplay());
+    }
+
+    public function testEmptyMethodCommentHidesTheClassDefaultAndUnknownExpressionsStayVisible(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $tester->execute(['boundary' => 'MigrationQuery::hidden', '--path' => ['packages/magix-cache-cli/tests/Fixture/Comments']]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringNotContainsString('移行中の既定メモ', $tester->getDisplay());
+        self::assertStringNotContainsString('    # ', $tester->getDisplay());
+
+        $tester->execute(['boundary' => 'MigrationQuery::unresolved', '--path' => ['packages/magix-cache-cli/tests/Fixture/Comments']]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('# (unresolved #[CacheComment])', $tester->getDisplay());
+        self::assertStringNotContainsString('移行中の既定メモ', $tester->getDisplay());
+    }
+
     public function testAnalyzeHighlightsPartialCapsWithoutCollapsingTtlAlternatives(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));

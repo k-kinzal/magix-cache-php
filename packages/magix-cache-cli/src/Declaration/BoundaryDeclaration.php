@@ -23,6 +23,7 @@ final readonly class BoundaryDeclaration
      * @param bool $suppliesMetadata Whether the boundary builds CacheMetadata itself.
      * @param UseStrategyDeclaration|null $useStrategy The enabled #[UseStrategy] applying to the boundary.
      * @param bool $isCacheBoundary False for an uncached analysis entry point, whose dependencies alone supply constraints.
+     * @param string|null $comment The effective analysis-only comment; null when absent, empty when explicitly hidden.
      */
     public function __construct(
         public string $class,
@@ -36,6 +37,7 @@ final readonly class BoundaryDeclaration
         public bool $suppliesMetadata = false,
         public ?UseStrategyDeclaration $useStrategy = null,
         public bool $isCacheBoundary = true,
+        public ?string $comment = null,
     ) {
     }
 

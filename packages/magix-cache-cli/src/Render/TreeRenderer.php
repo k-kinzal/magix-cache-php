@@ -6,6 +6,7 @@ namespace Magix\Cache\Cli\Render;
 
 use function array_merge;
 use function count;
+use function explode;
 use function implode;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
@@ -13,6 +14,10 @@ use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
+
+use function str_replace;
+
+use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * Renders one cache tree as an indented terminal report.
@@ -82,6 +87,12 @@ final readonly class TreeRenderer
         $connector = $last === null ? '' : ($last ? '`-- ' : '|-- ');
         $indent = $last === null ? $prefix : $prefix.($last ? '    ' : '|   ');
         $lines = [$prefix.$connector.$this->summary($node)];
+
+        if ($node->boundary->comment !== null && $node->boundary->comment !== '') {
+            foreach (explode("\n", str_replace(["\r\n", "\r"], "\n", $node->boundary->comment)) as $line) {
+                $lines[] = $indent.'    <fg=cyan># '.OutputFormatter::escape($line).'</>';
+            }
+        }
 
         foreach ($node->effect->problems as $problem) {
             $lines[] = $indent.'    <fg=red>! '.$problem.'</>';

@@ -62,7 +62,7 @@ The header block describes the boundary itself:
 | `key` | The parameters that form the key, the ignored ones, and the policy version |
 | `policy` | The declaration as it is written in the source |
 
-Lines below the header show each boundary of the tree, with `!` for a problem that makes the boundary fail and `~` for a note about how the tree was resolved.
+Lines below the header show each boundary of the tree, with `!` for a problem that makes the boundary fail, `~` for a note about how the tree was resolved, and `#` for a comment written with `#[CacheComment]`.
 
 Yellow fields mark **local restrictions**: a boundary's fixed TTL or `maxTtl`
 shortens the composed lifetime, or its policy/scoped parameters impose a stricter
@@ -136,6 +136,56 @@ flowchart TD
     n0_0["ProductQuery::execute<br/>20s - shared"]
     n0 --> n0_0
 ```
+
+### Migration comments
+
+Use `Magix\Cache\Attribute\CacheComment` to leave a note that remains visible in
+`analyze` while a migration or verification is unfinished:
+
+```php
+use Magix\Cache\Attribute\Cache;
+use Magix\Cache\Attribute\CacheComment;
+use Magix\Cache\Cached;
+use Magix\Cache\Metadata\Visibility;
+
+#[Cache(visibility: Visibility::NoStore)]
+#[CacheComment('既存準拠で NoStore。本来は Bubbling を止める必要なし')]
+public function execute(): Cached
+{
+    return $this->cached(fn () => $this->products->execute());
+}
+```
+
+The tree places the note directly below that boundary, including when it appears
+as a dependency:
+
+```text
+ProductPageQuery::execute  ttl 20s (declared Ttl::Auto)  nostore [local restriction: declared by the policy; composed shared]
+    # 既存準拠で NoStore。本来は Bubbling を止める必要なし
+`-- ProductQuery::execute  ttl 20s  shared
+```
+
+For the opposite migration state, use a comment such as
+`#[CacheComment('既存は NoStore。Bubbling を有効にして検証中')]` on the boundary
+whose policy now permits bubbling.
+
+The attribute accepts one string, positional or named (`comment: '...'`), on a
+class or method, including an uncached entry point. A class comment is the
+default for its declared methods; a method comment replaces it as a whole.
+`#[CacheComment('')]` hides the default for that method. Parent-class comments
+are not inherited implicitly. Use one attribute per declaration.
+
+Comments describe intent only: they do not change TTL, visibility, tags, cache
+keys, or analysis problems, and they do not suppress restriction highlights.
+They stay attached to their own nodes rather than bubbling as metadata.
+
+String literals, including multiline strings, are read without running the
+application. Expressions the reader cannot resolve, such as application
+constants, display `(unresolved #[CacheComment])` instead of executing code or
+silently using the class default. Tree comments are cyan with ANSI enabled and
+retain their `#` prefix without color. Console markup in the text is literal.
+JSON includes a separate `comment` field on each node (`null` if absent, `""`
+if explicitly hidden); Mermaid includes an escaped comment in the node label.
 
 ## magix key
 

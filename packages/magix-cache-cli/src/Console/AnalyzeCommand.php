@@ -20,6 +20,7 @@ use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -70,7 +71,7 @@ final readonly class AnalyzeCommand
         $nodes = array_map(static fn (BoundaryDeclaration $found): CacheNode => $tree->build($found, $depth), $matches);
 
         if ($format === 'json') {
-            $io->writeln((new JsonRenderer())->render($nodes));
+            $io->writeln((new JsonRenderer())->render($nodes), OutputInterface::OUTPUT_RAW);
 
             return Command::SUCCESS;
         }
@@ -78,7 +79,7 @@ final readonly class AnalyzeCommand
         $renderer = $format === 'mermaid' ? new MermaidRenderer() : new TreeRenderer();
 
         foreach ($nodes as $node) {
-            $io->writeln($renderer->render($node));
+            $io->writeln($renderer->render($node), $format === 'mermaid' ? OutputInterface::OUTPUT_RAW : OutputInterface::OUTPUT_NORMAL);
         }
 
         return Command::SUCCESS;

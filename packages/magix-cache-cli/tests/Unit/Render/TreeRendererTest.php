@@ -32,6 +32,20 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class TreeRendererTest extends TestCase
 {
+    public function testMultilineCommentsKeepTreeIndentationAndLiteralConsoleTags(): void
+    {
+        $node = new CacheNode(
+            new BoundaryDeclaration('App\Query', 'execute', 'query.php', 1, comment: "one\r\n<info>two</info>\rthree\\"),
+            new CacheEffect(),
+        );
+        $formatter = new \Symfony\Component\Console\Formatter\OutputFormatter();
+        $lines = (new TreeRenderer())->lines($node, '|   ', false);
+
+        self::assertSame('|   |       # one', $formatter->format($lines[1]));
+        self::assertSame('|   |       # <info>two</info>', $formatter->format($lines[2]));
+        self::assertSame('|   |       # three\\', $formatter->format($lines[3]));
+    }
+
     public function testRestrictedReplacesKnownTtlColorAndKeepsUnrestrictedFields(): void
     {
         $renderer = new TreeRenderer();

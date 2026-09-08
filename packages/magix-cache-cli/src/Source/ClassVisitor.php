@@ -53,12 +53,13 @@ final class ClassVisitor extends NodeVisitorAbstract
         $classPolicy = $this->boundaries->classPolicy($node);
         $classDynamicTtl = $this->boundaries->classDynamicTtl($node);
         $classUseStrategy = $this->boundaries->classUseStrategy($node);
+        $classComment = $this->boundaries->comment($node->attrGroups);
         $propertyTypes = $this->propertyTypes($node);
         $boundaries = [];
         $entryPoints = [];
 
         foreach ($node->getMethods() as $method) {
-            $boundary = $this->boundaries->read($method, $name, $this->file, $propertyTypes, $classPolicy, $classDynamicTtl, $classUseStrategy);
+            $boundary = $this->boundaries->read($method, $name, $this->file, $propertyTypes, $classPolicy, $classDynamicTtl, $classUseStrategy, $classComment);
 
             if ($boundary !== null) {
                 $boundaries[] = $boundary;
@@ -66,7 +67,7 @@ final class ClassVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            $entryPoint = $this->boundaries->entryPoint($method, $name, $this->file, $propertyTypes);
+            $entryPoint = $this->boundaries->entryPoint($method, $name, $this->file, $propertyTypes, $classComment);
 
             if ($entryPoint !== null) {
                 $entryPoints[] = $entryPoint;

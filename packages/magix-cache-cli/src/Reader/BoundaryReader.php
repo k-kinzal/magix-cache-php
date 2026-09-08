@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Reader;
 
+use function is_string;
+
 use Magix\Cache\Attribute\Cache;
+use Magix\Cache\Attribute\CacheComment;
 use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\UseStrategy;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
@@ -14,6 +17,7 @@ use Magix\Cache\Cli\Declaration\UseStrategyDeclaration;
 use Magix\Cache\Metadata\CacheMetadata;
 use PhpParser\Node;
 use PhpParser\Node\Attribute;
+use PhpParser\Node\AttributeGroup;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
@@ -62,6 +66,7 @@ final readonly class BoundaryReader
         ?PolicyDeclaration $classPolicy,
         bool $classDynamicTtl = false,
         ?UseStrategyDeclaration $classUseStrategy = null,
+        ?string $classComment = null,
     ): ?BoundaryDeclaration {
         $statements = $method->stmts ?? [];
 
@@ -95,17 +100,18 @@ final readonly class BoundaryReader
                 static fn (Node $node): bool => $node instanceof Name && $node->toString() === CacheMetadata::class,
             ) !== null,
             useStrategy: $this->useStrategy($method, $classUseStrategy),
+            comment: $this->comment($method->attrGroups, $classComment),
         );
     }
 
     /**
-     * Reads an uncached method as an analysis entry point without applying cache attributes.
+     * Reads an uncached entry point with its comment, without applying cache policies or behaviors.
      *
      * Call this only after read() has established that the method has no cached() call.
      *
      * @param array<string, string> $propertyTypes
      */
-    public function entryPoint(ClassMethod $method, string $class, string $file, array $propertyTypes): ?BoundaryDeclaration
+    public function entryPoint(ClassMethod $method, string $class, string $file, array $propertyTypes, ?string $classComment = null): ?BoundaryDeclaration
     {
         $parameters = $this->parameters->read($method);
         $dependencies = $this->dependencies->read($method, $class, $propertyTypes, $parameters);
@@ -121,7 +127,30 @@ final readonly class BoundaryReader
             line: $method->getStartLine(),
             dependencies: $dependencies,
             isCacheBoundary: false,
+            comment: $this->comment($method->attrGroups, $classComment),
         );
+    }
+
+    /**
+     * Reads a literal comment, replacing the class default when declared.
+     *
+     * Unreadable expressions stay visible as an unresolved comment; they are
+     * never evaluated and never fall back to a misleading class comment.
+     *
+     * @param array<AttributeGroup> $groups
+     */
+    public function comment(array $groups, ?string $classComment = null): ?string
+    {
+        $attribute = $this->attributes->find($groups, CacheComment::class);
+
+        if ($attribute === null) {
+            return $classComment;
+        }
+
+        $values = $this->arguments->values($attribute->args, ['comment']);
+        $comment = $values['comment'] ?? null;
+
+        return is_string($comment) && $comment !== LiteralReader::UNRESOLVED ? $comment : '(unresolved #[CacheComment])';
     }
 
     /**

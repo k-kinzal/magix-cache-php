@@ -64,6 +64,27 @@ The header block describes the boundary itself:
 
 Lines below the header show each boundary of the tree, with `!` for a problem that makes the boundary fail and `~` for a note about how the tree was resolved.
 
+Yellow fields mark **local restrictions**: a boundary's fixed TTL or `maxTtl`
+shortens the composed lifetime, or its policy/scoped parameters impose a stricter
+visibility than its dependencies. The header and every affected tree node retain
+the explanation, for example `10s [local restriction: local ttl 10s; composed 60s]`.
+This identifies where local settings limit metadata bubbling. Tags still union;
+adding a tag is not a bubbling stop.
+
+A cap can affect only some TTL alternatives: a composed `30/600-900s` under a
+local TTL of 300 seconds is highlighted as `30/300s`, with the original alternatives
+in the explanation. A policy cap on a declared strategy composition is also shown.
+Equal or looser settings, ordinary leaf declarations, and inherited restrictions
+are not highlighted. Runtime choices, unresolved dependencies, and invalid
+declarations are not presented as proven stops; an absent highlight does not prove
+that bubbling continues at runtime.
+
+Use `--ansi` to force terminal colors or `--no-ansi` to disable them. The
+`[local restriction: ...]` explanations remain readable without color. JSON includes
+an `effective.localRestrictions` map with `ttl` and/or `visibility` explanations
+(an empty array when none are proven). Mermaid colors affected nodes yellow and
+names their restricted fields.
+
 Disjoint lifetime contracts such as `#[Ttl(30, new TtlRange(min: 600, max: 900))]` render as `30/600-900s` in the tree and Mermaid output. Parent policies cap each alternative separately: a 300-second parent yields `30/300s`, while an automatic parent preserves `30/600-900s`. The analyzer does not infer the conditions selecting the alternatives or correlations between separate strategies.
 
 JSON retains the existing `state`, `seconds`, `lowerBound`, `upperBound`, and `reason` fields. When alternatives remain disjoint it also includes a normalized `ranges` list, for example `[{"min": 30, "max": 30}, {"min": 600, "max": 900}]`. The enclosing bounds alone do not describe the gaps. An unknown estimate with a proven finite expiration also includes `"finite": true`; an unknown numeric lifetime is not the same as an expiration that might be absent. Single intervals and determined values do not need a `ranges` field.

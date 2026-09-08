@@ -35,11 +35,29 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\StrategyResolver::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\ParameterEffects::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\LocalRestrictions::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\ParameterStrategyBinding::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class CacheTreeTest extends TestCase
 {
+    public function testBuildDoesNotHighlightRestrictionsAgainstTruncatedVisibility(): void
+    {
+        $inner = new BoundaryDeclaration('InnerQuery', 'execute', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 60), dependencies: [new DependencyCall('InnerQuery', 'execute', 2)]);
+        $outer = new BoundaryDeclaration('OuterQuery', 'execute', 'b.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 20, visibility: \Magix\Cache\Metadata\Visibility::Private), dependencies: [new DependencyCall('InnerQuery', 'execute', 2)]);
+        $tree = new CacheTree(new Catalog([
+            new ClassDeclaration('InnerQuery', boundaries: [$inner]),
+            new ClassDeclaration('OuterQuery', boundaries: [$outer]),
+        ]));
+        $limited = $tree->build($outer, 1);
+        $recursive = $tree->build($outer);
+
+        self::assertTrue($limited->effect->visibilityUnknown);
+        self::assertSame([], $limited->effect->localRestrictions);
+        self::assertTrue($recursive->effect->visibilityUnknown);
+        self::assertSame([], $recursive->effect->localRestrictions);
+    }
+
     public function testBuildKeepsUncachedRootDepthLimitsAndRecursionUnknown(): void
     {
         $query = new BoundaryDeclaration('App\ProductQuery', 'execute', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 20));

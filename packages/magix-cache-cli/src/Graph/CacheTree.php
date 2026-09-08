@@ -9,6 +9,7 @@ use function in_array;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\Catalog;
+use Magix\Cache\Metadata\Visibility;
 
 /**
  * Expands a boundary or an uncached entry point into its cache dependency tree.
@@ -38,7 +39,7 @@ final readonly class CacheTree
         $id = $boundary->id();
 
         if (in_array($id, $visited, true)) {
-            $effect = new CacheEffect(TtlEstimate::unknown(condition: 'recursive dependency, not analyzed'), $boundary->scope());
+            $effect = new CacheEffect(TtlEstimate::unknown(condition: 'recursive dependency, not analyzed'), $boundary->scope(), visibilityUnknown: $boundary->scope() !== Visibility::NoStore);
 
             return new CacheNode($boundary, $effect, [], ['recursive dependency, not expanded again']);
         }
@@ -46,7 +47,7 @@ final readonly class CacheTree
         if ($depth < 1) {
             $constraint = $boundary->dependencies === []
                 ? new DependencyConstraint()
-                : new DependencyConstraint(TtlEstimate::unknown(condition: 'dependencies beyond the depth limit were not analyzed'));
+                : new DependencyConstraint(TtlEstimate::unknown(condition: 'dependencies beyond the depth limit were not analyzed'), visibilityUnknown: true);
             $notes = $boundary->dependencies === [] ? [] : ['depth limit reached, dependencies not expanded'];
 
             return new CacheNode($boundary, $this->effects->calculate($boundary, $constraint, $this->strategies->resolve($boundary)), [], $notes);

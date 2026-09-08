@@ -22,6 +22,72 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class AnalyzeCommandTest extends TestCase
 {
+    public function testAnalyzeHighlightsPartialCapsWithoutCollapsingTtlAlternatives(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $tester->execute([
+            'boundary' => 'TimedPage::fixed',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/TtlAlternatives'],
+        ], ['decorated' => true]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString("\033[33m30/300s [local restriction: local ttl 300s; composed 30/600-900s]\033[39m", $tester->getDisplay());
+        self::assertStringContainsString('TimedQuery::execute', $tester->getDisplay());
+    }
+
+    public function testAnalyzeHighlightsLocalRestrictionsAtTheRootAndInsideTheTree(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => 'RestrictedPageQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture/Project']];
+
+        $tester->execute($arguments, ['decorated' => true]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString("\033[33m10s [local restriction: local ttl 10s; composed 60s]\033[39m", $tester->getDisplay());
+        self::assertStringContainsString("\033[33mprivate [local restriction:", $tester->getDisplay());
+        self::assertStringContainsString("\033[32m60s\033[39m", $tester->getDisplay());
+
+        $tester->execute([...$arguments, 'boundary' => 'RestrictedPageQuery::show'], ['decorated' => false]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('ttl          10s', $tester->getDisplay());
+        self::assertStringContainsString('RestrictedPageQuery::execute  ttl 10s [local restriction:', $tester->getDisplay());
+        self::assertStringNotContainsString("\033[", $tester->getDisplay());
+        self::assertStringNotContainsString('<fg=', $tester->getDisplay());
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testAnalyzeExportsRestrictionReasonsAndStylesOnlyTheAffectedMermaidNode(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => 'RestrictedPageQuery::show', '--path' => ['packages/magix-cache-cli/tests/Fixture/Project']];
+
+        $tester->execute([...$arguments, '--format' => 'json']);
+        $data = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+
+        self::assertIsArray($data);
+        self::assertIsArray($data['effective']);
+        self::assertSame([], $data['effective']['localRestrictions']);
+        self::assertIsArray($data['dependencies']);
+        self::assertIsArray($data['dependencies'][0]);
+        self::assertIsArray($data['dependencies'][0]['effective']);
+        self::assertSame([
+            'ttl' => 'local ttl 10s; composed 60s',
+            'visibility' => 'declared by the policy; composed shared',
+        ], $data['dependencies'][0]['effective']['localRestrictions']);
+
+        $tester->execute([...$arguments, '--format' => 'mermaid']);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('local restriction: ttl, visibility', $tester->getDisplay());
+        self::assertStringContainsString('style n0_0 fill:#fff3cd', $tester->getDisplay());
+        self::assertStringNotContainsString('style n0 ', $tester->getDisplay());
+        self::assertStringNotContainsString('style n0_0_0 ', $tester->getDisplay());
+    }
+
     public function testAnalyzeComposesQueriesInjectedIntoActionParameters(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));

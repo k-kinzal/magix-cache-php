@@ -170,6 +170,7 @@ final readonly class ParameterEffects
             strategy: $effect->strategy,
             visibilityUnknown: $visibilityUnknown,
             tagsUnknown: $tagsUnknown,
+            localRestrictions: $problems === [] ? (new LocalRestrictions())->describe($boundary, $constraint, $effect, $visibilityUnknown) : [],
         );
     }
 }

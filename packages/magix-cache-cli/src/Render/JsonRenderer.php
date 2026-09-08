@@ -76,6 +76,7 @@ final readonly class JsonRenderer
                 'ttl' => $effect->ttl->jsonSerialize(),
                 'visibility' => strtolower($effect->visibility->name),
                 'visibilityReason' => $effect->visibilityReason,
+                'localRestrictions' => $effect->localRestrictions,
                 'visibilityUnknown' => $effect->visibilityUnknown,
                 'tagsUnknown' => $effect->tagsUnknown,
                 'storable' => $effect->storable,

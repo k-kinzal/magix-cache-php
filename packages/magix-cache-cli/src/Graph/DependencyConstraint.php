@@ -21,6 +21,7 @@ final readonly class DependencyConstraint
      *
      * @param TtlEstimate|null $ttl Defaults to Unconstrained: no dependency imposes an expiration.
      * @param list<string> $tags
+     * @param bool $hasDependencies Whether any dependency nodes were actually expanded, distinguishing composition from a leaf or depth cutoff.
      */
     public function __construct(
         ?TtlEstimate $ttl = null,
@@ -30,6 +31,7 @@ final readonly class DependencyConstraint
         public array $tags = [],
         public bool $visibilityUnknown = false,
         public bool $tagsUnknown = false,
+        public bool $hasDependencies = false,
     ) {
         $this->ttl = $ttl ?? TtlEstimate::unconstrained();
     }

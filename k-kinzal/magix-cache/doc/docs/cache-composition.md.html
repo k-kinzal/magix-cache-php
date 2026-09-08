@@ -111,9 +111,7 @@ Result:    expires in 20s, Private, tags [inventory, products]</code></pre>
 <p>An uncacheable or <code>NoStore</code> dependency makes the composed result uncacheable or <code>NoStore</code>. A later policy cannot loosen those constraints.</p>
 <h3>Apply the Parent Policy</h3>
 <p>Composition happens inside the origin closure. The enclosing cache boundary applies its policy afterward:</p>
-<pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Policy\Ttl</span>;
-
-#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-id">Ttl</span>::<span class="tok-id">Auto</span>, <span class="tok-id">tags</span>: [<span class="tok-str">&#039;product-pages&#039;</span>])]
+<pre class="code-block"><code>#[<span class="tok-id">Cache</span>(<span class="tok-id">tags</span>: [<span class="tok-str">&#039;product-pages&#039;</span>])]
 <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(<span class="tok-id">int</span> <span class="tok-var">$productId</span>): <span class="tok-id">Cached</span>
 {
     <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-kw">function</span> () <span class="tok-kw">use</span> (<span class="tok-var">$productId</span>): <span class="tok-id">Cached</span> {
@@ -125,7 +123,7 @@ Result:    expires in 20s, Private, tags [inventory, products]</code></pre>
             );
     });
 }</code></pre>
-<p><code>Ttl::Auto</code> retains the composed expiration. A fixed parent TTL is met with the composed metadata, so the earlier of its own expiration and the composed expiration always wins — a parent can never extend what a dependency imposed.</p>
+<p>Omitting the TTL retains the composed expiration. Use bare <code>#[Cache]</code> when the parent adds no options; the example adds only a page tag. A fixed parent TTL is met with the composed metadata, so the earlier of its own expiration and the composed expiration always wins — a parent can never extend what a dependency imposed.</p>
 <h3>Create Source Metadata</h3>
 <p>Most dependencies receive metadata when their own cache boundary applies a policy. A source can also attach constraints directly:</p>
 <pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\CacheMetadata</span>;

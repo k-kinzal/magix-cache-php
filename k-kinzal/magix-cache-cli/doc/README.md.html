@@ -61,6 +61,7 @@ ProductPageQuery::execute  ttl 20s (declared 120s)  private  tags inventory,page
 |-- InventoryQuery::execute  ttl 60s  shared  tags inventory
 `-- ViewerQuery::execute  ttl 30s  private  tags viewer</code></pre>
 <p>The boundary declares 120 seconds, but <code>ProductQuery</code> expires after 20, and <code>ViewerQuery</code> is personalized, so the page is stored privately for 20 seconds. Nothing needs to be executed to see this.</p>
+<p>For a parent that only bubbles up child constraints, declare <code>#[Cache]</code> without a TTL. The tree shows the effective values directly, without a <code>(declared Ttl::Auto)</code> annotation, and the policy row uses <code>#[Cache]</code> (or includes any additional options). Explicit <code>ttl: Ttl::Auto</code> renders the same way. Fixed TTL declarations, upstream caps, and unknown or invalid lifetime diagnostics remain visible; JSON retains the normalized TTL mode in <code>policy.ttl</code>.</p>
 <h3>Commands</h3>
 <div class="table-wrap"><table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>magix analyze &lt;boundary&gt;</code></td><td>Expands a cache boundary or uncached controller action into its composed cache tree</td></tr><tr><td><code>magix key &lt;boundary&gt; [arguments]</code></td><td>Prints the cache key one call produces</td></tr></tbody></table></div>
 <p>Every command scans the Composer autoload roots of the current directory by default. Use <code>--path</code> once per directory or file to scan something else:</p>

@@ -65,10 +65,8 @@
 <p>A fixed TTL is always bounded by the upstream expiration; there is no opt-out. If a dependency has 20 seconds left, a 60-second boundary still expires after 20 seconds.</p>
 <p>A TTL of <code>0</code> is valid, but its expiration is not in the future, so the result is returned without being stored and the next call executes the origin again.</p>
 <h3>Automatic TTL</h3>
-<p><code>Ttl::Auto</code> inherits the finite expiration carried by the origin result:</p>
-<pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Policy\Ttl</span>;
-
-#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-id">Ttl</span>::<span class="tok-id">Auto</span>)]
+<p>Use <code>#[Cache]</code> without arguments when a parent only needs to bubble up its children&#039;s cache constraints:</p>
+<pre class="code-block"><code>#[<span class="tok-id">Cache</span>]
 <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(<span class="tok-id">int</span> <span class="tok-var">$productId</span>): <span class="tok-id">Cached</span>
 {
     <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-kw">function</span> () <span class="tok-kw">use</span> (<span class="tok-var">$productId</span>): <span class="tok-id">Cached</span> {
@@ -83,7 +81,8 @@
             );
     });
 }</code></pre>
-<p><code>Ttl::Auto</code> requires the returned <code>Cached</code> value to already carry a finite expiration. A value created with <code>Cached::of($value)</code> has unconstrained metadata until a policy is applied, so returning it directly under <code>Ttl::Auto</code> is a definition error and the runtime throws a <code>LogicException</code>.</p>
+<p>The composed expiration, cacheability, visibility, tags, and diagnostic reasons are preserved. The omitted TTL defaults to <code>Ttl::Auto</code>, so writing <code>#[Cache(ttl: Ttl::Auto)]</code> explicitly has the same effect. Other options can be supplied independently, such as <code>#[Cache(tags: [&#039;product-pages&#039;])]</code>.</p>
+<p>The automatic policy requires a finite expiration from the returned <code>Cached</code> value or another constraint. Returning <code>Cached::of($value)</code> with no finite constraint is a definition error and the runtime throws a <code>LogicException</code>.</p>
 <p>A <code>#[DynamicTtl]</code> resolver can supply the finite expiration before the automatic policy is applied. See <a href="../../../../k-kinzal/magix-cache/doc/docs/cache-behaviors.md.html#dynamic-ttl">Cache Behaviors</a>.</p>
 <h3>Upstream TTL</h3>
 <p><code>Ttl::FromUpstream</code> inherits an absolute expiration supplied in the returned metadata and caps it with <code>maxTtl</code>:</p>

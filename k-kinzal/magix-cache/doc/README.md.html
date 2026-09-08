@@ -75,6 +75,7 @@
     }
 }</code></pre>
 <p><code>cached()</code> takes exactly one closure, which must return a <code>Cached</code> value — wrap even a plain leaf value explicitly with <code>Cached::of()</code>. Policy and behaviors come from attributes alone: <code>#[Cache]</code> on the method wins over the concrete class as a whole, and there is no per-call override.</p>
+<p>When a parent only composes cached children, <code>#[Cache]</code> with no arguments is enough. The composed expiration, cacheability, visibility, tags, and reasons bubble up with the returned <code>Cached</code> value. Add policy options only when the parent needs additional constraints or configuration.</p>
 <p>Every method argument is included in the cache key by default. On a hit, the stored value and metadata are returned as <code>Cached</code> without running the compute closure.</p>
 <p>Use <code>map()</code>, <code>flatMap()</code>, and <code>combine2()</code> through <code>combine5()</code> to compose nested values. Their metadata can only become stricter: expiration moves earlier, cacheability uses logical AND, visibility becomes more restrictive, and tags and diagnostic reasons are combined. A declared TTL is always bounded by the upstream expiration, so no boundary can extend what a dependency imposed.</p>
 <h3>Documentation</h3>

@@ -75,7 +75,7 @@
 <span class="src-line" id="L39"><a class="ln" href="#L39">39</a><span class="tok-com">     */</span></span>
 <span class="src-line" id="L40"><a class="ln" href="#L40">40</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">label</span>(): <span class="tok-id">string</span></span>
 <span class="src-line" id="L41"><a class="ln" href="#L41">41</a>    {</span>
-<span class="src-line" id="L42"><a class="ln" href="#L42">42</a>        <span class="tok-var">$options</span> = [<span class="tok-str">&#039;ttl: &#039;</span>.<span class="tok-var">$this</span>-&gt;<span class="tok-id">ttlLabel</span>()];</span>
+<span class="src-line" id="L42"><a class="ln" href="#L42">42</a>        <span class="tok-var">$options</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">ttl</span> === <span class="tok-id">Ttl</span>::<span class="tok-id">Auto</span> ? [] : [<span class="tok-str">&#039;ttl: &#039;</span>.<span class="tok-var">$this</span>-&gt;<span class="tok-id">ttlLabel</span>()];</span>
 <span class="src-line" id="L43"><a class="ln" href="#L43">43</a></span>
 <span class="src-line" id="L44"><a class="ln" href="#L44">44</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">maxTtl</span> !== <span class="tok-id">null</span>) {</span>
 <span class="src-line" id="L45"><a class="ln" href="#L45">45</a>            <span class="tok-var">$options</span>[] = <span class="tok-str">&#039;maxTtl: &#039;</span>.<span class="tok-var">$this</span>-&gt;<span class="tok-id">maxTtl</span>;</span>
@@ -97,7 +97,7 @@
 <span class="src-line" id="L61"><a class="ln" href="#L61">61</a>            <span class="tok-var">$options</span>[] = <span class="tok-str">&#039;runtime: &#039;</span>.<span class="tok-var">$this</span>-&gt;<span class="tok-id">runtime</span>;</span>
 <span class="src-line" id="L62"><a class="ln" href="#L62">62</a>        }</span>
 <span class="src-line" id="L63"><a class="ln" href="#L63">63</a></span>
-<span class="src-line" id="L64"><a class="ln" href="#L64">64</a>        <span class="tok-kw">return</span> <span class="tok-str">&#039;#[Cache(&#039;</span>.<span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$options</span>).<span class="tok-str">&#039;)]&#039;</span>;</span>
+<span class="src-line" id="L64"><a class="ln" href="#L64">64</a>        <span class="tok-kw">return</span> <span class="tok-var">$options</span> === [] ? <span class="tok-str">&#039;#[Cache]&#039;</span> : <span class="tok-str">&#039;#[Cache(&#039;</span>.<span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$options</span>).<span class="tok-str">&#039;)]&#039;</span>;</span>
 <span class="src-line" id="L65"><a class="ln" href="#L65">65</a>    }</span>
 <span class="src-line" id="L66"><a class="ln" href="#L66">66</a></span>
 <span class="src-line" id="L67"><a class="ln" href="#L67">67</a>    <span class="tok-com">/**</span></span>

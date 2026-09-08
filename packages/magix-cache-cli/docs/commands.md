@@ -57,17 +57,36 @@ The header block describes the boundary itself:
 | `strategy` | The `#[UseStrategy]` construction, one line per composed strategy with its contracted candidate range, and `(assumed)` where an explicit `#[AssumeTtl]` replaced the contract. Only shown when a strategy is declared |
 | `strategy ttl` | The candidate constraint the composition adds on the normal origin path, before dependencies and the policy cap it; disjoint alternatives stay distinct, such as `30/600-900s` |
 | `visibility` | `shared`, `private`, or `nostore` after composition, followed by what restricted it |
-| `storable` | Whether the runtime writes an entry for this boundary at all |
+| `storable` | Whether static analysis can prove that this boundary stores its result; `no` also covers runtime-dependent results |
 | `tags` | Policy tags unioned with the tags of every dependency |
 | `key` | The parameters that form the key, the ignored ones, and the policy version |
 | `policy` | The declaration as it is written in the source |
 
 Lines below the header show each boundary of the tree, with `!` for a problem that makes the boundary fail and `~` for a note about how the tree was resolved.
 
+Terminal colors follow the **effective result after composition**:
+
+| Color | Meaning |
+|---|---|
+| White row | A boundary whose effective result is provably storable, including an automatic `#[Cache]` that carries child constraints upward |
+| Gray row | An uncached method, a missing policy, `NoStore`, zero TTL, an invalid declaration, or a result whose storage cannot be proven statically |
+| Yellow field | A local setting restricts a result that remains storable |
+| Red diagnostic | An invalid lifetime or a problem that makes the declaration fail |
+
+Follow the white rows to see how far cacheable results bubble. `NoStore` turns
+the affected parents gray; stored descendants remain white. An uncached entry
+point stays gray even when its summary contains a finite TTL from called caches.
+Gray can also mean that storage depends on runtime values: read the TTL condition
+and visibility label to distinguish uncertainty from a definite stop.
+Both `shared` and `private` caches use white; their text labels preserve the
+visibility distinction. Notes use gray, and ordinary TTL values follow the row
+color.
+
 Yellow fields mark **local restrictions**: a boundary's fixed TTL or `maxTtl`
 shortens the composed lifetime, or its policy/scoped parameters impose a stricter
 visibility than its dependencies. The header and affected tree nodes use color
-alone to identify where local settings limit metadata bubbling. Tags still union;
+alone to identify where local settings limit metadata bubbling while the result
+remains storable. Non-storable rows keep their gray color. Tags still union;
 adding a tag is not a bubbling stop.
 
 A cap can affect only some TTL alternatives: a composed `30/600-900s` under a
@@ -78,9 +97,10 @@ are not highlighted. Runtime choices, unresolved dependencies, and invalid
 declarations are not presented as proven stops; an absent highlight does not prove
 that bubbling continues at runtime.
 
-Use `--ansi` to force terminal colors or `--no-ansi` to disable them. Mermaid
-colors affected nodes yellow. Highlighting adds no annotations to tree, JSON,
-or Mermaid output.
+Use `--ansi` to force terminal colors or `--no-ansi` to disable them. Plain text
+keeps the same labels and diagnostics without escape codes or extra annotations.
+JSON retains the same data. Mermaid keeps its existing yellow styling for local
+restrictions; the white/gray row palette applies to the terminal tree.
 
 Disjoint lifetime contracts such as `#[Ttl(30, new TtlRange(min: 600, max: 900))]` render as `30/600-900s` in the tree and Mermaid output. Parent policies cap each alternative separately: a 300-second parent yields `30/300s`, while an automatic parent preserves `30/600-900s`. The analyzer does not infer the conditions selecting the alternatives or correlations between separate strategies.
 

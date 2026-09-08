@@ -13,6 +13,7 @@ use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
+use Magix\Cache\Runtime\Policy\Ttl;
 
 /**
  * Renders one cache tree as an indented terminal report.
@@ -110,7 +111,7 @@ final readonly class TreeRenderer
         $declared = $node->boundary->policy;
         $ttl = 'ttl '.$this->restricted($this->estimate($effect->ttl), $effect, 'ttl');
 
-        if ($declared !== null && $declared->ttlLabel() !== $effect->ttl->label()) {
+        if ($declared !== null && $declared->ttl !== Ttl::Auto && $declared->ttlLabel() !== $effect->ttl->label()) {
             $ttl .= ' (declared '.$declared->ttlLabel().')';
         }
 

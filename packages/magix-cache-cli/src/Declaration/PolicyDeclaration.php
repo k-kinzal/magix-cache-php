@@ -39,7 +39,7 @@ final readonly class PolicyDeclaration
      */
     public function label(): string
     {
-        $options = ['ttl: '.$this->ttlLabel()];
+        $options = $this->ttl === Ttl::Auto ? [] : ['ttl: '.$this->ttlLabel()];
 
         if ($this->maxTtl !== null) {
             $options[] = 'maxTtl: '.$this->maxTtl;
@@ -61,7 +61,7 @@ final readonly class PolicyDeclaration
             $options[] = 'runtime: '.$this->runtime;
         }
 
-        return '#[Cache('.implode(', ', $options).')]';
+        return $options === [] ? '#[Cache]' : '#[Cache('.implode(', ', $options).')]';
     }
 
     /**

@@ -59,12 +59,10 @@ A TTL of `0` is valid, but its expiration is not in the future, so the result is
 
 ## Automatic TTL
 
-`Ttl::Auto` inherits the finite expiration carried by the origin result:
+Use `#[Cache]` without arguments when a parent only needs to bubble up its children's cache constraints:
 
 ```php
-use Magix\Cache\Runtime\Policy\Ttl;
-
-#[Cache(ttl: Ttl::Auto)]
+#[Cache]
 public function execute(int $productId): Cached
 {
     return $this->cached(function () use ($productId): Cached {
@@ -81,7 +79,9 @@ public function execute(int $productId): Cached
 }
 ```
 
-`Ttl::Auto` requires the returned `Cached` value to already carry a finite expiration. A value created with `Cached::of($value)` has unconstrained metadata until a policy is applied, so returning it directly under `Ttl::Auto` is a definition error and the runtime throws a `LogicException`.
+The composed expiration, cacheability, visibility, tags, and diagnostic reasons are preserved. The omitted TTL defaults to `Ttl::Auto`, so writing `#[Cache(ttl: Ttl::Auto)]` explicitly has the same effect. Other options can be supplied independently, such as `#[Cache(tags: ['product-pages'])]`.
+
+The automatic policy requires a finite expiration from the returned `Cached` value or another constraint. Returning `Cached::of($value)` with no finite constraint is a definition error and the runtime throws a `LogicException`.
 
 A `#[DynamicTtl]` resolver can supply the finite expiration before the automatic policy is applied. See [Cache Behaviors](cache-behaviors.md#dynamic-ttl).
 

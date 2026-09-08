@@ -147,7 +147,6 @@ When a query depends on other cached queries, combine their values instead of di
 use Magix\Cache\Attribute\Cache;
 use Magix\Cache\Cacheable;
 use Magix\Cache\Cached;
-use Magix\Cache\Runtime\Policy\Ttl;
 
 final class ProductPageQuery
 {
@@ -160,7 +159,7 @@ final class ProductPageQuery
     }
 
     /** @return Cached<ProductPage> */
-    #[Cache(ttl: Ttl::Auto, tags: ['product-pages'])]
+    #[Cache(tags: ['product-pages'])]
     public function execute(int $productId): Cached
     {
         return $this->cached(function () use ($productId): Cached {
@@ -178,7 +177,7 @@ final class ProductPageQuery
 }
 ```
 
-If the product expires in 20 seconds and inventory expires in 60 seconds, the composed page expires in 20 seconds. Cacheability, visibility, tags, and diagnostic reasons are also combined conservatively — a declared TTL can shorten the result's lifetime but never extend what a dependency imposed. See [Cache Composition](cache-composition.md) for all composition rules, including the `value()` pitfall.
+The TTL can be omitted: `#[Cache]` alone inherits the composed constraints, and this example adds only a page tag. If the product expires in 20 seconds and inventory expires in 60 seconds, the composed page expires in 20 seconds. Cacheability, visibility, tags, and diagnostic reasons are also combined conservatively — a declared TTL can shorten the result's lifetime but never extend what a dependency imposed. See [Cache Composition](cache-composition.md) for all composition rules, including the `value()` pitfall.
 
 ## Select a Runtime per Boundary
 

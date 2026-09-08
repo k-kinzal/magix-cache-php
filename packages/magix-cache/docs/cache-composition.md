@@ -126,9 +126,7 @@ An uncacheable or `NoStore` dependency makes the composed result uncacheable or 
 Composition happens inside the origin closure. The enclosing cache boundary applies its policy afterward:
 
 ```php
-use Magix\Cache\Runtime\Policy\Ttl;
-
-#[Cache(ttl: Ttl::Auto, tags: ['product-pages'])]
+#[Cache(tags: ['product-pages'])]
 public function execute(int $productId): Cached
 {
     return $this->cached(function () use ($productId): Cached {
@@ -142,7 +140,7 @@ public function execute(int $productId): Cached
 }
 ```
 
-`Ttl::Auto` retains the composed expiration. A fixed parent TTL is met with the composed metadata, so the earlier of its own expiration and the composed expiration always wins — a parent can never extend what a dependency imposed.
+Omitting the TTL retains the composed expiration. Use bare `#[Cache]` when the parent adds no options; the example adds only a page tag. A fixed parent TTL is met with the composed metadata, so the earlier of its own expiration and the composed expiration always wins — a parent can never extend what a dependency imposed.
 
 ## Create Source Metadata
 

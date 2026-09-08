@@ -22,6 +22,29 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[UsesNamespace('Magix\Cache\Runtime\Parameter')]
 final class AnalyzeCommandTest extends TestCase
 {
+    public function testAnalyzeShowsBubbledMetadataWithoutAutomaticTtlDeclarations(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $tester->execute([
+            'boundary' => 'BubblingPageQuery::explicit',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $output = $tester->getDisplay();
+        self::assertStringContainsString('ttl          20s (inherited from BubblingPageQuery::execute)', $output);
+        self::assertStringContainsString('visibility   private', $output);
+        self::assertStringContainsString('tags         inventory, page, product, viewer', $output);
+        self::assertStringContainsString('storable     yes', $output);
+        self::assertStringContainsString('policy       #[Cache]', $output);
+        self::assertStringContainsString('BubblingPageQuery::explicit  ttl 20s  private', $output);
+        self::assertStringContainsString('BubblingPageQuery::execute  ttl 20s  private', $output);
+        self::assertStringContainsString('ProductPageQuery::execute  ttl 20s (declared 120s)', $output);
+        self::assertStringNotContainsString('Ttl::Auto', $output);
+        self::assertStringNotContainsString('local restriction:', $output);
+    }
+
     public function testAnalyzeHighlightsPartialCapsWithoutCollapsingTtlAlternatives(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));

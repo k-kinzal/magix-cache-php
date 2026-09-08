@@ -20,6 +20,7 @@
         "illuminate/support": "^12.0 || ^13.0",
         "k-kinzal/php-ai-toolkit": "dev-main",
         "nikic/php-parser": "^5.4",
+        "phpbench/phpbench": "^1.7",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^12.5",
         "psr/cache": "^3.0",
@@ -42,7 +43,8 @@
             "Tests\\Package\\Laravel\\": "packages/magix-cache-laravel/tests/",
             "Tests\\Package\\Symfony\\": "packages/magix-cache-symfony/tests/",
             "Magix\\Cache\\Cli\\": "packages/magix-cache-cli/src/",
-            "Tests\\Package\\Cli\\": "packages/magix-cache-cli/tests/"
+            "Tests\\Package\\Cli\\": "packages/magix-cache-cli/tests/",
+            "Bench\\": "bench/"
         }
     },
     "scripts": {
@@ -86,13 +88,20 @@
             "composer validate packages/magix-cache-cli/composer.json --strict --no-check-publish"
         ],
         "security:audit": "composer audit --locked",
-        "toolkit:install": "php-ai-toolkit install"
+        "toolkit:install": "php-ai-toolkit install",
+        "bench": "phpbench run --report=aggregate --report=overhead",
+        "bench:quick": "phpbench run --report=aggregate --report=overhead --warmup=1 --iterations=3 --retry-threshold=10"
     },
     "config": {
         "platform": {
             "php": "8.3.0"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "audit": {
+            "ignore-abandoned": {
+                "doctrine/annotations": "PHPBench 1.7 requires this development-only package for its annotation reader; our benchmarks use attributes. Remove when PHPBench drops the dependency."
+            }
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true

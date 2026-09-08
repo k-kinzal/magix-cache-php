@@ -37,4 +37,5 @@ parameters:
             - 'Tests\Package\Cli\Unit'
     paths:
         - packages
+        - bench
     tmpDir: .phpstan.cache

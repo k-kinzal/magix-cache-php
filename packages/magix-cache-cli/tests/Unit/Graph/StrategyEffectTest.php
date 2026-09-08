@@ -14,6 +14,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(StrategyEffect::class)]
 #[UsesClass(StrategyStep::class)]
 #[UsesClass(TtlEstimate::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class StrategyEffectTest extends TestCase
 {
     public function testCarriesTheAnalyzedCompositionOfADeclaredStrategy(): void

@@ -8,7 +8,6 @@ use InvalidArgumentException;
 
 use function is_a;
 
-use Magix\Cache\Strategy\Contract\Ttl;
 use Override;
 use RuntimeException;
 
@@ -65,7 +64,6 @@ final class StaleIfErrorCacheStrategy implements CacheStrategy
      * @throws RuntimeException when a delegate raises a failure outside the origin
      */
     #[Override]
-    #[Ttl(unconstrained: true)]
     public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
     {
         $result = $next->fetch($operation);

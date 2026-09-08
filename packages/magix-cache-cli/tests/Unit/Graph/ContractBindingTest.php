@@ -9,11 +9,13 @@ use Magix\Cache\Cli\Declaration\ContractSource;
 use Magix\Cache\Cli\Declaration\StrategyArgument;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\StrategyParameter;
+use Magix\Cache\Cli\Declaration\TtlContract;
 use Magix\Cache\Cli\Declaration\Unresolved;
 use Magix\Cache\Cli\Graph\ContractBinding;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
@@ -23,8 +25,56 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(StrategyDeclaration::class)]
 #[UsesClass(StrategyParameter::class)]
 #[UsesClass(TtlEstimate::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
+#[UsesClass(TtlContract::class)]
 final class ContractBindingTest extends TestCase
 {
+    public function testContractBindsReferencesWithinEachAlternative(): void
+    {
+        $normal = new ContractReference(ContractSource::Constructor, 'normal');
+        $minimum = new ContractReference(ContractSource::Constructor, 'minimum');
+        $contract = new TtlContract(oneOf: [new TtlContract($normal, $normal), new TtlContract($minimum, 900)]);
+        [$estimate, $problems] = (new ContractBinding())->contract($contract, ContractSource::Constructor, ['normal' => 30, 'minimum' => 600], 'Timed');
+
+        self::assertSame('30/600-900s', $estimate->label());
+        self::assertSame([], $problems);
+    }
+
+    public function testAlternativesPreservesPartialBoundsAndReportsMissingReferences(): void
+    {
+        $binding = new ContractBinding();
+        $unknown = new ContractReference(ContractSource::Constructor, 'upper');
+        $alternatives = [new TtlContract(30, 30), new TtlContract(600, $unknown)];
+        [$estimate, $problems] = $binding->alternatives($alternatives, ContractSource::Constructor, ['upper' => Unresolved::Value], 'Timed');
+
+        self::assertSame('30/600-?s', $estimate->label());
+        self::assertSame([], $problems);
+        [$missing, $errors] = $binding->alternatives($alternatives, ContractSource::Constructor, [], 'Timed');
+        self::assertSame(TtlEstimateState::Invalid, $missing->state);
+        self::assertCount(1, $errors);
+        self::assertStringContainsString('alternative 2', $errors[0]);
+        self::assertStringContainsString('no such parameter', $errors[0]);
+    }
+
+    #[DataProvider('providerInvalidAlternatives')]
+    public function testContractReportsInvalidBranchesInsteadOfDiscardingThem(TtlContract $invalid): void
+    {
+        [$estimate, $problems] = (new ContractBinding())->contract(new TtlContract(oneOf: [new TtlContract(30, 30), $invalid]), ContractSource::Constructor, [], 'Timed');
+
+        self::assertSame(TtlEstimateState::Invalid, $estimate->state);
+        self::assertNotEmpty($problems);
+    }
+
+    /**
+     * @return iterable<string, array{TtlContract}>
+     */
+    public static function providerInvalidAlternatives(): iterable
+    {
+        yield 'negative' => [new TtlContract(-1, -1)];
+        yield 'reversed' => [new TtlContract(900, 600)];
+    }
+
     public function testBindCreateBindsNamedArgumentsOverDefaults(): void
     {
         $binding = new ContractBinding();

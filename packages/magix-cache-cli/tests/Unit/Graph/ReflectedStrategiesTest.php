@@ -29,8 +29,23 @@ use Tests\Fixture\ProductCacheStrategy;
 #[UsesClass(StrategyParameter::class)]
 #[UsesClass(Ttl::class)]
 #[UsesClass(TtlContract::class)]
+#[UsesClass(\Magix\Cache\Strategy\Contract\TtlRange::class)]
 final class ReflectedStrategiesTest extends TestCase
 {
+    public function testAlternativesReadsRangesWithoutExecutingTheStrategy(): void
+    {
+        $declaration = (new ReflectedStrategies())->read(\Tests\Package\Cli\Fixture\TtlAlternatives\ConditionalTtlStrategy::class);
+
+        self::assertNotNull($declaration);
+        self::assertNotNull($declaration->ttl);
+        self::assertNotNull($declaration->ttl->oneOf);
+        self::assertCount(2, $declaration->ttl->oneOf);
+        self::assertInstanceOf(ContractReference::class, $declaration->ttl->oneOf[0]->min);
+        self::assertSame('normal', $declaration->ttl->oneOf[0]->min->name);
+        self::assertInstanceOf(ContractReference::class, $declaration->ttl->oneOf[1]->max);
+        self::assertSame('maximum', $declaration->ttl->oneOf[1]->max->name);
+    }
+
     public function testReadReflectsTheConstructorParametersOfABundledLeaf(): void
     {
         $declaration = (new ReflectedStrategies())->read(KeySpreadExpirationStrategy::class);
@@ -97,16 +112,12 @@ final class ReflectedStrategiesTest extends TestCase
         self::assertFalse($contract->unconstrained);
     }
 
-    public function testContractKeepsAnUnconstrainedDeclaration(): void
+    public function testContractMayBeOmittedForAnUnconstrainedStrategy(): void
     {
         $declaration = (new ReflectedStrategies())->read(StaleIfErrorCacheStrategy::class);
 
         self::assertInstanceOf(StrategyDeclaration::class, $declaration);
-        $contract = $declaration->ttl;
-        self::assertInstanceOf(TtlContract::class, $contract);
-        self::assertTrue($contract->unconstrained);
-        self::assertNull($contract->min);
-        self::assertNull($contract->max);
+        self::assertNull($declaration->ttl);
     }
 
     public function testAssumptionsAreEmptyForANullCreate(): void

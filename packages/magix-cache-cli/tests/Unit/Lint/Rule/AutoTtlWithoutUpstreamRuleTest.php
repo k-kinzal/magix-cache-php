@@ -32,8 +32,22 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Graph\DependencyConstraint::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\ParameterEffects::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class AutoTtlWithoutUpstreamRuleTest extends TestCase
 {
+    public function testCheckAcceptsAProvenFiniteAlternativeFromADependency(): void
+    {
+        $ttl = TtlEstimate::oneOf(new \Magix\Cache\Cli\Graph\TtlInterval(30, 30), new \Magix\Cache\Cli\Graph\TtlInterval(600, 900));
+        $node = new CacheNode(
+            new BoundaryDeclaration('Page', 'fetch', 'page.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, Ttl::Auto)),
+            new CacheEffect(ttl: $ttl),
+            [new CacheNode(new BoundaryDeclaration('Timed', 'fetch', 'timed.php', 1), new CacheEffect(ttl: $ttl))],
+        );
+
+        self::assertSame([], (new AutoTtlWithoutUpstreamRule())->check($node, new Catalog([])));
+    }
+
     public function testCheckReportsAConfirmedUnconstrainedUpstreamAsAnError(): void
     {
         $node = new CacheNode(

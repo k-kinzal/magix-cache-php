@@ -28,6 +28,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(StrategyEffect::class)]
 #[UsesClass(StrategyStep::class)]
 #[UsesClass(TtlEstimate::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class TreeRendererTest extends TestCase
 {
     public function testRenderShowsTheEffectiveValuesOfTheRootBoundary(): void

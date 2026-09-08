@@ -47,6 +47,7 @@ final readonly class ParameterEffects
         return $sources === [] ? null : TtlEstimate::unknown(
             condition: 'TTL depends on '.implode(', ', $sources).' (non-negative integer seconds)',
             lowerBound: 0,
+            finite: true,
         );
     }
 

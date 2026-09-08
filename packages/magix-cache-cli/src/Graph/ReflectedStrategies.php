@@ -20,6 +20,7 @@ use Magix\Cache\Strategy\Contract\Arg;
 use Magix\Cache\Strategy\Contract\AssumeTtl;
 use Magix\Cache\Strategy\Contract\ConstructorArg;
 use Magix\Cache\Strategy\Contract\Ttl;
+use Magix\Cache\Strategy\Contract\TtlRange;
 use Magix\Cache\Strategy\StrategyDefinition;
 use ReflectionClass;
 use ReflectionException;
@@ -151,6 +152,7 @@ final readonly class ReflectedStrategies
             min: $this->bound($declared->min),
             max: $this->bound($declared->max),
             unconstrained: $declared->unconstrained,
+            oneOf: $this->alternatives($declared->oneOf),
         );
     }
 
@@ -170,6 +172,7 @@ final readonly class ReflectedStrategies
                 min: $this->bound($declared->min),
                 max: $this->bound($declared->max),
                 unconstrained: $declared->unconstrained,
+                oneOf: $this->alternatives($declared->oneOf),
             );
         }
 
@@ -190,5 +193,23 @@ final readonly class ReflectedStrategies
         }
 
         return new ContractReference(ContractSource::Create, $bound->name);
+    }
+
+    /**
+     * Preserves each reflected point or interval as a separate declaration.
+     *
+     * @param list<int|ConstructorArg|Arg|TtlRange>|null $alternatives
+     * @return list<TtlContract>|null
+     */
+    public function alternatives(?array $alternatives): ?array
+    {
+        if ($alternatives === null) {
+            return null;
+        }
+
+        return array_map(fn (int|ConstructorArg|Arg|TtlRange $alternative): TtlContract =>
+            $alternative instanceof TtlRange
+                ? new TtlContract(min: $this->bound($alternative->min), max: $this->bound($alternative->max))
+                : new TtlContract(min: $this->bound($alternative), max: $this->bound($alternative)), $alternatives);
     }
 }

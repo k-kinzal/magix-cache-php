@@ -12,6 +12,7 @@ use Magix\Cache\Cli\Declaration\ContractSource;
 use Magix\Cache\Cli\Declaration\StrategyArgument;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\StrategyParameter;
+use Magix\Cache\Cli\Declaration\TtlContract;
 use Magix\Cache\Cli\Declaration\Unresolved;
 
 /**
@@ -118,6 +119,10 @@ final readonly class ContractBinding
      */
     public function estimate(?int $min, ?int $max, string $subject): TtlEstimate
     {
+        if (($min !== null && $min < 0) || ($max !== null && $max < 0)) {
+            return TtlEstimate::invalid('the resolved lifetime bounds of '.$subject.' must be zero or greater');
+        }
+
         if ($min !== null && $max !== null && $max < $min) {
             return TtlEstimate::invalid('the resolved lifetime bounds of '.$subject.' contradict ('.$min.'s > '.$max.'s)');
         }
@@ -127,10 +132,75 @@ final readonly class ContractBinding
         }
 
         if ($min === null && $max === null) {
-            return TtlEstimate::unknown(condition: 'the declared lifetime bounds of '.$subject.' are not statically resolved');
+            return TtlEstimate::unknown(condition: 'the declared lifetime bounds of '.$subject.' are not statically resolved', finite: true);
         }
 
-        return TtlEstimate::unknown(upperBound: $max, lowerBound: $min);
+        return TtlEstimate::unknown(upperBound: $max, lowerBound: $min, finite: true);
+    }
+
+    /**
+     * Resolves every alternative and reports declaration errors to the lint rule.
+     *
+     * @param array<string, mixed> $environment
+     * @return array{TtlEstimate, list<string>}
+     */
+    public function contract(TtlContract $contract, ContractSource $source, array $environment, string $subject): array
+    {
+        $problems = $contract->declarationProblems();
+
+        if ($problems !== []) {
+            return [TtlEstimate::invalid($problems[0]), $problems];
+        }
+
+        if ($contract->oneOf !== null) {
+            return $this->alternatives($contract->oneOf, $source, $environment, $subject);
+        }
+
+        if ($contract->unconstrained) {
+            return [TtlEstimate::unconstrained(), []];
+        }
+
+        [$min, $minProblem] = $this->bound($contract->min, $source, $environment, $subject);
+        [$max, $maxProblem] = $this->bound($contract->max, $source, $environment, $subject);
+        $problems = array_values(array_filter([$minProblem, $maxProblem], static fn (?string $problem): bool => $problem !== null));
+        $estimate = $problems === [] ? $this->estimate($min, $max, $subject) : TtlEstimate::invalid($problems[0]);
+
+        if ($estimate->state === TtlEstimateState::Invalid && $estimate->reason !== null && $problems === []) {
+            $problems[] = $estimate->reason;
+        }
+
+        return [$estimate, $problems];
+    }
+
+    /**
+     * Unions possible constraints rather than meeting mutually exclusive paths.
+     *
+     * @param list<TtlContract> $alternatives
+     * @param array<string, mixed> $environment
+     * @return array{TtlEstimate, list<string>}
+     */
+    public function alternatives(array $alternatives, ContractSource $source, array $environment, string $subject): array
+    {
+        $ranges = [];
+        $problems = [];
+        $condition = null;
+
+        foreach ($alternatives as $index => $alternative) {
+            [$estimate, $errors] = $this->contract($alternative, $source, $environment, $subject.' alternative '.($index + 1));
+            $problems = [...$problems, ...$errors];
+            $ranges = [...$ranges, ...$estimate->ranges()->intervals];
+            $condition ??= $estimate->reason;
+        }
+
+        if ($problems !== []) {
+            return [TtlEstimate::invalid($problems[0]), $problems];
+        }
+
+        if ($ranges === []) {
+            return [TtlEstimate::invalid('lifetime alternatives must not be empty'), ['lifetime alternatives must not be empty']];
+        }
+
+        return [TtlEstimate::fromRanges(new TtlRangeSet(...$ranges), $condition, finite: true), []];
     }
 
     /**

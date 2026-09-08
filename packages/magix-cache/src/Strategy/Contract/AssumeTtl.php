@@ -7,8 +7,6 @@ namespace Magix\Cache\Strategy\Contract;
 use Attribute;
 use InvalidArgumentException;
 
-use function is_int;
-
 /**
  * Declares an explicit analysis assumption for one composed strategy.
  *
@@ -24,38 +22,44 @@ use function is_int;
 final readonly class AssumeTtl
 {
     /**
+     * Assumed lower bound of the named range; null for alternatives or no constraint.
+     */
+    public int|ConstructorArg|Arg|null $min;
+
+    /**
+     * Assumed upper bound of the named range; null for alternatives or no constraint.
+     */
+    public int|ConstructorArg|Arg|null $max;
+
+    /**
+     * Whether only the child was named, assuming that it adds no TTL constraint.
+     */
+    public bool $unconstrained;
+
+    /**
+     * @var non-empty-list<int|ConstructorArg|Arg|TtlRange>|null
+     */
+    public ?array $oneOf;
+
+    /**
      * Declares the assumed lifetime contract of one composed strategy.
      *
      * @param string $strategy Class name of the composed strategy the assumption covers.
-     * @param int|Arg|null $min Assumed lower bound in seconds of the added constraint.
-     * @param int|Arg|null $max Assumed upper bound in seconds of the added constraint.
-     * @param bool $unconstrained Assumes that no lifetime constraint is added.
-     * @throws InvalidArgumentException when the strategy reference is empty, a bound is negative, the bounds contradict, or the declaration says nothing
+     * @param int|Arg|TtlRange|null ...$lifetimes Positional fixed lifetimes, Arg references or ranges; alternatively named min/max bounds in seconds. Null is allowed only for an omitted named bound. No lifetimes assumes that the named child adds no TTL constraint.
+     * @throws InvalidArgumentException when the strategy reference is empty, bounds or alternatives are invalid, an unknown name is supplied, or named bounds and positional alternatives are mixed
      */
     public function __construct(
         public string $strategy,
-        public int|Arg|null $min = null,
-        public int|Arg|null $max = null,
-        public bool $unconstrained = false,
+        int|Arg|TtlRange|null ...$lifetimes,
     ) {
         if ($strategy === '') {
             throw new InvalidArgumentException('An assumption must name the strategy class it covers.');
         }
 
-        if ($unconstrained && ($min !== null || $max !== null)) {
-            throw new InvalidArgumentException('An unconstrained lifetime assumption cannot also declare bounds.');
-        }
-
-        if (!$unconstrained && $min === null && $max === null) {
-            throw new InvalidArgumentException('A lifetime assumption must declare a bound, or unconstrained: true.');
-        }
-
-        if ((is_int($min) && $min < 0) || (is_int($max) && $max < 0)) {
-            throw new InvalidArgumentException('A lifetime bound must be zero or greater.');
-        }
-
-        if (is_int($min) && is_int($max) && $max < $min) {
-            throw new InvalidArgumentException('A lifetime assumption cannot bound the maximum below the minimum.');
-        }
+        $contract = new Ttl(...$lifetimes);
+        $this->min = $contract->min;
+        $this->max = $contract->max;
+        $this->unconstrained = $contract->unconstrained;
+        $this->oneOf = $contract->oneOf;
     }
 }

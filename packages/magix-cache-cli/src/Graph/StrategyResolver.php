@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Graph;
 
-use function array_filter;
-use function array_values;
-
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\Catalog;
 use Magix\Cache\Cli\Declaration\ContractSource;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\StrategyInstantiation;
 use Magix\Cache\Cli\Declaration\TtlAssumption;
+use Magix\Cache\Cli\Declaration\TtlContract;
 
 use function strrpos;
 use function substr;
@@ -169,11 +167,11 @@ final readonly class StrategyResolver
                 return $this->assumed($instantiation->class, $assumption, $environment);
             }
 
-            $condition = $child === null
-                ? $instantiation->class.' was not found in the scanned sources'
-                : $child->shortName().' declares no lifetime contract on fetch()';
+            if ($child === null) {
+                $condition = $instantiation->class.' was not found in the scanned sources';
 
-            return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition)), [], null];
+                return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition)), [], null];
+            }
         }
 
         return $this->contracted($child, $instantiation, $environment);
@@ -203,23 +201,18 @@ final readonly class StrategyResolver
      */
     public function contracted(StrategyDeclaration $child, StrategyInstantiation $instantiation, array $environment): array
     {
-        $contract = $child->ttl;
-
-        if ($contract === null || $contract->unconstrained) {
-            return [new StrategyStep($child->name, TtlEstimate::unconstrained()), [], false];
-        }
+        $contract = $child->ttl ?? new TtlContract(unconstrained: true);
 
         [$constructor, $problems] = $this->binding->bindConstructor($child, $instantiation->arguments, $environment);
         $subject = '#[Ttl] on '.$child->shortName().'::fetch()';
-        [$min, $minProblem] = $this->binding->bound($contract->min, ContractSource::Constructor, $constructor, $subject);
-        [$max, $maxProblem] = $this->binding->bound($contract->max, ContractSource::Constructor, $constructor, $subject);
-        $problems = [...$problems, ...array_filter([$minProblem, $maxProblem], static fn (?string $problem): bool => $problem !== null)];
+        [$estimate, $contractProblems] = $this->binding->contract($contract, ContractSource::Constructor, $constructor, $subject);
+        $problems = [...$problems, ...$contractProblems];
 
         if ($problems !== []) {
             return [new StrategyStep($child->name, TtlEstimate::invalid($problems[0])), $problems, true];
         }
 
-        return [new StrategyStep($child->name, $this->binding->estimate($min, $max, $child->shortName())), [], true];
+        return [new StrategyStep($child->name, $estimate), [], !$contract->unconstrained];
     }
 
     /**
@@ -230,20 +223,14 @@ final readonly class StrategyResolver
      */
     public function assumed(string $class, TtlAssumption $assumption, array $environment): array
     {
-        if ($assumption->unconstrained) {
-            return [new StrategyStep($class, TtlEstimate::unconstrained(), assumed: true), [], false];
-        }
-
         $subject = '#[AssumeTtl] for '.$this->shortName($class);
-        [$min, $minProblem] = $this->binding->bound($assumption->min, ContractSource::Create, $environment, $subject);
-        [$max, $maxProblem] = $this->binding->bound($assumption->max, ContractSource::Create, $environment, $subject);
-        $problems = array_values(array_filter([$minProblem, $maxProblem], static fn (?string $problem): bool => $problem !== null));
+        [$estimate, $problems] = $this->binding->contract($assumption->contract(), ContractSource::Create, $environment, $subject);
 
         if ($problems !== []) {
             return [new StrategyStep($class, TtlEstimate::invalid($problems[0]), assumed: true), $problems, true];
         }
 
-        return [new StrategyStep($class, $this->binding->estimate($min, $max, $this->shortName($class)), assumed: true), [], true];
+        return [new StrategyStep($class, $estimate, assumed: true), [], !$assumption->unconstrained];
     }
 
     /**

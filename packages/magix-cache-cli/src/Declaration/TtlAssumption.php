@@ -20,12 +20,24 @@ final readonly class TtlAssumption
      * @param string $strategy Class name of the composed strategy the assumption covers.
      * @param int|ContractReference|Unresolved|null $min
      * @param int|ContractReference|Unresolved|null $max
+     * @param list<TtlContract>|null $oneOf Alternative finite constraints for exactly the named child.
+     * @param list<string> $problems Statically malformed declaration syntax.
      */
     public function __construct(
         public string $strategy,
         public int|ContractReference|Unresolved|null $min = null,
         public int|ContractReference|Unresolved|null $max = null,
         public bool $unconstrained = false,
+        public ?array $oneOf = null,
+        public array $problems = [],
     ) {
+    }
+
+    /**
+     * Returns the assumed contract for the named child's normal origin path.
+     */
+    public function contract(): TtlContract
+    {
+        return new TtlContract($this->min, $this->max, $this->unconstrained, $this->oneOf, $this->problems);
     }
 }

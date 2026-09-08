@@ -6,12 +6,83 @@ namespace Tests\Package\Cli\Unit\Graph;
 
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
+use Magix\Cache\Cli\Graph\TtlInterval;
+use Magix\Cache\Cli\Graph\TtlRangeSet;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(TtlEstimate::class)]
+#[UsesClass(TtlInterval::class)]
+#[UsesClass(TtlRangeSet::class)]
 final class TtlEstimateTest extends TestCase
 {
+    public function testOneOfPreservesDisjointCandidatesInLabelsAndJson(): void
+    {
+        $estimate = TtlEstimate::oneOf(new TtlInterval(30, 30), new TtlInterval(600, 900));
+
+        self::assertSame('30/600-900s', $estimate->label());
+        self::assertSame(30, $estimate->lowerBound);
+        self::assertSame(900, $estimate->upperBound);
+        self::assertSame([['min' => 30, 'max' => 30], ['min' => 600, 'max' => 900]], $estimate->jsonSerialize()['ranges'] ?? null);
+        self::assertFalse($estimate->equals(TtlEstimate::unknown(900, null, 30)));
+        self::assertTrue($estimate->equals(TtlEstimate::oneOf(new TtlInterval(600, 900), new TtlInterval(30, 30))));
+    }
+
+    public function testFromRangesCollapsesOnlyUnconditionalSingletons(): void
+    {
+        $ranges = new TtlRangeSet(new TtlInterval(30, 30), new TtlInterval(30, 30));
+
+        self::assertSame(30, TtlEstimate::fromRanges($ranges)->seconds);
+        self::assertSame(TtlEstimateState::Unknown, TtlEstimate::fromRanges($ranges, 'requires metadata')->state);
+    }
+
+    public function testRangesPreservesPointsAndUnknownBounds(): void
+    {
+        self::assertSame([['min' => 30, 'max' => 30]], TtlEstimate::known(30)->ranges()->bounds());
+        self::assertSame([['min' => null, 'max' => 900]], TtlEstimate::unknown(900)->ranges()->bounds());
+    }
+
+    public function testWithConditionKeepsAllAlternatives(): void
+    {
+        $estimate = TtlEstimate::oneOf(new TtlInterval(30, 30), new TtlInterval(600, 900));
+        $conditional = $estimate->withCondition('requires a finite upstream expiration at runtime');
+
+        self::assertSame('30/600-900s', $conditional->label());
+        self::assertSame($estimate->ranges()->bounds(), $conditional->ranges()->bounds());
+        self::assertSame('requires a finite upstream expiration at runtime', $conditional->reason);
+    }
+
+    public function testWithConditionPreservesInvalidAndUnconstrainedStates(): void
+    {
+        $invalid = TtlEstimate::invalid('broken contract');
+        $unconstrained = TtlEstimate::unconstrained();
+
+        self::assertSame($invalid, $invalid->withCondition('unknown caller'));
+        self::assertSame($unconstrained, $unconstrained->withCondition('unknown caller'));
+    }
+
+    public function testHasFiniteExpirationSurvivesCompositionAndUnknownBounds(): void
+    {
+        $estimate = TtlEstimate::oneOf(new TtlInterval(30, 30), new TtlInterval(600));
+
+        self::assertTrue($estimate->hasFiniteExpiration());
+        self::assertTrue($estimate->meet(TtlEstimate::unknown())->hasFiniteExpiration());
+        self::assertTrue($estimate->withCondition('selected at runtime')->hasFiniteExpiration());
+        self::assertFalse(TtlEstimate::unknown(900)->hasFiniteExpiration());
+        self::assertFalse(TtlEstimate::unconstrained()->hasFiniteExpiration());
+    }
+
+    public function testMeetCapsEachAlternativeSeparately(): void
+    {
+        $estimate = TtlEstimate::oneOf(new TtlInterval(30, 30), new TtlInterval(600, 900));
+
+        self::assertSame('30/600-700s', $estimate->meet(TtlEstimate::known(700))->label());
+        self::assertSame('30/300s', $estimate->meet(TtlEstimate::known(300))->label());
+        self::assertSame('20s', $estimate->meet(TtlEstimate::known(20))->label());
+        self::assertSame('≤900s', $estimate->meet(TtlEstimate::unknown())->label());
+    }
+
     public function testKnownCarriesTheSecondsAndTheirDerivation(): void
     {
         $estimate = TtlEstimate::known(20, 'declared 120s, capped by ProductQuery::execute');

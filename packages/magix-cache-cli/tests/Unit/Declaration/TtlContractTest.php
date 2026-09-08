@@ -16,6 +16,18 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ContractReference::class)]
 final class TtlContractTest extends TestCase
 {
+    public function testDeclarationProblemsDistinguishesAlternativesFromSimultaneousBounds(): void
+    {
+        $alternatives = [new TtlContract(min: 30, max: 30), new TtlContract(min: 600, max: 900)];
+
+        self::assertSame([], (new TtlContract(oneOf: $alternatives))->declarationProblems());
+        self::assertSame(['lifetime alternatives must be a non-empty list'], (new TtlContract(oneOf: []))->declarationProblems());
+        self::assertSame(
+            ['lifetime alternatives cannot be combined with bounds or unconstrained'],
+            (new TtlContract(min: 30, oneOf: $alternatives))->declarationProblems(),
+        );
+    }
+
     public function testAContractKeepsItsWrittenBounds(): void
     {
         $maximum = new ContractReference(ContractSource::Constructor, 'seconds');

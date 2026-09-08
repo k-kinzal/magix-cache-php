@@ -10,7 +10,6 @@ use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CacheWrite;
-use Magix\Cache\Strategy\Contract\Ttl;
 use Magix\Cache\Strategy\NextCacheStrategy;
 use Magix\Cache\Strategy\OriginFailure;
 use Magix\Cache\Strategy\OriginResult;
@@ -61,7 +60,6 @@ final class StatefulStrategy implements CacheStrategy
      * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
      */
     #[Override]
-    #[Ttl(unconstrained: true)]
     public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
     {
         ++$this->fetches;

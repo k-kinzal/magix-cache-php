@@ -84,7 +84,7 @@ final readonly class ProductFreshnessStrategy implements CacheStrategy
 {
     public function __construct(private int $minimum) {}
 
-    #[Ttl(min: new ConstructorArg('minimum'))]
+    #[Ttl(new ConstructorArg('minimum'))]
     public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
     {
         $result = $next->fetch($operation);
@@ -96,11 +96,62 @@ final readonly class ProductFreshnessStrategy implements CacheStrategy
 }
 ```
 
-`Contract\Ttl` is not a range annotation but a promise: on the normal origin path the strategy meets one lifetime constraint into the produced metadata, that constraint lies within the declared bounds relative to the base time, and it never extends an expiration a dependency already imposed. `new ConstructorArg('minimum')` is an explicit reference to the constructor argument — the analyzer binds it to the value the construction code passes; it never guesses from the name. A missing bound is undetermined, not unlimited, and `#[Ttl(unconstrained: true)]` declares that the operation adds no lifetime constraint at all.
+`Contract\Ttl` is not a range annotation but a promise: on the normal origin path the strategy meets one lifetime constraint into the produced metadata, that constraint lies within the declared bounds relative to the base time, and it never extends an expiration a dependency already imposed. `new ConstructorArg('minimum')` is an explicit reference to the constructor argument — the analyzer binds it to the value the construction code passes; it never guesses from the name. A missing bound is undetermined, not unlimited. Omitting `#[Ttl]` declares that a readable strategy adds no lifetime constraint on the normal origin path; an empty `#[Ttl]` means the same thing. The analyzer does not infer an undeclared TTL from the method body. A class or factory the analyzer cannot read remains unknown.
 
-The bundled strategies publish their contracts the same way: `KeySpreadExpirationStrategy` declares `min`/`max` from its constructor arguments, and `StaleIfErrorCacheStrategy` declares `unconstrained: true` because it changes nothing on the normal path.
+The bundled strategies publish their contracts the same way: `KeySpreadExpirationStrategy` declares `min`/`max` from its constructor arguments, and `StaleIfErrorCacheStrategy` omits `#[Ttl]` because it adds no lifetime constraint on the normal path.
 
 A composition never re-declares the contracts of its children: the contract of `create()` is derived from the child contracts and the construction arguments.
+
+## Alternative Lifetimes
+
+Use a fixed positional value, named bounds for a single range, or multiple positional alternatives:
+
+| Declaration on `fetch()` | Candidate lifetime |
+| --- | --- |
+| `#[Ttl(30)]` | Exactly 30 seconds |
+| `#[Ttl(min: 600, max: 900)]` | Between 600 and 900 seconds |
+| `#[Ttl(30, 60)]` | Either 30 or 60 seconds |
+| Attribute omitted | Adds no TTL constraint |
+
+```php
+use Magix\Cache\Strategy\Contract\Ttl;
+use Magix\Cache\Strategy\Contract\TtlRange;
+
+// On fetch(): normally 30 seconds, or between 600 and 900 seconds.
+#[Ttl(30, new TtlRange(min: 600, max: 900))]
+```
+
+The CLI renders this candidate as `30/600-900s`. A point is an integer; a range has inclusive `min` and `max` bounds. Equal bounds describe a point. A missing bound is still undetermined: `#[Ttl(30, new TtlRange(min: 600))]` renders as `30/600-?s`. Every alternative promises a finite TTL constraint on the normal origin path, even when its numeric upper bound cannot be determined statically. Positional alternatives cannot be combined with named `min` or `max`; put a `TtlRange` in the alternatives when a range is needed. No `oneOf` or `unconstrained` option is needed or accepted.
+
+Constructor references can appear as points or within ranges:
+
+```php
+#[Ttl(
+    30,
+    60,
+    new TtlRange(min: 600, max: 900),
+    new TtlRange(new ConstructorArg('minimum'), new ConstructorArg('maximum')),
+)]
+```
+
+`#[AssumeTtl(ExternalStrategy::class, 30, new TtlRange(min: new Arg('minimum'), max: 900))]` supports the same alternatives for its one named child, with references bound to `create()` arguments. `#[AssumeTtl(ExternalStrategy::class)]` explicitly assumes that an opaque child adds no TTL constraint; omitting the assumption leaves an unreadable child unknown.
+
+The strategy's `fetch()` implementation selects the lifetime and meets it through `OriginResult::constrain(CacheMetadata::forTtl($ttl, $result->baseTime))`. For time-dependent behavior, evaluate the time window there using the origin base time and the intended timezone. Static-argument `create()` definitions are memoized; they must not freeze a current-time decision into the construction recipe. Fresh cache hits retain their existing expiration and do not run `fetch()`.
+
+Alternatives are carried through dependencies and parent policies without filling their gaps:
+
+| Parent policy over a `30/600-900s` dependency | Effective TTL |
+| --- | --- |
+| `Ttl::Auto` | `30/600-900s` |
+| Fixed `700`, or `Ttl::FromUpstream` with `maxTtl: 700` | `30/600-700s` |
+| Fixed `300` | `30/300s` |
+| Fixed `20` | `20s` |
+
+Composition takes the minimum for every pair of alternatives; it does not intersect the sets. For example, composing `30/600-900s` with `60/700-800s` produces `30/60/600-800s`. Duplicate and overlapping intervals are normalized. An unknown dependency that could expire at any earlier time can fill the gaps, producing `≤900s`; this uncertainty is preserved. The proof of a finite expiration also propagates, so an automatic parent does not report a missing-upstream notice merely because the exact TTL is runtime-dependent.
+
+The contracts describe possible outcomes, not the predicates selecting them. The analyzer does not prove time-window conditions or correlations between strategies. If two strategies share the same condition, their possible combinations are conservatively analyzed independently. Runtime metadata still uses the same fixed meet law.
+
+The earlier positional range syntax changes meaning: `Ttl(30)` now means exactly 30 seconds, and `Ttl(30, 600)` means two alternatives. Use `Ttl(min: 30)` for a lower bound or `Ttl(min: 30, max: 600)` for a range. Replace `Ttl(oneOf: [...])` with positional alternatives and remove `Ttl(unconstrained: true)`. Apply the same migration after the strategy argument of `AssumeTtl`.
 
 ## Strategies and the Fixed Stages
 

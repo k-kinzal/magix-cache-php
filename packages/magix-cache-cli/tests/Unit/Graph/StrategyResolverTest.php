@@ -56,6 +56,35 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UseStrategyDeclaration::class)]
 final class StrategyResolverTest extends TestCase
 {
+    public function testAssumedPreservesAlternativeFactoryBindings(): void
+    {
+        $assumption = new TtlAssumption('External', oneOf: [
+            new TtlContract(30, 30),
+            new TtlContract(new ContractReference(ContractSource::Create, 'minimum'), 900),
+        ]);
+        [$step, $problems, $adds] = (new StrategyResolver(new Catalog([])))->assumed('External', $assumption, ['minimum' => 600]);
+
+        self::assertSame('30/600-900s', $step->ttl->label());
+        self::assertSame([], $problems);
+        self::assertTrue($step->assumed);
+        self::assertTrue($adds);
+    }
+
+    public function testResolveMeetsAlternativeContractsAcrossAComposition(): void
+    {
+        $first = new ClassDeclaration('First', strategy: new StrategyDeclaration('First', ttl: new TtlContract(oneOf: [new TtlContract(30, 30), new TtlContract(600, 900)])));
+        $second = new ClassDeclaration('Second', strategy: new StrategyDeclaration('Second', ttl: new TtlContract(oneOf: [new TtlContract(60, 60), new TtlContract(700, 800)])));
+        $composed = new ClassDeclaration('Composed', strategy: new StrategyDeclaration('Composed', hasCreate: true, composed: [new StrategyInstantiation('First'), new StrategyInstantiation('Second')]));
+        $boundary = new BoundaryDeclaration('Page', 'fetch', 'page.php', 1, useStrategy: new UseStrategyDeclaration('Composed'));
+
+        $effect = (new StrategyResolver(new Catalog([$first, $second, $composed])))->resolve($boundary);
+
+        self::assertNotNull($effect);
+        self::assertSame('30/60/600-800s', $effect->ttl->label());
+        self::assertSame([], $effect->problems);
+        self::assertTrue($effect->addsConstraint);
+    }
+
     public function testResolveReturnsNullWithoutADeclaredStrategy(): void
     {
         $resolver = new StrategyResolver(new Catalog([]));
@@ -215,7 +244,7 @@ final class StrategyResolverTest extends TestCase
         self::assertNull($adds);
     }
 
-    public function testStepReportsAChildWithoutALifetimeContract(): void
+    public function testStepTreatsAnOmittedLifetimeContractAsAddingNothing(): void
     {
         $bare = new ClassDeclaration('App\Passthrough', strategy: new StrategyDeclaration('App\Passthrough'));
         $resolver = new StrategyResolver(new Catalog([$bare]));
@@ -226,10 +255,48 @@ final class StrategyResolverTest extends TestCase
             [],
         );
 
-        self::assertSame(TtlEstimateState::Unknown, $step->ttl->state);
-        self::assertSame('Passthrough declares no lifetime contract on fetch()', $step->ttl->reason);
+        self::assertSame(TtlEstimateState::Unconstrained, $step->ttl->state);
+        self::assertNull($step->ttl->reason);
         self::assertSame([], $problems);
-        self::assertNull($adds);
+        self::assertFalse($adds);
+    }
+
+    public function testCompositionPreservesAlternativesThroughAnUnannotatedChild(): void
+    {
+        $timed = new ClassDeclaration('App\Timed', strategy: new StrategyDeclaration(
+            'App\Timed',
+            ttl: new TtlContract(oneOf: [new TtlContract(30, 30), new TtlContract(600, 900)]),
+        ));
+        $bare = new ClassDeclaration('App\Passthrough', strategy: new StrategyDeclaration('App\Passthrough'));
+        $resolver = new StrategyResolver(new Catalog([$timed, $bare]));
+        $declaration = new StrategyDeclaration('App\Composite', composed: [
+            new StrategyInstantiation('App\Timed'),
+            new StrategyInstantiation('App\Passthrough'),
+        ]);
+
+        $effect = $resolver->composition($declaration, []);
+
+        self::assertSame('30/600-900s', $effect->ttl->label());
+        self::assertTrue($effect->addsConstraint);
+        self::assertSame([], $effect->problems);
+    }
+
+    public function testOmittingAContractStillValidatesTheConstruction(): void
+    {
+        $bare = new ClassDeclaration('App\Passthrough', strategy: new StrategyDeclaration(
+            'App\Passthrough',
+            parameters: [new StrategyParameter('required', 0)],
+        ));
+        $resolver = new StrategyResolver(new Catalog([$bare]));
+
+        [$step, $problems] = $resolver->step(
+            new StrategyDeclaration('App\Composite'),
+            new StrategyInstantiation('App\Passthrough'),
+            [],
+        );
+
+        self::assertSame(TtlEstimateState::Invalid, $step->ttl->state);
+        self::assertSame(['the constructor of Passthrough is missing a value for $required'], $problems);
     }
 
     public function testStepAppliesTheDeclaredAssumption(): void

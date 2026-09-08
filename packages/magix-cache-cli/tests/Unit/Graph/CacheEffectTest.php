@@ -14,6 +14,8 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CacheEffect::class)]
 #[UsesClass(TtlEstimate::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class CacheEffectTest extends TestCase
 {
     public function testEffectKeepsTheReasonsBehindEveryValue(): void

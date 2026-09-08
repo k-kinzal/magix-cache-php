@@ -26,6 +26,7 @@ use Magix\Cache\Cli\Render\TreeRenderer;
 use Magix\Cache\Cli\Source\ClassVisitor;
 use Magix\Cache\Cli\Source\SourceParser;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
@@ -54,6 +55,48 @@ use Tests\Package\Cli\Fixture\Project\ProductQuery;
 #[UsesClass(\Magix\Cache\Cli\Reader\UseStrategyReader::class)]
 final class SourceParserTest extends TestCase
 {
+    #[DataProvider('providerAlternativeParents')]
+    public function testParsePropagatesAlternativeLifetimesThroughParentsAndEveryRenderer(string $method, string $label, bool $storable): void
+    {
+        $parser = new SourceParser();
+        $directory = dirname(__DIR__, 2).'/Fixture/TtlAlternatives/';
+        $catalog = new Catalog([
+            ...$parser->parse($directory.'ConditionalTtlStrategy.php'),
+            ...$parser->parse($directory.'TimedQuery.php'),
+            ...$parser->parse($directory.'TimedPage.php'),
+        ]);
+        $tree = new CacheTree($catalog);
+        $boundary = $catalog->candidates(\Tests\Package\Cli\Fixture\TtlAlternatives\TimedPage::class, $method, includeEntryPoints: true)[0];
+        $node = $tree->build($boundary);
+        self::assertSame($label, $node->effect->ttl->label());
+        self::assertSame($storable, $node->effect->storable);
+        self::assertSame([], $node->effect->problems);
+        self::assertTrue($node->effect->ttl->hasFiniteExpiration());
+        self::assertStringContainsString($label, (new TreeRenderer())->render($node));
+        self::assertStringContainsString($label, (new \Magix\Cache\Cli\Render\BoundaryTableRenderer())->render([$node]));
+        self::assertStringContainsString($label, (new \Magix\Cache\Cli\Render\MermaidRenderer())->render($node));
+        $json = (new JsonRenderer())->tree($node);
+        self::assertIsArray($json['effective']);
+        self::assertSame($node->effect->ttl->jsonSerialize(), $json['effective']['ttl']);
+
+        self::assertSame([], (new CacheLinter())->inspect($catalog));
+        $child = $tree->build($catalog->candidates(\Tests\Package\Cli\Fixture\TtlAlternatives\TimedQuery::class, 'execute')[0]);
+        self::assertSame('30/600-900s', $child->effect->strategy?->ttl->label());
+        self::assertTrue($child->effect->storable);
+    }
+
+    /**
+     * @return iterable<string, array{string, string, bool}>
+     */
+    public static function providerAlternativeParents(): iterable
+    {
+        yield 'auto' => ['automatic', '30/600-900s', true];
+        yield 'bounded' => ['bounded', '30/600-700s', true];
+        yield 'fixed' => ['fixed', '30/300s', true];
+        yield 'shorter' => ['shorter', '20s', true];
+        yield 'uncached' => ['show', '30/600-700s', false];
+    }
+
     public function testParseReadsABoundaryFromARealFile(): void
     {
         $declarations = (new SourceParser())->parse(dirname(__DIR__, 2).'/Fixture/Project/ProductQuery.php');

@@ -31,6 +31,8 @@ final readonly class TtlEstimate implements JsonSerializable
      * @param int|null $upperBound Bound a stored entry cannot outlive, carried only by Unknown.
      * @param string|null $reason Why the value holds: a derivation for Known, a runtime condition for Unknown, the problem for Invalid.
      * @param int|null $lowerBound Bound the lifetime never goes under, carried only by Unknown.
+     * @param TtlRangeSet|null $alternatives Disjoint alternatives whose enclosing bounds match this estimate.
+     * @param bool $finite Whether a finite expiration is guaranteed even though its lifetime depends on runtime values.
      * @throws InvalidArgumentException when a field is combined with a state that cannot carry it
      */
     public function __construct(
@@ -39,6 +41,8 @@ final readonly class TtlEstimate implements JsonSerializable
         public ?int $upperBound = null,
         public ?string $reason = null,
         public ?int $lowerBound = null,
+        public ?TtlRangeSet $alternatives = null,
+        public bool $finite = false,
     ) {
         if (($state === TtlEstimateState::Known) !== ($seconds !== null)) {
             throw new InvalidArgumentException('A lifetime in seconds is carried by a Known estimate and nothing else.');
@@ -58,6 +62,11 @@ final readonly class TtlEstimate implements JsonSerializable
 
         if ($lowerBound !== null && $upperBound !== null && $upperBound < $lowerBound) {
             throw new InvalidArgumentException('A lifetime upper bound cannot be below the lower bound.');
+        }
+
+        if ($alternatives !== null && ($state !== TtlEstimateState::Unknown
+            || $lowerBound !== $alternatives->lowerBound() || $upperBound !== $alternatives->upperBound())) {
+            throw new InvalidArgumentException('Lifetime alternatives require an unknown estimate with matching enclosing bounds.');
         }
     }
 
@@ -85,10 +94,11 @@ final readonly class TtlEstimate implements JsonSerializable
      * @param int|null $upperBound Bound the lifetime cannot exceed if the boundary stores at all.
      * @param string|null $condition What must hold at runtime for a lifetime to exist.
      * @param int|null $lowerBound Bound the lifetime never goes under.
+     * @param bool $finite Proof that successful evaluation supplies a finite expiration even when its numeric bounds are undetermined.
      */
-    public static function unknown(?int $upperBound = null, ?string $condition = null, ?int $lowerBound = null): self
+    public static function unknown(?int $upperBound = null, ?string $condition = null, ?int $lowerBound = null, bool $finite = false): self
     {
-        return new self(TtlEstimateState::Unknown, upperBound: $upperBound, reason: $condition, lowerBound: $lowerBound);
+        return new self(TtlEstimateState::Unknown, upperBound: $upperBound, reason: $condition, lowerBound: $lowerBound, finite: $finite);
     }
 
     /**
@@ -97,6 +107,71 @@ final readonly class TtlEstimate implements JsonSerializable
     public static function invalid(string $problem): self
     {
         return new self(TtlEstimateState::Invalid, reason: $problem);
+    }
+
+    /**
+     * Returns an estimate of alternative points and intervals, preserving gaps.
+     */
+    public static function oneOf(TtlInterval $first, TtlInterval ...$rest): self
+    {
+        return self::fromRanges(new TtlRangeSet($first, ...$rest), finite: true);
+    }
+
+    /**
+     * Collapses only a single proven value; other alternatives stay unknown.
+     *
+     * @param bool $finite Whether all alternatives promise a finite expiration.
+     */
+    public static function fromRanges(TtlRangeSet $ranges, ?string $condition = null, bool $finite = false): self
+    {
+        $lower = $ranges->lowerBound();
+        $upper = $ranges->upperBound();
+
+        if ($lower !== null && $lower === $upper && $condition === null) {
+            return self::known($lower);
+        }
+
+        return new self(
+            TtlEstimateState::Unknown,
+            upperBound: $upper,
+            reason: $condition,
+            lowerBound: $lower,
+            alternatives: count($ranges->intervals) > 1 ? $ranges : null,
+            finite: $finite,
+        );
+    }
+
+    /**
+     * Returns this value's possible intervals for lifetime composition.
+     */
+    public function ranges(): TtlRangeSet
+    {
+        return $this->alternatives ?? new TtlRangeSet(new TtlInterval(
+            $this->seconds ?? $this->lowerBound,
+            $this->seconds ?? $this->upperBound,
+        ));
+    }
+
+    /**
+     * Adds a runtime condition while preserving every possible lifetime.
+     */
+    public function withCondition(string $condition): self
+    {
+        if ($this->state === TtlEstimateState::Invalid || $this->state === TtlEstimateState::Unconstrained) {
+            return $this;
+        }
+
+        return self::fromRanges($this->ranges(), $condition, $this->hasFiniteExpiration());
+    }
+
+    /**
+     * Reports the proof that a successful boundary supplies a finite expiration.
+     *
+     * Unknown bounds do not erase a strategy's promise to add a finite TTL.
+     */
+    public function hasFiniteExpiration(): bool
+    {
+        return $this->state === TtlEstimateState::Known || ($this->state === TtlEstimateState::Unknown && $this->finite);
     }
 
     /**
@@ -131,15 +206,11 @@ final readonly class TtlEstimate implements JsonSerializable
             return $this->seconds <= $other->seconds ? $this : $other;
         }
 
-        $lower = $this->floor($other);
-        $upper = $this->bound($other);
-        $condition = $this->condition($other);
-
-        if ($lower !== null && $lower === $upper && $condition === null) {
-            return self::known($lower);
-        }
-
-        return self::unknown($upper, $condition, $lower);
+        return self::fromRanges(
+            $this->ranges()->meet($other->ranges()),
+            $this->condition($other),
+            $this->hasFiniteExpiration() || $other->hasFiniteExpiration(),
+        );
     }
 
     /**
@@ -196,6 +267,8 @@ final readonly class TtlEstimate implements JsonSerializable
             && $this->seconds === $other->seconds
             && $this->upperBound === $other->upperBound
             && $this->lowerBound === $other->lowerBound
+            && $this->alternatives?->bounds() === $other->alternatives?->bounds()
+            && $this->hasFiniteExpiration() === $other->hasFiniteExpiration()
             && $this->reason === $other->reason;
     }
 
@@ -208,6 +281,10 @@ final readonly class TtlEstimate implements JsonSerializable
      */
     public function label(): string
     {
+        if ($this->alternatives !== null) {
+            return $this->alternatives->label();
+        }
+
         if ($this->seconds !== null) {
             return $this->seconds.'s';
         }
@@ -228,17 +305,27 @@ final readonly class TtlEstimate implements JsonSerializable
     /**
      * Returns the estimate as plain data for machine readable output.
      *
-     * @return array{state: string, seconds: int|null, lowerBound: int|null, upperBound: int|null, reason: string|null}
+     * @return array{state: string, seconds: int|null, lowerBound: int|null, upperBound: int|null, reason: string|null, ranges?: non-empty-list<array{min: int|null, max: int|null}>, finite?: true}
      */
     #[Override]
     public function jsonSerialize(): array
     {
-        return [
+        $serialized = [
             'state' => $this->state->value,
             'seconds' => $this->seconds,
             'lowerBound' => $this->lowerBound,
             'upperBound' => $this->upperBound,
             'reason' => $this->reason,
         ];
+
+        if ($this->alternatives !== null) {
+            $serialized['ranges'] = $this->alternatives->bounds();
+        }
+
+        if ($this->state === TtlEstimateState::Unknown && $this->finite) {
+            $serialized['finite'] = true;
+        }
+
+        return $serialized;
     }
 }

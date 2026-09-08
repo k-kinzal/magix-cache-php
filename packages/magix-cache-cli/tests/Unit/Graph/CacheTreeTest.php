@@ -36,6 +36,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Graph\StrategyResolver::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\ParameterEffects::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\ParameterStrategyBinding::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class CacheTreeTest extends TestCase
 {
     public function testBuildKeepsUncachedRootDepthLimitsAndRecursionUnknown(): void

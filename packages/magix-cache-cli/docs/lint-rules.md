@@ -42,6 +42,8 @@ Declare a fixed TTL, depend on a cached query, or supply `CacheMetadata` with an
 
 When the upstream expiration cannot be decided statically, the requirement is only conditional: the rule reports a notice instead of an error, because whether a finite expiration exists is known only at runtime. Notices never fail the run.
 
+A strategy contract promising finite alternatives, such as `30/600-900s`, satisfies this requirement even though the selected number is runtime-dependent. That proof propagates to parent boundaries, so their `Ttl::Auto` and `Ttl::FromUpstream` policies do not produce this notice.
+
 ## scoped-ignore-conflict
 
 A parameter that is excluded from the key cannot narrow visibility, because the narrowed entry would have no key to distinguish it. `CacheDefinition` throws an `InvalidArgumentException` for this combination unless the scope is `Visibility::NoStore`.
@@ -119,3 +121,5 @@ public function execute(int $id): Cached
 ```
 
 A missing `create()` throws a `LogicException` when the boundary is resolved; an argument or reference that cannot be bound leaves the analysis with a declaration error instead of a silent unknown. Declare arguments and references that match the construction code of the strategy.
+
+Every positional TTL alternative is checked independently. Mixing positional alternatives with named `min`/`max`, unknown argument names (including the removed `oneOf` and `unconstrained` options), negative or contradictory bounds, and a reference missing from any branch are declaration errors reported by this rule. A valid branch never hides an invalid sibling. Bounds that depend on unresolved runtime arguments remain unknown instead of being replaced with defaults.

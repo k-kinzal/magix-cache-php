@@ -170,9 +170,9 @@ final readonly class EffectCalculator
             $estimate = $this->derived($declared, $policy->maxTtl, $boundary, $combined, $source, $strategy?->addsConstraint === true || $parameterTtl !== null);
         }
 
-        if ($candidate !== null && $upstream->state === TtlEstimateState::Unknown
+        if ($candidate !== null && $upstream->state === TtlEstimateState::Unknown && !$upstream->hasFiniteExpiration()
             && $estimate->state === TtlEstimateState::Unknown && $estimate->reason === null) {
-            $estimate = TtlEstimate::unknown($estimate->upperBound, 'an upstream expiration may shorten the lifetime', $estimate->lowerBound);
+            $estimate = $estimate->withCondition('an upstream expiration may shorten the lifetime');
         }
 
         if ($boundary->hasDynamicTtl) {
@@ -214,11 +214,11 @@ final readonly class EffectCalculator
                 : TtlEstimate::known($met->seconds, 'declared '.$declared.'s, capped by '.$source);
         }
 
-        return TtlEstimate::unknown(
-            upperBound: $met->upperBound,
-            condition: 'an upstream expiration may shorten the declared '.$declared.'s',
-            lowerBound: $met->lowerBound,
-        );
+        if ($upstream->hasFiniteExpiration() && $met->reason === null) {
+            return $met;
+        }
+
+        return $met->withCondition('an upstream expiration may shorten the declared '.$declared.'s');
     }
 
     /**
@@ -248,15 +248,11 @@ final readonly class EffectCalculator
         if ($upstream->state === TtlEstimateState::Unknown) {
             $capped = $cap === null ? $upstream : $upstream->meet(TtlEstimate::known($cap));
 
-            if ($strategyAddsConstraint) {
+            if ($strategyAddsConstraint || $upstream->hasFiniteExpiration()) {
                 return $capped;
             }
 
-            return TtlEstimate::unknown(
-                upperBound: $capped->seconds ?? $capped->upperBound,
-                condition: 'requires a finite upstream expiration at runtime',
-                lowerBound: $capped->seconds ?? $capped->lowerBound,
-            );
+            return $capped->withCondition('requires a finite upstream expiration at runtime');
         }
 
         if ($boundary->suppliesMetadata || $boundary->hasDynamicTtl) {

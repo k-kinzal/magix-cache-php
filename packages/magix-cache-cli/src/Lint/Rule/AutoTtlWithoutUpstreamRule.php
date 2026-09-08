@@ -65,7 +65,7 @@ final readonly class AutoTtlWithoutUpstreamRule implements LintRule
             )];
         }
 
-        if ($upstream->state === TtlEstimateState::Unknown) {
+        if ($upstream->state === TtlEstimateState::Unknown && !$upstream->hasFiniteExpiration()) {
             return [new Diagnostic(
                 rule: 'auto-ttl-without-upstream',
                 severity: Severity::Notice,

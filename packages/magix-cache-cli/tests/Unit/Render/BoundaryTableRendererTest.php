@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CacheEffect::class)]
 #[UsesClass(CacheNode::class)]
 #[UsesClass(TtlEstimate::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class BoundaryTableRendererTest extends TestCase
 {
     public function testRenderAlignsEveryColumnUnderItsHeader(): void

@@ -12,6 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(StrategyStep::class)]
 #[UsesClass(TtlEstimate::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class StrategyStepTest extends TestCase
 {
     public function testShortNameStripsTheNamespace(): void

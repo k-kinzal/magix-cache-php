@@ -27,6 +27,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(TreeRenderer::class)]
 #[UsesNamespace('Magix\Cache\Cli')]
 #[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
+#[UsesClass(\Magix\Cache\Strategy\Contract\ConstructorArg::class)]
+#[UsesClass(\Magix\Cache\Strategy\Contract\Ttl::class)]
+#[UsesClass(\Magix\Cache\Strategy\Contract\TtlRange::class)]
 #[UsesClass(Visibility::class)]
 #[UsesNamespace('Magix\Cache\Runtime\Parameter')]
 #[UsesClass(BoundaryDeclaration::class)]
@@ -209,7 +212,7 @@ final class TreeRendererTest extends TestCase
     }
 
     #[DataProvider('providerBoundaryColors')]
-    public function testHighlightFollowsEffectiveStorageInsteadOfDeclaredTtl(string $boundary, int $color): void
+    public function testHighlightDistinguishesNormalBehaviorNonStorageAndErrors(string $boundary, int $color): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $tester->execute([
@@ -235,9 +238,14 @@ final class TreeRendererTest extends TestCase
         yield 'NoStore policy' => ['NoStorePageQuery::disabled', 90];
         yield 'bubbled NoStore' => ['NoStorePageQuery::execute', 90];
         yield 'zero TTL' => ['NoStorePageQuery::expired', 90];
-        yield 'missing policy' => ['BrokenQuery::undeclared', 90];
+        yield 'missing policy' => ['BrokenQuery::undeclared', 31];
         yield 'uncached entry point' => ['ProductController::show', 90];
-        yield 'dynamic TTL' => ['ExchangeRateQuery::execute', 90];
+        yield 'dynamic TTL' => ['ExchangeRateQuery::execute', 37];
+        yield 'parameter TTL' => ['ParameterQuery::auto', 37];
+        yield 'parameter visibility' => ['ParameterQuery::fetch', 37];
+        yield 'custom strategy' => ['SeasonalProductQuery::execute', 37];
+        yield 'invalid automatic TTL' => ['BrokenQuery::inherited', 31];
+        yield 'analysis gap' => ['InspectionQuery::execute', 33];
     }
 
     public function testNoStoreBubblesGrayToParentsWhileStoredChildrenStayWhite(): void
@@ -267,14 +275,14 @@ final class TreeRendererTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $output = $tester->getDisplay();
-        self::assertStringContainsString("\033[90;1mInspectionQuery::execute\033[39;22m", $output);
-        self::assertStringContainsString("\033[31m! cache propagation unanalyzed:", $output);
+        self::assertStringContainsString("\033[33;1mInspectionQuery::execute\033[39;22m", $output);
+        self::assertStringContainsString("\033[33m~ cache propagation unanalyzed:", $output);
         self::assertStringContainsString("\033[90;1mInventoryLookup::get\033[39;22m\033[90m (uncached)", $output);
         self::assertStringContainsString("\033[90;1mInspectionQuery::offset\033[39;22m\033[90m (uncached)", $output);
         self::assertStringContainsString("\033[37;1mProductQuery::execute\033[39;22m", $output);
     }
 
-    public function testMissingPolicyStaysGrayWithoutHidingItsRedDiagnostic(): void
+    public function testMissingPolicyColorsBothTheBoundaryAndItsDiagnosticRed(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $tester->execute([
@@ -283,7 +291,7 @@ final class TreeRendererTest extends TestCase
         ], ['decorated' => true]);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringContainsString("\033[90;1mBrokenQuery::undeclared\033[39;22m", $tester->getDisplay());
+        self::assertStringContainsString("\033[31;1mBrokenQuery::undeclared\033[39;22m", $tester->getDisplay());
         self::assertStringContainsString("\033[31m! no #[Cache] attribute", $tester->getDisplay());
     }
 

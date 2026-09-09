@@ -91,13 +91,13 @@ final class TreeFilterTest extends TestCase
         self::assertEquals($cached, (new TreeFilter(uncached: $mode))->apply($cached));
     }
 
-    public function testApplyKeepsDepthNotesOnlyWhenOrdinaryRowsAreRequested(): void
+    public function testApplyPreservesWarningsEvenWhenOrdinaryRowsAreHidden(): void
     {
         $effect = new CacheEffect(TtlEstimate::unknown(), Visibility::Shared);
         $stopped = new CacheNode(new BoundaryDeclaration('Lookup', 'get', 'lookup.php', 1, isCacheBoundary: false), $effect, notes: ['depth limit reached, dependencies not expanded']);
         $root = new CacheNode(new BoundaryDeclaration('CachedQuery', 'get', 'cached.php', 1), $effect, [$stopped]);
 
-        self::assertEquals(new CacheNode($root->boundary, $effect), (new TreeFilter())->apply($root));
+        self::assertEquals(new CacheNode($root->boundary, $effect, analysisWarnings: $root->analysisWarnings), (new TreeFilter())->apply($root));
         self::assertEquals($root, (new TreeFilter(uncached: UncachedMode::All))->apply($root));
         self::assertEquals($stopped, (new TreeFilter(uncached: UncachedMode::None))->apply($stopped));
     }

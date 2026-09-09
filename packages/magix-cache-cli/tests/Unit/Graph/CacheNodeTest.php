@@ -37,5 +37,8 @@ final class CacheNodeTest extends TestCase
         self::assertSame('App\PageQuery::execute', $node->boundary->id());
         self::assertSame([$child], $node->children);
         self::assertSame(['recursive dependency'], $node->notes);
+        self::assertSame(['PageQuery::execute: recursive dependency'], $node->analysisWarnings);
+        $ancestor = new CacheNode($node->boundary, $node->effect, [$node]);
+        self::assertSame($node->analysisWarnings, $ancestor->analysisWarnings);
     }
 }

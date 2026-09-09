@@ -36,7 +36,7 @@ final readonly class TreeRenderer
             ...($effect->expirationConstraints === [] ? [] : ['  expires by   '.ExpirationEstimate::describe($effect->expirationConstraints)]),
             '  visibility   '.$this->restricted($effect->visibilityLabel(), $effect, 'visibility')
                 .($effect->visibilityReason === null ? '' : ' ('.$effect->visibilityReason.')'),
-            '  storable     '.($effect->storable ? 'yes' : 'no'),
+            '  storable     '.(new NodePresentation())->storage($node),
             '  tags         '.$this->restricted($effect->tagsLabel(), $effect, 'tags'),
             '  key          '.$this->key($node->boundary),
             '  policy       '.($node->boundary->isCacheBoundary ? ($node->boundary->policy?->label() ?? 'not declared') : 'none (uncached entry point)'),
@@ -91,16 +91,12 @@ final readonly class TreeRenderer
         $indent = $last === null ? $prefix : $prefix.($last ? '    ' : '|   ');
         $lines = [$prefix.$connector.$this->summary($node, $last === null)];
 
-        foreach ($node->gaps as $gap) {
-            $lines[] = $indent.'    <fg=red>! '.$gap->label().'</>';
-        }
-
         foreach ($node->effect->problems as $problem) {
             $lines[] = $indent.'    <fg=red>! '.$problem.'</>';
         }
 
-        foreach ($node->notes as $note) {
-            $lines[] = $indent.'    <fg=gray>~ '.$note.'</>';
+        foreach ((new NodePresentation())->warnings($node) as $warning) {
+            $lines[] = $indent.'    <fg=yellow>~ '.$warning.'</>';
         }
 
         $remaining = count($node->children);
@@ -150,14 +146,14 @@ final readonly class TreeRenderer
     }
 
     /**
-     * Uses white for provably storable boundaries and gray for every other node.
+     * Colors normal boundaries white, non-storage gray, incomplete analysis yellow and errors red.
      *
-     * Runtime-dependent effects remain gray because storage is not proven.
+     * Runtime-dependent TTL and custom strategies are normal cache behavior.
      * Nested bold labels repeat the foreground because Console styles do not inherit it.
      */
     public function highlight(string $label, CacheNode $node, bool $bold = false): string
     {
-        $color = $node->effect->storable ? 'white' : 'gray';
+        $color = (new NodePresentation())->color($node);
 
         return '<fg='.$color.($bold ? ';options=bold' : '').'>'.$label.'</>';
     }
@@ -173,13 +169,15 @@ final readonly class TreeRenderer
     }
 
     /**
-     * Highlights a explicitly overridden field only while the result remains storable.
+     * Highlights an explicit override on a valid, enabled boundary, including runtime choices.
      *
      * @param 'ttl'|'visibility'|'tags' $field
      */
     public function restricted(string $label, CacheEffect $effect, string $field): string
     {
-        if (!$effect->storable || !isset($effect->localOverrides[$field])) {
+        $presentation = new NodePresentation();
+
+        if ($presentation->invalid($effect) || $presentation->disabled($effect) || !isset($effect->localOverrides[$field])) {
             return $label;
         }
 

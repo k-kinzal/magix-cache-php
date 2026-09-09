@@ -54,7 +54,7 @@ final class AnalyzeCommandTest extends TestCase
         self::assertStringNotContainsString('local restriction:', $output);
     }
 
-    public function testAnalyzeKeepsAParentOverrideGrayWhenStrategyMetadataIsUnknown(): void
+    public function testAnalyzeHighlightsAParentOverrideWhenStrategyMetadataIsUnknown(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
 
@@ -65,7 +65,7 @@ final class AnalyzeCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         self::assertStringContainsString('300s', $tester->getDisplay());
-        self::assertStringNotContainsString("\033[33m300s\033[39m", $tester->getDisplay());
+        self::assertStringContainsString("\033[33m300s\033[39m", $tester->getDisplay());
         self::assertStringNotContainsString('local restriction:', $tester->getDisplay());
         self::assertStringContainsString('TimedQuery::execute', $tester->getDisplay());
     }
@@ -96,7 +96,7 @@ final class AnalyzeCommandTest extends TestCase
     /**
      * @throws JsonException
      */
-    public function testAnalyzeKeepsJsonUnannotatedAndStylesOnlyTheAffectedMermaidNode(): void
+    public function testAnalyzeKeepsMetadataUnannotatedAndStylesMermaidNodesByBehavior(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $arguments = ['boundary' => 'RestrictedPageQuery::show', '--path' => ['packages/magix-cache-cli/tests/Fixture/Project']];
@@ -118,8 +118,8 @@ final class AnalyzeCommandTest extends TestCase
         self::assertStringContainsString('n0_0["RestrictedPageQuery::execute<br/>10s - private"]', $tester->getDisplay());
         self::assertStringNotContainsString('local restriction:', $tester->getDisplay());
         self::assertStringContainsString('style n0_0 fill:#fff3cd', $tester->getDisplay());
-        self::assertStringNotContainsString('style n0 ', $tester->getDisplay());
-        self::assertStringNotContainsString('style n0_0_0 ', $tester->getDisplay());
+        self::assertStringContainsString('style n0 fill:#e9ecef', $tester->getDisplay());
+        self::assertStringContainsString('style n0_0_0 fill:#ffffff', $tester->getDisplay());
     }
 
     public function testAnalyzeComposesQueriesInjectedIntoActionParameters(): void

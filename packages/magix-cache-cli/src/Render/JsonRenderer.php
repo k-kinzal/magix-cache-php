@@ -87,6 +87,7 @@ final readonly class JsonRenderer
                 'problems' => $effect->problems,
             ],
             'notes' => $node->notes,
+            'analysisWarnings' => $node->analysisWarnings,
             'analysisGaps' => array_map($this->gap(...), $node->gaps),
             'dependencies' => array_map(fn (CacheNode $child): array => $this->tree($child, false), $node->children),
         ];

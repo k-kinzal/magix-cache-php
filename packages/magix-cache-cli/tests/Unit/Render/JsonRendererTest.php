@@ -10,6 +10,7 @@ use Magix\Cache\Cli\Declaration\KeyParameter;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Graph\CacheEffect;
+use Magix\Cache\Cli\Graph\CacheGap;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\StrategyEffect;
 use Magix\Cache\Cli\Graph\StrategyStep;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(JsonRenderer::class)]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
+#[UsesClass(CacheGap::class)]
 #[UsesClass(CacheNode::class)]
 #[UsesClass(KeyParameter::class)]
 #[UsesClass(PolicyDeclaration::class)]
@@ -33,6 +35,21 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class JsonRendererTest extends TestCase
 {
+    public function testGapKeepsQualifiedEndpointsAndIntermediateMethods(): void
+    {
+        $gap = new CacheGap([
+            new BoundaryDeclaration('App\PageQuery', 'get', 'page.php', 1),
+            new BoundaryDeclaration('App\Lookup', 'get', 'lookup.php', 2, isCacheBoundary: false),
+            new BoundaryDeclaration('Other\PageQuery', 'get', 'other.php', 3),
+        ]);
+
+        $data = (new JsonRenderer())->gap($gap);
+
+        self::assertSame('unverified-cache-propagation', $data['kind']);
+        self::assertSame(['App\PageQuery::get', 'App\Lookup::get', 'Other\PageQuery::get'], $data['path']);
+        self::assertSame('cache propagation unanalyzed: PageQuery::get -> Lookup::get -> PageQuery::get', $data['message']);
+    }
+
     /**
      * @throws JsonException
      */

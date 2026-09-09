@@ -62,7 +62,7 @@ The header block describes the boundary itself:
 | `key` | The parameters that form the key, the ignored ones, and the policy version |
 | `policy` | The declaration as it is written in the source |
 
-Lines below the header show each boundary of the tree, with `!` for a problem that makes the boundary fail and `~` for a note about how the tree was resolved.
+Lines below the header show each boundary of the tree, with `!` for a declaration problem or an explicitly labelled analysis gap, and `~` for a note about how the tree was resolved. An analysis gap does not assert that the boundary fails at runtime.
 
 Terminal colors follow the **effective result after composition**:
 
@@ -71,7 +71,7 @@ Terminal colors follow the **effective result after composition**:
 | White row | A boundary whose effective result is provably storable, including an automatic `#[Cache]` that carries child constraints upward |
 | Gray row | An uncached method, a missing policy, `NoStore`, zero TTL, an invalid declaration, or a result whose storage cannot be proven statically |
 | Yellow field | A local setting restricts a result that remains storable |
-| Red diagnostic | An invalid lifetime or a problem that makes the declaration fail |
+| Red diagnostic | An invalid lifetime, a problem that makes the declaration fail, or an explicit `cache propagation unanalyzed` gap |
 
 Follow the white rows to see how far cacheable results bubble. `NoStore` turns
 the affected parents gray; stored descendants remain white. An uncached entry
@@ -136,7 +136,7 @@ The root's `key` and `policy` are `none (uncached entry point)` and `storable` i
 | `--path` | Composer autoload roots | Directory or file to scan, repeatable |
 | `--format` | `tree` | `tree`, `json`, or `mermaid` |
 | `--depth` | `8` | Maximum dependency depth to expand |
-| `--show-uncached` | off | Also show ordinary callees, including leaves and calls inside cache boundaries |
+| `--show-uncached` | off | Also show ordinary callees beyond the paths already displayed for cache propagation gaps |
 | `--ignore` | none | Hide matching class or `Class::method` subtrees; repeatable and independent of `--show-uncached` |
 
 ### Inspecting ordinary calls and hiding subtrees
@@ -150,11 +150,11 @@ vendor/bin/magix analyze PageQuery::execute --show-uncached \
 
 Ordinary callees are labelled `uncached`; their lack of a boundary is not an error. They are followed recursively within the scanned sources and the existing `--depth` limit, including concrete methods with no further calls. This uses the same call resolution as the cache analysis: it does not infer database access, execute application code, or discover dynamically named calls and unscanned implementations. A method that calls `cached()` remains a cache boundary and still reports a missing `#[Cache]` policy as a problem.
 
-Without `--show-uncached`, the existing cache tree is retained, including intermediate uncached methods when tracing an uncached entry point. The flag adds inspection paths inside cache boundaries and ordinary leaves. It does not change the computed TTL, visibility, tags, storability, or problems of existing nodes. In particular, following an ordinary helper is not proof that its result carries cache metadata: a helper can extract a plain value with `value()`.
+Without `--show-uncached`, the tree includes intermediate uncached methods when tracing an uncached entry point, and paths from a cache parent through uncached methods to a cache child. The latter are reported as analysis gaps. The flag adds other inspection paths inside cache boundaries and ordinary leaves. It does not change the computed TTL, visibility, tags, storability, problems, or gaps of existing nodes. Following an ordinary helper is not proof that its result carries cache metadata: a helper can extract a plain value with `value()`.
 
 `--ignore` applies to cached and uncached nodes alike, with or without `--show-uncached`. A match hides that node and its entire subtree; descendants are never promoted to the parent. Other paths to the same method remain visible unless they also match. Multiple patterns are combined with OR. The selected root is subject to the same filter: if all roots are ignored, the command succeeds with `[]` in JSON and an explanatory message in the text formats.
 
-Filtering happens after analysis. An ignored dependency still constrains its ancestors' TTL and visibility, contributes tags, and can cause an ancestor to be invalid. Reasons may consequently refer to a hidden dependency. Neither display option changes cache composition or the runtime. The depth limit counts actual method calls before filtering; hidden branches do not free depth for other calls.
+Filtering happens after analysis. An ignored dependency still constrains its ancestors' TTL and visibility, contributes tags, and can cause an ancestor to be invalid. Analysis gaps and uncertainty also remain on the affected parent when their paths are hidden. Diagnostics may consequently refer to a hidden dependency. Neither display option changes cache composition or the runtime. The depth limit counts actual method calls before filtering; hidden branches do not free depth for other calls.
 
 | Pattern | Matches |
 |---|---|
@@ -171,6 +171,52 @@ Patterns match complete names and are case-sensitive. Without `::`, the pattern 
 Only `*` (zero or more characters) and `?` (one character) are special. `*` also crosses namespace separators; `\` is a literal namespace separator, not a pattern escape. Regexes, character classes, negation and comma-separated lists are not supported; use another `--ignore` for another pattern. Quote patterns as shown above so the shell does not expand them.
 
 The same filtering and labels apply to tree, JSON and Mermaid output.
+
+### Cache propagation gaps
+
+A path such as `PageQuery::execute -> ProductLookup::get -> ProductQuery::execute`
+has cache boundaries at both ends and an ordinary method between them. Unlike an
+ordinary leaf call, this exposes a specific gap in cache analysis: the analyzer
+has found the child cache but has not verified whether its metadata reaches the
+parent. Multiple ordinary methods and resolved interface implementations are
+followed, stopping at the first cache boundary on each path.
+
+These paths appear by default with a diagnostic marked `!` (red in color terminals):
+
+```text
+PageQuery::execute  ttl ≤60s (declared 60s)  shared or stricter  tags runtime tags
+    ! cache propagation unanalyzed: PageQuery::execute -> ProductLookup::get -> ProductQuery::execute
+`-- ProductLookup::get (uncached)
+    `-- ProductQuery::execute  ttl 20s  shared  tags product
+```
+
+The parent retains its proven 60-second cap. The child's 20 seconds and tags are
+not assumed to propagate through the helper. Instead, the parent gains an unknown
+upstream constraint, unknown additional visibility and tags, and cannot be proven
+storable. This uncertainty propagates to composed ancestors. An automatic parent
+keeps its requirement for a finite upstream expiration instead of incorrectly
+reporting a confirmed missing expiration. Independently invalid declarations
+still report their usual problems.
+
+Review the named methods for lost metadata, such as `value()` extraction or an
+uncomposed dependency inside `map()`. Preserve and explicitly compose `Cached`
+results where those constraints should reach the parent. The diagnostic remains
+an **analysis gap**, not proof of a runtime bug: this analyzer does not perform
+return-value data flow analysis, including through ordinary methods that return
+`Cached` intact. Direct cache-to-cache calls retain the existing composition
+analysis. An uncached entry point alone does not create a gap.
+
+Detection is limited to resolved calls in scanned sources within `--depth`.
+Recursion and depth cutoffs do not invent unseen cache children; use
+`--show-uncached` to inspect truncated ordinary paths and increase `--depth` when
+needed. No gap is not proof that every runtime dependency has been found.
+
+JSON includes an `analysisGaps` list on every node. Each gap has
+`kind: "unverified-cache-propagation"`, a `path` of fully qualified method IDs
+including both cache endpoints, and a readable `message`. This is separate from
+`effective.problems`, which describes invalid declarations. Mermaid includes the
+diagnostic path and styles the affected parent red. `analyze` continues to succeed
+when it produces a report, including a report with analysis gaps.
 
 ### Structured output
 

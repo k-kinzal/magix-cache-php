@@ -6,7 +6,9 @@ namespace Tests\Package\Cli\Unit\Render;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Graph\CacheEffect;
+use Magix\Cache\Cli\Graph\CacheGap;
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\ExpirationEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\MermaidRenderer;
 use Magix\Cache\Metadata\Visibility;
@@ -17,12 +19,29 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MermaidRenderer::class)]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
+#[UsesClass(CacheGap::class)]
 #[UsesClass(CacheNode::class)]
+#[UsesClass(ExpirationEstimate::class)]
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 final class MermaidRendererTest extends TestCase
 {
+    public function testRenderIdentifiesAndHighlightsAnUnverifiedCachePath(): void
+    {
+        $parent = new BoundaryDeclaration('App\PageQuery', 'get', 'page.php', 1);
+        $bridge = new BoundaryDeclaration('App\Lookup', 'get', 'lookup.php', 1, isCacheBoundary: false);
+        $child = new BoundaryDeclaration('App\ProductQuery', 'get', 'product.php', 1);
+        $effect = new CacheEffect(TtlEstimate::unknown(60), expirationConstraints: [new ExpirationEstimate('12:00', '12:15', 'Asia/Tokyo', true)]);
+        $node = new CacheNode($parent, $effect, gaps: [new CacheGap([$parent, $bridge, $child])]);
+
+        $chart = (new MermaidRenderer())->render($node);
+
+        self::assertStringContainsString('cache propagation unanalyzed: PageQuery::get → Lookup::get → ProductQuery::get', $chart);
+        self::assertStringContainsString('expires by daily 12:00-12:15 Asia/Tokyo', $chart);
+        self::assertStringContainsString('style n0 fill:#f8d7da,stroke:#b02a37,color:#842029', $chart);
+    }
+
     public function testRenderStartsAFlowchart(): void
     {
         $node = new CacheNode(

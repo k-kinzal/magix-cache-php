@@ -16,12 +16,14 @@ final readonly class CacheNode
      *
      * @param list<CacheNode> $children
      * @param list<string> $notes Observations about how the tree was resolved.
+     * @param list<CacheGap> $gaps Cache paths whose metadata propagation is not verified.
      */
     public function __construct(
         public BoundaryDeclaration $boundary,
         public CacheEffect $effect,
         public array $children = [],
         public array $notes = [],
+        public array $gaps = [],
     ) {
     }
 }

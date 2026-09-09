@@ -11,6 +11,7 @@ The result answers the questions that are otherwise only observable in productio
 
 - Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node
 - Optional ordinary method calls with `--show-uncached`, and independent subtree filters with repeatable `--ignore` patterns
+- Explicit analysis gaps when a cache boundary reaches another cache through ordinary methods, with unverified metadata kept unknown
 - The reason behind each effective value, such as which dependency capped a TTL or made a result private
 - White rows for provably storable caches and gray rows for other nodes, so the extent of cache bubbling is visible at a glance
 - Yellow fields where local TTL, `maxTtl`, or visibility settings restrict a storable result
@@ -83,6 +84,14 @@ The composition rules are the ones the runtime applies: the earliest expiration 
 Because the analysis is static, the effective TTL is an honest estimate rather than a guess. A lifetime is reported as a number only when it is statically determined; a boundary that is provably without expiration is `unconstrained`; anything that depends on runtime values, such as a `#[DynamicTtl]` resolver or an upstream the analyzer cannot see, is `unknown`, together with the tightest provable upper bound such as `unknown (≤30s)`; and a declaration that throws at runtime is `invalid`. A call that resolves to several implementations expands into all of them.
 
 The call graph follows dependencies inside composition callbacks, including `traverse()`, and preserves both dependencies when `unzip()` selects one side of a pair. It does not prove which callbacks execute or whether an iterable is non-empty. Check the empty collection path separately: `sequence()` and `traverse()` return unconstrained metadata for empty input, so an automatic parent TTL still needs a finite constraint from elsewhere on that path.
+
+A cache parent calling a cache child through ordinary methods is reported as
+`cache propagation unanalyzed`, even without `--show-uncached`. Those methods
+might return `Cached` intact or detach its metadata with `value()`; the call graph
+does not prove either. The report displays the intervening path and keeps the
+parent's TTL, visibility, and tags uncertain while preserving proven constraints.
+JSON exposes these paths in `analysisGaps`. See [analysis gaps](docs/commands.md#cache-propagation-gaps)
+for the distinction from ordinary uncached calls and invalid declarations.
 
 `magix key` is the one exception: it loads the referenced class through the Composer autoloader and runs its `#[CacheKey]` reducers and strategy factories. It computes the default hash strategy's key with the runtime's default namespace, `magix`; supply `--namespace` when the application configures another namespace. The boundary body is not called and no cache entries are read or written.
 

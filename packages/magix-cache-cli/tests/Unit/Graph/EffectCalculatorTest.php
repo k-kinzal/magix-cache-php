@@ -96,6 +96,24 @@ final class EffectCalculatorTest extends TestCase
         self::assertSame(['inventory', 'viewer'], $constraint->tags);
     }
 
+    public function testConstrainKeepsDailyExpirationsWhenOtherPathsHaveGaps(): void
+    {
+        $expiration = new \Magix\Cache\Cli\Graph\ExpirationEstimate('12:00', '12:15', 'Asia/Tokyo', true);
+        $child = new CacheNode(
+            new BoundaryDeclaration('App\NoonQuery', 'window', 'noon.php', 1),
+            new CacheEffect(TtlEstimate::unknown(finite: true), expirationConstraints: [$expiration]),
+        );
+
+        $constraint = (new EffectCalculator())->constrain([$child], hasGaps: true);
+
+        self::assertSame([$expiration], $constraint->expirationConstraints);
+        self::assertSame(TtlEstimateState::Unknown, $constraint->ttl->state);
+        self::assertTrue($constraint->ttl->hasFiniteExpiration());
+        self::assertSame('cache propagation through uncached methods is unanalyzed', $constraint->ttl->reason);
+        self::assertTrue($constraint->visibilityUnknown);
+        self::assertTrue($constraint->tagsUnknown);
+    }
+
     public function testConstrainStaysUnconstrainedWithoutConstrainedChildren(): void
     {
         $calculator = new EffectCalculator();

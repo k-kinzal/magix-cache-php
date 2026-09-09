@@ -65,7 +65,7 @@ final readonly class AnalyzeCommand
         string $format = 'tree',
         #[Option(description: 'Maximum dependency depth to expand')]
         int $depth = 8,
-        #[Option(description: 'Also display ordinary method calls without changing cache composition', name: 'show-uncached')]
+        #[Option(description: 'Also display ordinary method calls beyond reported cache propagation gaps', name: 'show-uncached')]
         bool $showUncached = false,
         #[Option(description: 'Hide matching class or Class::method subtrees (* and ? wildcards), repeatable')]
         array $ignore = [],

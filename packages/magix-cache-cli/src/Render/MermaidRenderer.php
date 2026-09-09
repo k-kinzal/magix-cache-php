@@ -42,9 +42,15 @@ final readonly class MermaidRenderer
             $label .= '<br/>expires by '.ExpirationEstimate::describe($effect->expirationConstraints);
         }
 
+        foreach ($node->gaps as $gap) {
+            $label .= '<br/>'.str_replace(' -> ', ' → ', $gap->label());
+        }
+
         $statements = ['    '.$id.'["'.$label.'"]'];
 
-        if ($effect->localRestrictions !== []) {
+        if ($node->gaps !== []) {
+            $statements[] = '    style '.$id.' fill:#f8d7da,stroke:#b02a37,color:#842029';
+        } elseif ($effect->localRestrictions !== []) {
             $statements[] = '    style '.$id.' fill:#fff3cd,stroke:#b58100,color:#664d03';
         }
 

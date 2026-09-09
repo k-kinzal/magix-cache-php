@@ -91,6 +91,10 @@ final readonly class TreeRenderer
         $indent = $last === null ? $prefix : $prefix.($last ? '    ' : '|   ');
         $lines = [$prefix.$connector.$this->summary($node, $last === null)];
 
+        foreach ($node->gaps as $gap) {
+            $lines[] = $indent.'    <fg=red>! '.$gap->label().'</>';
+        }
+
         foreach ($node->effect->problems as $problem) {
             $lines[] = $indent.'    <fg=red>! '.$problem.'</>';
         }

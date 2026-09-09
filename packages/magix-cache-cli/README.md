@@ -13,8 +13,8 @@ The result answers the questions that are otherwise only observable in productio
 - Ordinary method display with `--uncached=between|all|none` (default: `between` cache boundaries), and independent subtree filters with repeatable `--ignore` patterns
 - Explicit analysis gaps when a cache boundary reaches another cache through ordinary methods, with unverified metadata kept unknown
 - The reason behind each effective value, including inherited metadata and explicit local overrides
-- White rows for provably storable caches and gray rows for other nodes, so the extent of cache bubbling is visible at a glance
-- Yellow fields where local TTL, `maxTtl`, tags or visibility settings override a storable result
+- White rows for normal cache boundaries, including runtime-dependent TTL and custom Strategies; gray for ordinary methods, NoStore and TTL 0
+- Yellow fields for explicit bubbling overrides, yellow warnings for incomplete analysis, and red for definite declaration errors
 - Composed strategy contracts, bound to the same `create()` the runtime calls, with candidate ranges such as `30-60s` kept apart from the effective TTL
 - The default hash strategy's cache key for a call in the configured runtime namespace
 - Tree, JSON, and Mermaid output for terminals, editors, and documentation
@@ -56,7 +56,7 @@ ProductPageQuery::execute  ttl 120s  private  tags page
 
 The boundary explicitly chooses 120 seconds and replaces tags with `page`. Its omitted visibility inherits Private from `ViewerQuery`. The child's 20-second TTL does not cap the parent's explicit override. Nothing needs to be executed to see this.
 
-In a color terminal, these storable boundaries appear white. A `NoStore` result and parents that inherit it appear gray, while stored children remain white. Uncached methods, missing `#[Cache]` declarations, zero TTLs, and results whose storage depends on runtime values are also gray. `shared` and `private` retain their text labels without separate colors. Use `--ansi` to force colors or `--no-ansi` for plain text.
+In a color terminal, normal cache boundaries appear white, including dynamic TTL, parameter configuration and custom Strategies. Ordinary methods, effective `NoStore` and TTL 0 use gray; missing policies and invalid declarations use red. Incomplete call analysis uses yellow with a diagnostic; depth limits explain how to increase `--depth`. Explicit overrides of bubbled fields also use yellow. `shared` and `private` retain their text labels without separate colors. White describes normal behavior rather than guaranteed storage: the header distinguishes `runtime-dependent` from `no`. Mermaid uses the same meanings. Use `--ansi` to force terminal colors or `--no-ansi` for plain text.
 
 For a parent that only bubbles up child constraints, declare `#[Cache]` without a TTL. The tree shows the effective values directly, without a `(declared Ttl::Auto)` annotation, and the policy row uses `#[Cache]` (or includes any additional options). Explicit `ttl: Ttl::Auto` renders the same way. Fixed TTL declarations, upstream caps, and unknown or invalid lifetime diagnostics remain visible; JSON retains the normalized TTL mode in `policy.ttl`.
 

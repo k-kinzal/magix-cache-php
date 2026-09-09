@@ -53,6 +53,6 @@ final readonly class TreeFilter
             }
         }
 
-        return new CacheNode($node->boundary, $node->effect, $children, $node->notes, $node->gaps);
+        return new CacheNode($node->boundary, $node->effect, $children, $node->notes, $node->gaps, $node->analysisWarnings);
     }
 }

@@ -57,46 +57,58 @@ The header block describes the boundary itself:
 | `strategy` | The `#[UseStrategy]` construction, one line per composed strategy with its contracted candidate range, and `(assumed)` where an explicit `#[AssumeTtl]` replaced the contract. Only shown when a strategy is declared |
 | `strategy ttl` | The winning Strategy expiration override on the normal origin path; disjoint alternatives stay distinct, such as `30/600-900s` |
 | `visibility` | `shared`, `private`, or `nostore` after composition, followed by what restricted it |
-| `storable` | Whether static analysis can prove that this boundary stores its result; `no` also covers runtime-dependent results |
+| `storable` | `yes` when storage is proven, `no` for a non-cache method, a disabled cache, or an invalid declaration, `runtime-dependent` for a normal runtime decision, and `unknown (analysis incomplete)` when storage is unproven and call analysis is unfinished |
 | `tags` | Bubbled dependency tags, replaced when the boundary explicitly sets tags |
 | `key` | The parameters that form the key, the ignored ones, and the policy version |
 | `policy` | The declaration as it is written in the source |
 
-Lines below the header show each boundary of the tree, with `!` for a declaration problem or an explicitly labelled analysis gap, and `~` for a note about how the tree was resolved. An analysis gap does not assert that the boundary fails at runtime.
+Lines below the header show each boundary of the tree, with `!` for a declaration problem and `~` for incomplete analysis or a note about how the tree was resolved. An analysis gap does not assert that the boundary fails at runtime.
 
-Terminal colors follow the **effective result after composition**:
+Terminal colors describe **Magix Cache behavior**, independently of whether static
+analysis proves that a particular invocation will store an entry:
 
 | Color | Meaning |
 |---|---|
-| White row | A boundary whose effective result is provably storable, including an automatic `#[Cache]` that carries child constraints upward |
-| Gray row | An uncached method, a missing policy, `NoStore`, zero TTL, an invalid declaration, or a result whose storage cannot be proven statically |
-| Yellow field | A local setting overrides a result that remains storable |
-| Red diagnostic | An invalid lifetime, a problem that makes the declaration fail, or an explicit `cache propagation unanalyzed` gap |
+| White row | A normal cache boundary, including dynamic TTL, parameter configuration, daily expiration and custom Strategies |
+| Gray row | An ordinary method, an uncached entry point, or a boundary whose effective result has `NoStore` or TTL 0 |
+| Yellow row / `~` diagnostic | Incomplete call analysis: depth limits, recursion, ambiguous implementations or unverified propagation through ordinary methods |
+| Yellow field | An explicit local override of bubbled TTL, visibility or tags on an enabled, valid boundary |
+| Red row / `!` diagnostic | A definite declaration error, such as a missing policy, invalid lifetime or invalid Strategy binding |
 
-Follow the white rows to see how far cacheable results bubble. `NoStore` turns
-parents that inherit it gray; stored descendants remain white. An uncached entry
-point stays gray even when its summary contains a finite TTL from called caches.
-Gray can also mean that storage depends on runtime values: read the TTL condition
-and visibility label to distinguish uncertainty from a definite stop.
-Both `shared` and `private` caches use white; their text labels preserve the
-visibility distinction. Notes use gray, and ordinary TTL values follow the row
-color.
+White means normal cache participation, not guaranteed storage. Runtime TTL and
+visibility can decide whether a particular call is stored; custom Strategy
+metadata stays unknown in the analysis without turning normal behavior into a
+warning. `shared` and `private` both use white. TTL 0 is a valid non-storage
+setting, so it uses gray like `NoStore`, not error red.
 
-Yellow fields mark **local overrides** of TTL, visibility or tags when a
-boundary has dependencies and its result remains storable. Explicit settings
-are shown even when numerically equal to inherited values: they still own that
-field. Ordinary leaf declarations have no dependency bubbling to override.
-FromUpstream is highlighted when its maximum changes a proven lifetime.
+Ordinary descendants display `(uncached)` without TTL or visibility fields;
+NoStore boundaries retain their metadata and show `nostore`. An explicitly
+selected uncached root remains visible as `(uncached entry point)` with its
+summary of called caches. Errors take precedence over gray and yellow. Disabled
+caches and ordinary methods retain gray rows even when they carry yellow warnings.
 
-A fixed parent TTL of 300 seconds replaces a bubbled `30/600-900s` with `300s`.
-An automatic parent keeps `30/600-900s`; FromUpstream with maxTtl 300 yields
-`30/300s`. Strategies have higher priority than policy and runtime parameters;
-outer fetch wrappers override inner ones. Unknown writers remain unknown.
+Yellow analysis warnings name the affected method or call path. For a depth limit,
+raise `--depth`; recursion and unverified metadata propagation require inspecting
+the reported path and cannot be solved just by increasing depth. Warnings remain
+visible when their source rows are hidden by `--uncached` or `--ignore`. Affected
+cache ancestors stay yellow because filtering does not complete the analysis.
+Each warning appears at its lowest visible ancestor to avoid repeating it at
+every level. Informational labels and ordinary TTL values follow the row color.
+
+Yellow fields mark **local overrides** when a boundary has dependencies.
+Explicit settings are shown even when numerically equal to inherited values:
+they still own that field. This includes runtime-dependent overrides and
+Strategies. Ordinary leaf declarations have no dependency bubbling to override.
+FromUpstream is highlighted when its maximum changes a proven lifetime. Invalid
+and disabled boundaries retain their red or gray fields.
 
 Use `--ansi` to force terminal colors or `--no-ansi` to disable them. Plain text
-keeps the same labels and diagnostics without escape codes or extra annotations.
-JSON retains the same data. Mermaid keeps its existing yellow styling for local
-overrides; the white/gray row palette applies to the terminal tree.
+keeps the same labels and diagnostics. Mermaid uses the same row meanings,
+coloring the whole node yellow when a white node contains override fields; errors
+remain red and disabled nodes remain gray. JSON preserves conservative
+`effective.storable` proof (`false` still includes runtime decisions), and adds
+`analysisWarnings` independently of declaration `problems` and `analysisGaps`.
+Neither color nor the terminal storage label changes the computed metadata.
 
 Disjoint lifetime contracts such as `#[Ttl(30, new TtlRange(min: 600, max: 900))]` render as `30/600-900s` in the tree and Mermaid output. A fixed 300-second parent yields `300s`, while an automatic parent preserves `30/600-900s`. FromUpstream caps each alternative separately. The analyzer does not infer the conditions selecting the alternatives or correlations between separate strategies.
 
@@ -187,11 +199,11 @@ has found the child cache but has not verified whether its metadata reaches the
 parent. Multiple ordinary methods and resolved interface implementations are
 followed, stopping at the first cache boundary on each path.
 
-These paths appear by default with a diagnostic marked `!` (red in color terminals):
+These paths appear by default with a diagnostic marked `~` (yellow in color terminals):
 
 ```text
 PageQuery::execute  ttl ≤60s (declared 60s)  shared or stricter  tags runtime tags
-    ! cache propagation unanalyzed: PageQuery::execute -> ProductLookup::get -> ProductQuery::execute
+    ~ cache propagation unanalyzed: PageQuery::execute -> ProductLookup::get -> ProductQuery::execute
 `-- ProductLookup::get (uncached)
     `-- ProductQuery::execute  ttl 20s  shared  tags product
 ```
@@ -221,7 +233,7 @@ JSON includes an `analysisGaps` list on every node. Each gap has
 `kind: "unverified-cache-propagation"`, a `path` of fully qualified method IDs
 including both cache endpoints, and a readable `message`. This is separate from
 `effective.problems`, which describes invalid declarations. Mermaid includes the
-diagnostic path and styles the affected parent red. `analyze` continues to succeed
+diagnostic path and styles the affected cache parent yellow. `analyze` continues to succeed
 when it produces a report, including a report with analysis gaps.
 
 ### Structured output

@@ -59,7 +59,7 @@ final class CacheTreeTest extends TestCase
         self::assertEquals($baseline->effect, $expanded->effect);
         self::assertEquals($baseline->effect, $limited->effect);
         self::assertSame(['recursive dependency, not expanded again'], $expanded->children[0]->children[0]->notes);
-        self::assertSame(['depth limit reached, dependencies not expanded'], $limited->children[0]->notes);
+        self::assertSame(['depth limit reached, dependencies not expanded; increase --depth to analyze further'], $limited->children[0]->notes);
         self::assertSame(TtlEstimateState::Unknown, $limited->children[0]->effect->ttl->state);
     }
 
@@ -103,7 +103,7 @@ final class CacheTreeTest extends TestCase
         $limited = $tree->build($root, 0);
         self::assertSame(TtlEstimateState::Unknown, $limited->effect->ttl->state);
         self::assertSame([], $limited->effect->problems);
-        self::assertSame(['depth limit reached, dependencies not expanded'], $limited->notes);
+        self::assertSame(['depth limit reached, dependencies not expanded; increase --depth to analyze further'], $limited->notes);
         $recursive = $tree->build($root);
         self::assertCount(2, $recursive->children);
         self::assertSame(TtlEstimateState::Unknown, $recursive->effect->ttl->state);
@@ -160,7 +160,7 @@ final class CacheTreeTest extends TestCase
         self::assertSame(['recursive dependency, not expanded again'], $recursive->children[0]->notes);
         self::assertSame(TtlEstimateState::Unknown, $recursive->children[0]->effect->ttl->state);
         self::assertSame([], $limited->children);
-        self::assertSame(['depth limit reached, dependencies not expanded'], $limited->notes);
+        self::assertSame(['depth limit reached, dependencies not expanded; increase --depth to analyze further'], $limited->notes);
         self::assertSame(TtlEstimateState::Known, $limited->effect->ttl->state);
         self::assertSame(20, $limited->effect->ttl->seconds);
     }

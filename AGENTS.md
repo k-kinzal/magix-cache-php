@@ -109,3 +109,5 @@ Keep PSR/backend details in adapters, preserve dependency bubbling and the separ
 
 
 The CLI's TTL/ExpiresAt contracts describe expiration only. For custom Strategies, tags and visibility remain unknown because arbitrary metadata overrides are not proven by those contracts. The bundled KeySpreadExpirationStrategy and StaleIfErrorCacheStrategy preserve those fields on normal origin success. A later parent can explicitly replace unknown fields; AssumeTtl only resolves expiration, never other metadata.
+
+CLI presentation colors describe behavior rather than storage proof: normal boundaries (including runtime TTL/visibility and custom Strategies) are white; ordinary methods, NoStore and effective TTL 0 are gray; incomplete call analysis and explicit bubbling overrides are yellow; definite declaration errors are red. Keep runtime uncertainty distinct from incomplete traversal. Preserve subtree analysis warnings through display filtering, with depth-limit diagnostics explaining --depth. Tree and Mermaid share this classification; JSON retains conservative storage proof and independent analysis warnings.

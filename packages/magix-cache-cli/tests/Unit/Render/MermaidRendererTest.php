@@ -11,12 +11,14 @@ use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\ExpirationEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\MermaidRenderer;
+use Magix\Cache\Cli\Render\NodePresentation;
 use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MermaidRenderer::class)]
+#[UsesClass(NodePresentation::class)]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
 #[UsesClass(CacheGap::class)]
@@ -39,7 +41,7 @@ final class MermaidRendererTest extends TestCase
 
         self::assertStringContainsString('cache propagation unanalyzed: PageQuery::get → Lookup::get → ProductQuery::get', $chart);
         self::assertStringContainsString('expires by daily 12:00-12:15 Asia/Tokyo', $chart);
-        self::assertStringContainsString('style n0 fill:#f8d7da,stroke:#b02a37,color:#842029', $chart);
+        self::assertStringContainsString('style n0 fill:#fff3cd,stroke:#b58100,color:#664d03', $chart);
     }
 
     public function testRenderStartsAFlowchart(): void
@@ -69,8 +71,8 @@ final class MermaidRendererTest extends TestCase
 
         $statements = (new MermaidRenderer())->statements($node, 'n0');
 
-        self::assertSame('    n0_0["ViewerQuery::execute<br/>unconstrained - private"]', $statements[1]);
-        self::assertSame('    n0 --> n0_0', $statements[2]);
+        self::assertSame('    n0_0["ViewerQuery::execute<br/>unconstrained - private"]', $statements[2]);
+        self::assertSame('    n0 --> n0_0', $statements[4]);
     }
 
     public function testStatementsShowConditionalUpperBounds(): void

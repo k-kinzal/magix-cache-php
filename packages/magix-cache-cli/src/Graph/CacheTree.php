@@ -49,7 +49,7 @@ final readonly class CacheTree
             $constraint = $boundary->dependencies === []
                 ? new DependencyConstraint()
                 : new DependencyConstraint(TtlEstimate::unknown(condition: 'dependencies beyond the depth limit were not analyzed'), visibilityUnknown: true);
-            $notes = $boundary->dependencies === [] ? [] : ['depth limit reached, dependencies not expanded'];
+            $notes = $boundary->dependencies === [] ? [] : ['depth limit reached, dependencies not expanded; increase --depth to analyze further'];
 
             return new CacheNode($boundary, $this->effects->calculate($boundary, $constraint, $this->strategies->resolve($boundary)), [], $notes);
         }

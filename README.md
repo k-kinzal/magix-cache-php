@@ -86,6 +86,8 @@ Because the analysis is static, a TTL is not always a single number: it may be r
 
 The workspace resolves dependencies for PHP 8.3 via Composer's `config.platform.php`, so the committed lock file installs on every supported PHP version. CI runs tests and the CLI entry point on PHP 8.3, 8.4, and 8.5, and checks the latest supported Symfony dependencies separately on PHP 8.5. Static analysis targets PHP 8.3.
 
+Run `composer bench` (or `composer bench:quick`) to compare plain PHP with Magix Cache when every cache boundary misses. The suite uses in-memory storage and reports added time and duration ratios for single and composed queries, including deep and wide trees with 111–127 boundaries for evaluating adoption in legacy systems. Use `composer bench -- --filter=Large` for those larger workloads. See [the benchmark contract and commands](bench/README.md).
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.

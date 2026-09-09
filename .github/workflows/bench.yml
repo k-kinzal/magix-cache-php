@@ -1,0 +1,101 @@
+name: Benchmarks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  COMPOSER_NO_INTERACTION: '1'
+  XDEBUG_MODE: 'off'
+
+jobs:
+  all-miss:
+    name: Plain PHP vs Magix Cache all miss (PHP 8.3)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out the candidate
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, dom
+          coverage: none
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+        with:
+          dependency-versions: locked
+          composer-options: --prefer-dist
+
+      - name: Check platform requirements
+        run: composer check-platform-reqs
+
+      - name: Measure both implementations on the same runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/phpbench
+          composer bench -- --tag=all_miss \
+            --dump-file=build/phpbench/results.xml --progress=none \
+            2>&1 | tee build/phpbench/report.txt
+
+      - name: Record the measurement environment
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/phpbench
+          {
+            git rev-parse HEAD
+            uname -a
+            lscpu
+            php -v
+            composer --version
+            if [ -x vendor/bin/phpbench ]; then
+              vendor/bin/phpbench --version
+            fi
+          } > build/phpbench/environment.txt
+          cp phpbench.json.dist composer.lock build/phpbench/
+
+      - name: Publish the comparison
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo '## Magix Cache all-miss overhead'
+            echo
+            echo 'Same origin computation, with and without Magix Cache, on this revision.'
+            echo 'Every cache boundary misses and writes to memory. Declarations are warmed.'
+            echo 'Times are per complete query tree. Additional = all-miss - plain; ratio = all-miss / plain.'
+            echo 'Informational measurement; no performance threshold is applied.'
+            echo
+            if [ -f build/phpbench/report.txt ]; then
+              echo '```text'
+              cat build/phpbench/report.txt
+              echo '```'
+            else
+              echo 'The benchmark did not produce a report; inspect the failed step.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: phpbench-all-miss-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: build/phpbench/
+          if-no-files-found: warn
+          retention-days: 14

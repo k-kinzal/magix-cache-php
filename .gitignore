@@ -1,5 +1,6 @@
 /vendor/
 /build/
+/phpbench.json
 /.phpunit.cache/
 /.php-cs-fixer.cache
 /.deptrac.cache

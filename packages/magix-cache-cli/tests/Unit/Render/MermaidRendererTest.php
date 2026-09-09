@@ -27,6 +27,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
+#[UsesClass(\Magix\Cache\Cli\Render\AlternativePresentation::class)]
 final class MermaidRendererTest extends TestCase
 {
     public function testRenderIdentifiesAndHighlightsAnUnverifiedCachePath(): void

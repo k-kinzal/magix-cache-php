@@ -19,9 +19,11 @@ use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CacheTree::class)]
+#[UsesNamespace('Magix\Cache\Cli')]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(Catalog::class)]
 #[UsesClass(CacheEffect::class)]
@@ -189,4 +191,19 @@ final class CacheTreeTest extends TestCase
         self::assertSame(['App\FeedQuery::execute resolves to 2 implementations'], $node->notes);
         self::assertSame(120, $node->effect->ttl->seconds);
     }
+    public function testFinishSummarizesReturnAlternativesWithoutMeetingThem(): void
+    {
+        $node = \Tests\Package\Cli\Fixture\AnalysisSource::node('return $flag ? $this->inputs->a() : $this->inputs->b();');
+        self::assertSame('20/60s', $node->effect->ttl->label());
+        self::assertSame([], $node->gaps);
+    }
+
+    public function testUnverifiedRetainsOnlyOpaquePropagationDiagnostics(): void
+    {
+        $known = \Tests\Package\Cli\Fixture\AnalysisSource::node('return $this->inputs->a();');
+        $opaque = \Tests\Package\Cli\Fixture\AnalysisSource::node('return transform($this->inputs->a());');
+        self::assertSame([], $known->gaps);
+        self::assertCount(1, $opaque->gaps);
+    }
+
 }

@@ -69,6 +69,7 @@ final readonly class CacheTree
         $notes = [];
         $seen = [];
         $gaps = [];
+        $calls = [];
 
         foreach ($boundary->dependencies as $dependency) {
             $candidates = $this->catalog->candidates($dependency->class, $dependency->method, includeEntryPoints: true);
@@ -81,13 +82,15 @@ final readonly class CacheTree
                 $composed = $candidate->isCacheBoundary || (!$boundary->isCacheBoundary && $candidate->dependencies !== []);
 
                 if (isset($seen[$candidate->id()])) {
+                    $calls[$dependency->class.'::'.$dependency->method][] = $seen[$candidate->id()];
                     continue;
                 }
 
-                $seen[$candidate->id()] = true;
                 $child = $this->build($candidate, $depth - 1, $visited, $includeUncached);
+                $seen[$candidate->id()] = $child;
+                $calls[$dependency->class.'::'.$dependency->method][] = $child;
                 $paths = $boundary->isCacheBoundary && !$candidate->isCacheBoundary ? CacheGap::through($child, [$boundary]) : [];
-                $gaps = [...$gaps, ...$paths];
+                $gaps = [...$gaps, ...($this->unverified($boundary, $child, $dependency->class.'::'.$dependency->method) ? $paths : [])];
 
                 if ($includeUncached || $composed || $paths !== []) {
                     $children[] = $child;
@@ -99,12 +102,72 @@ final readonly class CacheTree
             }
         }
 
+        return $this->finish($boundary, $children, $constraints, $notes, $gaps, $calls);
+    }
+
+    /**
+     * @param list<CacheNode> $children
+     * @param list<CacheNode> $constraints
+     * @param list<string> $notes
+     * @param list<CacheGap> $gaps
+     * @param array<string, list<CacheNode>> $calls
+     */
+    public function finish(BoundaryDeclaration $boundary, array $children, array $constraints, array $notes, array $gaps, array $calls): CacheNode
+    {
+        $strategy = $this->strategies->resolve($boundary);
+        $variants = $boundary->metadataFlow === null ? null : $this->effects->applyAlternatives(
+            $boundary,
+            (new FlowEffects())->evaluate($boundary->metadataFlow, $calls),
+            $strategy,
+        );
+        foreach ($variants ?? [] as $variant) {
+            if (!$variant->analyzed) {
+                $notes[] = 'returned cache metadata is not analyzed';
+                break;
+            }
+        }
+
+        $effect = $variants !== null && $variants !== []
+            ? (count($variants) === 1 ? $variants[0]->effect : (new AlternativeEffects())->summarize($variants))
+            : $this->effects->calculate($boundary, $this->effects->constrain($constraints, $gaps !== []), $strategy);
+
+        if ($variants === []) {
+            $effect = new CacheEffect(TtlEstimate::unknown(condition: 'method has no normal return'));
+        }
+
         return new CacheNode(
             $boundary,
-            $this->effects->calculate($boundary, $this->effects->constrain($constraints, $gaps !== []), $this->strategies->resolve($boundary)),
+            $effect,
             $children,
             $notes,
             $gaps,
+            metadataVariants: $variants,
         );
+    }
+
+    /**
+     * A proven return or extraction is not an analysis gap just because it crosses an ordinary method.
+     */
+    public function unverified(BoundaryDeclaration $boundary, CacheNode $child, string $target): bool
+    {
+        if ($boundary->metadataFlow === null || $child->metadataVariants === null) {
+            return true;
+        }
+
+        if (!$boundary->metadataFlow->hasUnknown() && !$boundary->metadataFlow->references($target)) {
+            return false;
+        }
+
+        if ($boundary->metadataFlow->hasUnknown()) {
+            return true;
+        }
+
+        foreach ($child->metadataVariants as $variant) {
+            if (!$variant->analyzed) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

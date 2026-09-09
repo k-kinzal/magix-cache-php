@@ -90,6 +90,11 @@ final readonly class TreeRenderer
         $connector = $last === null ? '' : ($last ? '`-- ' : '|-- ');
         $indent = $last === null ? $prefix : $prefix.($last ? '    ' : '|   ');
         $lines = [$prefix.$connector.$this->summary($node, $last === null)];
+        $alternatives = (new AlternativePresentation())->label($node);
+
+        if ($alternatives !== null) {
+            $lines[] = $indent.'    alternatives: '.$alternatives;
+        }
 
         foreach ($node->effect->problems as $problem) {
             $lines[] = $indent.'    <fg=red>! '.$problem.'</>';

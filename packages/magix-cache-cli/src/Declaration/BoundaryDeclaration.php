@@ -22,6 +22,7 @@ final readonly class BoundaryDeclaration
      * @param bool $hasDynamicTtl Whether an enabled #[DynamicTtl] applies to the boundary.
      * @param bool $suppliesMetadata Whether the boundary builds CacheMetadata itself.
      * @param UseStrategyDeclaration|null $useStrategy The enabled #[UseStrategy] applying to the boundary.
+     * @param MetadataFlow|null $metadataFlow Returned metadata operations; null when no method body was read.
      * @param bool $isCacheBoundary False for an uncached analysis entry point, whose dependencies alone supply constraints.
      */
     public function __construct(
@@ -36,6 +37,7 @@ final readonly class BoundaryDeclaration
         public bool $suppliesMetadata = false,
         public ?UseStrategyDeclaration $useStrategy = null,
         public bool $isCacheBoundary = true,
+        public ?MetadataFlow $metadataFlow = null,
     ) {
     }
 

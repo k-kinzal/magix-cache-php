@@ -83,19 +83,23 @@ The composition rules are the ones the runtime applies: the earliest expiration 
 
 Because the analysis is static, the effective TTL is an honest estimate rather than a guess. A lifetime is reported as a number only when it is statically determined; a boundary that is provably without expiration is `unconstrained`; anything that depends on runtime values, such as a `#[DynamicTtl]` resolver or an upstream the analyzer cannot see, is `unknown`, together with the tightest provable upper bound such as `unknown (≤30s)`; and a declaration that throws at runtime is `invalid`. A call that resolves to several implementations expands into all of them.
 
-The call graph follows dependencies inside composition callbacks, including `traverse()`, and preserves both dependencies when `unzip()` selects one side of a pair. It does not prove which callbacks execute or whether an iterable is non-empty. Check the empty collection path separately: `sequence()` and `traverse()` return unconstrained metadata for empty input, so an automatic parent TTL still needs a finite constraint from elsewhere on that path.
+The analyzer follows returned metadata through ordinary methods and cached origin
+closures. Returning `Cached` preserves it; `value()` extraction and plain return
+values detach it. `map()` preserves its receiver, and `flatMap()`, `zip()`,
+`combineN()`, and literal `sequence()` inputs compose their metadata.
 
-A cache parent calling a cache child through ordinary methods is reported as
-`cache propagation unanalyzed`. Those methods might return `Cached` intact or
-detach its metadata with `value()`; the call graph does not prove either. The
-report keeps the parent's TTL, visibility, and tags uncertain while preserving
-proven constraints. The default `--uncached=between` shows the intermediate
-methods; `all` also shows wholly uncached branches, and `none` omits ordinary
-rows while keeping cached descendants and gap diagnostics.
-JSON exposes these paths in `analysisGaps`. See [analysis gaps](docs/commands.md#cache-propagation-gaps)
-for the distinction from ordinary uncached calls and invalid declarations.
+Branches (`if`/`elseif`, ternaries, `switch`, and `match`) remain alternatives:
+`A or B`, with TTL, visibility, and tags kept together for each result.
+Composing a choice with C produces `(A + C) or (B + C)`. Tree and Mermaid show
+these candidates; JSON includes `metadataAlternatives`. No candidate is selected
+by running the application.
 
-`magix key` is the one exception: it loads the referenced class through the Composer autoloader and runs its `#[CacheKey]` reducers and strategy factories. It computes the default hash strategy's key with the runtime's default namespace, `magix`; supply `--namespace` when the application configures another namespace. The boundary body is not called and no cache entries are read or written.
+Opaque transformations or unsupported control flow can still produce
+`cache propagation unanalyzed`; merely crossing an ordinary method does not.
+The default `--uncached=between` shows intermediate methods; `all` also shows
+wholly uncached branches, and `none` omits ordinary rows. These display choices
+preserve alternatives, effects, and diagnostics. See [analysis gaps](docs/commands.md#cache-propagation-gaps)
+and [conditional cache results](docs/commands.md#conditional-cache-results).
 
 ## Documentation
 

@@ -135,9 +135,9 @@ public function show(int $productId, int $viewerId): View
 vendor/bin/magix analyze ProductController::show
 ```
 
-The root is labelled `uncached entry point`. Its TTL is the shortest lifetime of the called boundaries, visibility is the strictest, and tags are unioned. For the three queries above, it reports `20s`, `private`, and `inventory, product, viewer`. Unknown bounds and runtime metadata stay unknown. Calls through uncached methods are followed until cache boundaries are reached; those boundaries retain their usual policy analysis. Query objects can be resolved through typed properties, typed action parameters, local constructor assignments, and static calls.
+The root is labelled `uncached entry point`. Its effective metadata describes what the method returns. In the example above, `value()` extracts plain values, so the root has `unconstrained` TTL, `shared` visibility, and no tags. The child queries remain visible with their own cache policies. An ordinary method returning a `Cached` intact preserves that result's metadata. Query objects can be resolved through typed properties, typed action parameters, local constructor assignments, and static calls.
 
-The root's `key` and `policy` are `none (uncached entry point)` and `storable` is `no`, because the action itself does not write a cache entry. This report summarizes the called caches; it does not attach metadata to values extracted with `value()` or configure HTTP caching for the view. Methods that actually call `cached()` still require a cache policy. Uncached entry points cannot be selected by `key`.
+The root's `key` and `policy` are `none (uncached entry point)` and `storable` is `no`, because the action itself does not write a cache entry. The report does not attach metadata to values extracted with `value()` or configure HTTP caching for the view. Methods that actually call `cached()` still require a cache policy. Uncached entry points cannot be selected by `key`.
 
 | Option | Default | Purpose |
 |---|---|---|
@@ -190,57 +190,90 @@ Only `*` (zero or more characters) and `?` (one character) are special. `*` also
 
 The same filtering and labels apply to tree, JSON and Mermaid output.
 
-### Cache propagation gaps
+### Conditional cache results
 
-A path such as `PageQuery::execute -> ProductLookup::get -> ProductQuery::execute`
-has cache boundaries at both ends and an ordinary method between them. Unlike an
-ordinary leaf call, this exposes a specific gap in cache analysis: the analyzer
-has found the child cache but has not verified whether its metadata reaches the
-parent. Multiple ordinary methods and resolved interface implementations are
-followed, stopping at the first cache boundary on each path.
+The analyzer follows returns and local assignments through `if`/`elseif`/`else`,
+ternaries, `switch` (including fallthrough and an absent default), and `match`.
+It does not execute conditions or choose a runtime branch. For example:
 
-These paths appear by default with a diagnostic marked `~` (yellow in color terminals):
+```php
+public function choose(bool $flag): Cached
+{
+    return $flag ? $this->a->execute() : $this->b->execute();
+}
+```
+
+If A returns 20 seconds with shared visibility and tag `a`, while B returns
+60 seconds with private visibility and tag `b`, the report retains both:
 
 ```text
-PageQuery::execute  ttl ≤60s (declared 60s)  shared or stricter  tags runtime tags
+alternatives: A::execute [ttl 20s, shared, tags a] or B::execute [ttl 60s, private, tags b]
+```
+
+The TTL summary is `20/60s`, not `20s`. Only facts common to every branch appear
+in the summary's tags and visibility; each candidate retains its exact fields.
+This also works inside a `cached()` origin. An ordinary method still displays
+`(uncached)` and never stores its own result.
+
+Composition uses each possible combination: `(A or B)->zip(C)` yields
+`(A + C) or (B + C)`. Reusing the same selected value, such as `$v->zip($v)`,
+does not invent a combination of different alternatives. Separate conditions
+are independent unless they reuse that same value; the analyzer does not prove
+relationships between arbitrary predicates. Boundary settings are applied to
+every candidate separately. Even when settings make their metadata equal,
+distinct dependency selections remain visible. A branch without a finite
+expiration cannot borrow one from another branch to satisfy an automatic TTL.
+
+`map()` preserves its receiver's metadata. `flatMap()`, `zip()`, `combineN()`,
+literal `sequence()` inputs, and readable `flatten()`/`unzip()` expressions
+preserve their composition semantics. A literal empty `sequence()` or `traverse()`
+has no constraint. A runtime iterable remains unknown, including whether it is
+empty. Opaque callbacks, unsupported statements, mutated bindings that cannot be
+followed, and excessive path expansion remain unanalyzed. Statement branching is
+bounded to eight levels and metadata expansion to 128 candidates per operation.
+
+### Cache propagation gaps
+
+An ordinary method between two cache boundaries does not by itself cause a gap.
+Returning `Cached` intact propagates its metadata. Extracting `value()`, including
+through local aliases, returns a plain value without that metadata. For example,
+`return $this->query->execute()->value()` is uncached; its query remains visible
+under `--uncached=between`, and no propagation diagnostic is emitted. Rewrapping
+with `Cached::of($value)` adds no metadata; explicitly supplying a child's
+`metadata` preserves that child's constraints.
+
+A gap remains when the returned metadata cannot be followed, such as
+`return opaqueTransform($this->query->execute())`. The report then includes:
+
+```text
+PageQuery::execute  ttl 60s  shared or stricter  tags runtime tags
     ~ cache propagation unanalyzed: PageQuery::execute -> ProductLookup::get -> ProductQuery::execute
 `-- ProductLookup::get (uncached)
     `-- ProductQuery::execute  ttl 20s  shared  tags product
 ```
 
-The parent retains its proven 60-second cap. The child's 20 seconds and tags are
-not assumed to propagate through the helper. Instead, the parent gains an unknown
-upstream constraint, unknown additional visibility and tags, and cannot be proven
-storable. This uncertainty propagates to composed ancestors. An automatic parent
-keeps its requirement for a finite upstream expiration instead of incorrectly
-reporting a confirmed missing expiration. Independently invalid declarations
-still report their usual problems.
-
-Review the named methods for lost metadata, such as `value()` extraction or an
-uncomposed dependency inside `map()`. Preserve and explicitly compose `Cached`
-results where those constraints should reach the parent. The diagnostic remains
-an **analysis gap**, not proof of a runtime bug: this analyzer does not perform
-return-value data flow analysis, including through ordinary methods that return
-`Cached` intact. Direct cache-to-cache calls retain the existing composition
-analysis. An uncached entry point alone does not create a gap.
+The child's metadata is not assumed to propagate through an opaque transformation.
+Unknown TTL, visibility, and tags remain subject to the parent's explicit settings.
+The warning describes incomplete analysis, not an invalid declaration. A known
+extraction is analyzed even though it deliberately drops the child's metadata.
 
 Detection is limited to resolved calls in scanned sources within `--depth`.
-Recursion and depth cutoffs do not invent unseen cache children; use
-`--uncached=all` to inspect truncated ordinary paths and increase `--depth` when
-needed. No gap is not proof that every runtime dependency has been found.
+Recursion and depth cutoffs retain uncertainty without inventing unseen children.
+Use `--uncached=all` to inspect ordinary paths. No gap is not proof that every
+runtime dependency has been found. Filtering never removes the original metadata
+alternatives or diagnostics, including when their source nodes are hidden.
 
 JSON includes an `analysisGaps` list on every node. Each gap has
-`kind: "unverified-cache-propagation"`, a `path` of fully qualified method IDs
-including both cache endpoints, and a readable `message`. This is separate from
-`effective.problems`, which describes invalid declarations. Mermaid includes the
-diagnostic path and styles the affected cache parent yellow. `analyze` continues to succeed
-when it produces a report, including a report with analysis gaps.
+`kind: "unverified-cache-propagation"`, a `path` of fully qualified method IDs,
+and a readable `message`, separate from invalid `effective.problems`.
+Mermaid includes the diagnostic path and styles an affected cache parent yellow.
+`analyze` continues to succeed when it produces a report with analysis gaps.
 
 ### Structured output
 
 `--format=json` prints the whole tree, including every policy, parameter, effective value, and reason, which suits editors and other tools:
 
-Each node has a `kind` of `boundary`, `entry-point` (an uncached root), or `uncached` (an ordinary callee). Both uncached kinds have `policy: null`, `key: null`, and `effective.storable: false`. Their `effective` result summarizes the called caches; it does not assert that the method returns metadata. After filtering, the remaining nodes keep their original `effective` results while `dependencies` contains only visible children.
+Each node has a `kind` of `boundary`, `entry-point` (an uncached root), or `uncached` (an ordinary callee). Both uncached kinds have `policy: null`, `key: null`, and `effective.storable: false`. Their `effective` result describes returned metadata; known extraction yields no constraints. `metadataAlternatives` retains each possible result with its sources, TTL, visibility, tags, storage proof, and analysis status. The top-level `effective` result summarizes only facts shared by those alternatives. After filtering, the remaining nodes keep their original `effective` results while `dependencies` contains only visible children.
 
 ```bash
 vendor/bin/magix analyze ProductPageQuery::execute --format=json

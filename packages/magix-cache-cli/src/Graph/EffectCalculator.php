@@ -81,6 +81,22 @@ final readonly class EffectCalculator
     }
 
     /**
+     * Applies local overrides separately so fields from different branches never mix.
+     *
+     * @param list<CacheVariant> $variants
+     * @return list<CacheVariant>
+     */
+    public function applyAlternatives(BoundaryDeclaration $boundary, array $variants, ?StrategyEffect $strategy): array
+    {
+        return (new FlowEffects())->unique(array_map(fn (CacheVariant $variant): CacheVariant => new CacheVariant(
+            $this->calculate($boundary, $variant->constraint(), $strategy),
+            $variant->sources,
+            $variant->analyzed,
+            cached: $boundary->isCacheBoundary || $variant->cached,
+        ), $variants));
+    }
+
+    /**
      * Returns the metadata a cached() boundary produces once its policy is applied.
      */
     public function applyPolicy(BoundaryDeclaration $boundary, DependencyConstraint $constraint, ?StrategyEffect $strategy = null): CacheEffect

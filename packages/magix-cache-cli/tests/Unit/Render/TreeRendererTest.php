@@ -245,7 +245,7 @@ final class TreeRendererTest extends TestCase
         yield 'parameter visibility' => ['ParameterQuery::fetch', 37];
         yield 'custom strategy' => ['SeasonalProductQuery::execute', 37];
         yield 'invalid automatic TTL' => ['BrokenQuery::inherited', 31];
-        yield 'analysis gap' => ['InspectionQuery::execute', 33];
+        yield 'analyzed extraction' => ['InspectionQuery::execute', 37];
     }
 
     public function testNoStoreBubblesGrayToParentsWhileStoredChildrenStayWhite(): void
@@ -275,8 +275,8 @@ final class TreeRendererTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $output = $tester->getDisplay();
-        self::assertStringContainsString("\033[33;1mInspectionQuery::execute\033[39;22m", $output);
-        self::assertStringContainsString("\033[33m~ cache propagation unanalyzed:", $output);
+        self::assertStringContainsString("\033[37;1mInspectionQuery::execute\033[39;22m", $output);
+        self::assertStringNotContainsString("\033[33m~ cache propagation unanalyzed:", $output);
         self::assertStringContainsString("\033[90;1mInventoryLookup::get\033[39;22m\033[90m (uncached)", $output);
         self::assertStringContainsString("\033[90;1mInspectionQuery::offset\033[39;22m\033[90m (uncached)", $output);
         self::assertStringContainsString("\033[37;1mProductQuery::execute\033[39;22m", $output);

@@ -8,6 +8,8 @@ use function array_map;
 use function json_encode;
 
 use JsonException;
+use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
+use Magix\Cache\Cli\Graph\CacheGap;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\StrategyEffect;
 use Magix\Cache\Cli\Graph\StrategyStep;
@@ -84,7 +86,22 @@ final readonly class JsonRenderer
                 'problems' => $effect->problems,
             ],
             'notes' => $node->notes,
+            'analysisGaps' => array_map($this->gap(...), $node->gaps),
             'dependencies' => array_map(fn (CacheNode $child): array => $this->tree($child, false), $node->children),
+        ];
+    }
+
+    /**
+     * Returns an analysis gap with a stable kind and fully qualified call path.
+     *
+     * @return array{kind: string, path: list<string>, message: string}
+     */
+    public function gap(CacheGap $gap): array
+    {
+        return [
+            'kind' => 'unverified-cache-propagation',
+            'path' => array_map(static fn (BoundaryDeclaration $boundary): string => $boundary->id(), $gap->path),
+            'message' => $gap->label(),
         ];
     }
 

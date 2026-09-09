@@ -276,7 +276,19 @@ final class AnalyzeCommandTest extends TestCase
         $baseline = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
         self::assertIsArray($baseline);
         self::assertIsArray($baseline['dependencies']);
-        self::assertSame([ViewerQuery::class.'::execute'], array_column($baseline['dependencies'], 'boundary'));
+        self::assertSame([ViewerQuery::class.'::execute', InventoryLookup::class.'::get'], array_column($baseline['dependencies'], 'boundary'));
+        self::assertIsArray($baseline['effective']);
+        self::assertIsArray($baseline['effective']['ttl']);
+        self::assertSame('unknown', $baseline['effective']['ttl']['state']);
+        self::assertSame(30, $baseline['effective']['ttl']['upperBound']);
+        self::assertFalse($baseline['effective']['storable']);
+        self::assertTrue($baseline['effective']['visibilityUnknown']);
+        self::assertTrue($baseline['effective']['tagsUnknown']);
+        self::assertSame([], $baseline['effective']['problems']);
+        self::assertIsArray($baseline['analysisGaps']);
+        self::assertIsArray($baseline['analysisGaps'][0]);
+        self::assertSame('unverified-cache-propagation', $baseline['analysisGaps'][0]['kind']);
+        self::assertSame([InspectionQuery::class.'::execute', InventoryLookup::class.'::get', ProductQuery::class.'::execute'], $baseline['analysisGaps'][0]['path']);
 
         $tester->execute([...$arguments, '--show-uncached' => true]);
         $tester->assertCommandIsSuccessful();
@@ -298,8 +310,26 @@ final class AnalyzeCommandTest extends TestCase
         $filtered = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
         self::assertIsArray($filtered);
         self::assertSame($expanded['effective'], $filtered['effective']);
+        self::assertSame($expanded['analysisGaps'], $filtered['analysisGaps']);
         self::assertIsArray($filtered['dependencies']);
         self::assertSame([InspectionQuery::class.'::offset'], array_column($filtered['dependencies'], 'boundary'));
+    }
+
+    #[DataProvider('providerFormatsAndFlags')]
+    public function testCacheGapsAreVisibleWithoutOrdinaryCallInspection(string $format, bool $showUncached): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $tester->execute([
+            'boundary' => 'InspectionQuery::execute',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture'],
+            '--format' => $format,
+            '--show-uncached' => $showUncached,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('cache propagation unanalyzed:', $tester->getDisplay());
+        self::assertStringContainsString('InventoryLookup::get', $tester->getDisplay());
+        self::assertStringContainsString('ProductQuery::execute', $tester->getDisplay());
     }
 
     #[DataProvider('providerFormatsAndFlags')]
@@ -352,8 +382,10 @@ final class AnalyzeCommandTest extends TestCase
         self::assertStringContainsString('ProductQuery::execute', $tester->getDisplay());
 
         $tester->execute([...$arguments, '--ignore' => ['*Lookup']]);
-        self::assertStringNotContainsString('InventoryLookup', $tester->getDisplay());
-        self::assertStringNotContainsString('ProductQuery', $tester->getDisplay());
+        self::assertStringNotContainsString('InventoryLookup::get (uncached)', $tester->getDisplay());
+        self::assertStringNotContainsString('ProductQuery::execute  ttl', $tester->getDisplay());
+        self::assertStringNotContainsString('ProductQuery::execute<br/>', $tester->getDisplay());
+        self::assertStringContainsString('cache propagation unanalyzed:', $tester->getDisplay());
         self::assertStringContainsString('InspectionQuery::offset (uncached)', $tester->getDisplay());
     }
 

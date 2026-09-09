@@ -267,7 +267,8 @@ final class TreeRendererTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $output = $tester->getDisplay();
-        self::assertStringContainsString("\033[37;1mInspectionQuery::execute\033[39;22m", $output);
+        self::assertStringContainsString("\033[90;1mInspectionQuery::execute\033[39;22m", $output);
+        self::assertStringContainsString("\033[31m! cache propagation unanalyzed:", $output);
         self::assertStringContainsString("\033[90;1mInventoryLookup::get\033[39;22m\033[90m (uncached)", $output);
         self::assertStringContainsString("\033[90;1mInspectionQuery::offset\033[39;22m\033[90m (uncached)", $output);
         self::assertStringContainsString("\033[37;1mProductQuery::execute\033[39;22m", $output);

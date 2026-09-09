@@ -33,7 +33,7 @@ final readonly class CacheTree
      * Returns a tree rooted at a boundary or an uncached method whose callees are composed.
      *
      * @param list<string> $visited Boundary identifiers already on the current path.
-     * @param bool $includeUncached Include ordinary calls for inspection without adding them to a cache boundary's constraints.
+     * @param bool $includeUncached Include ordinary calls beyond the paths needed to report cache propagation gaps.
      */
     public function build(BoundaryDeclaration $boundary, int $depth = 8, array $visited = [], bool $includeUncached = false): CacheNode
     {
@@ -68,9 +68,10 @@ final readonly class CacheTree
         $constraints = [];
         $notes = [];
         $seen = [];
+        $gaps = [];
 
         foreach ($boundary->dependencies as $dependency) {
-            $candidates = $this->catalog->candidates($dependency->class, $dependency->method, includeEntryPoints: $includeUncached || !$boundary->isCacheBoundary);
+            $candidates = $this->catalog->candidates($dependency->class, $dependency->method, includeEntryPoints: true);
 
             if (count($candidates) > 1) {
                 $notes[] = $dependency->class.'::'.$dependency->method.' resolves to '.count($candidates).' implementations';
@@ -79,17 +80,18 @@ final readonly class CacheTree
             foreach ($candidates as $candidate) {
                 $composed = $candidate->isCacheBoundary || (!$boundary->isCacheBoundary && $candidate->dependencies !== []);
 
-                if (!$includeUncached && !$composed) {
-                    continue;
-                }
-
                 if (isset($seen[$candidate->id()])) {
                     continue;
                 }
 
                 $seen[$candidate->id()] = true;
                 $child = $this->build($candidate, $depth - 1, $visited, $includeUncached);
-                $children[] = $child;
+                $paths = $boundary->isCacheBoundary && !$candidate->isCacheBoundary ? CacheGap::through($child, [$boundary]) : [];
+                $gaps = [...$gaps, ...$paths];
+
+                if ($includeUncached || $composed || $paths !== []) {
+                    $children[] = $child;
+                }
 
                 if ($composed) {
                     $constraints[] = $child;
@@ -99,9 +101,10 @@ final readonly class CacheTree
 
         return new CacheNode(
             $boundary,
-            $this->effects->calculate($boundary, $this->effects->constrain($constraints), $this->strategies->resolve($boundary)),
+            $this->effects->calculate($boundary, $this->effects->constrain($constraints, $gaps !== []), $this->strategies->resolve($boundary)),
             $children,
             $notes,
+            $gaps,
         );
     }
 }

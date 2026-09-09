@@ -96,7 +96,7 @@ final readonly class ProductFreshnessStrategy implements CacheStrategy
 }
 ```
 
-`Contract\Ttl` is not a range annotation but a promise: on the normal origin path the strategy meets one lifetime constraint into the produced metadata, that constraint lies within the declared bounds relative to the base time, and it never extends an expiration a dependency already imposed. `new ConstructorArg('minimum')` is an explicit reference to the constructor argument — the analyzer binds it to the value the construction code passes; it never guesses from the name. A missing bound is undetermined, not unlimited. Omitting `#[Ttl]` declares that a readable strategy adds no lifetime constraint on the normal origin path; an empty `#[Ttl]` means the same thing. The analyzer does not infer an undeclared TTL from the method body. A class or factory the analyzer cannot read remains unknown.
+`Contract\Ttl` is not a range annotation but a promise: on the normal origin path the strategy meets one lifetime constraint into the produced metadata, that constraint lies within the declared bounds relative to the base time, and it never extends an expiration a dependency already imposed. `new ConstructorArg('minimum')` is an explicit reference to the constructor argument — the analyzer binds it to the value the construction code passes; it never guesses from the name. A missing bound is undetermined, not unlimited. Omitting both `#[Ttl]` and `#[ExpiresAt]` declares that a readable strategy adds no expiration constraint on the normal origin path; an empty `#[Ttl]` means the same thing. The analyzer does not infer an undeclared TTL from the method body. A class or factory the analyzer cannot read remains unknown.
 
 The bundled strategies publish their contracts the same way: `KeySpreadExpirationStrategy` declares `min`/`max` from its constructor arguments, and `StaleIfErrorCacheStrategy` omits `#[Ttl]` because it adds no lifetime constraint on the normal path.
 
@@ -152,6 +152,49 @@ Composition takes the minimum for every pair of alternatives; it does not inters
 The contracts describe possible outcomes, not the predicates selecting them. The analyzer does not prove time-window conditions or correlations between strategies. If two strategies share the same condition, their possible combinations are conservatively analyzed independently. Runtime metadata still uses the same fixed meet law.
 
 The earlier positional range syntax changes meaning: `Ttl(30)` now means exactly 30 seconds, and `Ttl(30, 600)` means two alternatives. Use `Ttl(min: 30)` for a lower bound or `Ttl(min: 30, max: 600)` for a range. Replace `Ttl(oneOf: [...])` with positional alternatives and remove `Ttl(unconstrained: true)`. Apply the same migration after the strategy argument of `AssumeTtl`.
+
+## Daily Expiration Times and Distribution Windows
+
+Use `Contract\ExpiresAt` when the strategy selects a wall-clock expiration:
+
+```php
+use Magix\Cache\Strategy\Contract\ConstructorArg;
+use Magix\Cache\Strategy\Contract\ExpiresAt;
+
+// On fetch(): a daily expiration at noon UTC.
+#[ExpiresAt('12:00')]
+
+// On fetch(): distribute expiration times within this inclusive local window.
+#[ExpiresAt('12:00', until: '12:15', timezone: 'Asia/Tokyo')]
+
+// On fetch(): bind the actual construction values, including invocation arguments.
+#[ExpiresAt(
+    new ConstructorArg('at'),
+    until: new ConstructorArg('until'),
+    timezone: new ConstructorArg('timezone'),
+)]
+```
+
+`at` and `until` accept zero-padded `HH:MM` or `HH:MM:SS` local times. Omit `until`, or bind it to `null`, for a single time. An end before the start crosses midnight: `23:55`–`00:15` ends on the following local date and renders with `(+1 day)`. Equal endpoints describe a single instant, not a full-day window. `timezone` is an IANA identifier and defaults to `UTC`, independently of the process timezone. Each field can reference a declared constructor parameter with `ConstructorArg`; `Arg` belongs to factory assumptions and cannot bind here.
+
+This is an analysis contract for an existing `fetch()` implementation. It promises that every successful normal origin path adds a finite expiration at a future occurrence of the local time or within the declared window. It does not schedule eviction or implement a timer. The strategy selects the occurrence and the point within the window (for example, by a stable cache-key hash), defines rollover and daylight-saving behavior for missing/repeated local times, and meets the absolute expiration into `OriginResult` metadata. Evaluate that choice against `OriginResult::baseTime` in `fetch()`, since `create()` definitions with static arguments are memoized. Fresh hits keep their existing expiration; stale answers keep their expired metadata.
+
+The CLI shows the candidate times separately from durations:
+
+```text
+  strategy     DailyExpirationStrategy::create(at: '12:00', until: '12:15', timezone: 'Asia/Tokyo')
+               - DailyExpirationStrategy  expires daily 12:00-12:15 Asia/Tokyo
+  strategy ttl unknown (duration depends on the origin time and daily expiration)
+  strategy at  daily 12:00-12:15 Asia/Tokyo
+  ttl          unknown (duration depends on the origin time and daily expiration)
+  expires by   daily 12:00-12:15 Asia/Tokyo
+```
+
+`strategy at` describes the candidate selected by the strategy. `expires by` carries the time constraints through dependencies and parent policies; the result can expire sooner because of TTLs, dynamic constraints, or other dependencies. A fixed parent TTL of 60 seconds therefore remains `≤60s`, while retaining the time window. `Ttl::Auto` and automatic parents retain proof of a finite expiration without guessing a number of seconds. No current-time calculation, 24-hour upper bound, distribution algorithm, or correlation between different strategies is inferred.
+
+You may declare both `#[Ttl(...)]` and `#[ExpiresAt(...)]` on a `fetch()` that adds both constraints; the analyzer meets them. Nested compositions retain every candidate time/window, including different timezones, and describe their earliest selected expiration without intersecting the windows or sorting local clock faces. Supplied invocation values stay unknown even when their boundary parameter has a default. Invalid times, timezones, argument shapes, and missing constructor references appear in `analyze` problems.
+
+Tree and Mermaid output include the time constraints. JSON adds `strategy.expirations`, per-step `expirations`, and `effective.expirationConstraints` for timed boundaries. Each item preserves `at`, `until`, `timezone`, `window`, `crossesMidnight`, and `recurrence: "daily"`; unresolved clock fields are `null`. The `window` flag records a declared end that may still be unresolved. These are simultaneous candidate constraints, not a prediction that storage will remain fresh until the displayed time. Existing TTL JSON fields retain their duration semantics.
 
 ## Strategies and the Fixed Stages
 

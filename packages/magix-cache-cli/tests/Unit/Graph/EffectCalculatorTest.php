@@ -37,6 +37,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(StrategyEffect::class)]
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(Visibility::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\ExpirationEstimate::class)]
 final class EffectCalculatorTest extends TestCase
 {
     public function testComposePreservesUnknownConstraintsWithoutRequiringAPolicy(): void
@@ -93,6 +94,24 @@ final class EffectCalculatorTest extends TestCase
         self::assertSame(Visibility::Private, $constraint->visibility);
         self::assertSame('ViewerQuery::execute', $constraint->visibilitySource);
         self::assertSame(['inventory', 'viewer'], $constraint->tags);
+    }
+
+    public function testConstrainKeepsDailyExpirationsWhenOtherPathsHaveGaps(): void
+    {
+        $expiration = new \Magix\Cache\Cli\Graph\ExpirationEstimate('12:00', '12:15', 'Asia/Tokyo', true);
+        $child = new CacheNode(
+            new BoundaryDeclaration('App\NoonQuery', 'window', 'noon.php', 1),
+            new CacheEffect(TtlEstimate::unknown(finite: true), expirationConstraints: [$expiration]),
+        );
+
+        $constraint = (new EffectCalculator())->constrain([$child], hasGaps: true);
+
+        self::assertSame([$expiration], $constraint->expirationConstraints);
+        self::assertSame(TtlEstimateState::Unknown, $constraint->ttl->state);
+        self::assertTrue($constraint->ttl->hasFiniteExpiration());
+        self::assertSame('cache propagation through uncached methods is unanalyzed', $constraint->ttl->reason);
+        self::assertTrue($constraint->visibilityUnknown);
+        self::assertTrue($constraint->tagsUnknown);
     }
 
     public function testConstrainStaysUnconstrainedWithoutConstrainedChildren(): void
@@ -513,5 +532,17 @@ final class EffectCalculatorTest extends TestCase
         self::assertSame([
             'Ttl::Auto has no dependency with a finite expiration, so applying the policy throws a LogicException',
         ], $node->effect->problems);
+    }
+
+    public function testMissingPolicyKeepsDailyDependencyConstraintsWithTheError(): void
+    {
+        $expiration = new \Magix\Cache\Cli\Graph\ExpirationEstimate('12:00', '12:15', 'Asia/Tokyo', true);
+        $constraint = new DependencyConstraint(expirationConstraints: [$expiration]);
+        $effect = (new EffectCalculator())->missingPolicy($constraint, null, Visibility::Shared, null);
+
+        self::assertSame(TtlEstimateState::Invalid, $effect->ttl->state);
+        self::assertFalse($effect->storable);
+        self::assertSame([$expiration], $effect->expirationConstraints);
+        self::assertSame(['no #[Cache] attribute on the method or its concrete class, so cached() throws a LogicException'], $effect->problems);
     }
 }

@@ -9,6 +9,7 @@ use function count;
 use function in_array;
 use function is_string;
 
+use Magix\Cache\Cli\Declaration\ExpirationContract;
 use Magix\Cache\Cli\Declaration\StrategyArgument;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\StrategyInstantiation;
@@ -19,6 +20,7 @@ use Magix\Cache\Cli\Declaration\Unresolved;
 use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CompositeCacheStrategy;
 use Magix\Cache\Strategy\Contract\AssumeTtl;
+use Magix\Cache\Strategy\Contract\ExpiresAt;
 use Magix\Cache\Strategy\Contract\Ttl as TtlAttribute;
 use Magix\Cache\Strategy\StrategyDefinition;
 use PhpParser\Node\Arg;
@@ -81,6 +83,7 @@ final readonly class StrategyReader
             hasCreate: $hasCreate,
             composed: $composed,
             ttl: $this->contract($node->getMethod('fetch')),
+            expiration: $this->expiration($node->getMethod('fetch')),
             assumptions: $hasCreate ? $this->assumptions($create) : [],
             notes: $notes,
             constructible: $leaf && !$node->isAbstract(),
@@ -129,6 +132,35 @@ final readonly class StrategyReader
         $attribute = $this->attributes->find($method->attrGroups, TtlAttribute::class);
 
         return $attribute === null ? null : $this->contracts->ttl($attribute);
+    }
+
+    /**
+     * Returns the daily expiration contract declared on the origin operation.
+     */
+    public function expiration(?ClassMethod $method): ?ExpirationContract
+    {
+        $attributes = [];
+
+        foreach ($method->attrGroups ?? [] as $group) {
+            foreach ($group->attrs as $attribute) {
+                if ($attribute->name->toString() === ExpiresAt::class) {
+                    $attributes[] = $attribute;
+                }
+            }
+        }
+
+        if ($attributes === []) {
+            return null;
+        }
+
+        $contract = (new ExpirationReader())->read($attributes[0]);
+
+        return count($attributes) === 1 ? $contract : new ExpirationContract(
+            $contract->at,
+            $contract->until,
+            $contract->timezone,
+            [...$contract->problems, '#[ExpiresAt] cannot be repeated'],
+        );
     }
 
     /**

@@ -25,6 +25,10 @@ use Tests\Package\Cli\Fixture\Project\ViewerQuery;
 #[UsesClass(\Magix\Cache\Runtime\CacheKeyArgumentBinder::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesNamespace('Magix\Cache\Runtime\Parameter')]
+#[UsesClass(\Magix\Cache\Strategy\Contract\ExpiresAt::class)]
+#[UsesClass(\Magix\Cache\Strategy\Contract\ConstructorArg::class)]
+#[UsesClass(\Magix\Cache\Strategy\Contract\Ttl::class)]
+#[UsesClass(\Magix\Cache\Strategy\Contract\TtlRange::class)]
 final class AnalyzeCommandTest extends TestCase
 {
     public function testAnalyzeShowsBubbledMetadataWithoutAutomaticTtlDeclarations(): void
@@ -265,6 +269,7 @@ final class AnalyzeCommandTest extends TestCase
         self::assertStringContainsString('No cache boundaries were found', $command->suggestions([]));
         self::assertStringContainsString('and 2 more', $command->suggestions($many));
     }
+
     /**
      * @throws JsonException
      */
@@ -424,5 +429,102 @@ final class AnalyzeCommandTest extends TestCase
     {
         yield 'tree' => ['tree'];
         yield 'mermaid' => ['mermaid'];
+    }
+
+    #[DataProvider('providerExpirationBoundaries')]
+    public function testAnalyzeRendersDailyTimesSeparatelyFromTtl(string $boundary, string $time): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => $boundary, '--path' => ['packages/magix-cache-cli/tests/Fixture/Expiration']];
+        $tester->execute($arguments);
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('strategy at  '.$time, $tester->getDisplay());
+        self::assertStringContainsString('expires by '.$time, $tester->getDisplay());
+        self::assertStringContainsString('ttl          unknown', $tester->getDisplay());
+        self::assertStringNotContainsString('86400s', $tester->getDisplay());
+        self::assertStringNotContainsString('requires a finite upstream expiration', $tester->getDisplay());
+
+        $tester->execute([...$arguments, '--format' => 'mermaid']);
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('expires by '.$time, $tester->getDisplay());
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function providerExpirationBoundaries(): iterable
+    {
+        yield 'point' => ['NoonQuery::single', 'daily 12:00 UTC'];
+        yield 'window' => ['NoonQuery::window', 'daily 12:00-12:15 Asia/Tokyo'];
+        yield 'overnight' => ['NoonQuery::overnight', 'daily 23:55:30-00:10:15 (+1 day) UTC'];
+        yield 'runtime binding' => ['NoonQuery::dynamic', 'daily ?-12:15 Asia/Tokyo'];
+    }
+
+    /**
+     * @throws JsonException
+     */
+    #[DataProvider('providerExpirationPolicies')]
+    public function testAnalyzePropagatesDailyWindowsThroughPoliciesAndUncachedEntryPoints(string $method, ?int $upperBound): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+
+        $arguments = ['boundary' => 'NoonPage::'.$method, '--path' => ['packages/magix-cache-cli/tests/Fixture/Expiration']];
+        $tester->execute([...$arguments, '--format' => 'json']);
+        $tester->assertCommandIsSuccessful();
+        $data = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
+        self::assertIsArray($data['effective']);
+        self::assertIsArray($data['effective']['ttl']);
+        self::assertSame('unknown', $data['effective']['ttl']['state']);
+        self::assertNull($data['effective']['ttl']['seconds']);
+        self::assertSame($upperBound, $data['effective']['ttl']['upperBound']);
+        self::assertTrue($data['effective']['ttl']['finite']);
+        self::assertSame([], $data['effective']['problems']);
+        self::assertSame([[
+            'at' => '12:00', 'until' => '12:15', 'timezone' => 'Asia/Tokyo',
+            'window' => true, 'crossesMidnight' => false, 'recurrence' => 'daily',
+        ]], $data['effective']['expirationConstraints']);
+
+        $tester->execute($arguments);
+        self::assertStringContainsString('expires by   daily 12:00-12:15 Asia/Tokyo', $tester->getDisplay());
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testAnalyzePreservesNestedCandidatesAndFiniteProofAcrossDifferentTimezones(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => 'NoonQuery::composed', '--path' => ['packages/magix-cache-cli/tests/Fixture/Expiration']];
+        $tester->execute([...$arguments, '--format' => 'json']);
+        $tester->assertCommandIsSuccessful();
+        $data = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
+        self::assertIsArray($data['strategy']);
+        self::assertIsArray($data['strategy']['expirations']);
+        self::assertCount(2, $data['strategy']['expirations']);
+        self::assertIsArray($data['strategy']['steps']);
+        self::assertIsArray($data['strategy']['steps'][0]);
+        self::assertArrayHasKey('expirations', $data['strategy']['steps'][0]);
+        self::assertIsArray($data['effective']);
+        self::assertIsArray($data['effective']['ttl']);
+        self::assertSame(60, $data['effective']['ttl']['upperBound']);
+        self::assertNull($data['effective']['ttl']['lowerBound']);
+        self::assertTrue($data['effective']['ttl']['finite']);
+        self::assertSame([], $data['effective']['problems']);
+
+        $tester->execute([...$arguments, '--format' => 'mermaid']);
+        self::assertStringContainsString('earliest of (daily 12:00-12:15 Asia/Tokyo; daily 09:00 America/New_York)', $tester->getDisplay());
+    }
+
+    /**
+     * @return iterable<string, array{string, int|null}>
+     */
+    public static function providerExpirationPolicies(): iterable
+    {
+        yield 'auto' => ['automatic', null];
+        yield 'fixed' => ['fixed', 60];
+        yield 'bounded' => ['bounded', 30];
+        yield 'uncached entry' => ['show', 30];
     }
 }

@@ -18,11 +18,13 @@ final readonly class StrategyStep
      * @param string $strategy Class name of the composed strategy.
      * @param TtlEstimate $ttl Candidate constraint this step contributes.
      * @param bool $assumed True when an explicit assumption replaced the contract.
+     * @param list<ExpirationEstimate> $expirations Candidate daily expiration constraints.
      */
     public function __construct(
         public string $strategy,
         public TtlEstimate $ttl,
         public bool $assumed = false,
+        public array $expirations = [],
     ) {
     }
 

@@ -46,11 +46,13 @@ final readonly class EffectCalculator
         $visibility = Visibility::Shared;
         $visibilitySource = null;
         $tags = [];
+        $expirations = [];
         $visibilityUnknown = $hasGaps;
         $tagsUnknown = $hasGaps;
 
         foreach ($children as $child) {
             $effect = $child->effect;
+            $expirations = [...$expirations, ...$effect->expirationConstraints];
             $visibilityUnknown = $visibilityUnknown || $effect->visibilityUnknown;
             $tagsUnknown = $tagsUnknown || $effect->tagsUnknown;
             $tags = array_merge($tags, $effect->tags);
@@ -68,7 +70,7 @@ final readonly class EffectCalculator
             }
         }
 
-        return new DependencyConstraint($ttl, $ttlSource, $visibility, $visibilitySource, $this->tags($tags), $visibilityUnknown, $tagsUnknown, $children !== []);
+        return new DependencyConstraint($ttl, $ttlSource, $visibility, $visibilitySource, $this->tags($tags), $visibilityUnknown, $tagsUnknown, $children !== [], $expirations);
     }
 
     /**
@@ -96,16 +98,7 @@ final readonly class EffectCalculator
         $policy = $boundary->policy;
 
         if ($policy === null) {
-            $problem = 'no #[Cache] attribute on the method or its concrete class, so cached() throws a LogicException';
-
-            return new CacheEffect(
-                ttl: TtlEstimate::invalid($problem),
-                visibility: $visibility,
-                tags: $constraint->tags,
-                visibilityReason: $reason,
-                problems: $this->problems([$problem], $strategy),
-                strategy: $strategy,
-            );
+            return $this->missingPolicy($constraint, $strategy, $visibility, $reason);
         }
 
         if ($policy->visibility->meet($visibility) !== $visibility) {
@@ -127,6 +120,7 @@ final readonly class EffectCalculator
             visibilityReason: $reason,
             problems: $problems,
             strategy: $strategy,
+            expirationConstraints: [...$constraint->expirationConstraints, ...($strategy->expirations ?? [])],
         );
 
         return (new ParameterEffects())->apply($boundary, $constraint, $effect);
@@ -145,6 +139,7 @@ final readonly class EffectCalculator
             problems: $constraint->ttl->state === TtlEstimateState::Invalid && $constraint->ttl->reason !== null ? [$constraint->ttl->reason] : [],
             visibilityUnknown: $constraint->visibilityUnknown,
             tagsUnknown: $constraint->tagsUnknown,
+            expirationConstraints: $constraint->expirationConstraints,
         );
     }
 
@@ -312,5 +307,23 @@ final readonly class EffectCalculator
     public function problems(array $problems, ?StrategyEffect $strategy): array
     {
         return array_values(array_unique([...$problems, ...($strategy->problems ?? [])]));
+    }
+
+    /**
+     * Reports a missing policy while retaining all discovered constraints.
+     */
+    public function missingPolicy(DependencyConstraint $constraint, ?StrategyEffect $strategy, Visibility $visibility, ?string $reason): CacheEffect
+    {
+        $problem = 'no #[Cache] attribute on the method or its concrete class, so cached() throws a LogicException';
+
+        return new CacheEffect(
+            ttl: TtlEstimate::invalid($problem),
+            visibility: $visibility,
+            tags: $constraint->tags,
+            visibilityReason: $reason,
+            problems: $this->problems([$problem], $strategy),
+            strategy: $strategy,
+            expirationConstraints: [...$constraint->expirationConstraints, ...($strategy->expirations ?? [])],
+        );
     }
 }

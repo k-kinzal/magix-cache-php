@@ -24,6 +24,7 @@ final readonly class StrategyEffect
      * @param list<StrategyStep> $steps Contributions in composition order.
      * @param bool|null $addsConstraint Whether a finite constraint is definitely added; null when undeclared parts leave it open.
      * @param list<string> $problems Declarations that cannot work as written.
+     * @param list<ExpirationEstimate> $expirations Candidate daily expiration constraints.
      */
     public function __construct(
         public string $label,
@@ -31,6 +32,7 @@ final readonly class StrategyEffect
         public array $steps = [],
         public ?bool $addsConstraint = null,
         public array $problems = [],
+        public array $expirations = [],
     ) {
     }
 }

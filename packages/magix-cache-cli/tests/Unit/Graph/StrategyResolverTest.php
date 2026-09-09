@@ -54,6 +54,10 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TtlContract::class)]
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(UseStrategyDeclaration::class)]
+#[UsesClass(\Magix\Cache\Cli\Declaration\ExpirationContract::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\ExpirationBinding::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\ExpirationEstimate::class)]
+#[UsesClass(\Magix\Cache\Strategy\Contract\ExpiresAt::class)]
 final class StrategyResolverTest extends TestCase
 {
     public function testAssumedPreservesAlternativeFactoryBindings(): void
@@ -511,5 +515,37 @@ final class StrategyResolverTest extends TestCase
         self::assertNull($effect->ttl->lowerBound, 'the factory default is not the invocation value');
         self::assertSame(60, $effect->ttl->upperBound);
         self::assertSame([], $effect->problems);
+    }
+
+    public function testContractedMeetsClockAndTtlContractsAndReportsInvalidClocks(): void
+    {
+        $resolver = new StrategyResolver(new Catalog([]));
+        $child = new StrategyDeclaration('App\Daily', ttl: new TtlContract(oneOf: [new TtlContract(30, 30), new TtlContract(600, 900)]), expiration: new \Magix\Cache\Cli\Declaration\ExpirationContract('12:00', '12:15', 'Asia/Tokyo'));
+        [$step, $problems, $adds] = $resolver->contracted($child, new StrategyInstantiation('App\Daily'), []);
+
+        self::assertSame('≤900s', $step->ttl->label(), 'an absolute expiration may shorten either duration alternative');
+        self::assertTrue($step->ttl->hasFiniteExpiration());
+        self::assertTrue($adds);
+        self::assertSame([], $problems);
+        self::assertSame('daily 12:00-12:15 Asia/Tokyo', $step->expirations[0]->label());
+
+        $invalid = new StrategyDeclaration('App\Invalid', expiration: new \Magix\Cache\Cli\Declaration\ExpirationContract('24:00'));
+        [$invalidStep, $invalidProblems] = $resolver->contracted($invalid, new StrategyInstantiation('App\Invalid'), []);
+        self::assertSame(TtlEstimateState::Invalid, $invalidStep->ttl->state);
+        self::assertSame(['#[ExpiresAt] on Invalid::fetch(): at must be a valid HH:MM or HH:MM:SS time'], $invalidProblems);
+    }
+
+    public function testStepPreservesAnExpirationContractDespiteAnAssumeTtlForUnannotatedChildren(): void
+    {
+        $child = new ClassDeclaration('App\Daily', strategy: new StrategyDeclaration('App\Daily', expiration: new \Magix\Cache\Cli\Declaration\ExpirationContract('12:00')));
+        $resolver = new StrategyResolver(new Catalog([$child]));
+        $parent = new StrategyDeclaration('App\Parent', assumptions: [new TtlAssumption('App\Daily', min: 60, max: 60)]);
+        [$step, $problems, $adds] = $resolver->step($parent, new StrategyInstantiation('App\Daily'), []);
+
+        self::assertFalse($step->assumed);
+        self::assertSame(TtlEstimateState::Unknown, $step->ttl->state);
+        self::assertTrue($adds);
+        self::assertSame([], $problems);
+        self::assertSame('daily 12:00 UTC', $step->expirations[0]->label());
     }
 }

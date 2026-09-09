@@ -11,6 +11,7 @@ use function implode;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
+use Magix\Cache\Cli\Graph\ExpirationEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
 use Magix\Cache\Runtime\Policy\Ttl;
@@ -32,6 +33,7 @@ final readonly class TreeRenderer
             '',
             ...$this->strategy($effect),
             '  ttl          '.$this->ttl($effect),
+            ...($effect->expirationConstraints === [] ? [] : ['  expires by   '.ExpirationEstimate::describe($effect->expirationConstraints)]),
             '  visibility   '.$this->restricted($effect->visibilityLabel(), $effect, 'visibility')
                 .($effect->visibilityReason === null ? '' : ' ('.$effect->visibilityReason.')'),
             '  storable     '.($effect->storable ? 'yes' : 'no'),
@@ -64,10 +66,15 @@ final readonly class TreeRenderer
 
         foreach ($strategy->steps as $step) {
             $assumed = $step->assumed ? ' (assumed)' : '';
-            $lines[] = '               - '.$step->shortName().'  '.$this->labelled($step->ttl).$assumed;
+            $candidate = $step->expirations === [] ? $this->labelled($step->ttl) : 'expires '.ExpirationEstimate::describe($step->expirations);
+            $lines[] = '               - '.$step->shortName().'  '.$candidate.$assumed;
         }
 
         $lines[] = '  strategy ttl '.$this->labelled($strategy->ttl);
+
+        if ($strategy->expirations !== []) {
+            $lines[] = '  strategy at  '.ExpirationEstimate::describe($strategy->expirations);
+        }
 
         return $lines;
     }
@@ -130,6 +137,10 @@ final readonly class TreeRenderer
             $ttl,
             $this->restricted($effect->visibilityLabel(), $effect, 'visibility'),
         ];
+
+        if ($effect->expirationConstraints !== []) {
+            $parts[] = 'expires by '.ExpirationEstimate::describe($effect->expirationConstraints);
+        }
 
         if ($effect->tags !== [] || $effect->tagsUnknown) {
             $parts[] = 'tags '.$effect->tagsLabel(',');

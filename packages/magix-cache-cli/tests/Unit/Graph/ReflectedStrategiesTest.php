@@ -30,6 +30,7 @@ use Tests\Fixture\ProductCacheStrategy;
 #[UsesClass(Ttl::class)]
 #[UsesClass(TtlContract::class)]
 #[UsesClass(\Magix\Cache\Strategy\Contract\TtlRange::class)]
+#[UsesClass(\Magix\Cache\Cli\Declaration\ExpirationContract::class)]
 final class ReflectedStrategiesTest extends TestCase
 {
     public function testAlternativesReadsRangesWithoutExecutingTheStrategy(): void
@@ -147,5 +148,22 @@ final class ReflectedStrategiesTest extends TestCase
 
         self::assertNotNull($declaration);
         self::assertNull($declaration->definitionProblem);
+    }
+
+    public function testExpirationReadsExternalClockContractsAndConstructorBindings(): void
+    {
+        $reader = new ReflectedStrategies();
+        $class = \Tests\Package\Cli\Fixture\Expiration\DailyExpirationStrategy::class;
+        $declaration = $reader->read($class);
+
+        self::assertNotNull($declaration);
+        $contract = $declaration->expiration;
+        self::assertNotNull($contract);
+        self::assertEquals(new ContractReference(ContractSource::Constructor, 'at'), $contract->at);
+        self::assertEquals(new ContractReference(ContractSource::Constructor, 'until'), $contract->until);
+        self::assertEquals(new ContractReference(ContractSource::Constructor, 'timezone'), $contract->timezone);
+        self::assertSame('at', $declaration->parameters[0]->name);
+        self::assertNull($declaration->composed, 'reflection does not execute an external factory');
+        self::assertNull($reader->read(stdClass::class));
     }
 }

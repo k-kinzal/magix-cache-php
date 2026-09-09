@@ -67,7 +67,7 @@ final readonly class ContractBinding
         foreach ($arguments as $argument) {
             $value = $argument->variable === null
                 ? $argument->value
-                : ($environment[$argument->variable] ?? Unresolved::Value);
+                : (array_key_exists($argument->variable, $environment) ? $environment[$argument->variable] : Unresolved::Value);
 
             if ($argument->name === null) {
                 $values[] = $value;

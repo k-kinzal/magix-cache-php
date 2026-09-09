@@ -87,6 +87,7 @@ final readonly class JsonRenderer
                 'problems' => $effect->problems,
             ],
             'notes' => $node->notes,
+            ...($node->metadataVariants === null ? [] : ['metadataAlternatives' => array_map((new AlternativePresentation())->data(...), $node->metadataVariants)]),
             'analysisWarnings' => $node->analysisWarnings,
             'analysisGaps' => array_map($this->gap(...), $node->gaps),
             'dependencies' => array_map(fn (CacheNode $child): array => $this->tree($child, false), $node->children),

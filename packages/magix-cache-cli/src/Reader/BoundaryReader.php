@@ -95,6 +95,7 @@ final readonly class BoundaryReader
                 static fn (Node $node): bool => $node instanceof Name && $node->toString() === CacheMetadata::class,
             ) !== null,
             useStrategy: $this->useStrategy($method, $classUseStrategy),
+            metadataFlow: (new MetadataFlowReader())->read($method, $class, $propertyTypes),
         );
     }
 
@@ -122,6 +123,7 @@ final readonly class BoundaryReader
             line: $method->getStartLine(),
             dependencies: $dependencies,
             isCacheBoundary: false,
+            metadataFlow: (new MetadataFlowReader())->read($method, $class, $propertyTypes),
         );
     }
 

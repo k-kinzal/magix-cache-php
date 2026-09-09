@@ -47,6 +47,11 @@ final readonly class MermaidRenderer
         }
 
         $presentation = new NodePresentation();
+        $alternatives = (new AlternativePresentation())->label($node);
+
+        if ($alternatives !== null) {
+            $label .= '<br/>alternatives: '.$alternatives;
+        }
 
         foreach ($presentation->warnings($node) as $warning) {
             $label .= '<br/>~ '.str_replace(' -> ', ' → ', $warning);

@@ -573,4 +573,17 @@ final class EffectCalculatorTest extends TestCase
         self::assertFalse($effect->tagsUnknown);
         self::assertTrue($effect->storable);
     }
+    public function testApplyAlternativesOverridesEveryCandidateWithoutCollapsingItsSelection(): void
+    {
+        $node = \Tests\Package\Cli\Fixture\AnalysisSource::node('return $flag ? $this->inputs->a() : $this->inputs->b();', '#[Cache(ttl: 120, tags: [], visibility: Visibility::Shared)]');
+        self::assertSame(120, $node->effect->ttl->seconds);
+        self::assertSame([], $node->effect->tags);
+        self::assertFalse($node->effect->tagsUnknown);
+        self::assertFalse($node->effect->visibilityUnknown);
+        self::assertNotNull($node->metadataVariants);
+        self::assertCount(2, $node->metadataVariants);
+        self::assertSame([['Inputs::a'], ['Inputs::b']], array_map(static fn (\Magix\Cache\Cli\Graph\CacheVariant $v): array => $v->sources, $node->metadataVariants));
+    }
+
+
 }

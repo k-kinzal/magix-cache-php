@@ -46,6 +46,10 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Reader\StrategyReader::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\UseStrategyReader::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\ParameterConfigurationReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Declaration\MetadataFlow::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionFlowReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\MetadataFlowReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\StatementFlowReader::class)]
 final class ClassVisitorTest extends TestCase
 {
     public function testEnterNodeCollectsBoundariesWithTheClassPolicy(): void

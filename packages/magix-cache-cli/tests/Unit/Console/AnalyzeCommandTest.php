@@ -122,7 +122,7 @@ final class AnalyzeCommandTest extends TestCase
         self::assertStringContainsString('style n0_0_0 fill:#ffffff', $tester->getDisplay());
     }
 
-    public function testAnalyzeComposesQueriesInjectedIntoActionParameters(): void
+    public function testAnalyzeShowsDetachedQueriesInjectedIntoActionParameters(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
 
@@ -132,12 +132,12 @@ final class AnalyzeCommandTest extends TestCase
         ]);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringContainsString('ttl          20s', $tester->getDisplay());
-        self::assertStringContainsString('tags         inventory, product', $tester->getDisplay());
+        self::assertStringContainsString('ttl          unconstrained', $tester->getDisplay());
+        self::assertStringContainsString('tags         -', $tester->getDisplay());
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
     }
 
-    public function testAnalyzeComposesAnUncachedControllerAction(): void
+    public function testAnalyzeKeepsAnUncachedControllerActionDetached(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
 
@@ -149,9 +149,9 @@ final class AnalyzeCommandTest extends TestCase
         $tester->assertCommandIsSuccessful();
         $output = $tester->getDisplay();
         self::assertStringContainsString('ProductController::show (uncached entry point)', $output);
-        self::assertStringContainsString('ttl          20s', $output);
-        self::assertStringContainsString('private (restricted by ViewerQuery::execute)', $output);
-        self::assertStringContainsString('tags         inventory, product, viewer', $output);
+        self::assertStringContainsString('ttl          unconstrained', $output);
+        self::assertStringContainsString('visibility   shared', $output);
+        self::assertStringContainsString('tags         -', $output);
         self::assertStringContainsString('key          none (uncached entry point)', $output);
         self::assertStringContainsString('policy       none (uncached entry point)', $output);
         self::assertStringContainsString('storable     no', $output);
@@ -185,12 +185,12 @@ final class AnalyzeCommandTest extends TestCase
         self::assertNull($data['policy']);
         self::assertNull($data['key']);
         self::assertIsArray($data['effective']);
-        self::assertSame('private', $data['effective']['visibility']);
+        self::assertSame('shared', $data['effective']['visibility']);
         self::assertFalse($data['effective']['storable']);
         self::assertSame([], $data['effective']['problems']);
         self::assertIsArray($data['dependencies']);
         self::assertCount(3, $data['dependencies']);
-        self::assertStringContainsString('ProductController::show (uncached entry point)<br/>20s - private', $mermaid->getDisplay());
+        self::assertStringContainsString('ProductController::show (uncached entry point)<br/>unconstrained - shared', $mermaid->getDisplay());
     }
 
     public function testAnalyzeFollowsAnUncachedMethodCallingAnotherUncachedMethod(): void
@@ -203,7 +203,7 @@ final class AnalyzeCommandTest extends TestCase
         ]);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringContainsString('ttl          20s', $tester->getDisplay());
+        self::assertStringContainsString('ttl          unconstrained', $tester->getDisplay());
         self::assertStringNotContainsString('ProductController::show (uncached)', $tester->getDisplay());
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
     }
@@ -287,14 +287,11 @@ final class AnalyzeCommandTest extends TestCase
         self::assertIsArray($baseline['effective']['ttl']);
         self::assertSame('known', $baseline['effective']['ttl']['state']);
         self::assertSame(120, $baseline['effective']['ttl']['seconds']);
-        self::assertFalse($baseline['effective']['storable']);
-        self::assertTrue($baseline['effective']['visibilityUnknown']);
-        self::assertTrue($baseline['effective']['tagsUnknown']);
+        self::assertTrue($baseline['effective']['storable']);
+        self::assertFalse($baseline['effective']['visibilityUnknown']);
+        self::assertFalse($baseline['effective']['tagsUnknown']);
         self::assertSame([], $baseline['effective']['problems']);
-        self::assertIsArray($baseline['analysisGaps']);
-        self::assertIsArray($baseline['analysisGaps'][0]);
-        self::assertSame('unverified-cache-propagation', $baseline['analysisGaps'][0]['kind']);
-        self::assertSame([InspectionQuery::class.'::execute', InventoryLookup::class.'::get', ProductQuery::class.'::execute'], $baseline['analysisGaps'][0]['path']);
+        self::assertSame([], $baseline['analysisGaps']);
 
         $tester->execute([...$arguments, '--uncached' => 'all']);
         $tester->assertCommandIsSuccessful();
@@ -322,7 +319,7 @@ final class AnalyzeCommandTest extends TestCase
     }
 
     #[DataProvider('providerFormatsAndUncachedModes')]
-    public function testCacheGapsRemainVisibleInEveryUncachedMode(string $format, string $uncached): void
+    public function testAnalyzedExtractionsStayFreeOfGapsInEveryUncachedMode(string $format, string $uncached): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $tester->execute([
@@ -333,8 +330,7 @@ final class AnalyzeCommandTest extends TestCase
         ]);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringContainsString('cache propagation unanalyzed:', $tester->getDisplay());
-        self::assertStringContainsString('InventoryLookup::get', $tester->getDisplay());
+        self::assertStringNotContainsString('cache propagation unanalyzed:', $tester->getDisplay());
         self::assertStringContainsString('ProductQuery::execute', $tester->getDisplay());
     }
 
@@ -391,7 +387,7 @@ final class AnalyzeCommandTest extends TestCase
         self::assertStringNotContainsString('InventoryLookup::get (uncached)', $tester->getDisplay());
         self::assertStringNotContainsString('ProductQuery::execute  ttl', $tester->getDisplay());
         self::assertStringNotContainsString('ProductQuery::execute<br/>', $tester->getDisplay());
-        self::assertStringContainsString('cache propagation unanalyzed:', $tester->getDisplay());
+        self::assertStringNotContainsString('cache propagation unanalyzed:', $tester->getDisplay());
         self::assertStringContainsString('InspectionQuery::offset (uncached)', $tester->getDisplay());
     }
 
@@ -630,7 +626,7 @@ final class AnalyzeCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $output = $tester->getDisplay();
-        self::assertStringContainsString('cache propagation unanalyzed:', $output);
+        self::assertStringNotContainsString('cache propagation unanalyzed:', $output);
         self::assertStringContainsString($format === 'tree' ? 'ProductQuery::execute  ttl 20s' : 'ProductQuery::execute<br/>20s', $output);
 
         preg_match_all('/([A-Za-z]+::[A-Za-z]+) \(uncached\)/', $output, $matches);

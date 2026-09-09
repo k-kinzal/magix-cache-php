@@ -23,6 +23,7 @@ final readonly class CacheNode
      * @param list<string> $notes Observations about how the tree was resolved.
      * @param list<CacheGap> $gaps Cache paths whose metadata propagation is not verified.
      * @param list<string>|null $analysisWarnings Null collects warnings from the original subtree; filters pass the existing collection.
+     * @param list<CacheVariant>|null $metadataVariants Possible returned metadata, kept separate across exclusive paths.
      */
     public function __construct(
         public BoundaryDeclaration $boundary,
@@ -31,6 +32,7 @@ final readonly class CacheNode
         public array $notes = [],
         public array $gaps = [],
         ?array $analysisWarnings = null,
+        public ?array $metadataVariants = null,
     ) {
         $this->analysisWarnings = $analysisWarnings ?? array_values(array_unique([
             ...array_map(static fn (string $note): string => $boundary->shortId().': '.$note, $notes),

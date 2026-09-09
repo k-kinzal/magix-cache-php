@@ -65,7 +65,7 @@
 <span class="src-line" id="L29"><a class="ln" href="#L29">29</a><span class="tok-com">     * @param list&lt;TtlAssumption&gt; $assumptions Explicit assumptions declared on create().</span></span>
 <span class="src-line" id="L30"><a class="ln" href="#L30">30</a><span class="tok-com">     * @param list&lt;string&gt; $notes Why parts of the declaration could not be read.</span></span>
 <span class="src-line" id="L31"><a class="ln" href="#L31">31</a><span class="tok-com">     * @param bool $constructible Whether this class can be a constructed CacheStrategy leaf.</span></span>
-<span class="src-line" id="L32"><a class="ln" href="#L32">32</a><span class="tok-com">     * @param ExpirationContract|null $expiration Daily wall-clock contract on fetch(), independent of TTL.</span></span>
+<span class="src-line" id="L32"><a class="ln" href="#L32">32</a><span class="tok-com">     * @param list&lt;ExpirationContract&gt; $expirations Daily wall-clock contracts on fetch(), in declaration order, independent of TTL.</span></span>
 <span class="src-line" id="L33"><a class="ln" href="#L33">33</a><span class="tok-com">     * @param string|null $definitionProblem A factory signature incompatible with StrategyDefinition.</span></span>
 <span class="src-line" id="L34"><a class="ln" href="#L34">34</a><span class="tok-com">     */</span></span>
 <span class="src-line" id="L35"><a class="ln" href="#L35">35</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(</span>
@@ -81,7 +81,7 @@
 <span class="src-line" id="L45"><a class="ln" href="#L45">45</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$notes</span> = [],</span>
 <span class="src-line" id="L46"><a class="ln" href="#L46">46</a>        <span class="tok-kw">public</span> <span class="tok-id">bool</span> <span class="tok-var">$constructible</span> = <span class="tok-id">true</span>,</span>
 <span class="src-line" id="L47"><a class="ln" href="#L47">47</a>        <span class="tok-kw">public</span> ?<span class="tok-id">string</span> <span class="tok-var">$definitionProblem</span> = <span class="tok-id">null</span>,</span>
-<span class="src-line" id="L48"><a class="ln" href="#L48">48</a>        <span class="tok-kw">public</span> ?<span class="tok-id">ExpirationContract</span> <span class="tok-var">$expiration</span> = <span class="tok-id">null</span>,</span>
+<span class="src-line" id="L48"><a class="ln" href="#L48">48</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$expirations</span> = [],</span>
 <span class="src-line" id="L49"><a class="ln" href="#L49">49</a>    ) {</span>
 <span class="src-line" id="L50"><a class="ln" href="#L50">50</a>    }</span>
 <span class="src-line" id="L51"><a class="ln" href="#L51">51</a></span>

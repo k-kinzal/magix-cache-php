@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cache Keys — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/pr/20/k-kinzal/magix-cache/doc/docs/cache-keys.md.html">
+<meta name="description" content="Cache Keys, a document of the k-kinzal/magix-cache package.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="Cache Keys — magix-cache-php">
+<meta property="og:description" content="Cache Keys, a document of the k-kinzal/magix-cache package.">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/pr/20/k-kinzal/magix-cache/doc/docs/cache-keys.md.html">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/pr/20/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}document.documentElement.dataset.diffMode=localStorage.getItem("docgen-diff-mode")||"inline"}catch(e){}</script>
+</head>
+<body data-root="../../../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../index.html">magix-cache-php</a></div><div class="sb-pkg"><a href="../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></div><nav class="sb-block"><div class="sb-title">Package</div><ul class="sb-list"><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/all-items.html">All items</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/index.html#documents">Documents</a></li></ul><div class="sb-kind" data-diff="same">Layers</div><ul class="sb-list"><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Attribute.html">Attribute</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Cache.html">Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Clock.html">Clock</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Composition.html">Composition</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.CoreApi.html">CoreApi</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Metadata.html">Metadata</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Runtime.html">Runtime</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Strategy.html">Strategy</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Namespaces</div><ul class="sb-list"><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/index.html" title="Magix\Cache">Magix\Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Attribute/index.html" title="Magix\Cache\Attribute">Magix\Cache\Attribute</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/index.html" title="Magix\Cache\Cache">Magix\Cache\Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/PSR16/index.html" title="Magix\Cache\Cache\PSR16">Magix\Cache\Cache\PSR16</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/PSR6/index.html" title="Magix\Cache\Cache\PSR6">Magix\Cache\Cache\PSR6</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Clock/index.html" title="Magix\Cache\Clock">Magix\Cache\Clock</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Composition/index.html" title="Magix\Cache\Composition">Magix\Cache\Composition</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Metadata/index.html" title="Magix\Cache\Metadata">Magix\Cache\Metadata</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/index.html" title="Magix\Cache\Runtime">Magix\Cache\Runtime</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Extension/index.html" title="Magix\Cache\Runtime\Extension">Magix\Cache\Runtime\Extension</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/KeyStrategy/index.html" title="Magix\Cache\Runtime\KeyStrategy">Magix\Cache\Runtime\KeyStrategy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Parameter/index.html" title="Magix\Cache\Runtime\Parameter">Magix\Cache\Runtime\Parameter</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Policy/index.html" title="Magix\Cache\Runtime\Policy">Magix\Cache\Runtime\Policy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Strategy/index.html" title="Magix\Cache\Strategy">Magix\Cache\Strategy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Strategy/Contract/index.html" title="Magix\Cache\Strategy\Contract">Magix\Cache\Strategy\Contract</a></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><a href="../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a><span class="crumb-sep">::</span><span class="crumb-current">docs/cache-keys.md</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<span class="diff-range" title="Comparing ec71b5b to working tree">ec71b5b <span class="diff-arrow">→</span> working tree</span><div class="diff-modes" id="diff-modes" role="group" aria-label="Diff display mode"><button type="button" class="diff-mode" data-diff-mode="off" title="Documentation of the head revision, without diff marks">Off</button><button type="button" class="diff-mode" data-diff-mode="inline" title="Every page with additions and removals marked">Diff</button><button type="button" class="diff-mode" data-diff-mode="changes" title="Only what the head revision added, changed, or removed">Changes</button></div><a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<p class="diff-empty" id="diff-empty" data-changes="Nothing on this page changed between ec71b5b and working tree." data-off="This page documents what ec71b5b had and working tree no longer has. Switch to Diff to read it." hidden></p>
+<div class="symbol-head"><h1><span class="chip chip-kind k-document">document</span>Cache Keys</h1><div class="symbol-meta"><span class="src-link">docs/cache-keys.md</span></div></div>
+<section class="readme" data-diff="same"><div class="doc-block" data-diff="same"><h2>Cache Keys</h2>
+</div><div class="doc-block" data-diff="same"><p>This guide explains how MagixCache identifies method calls and how to make keys stable, private, or intentionally independent of selected arguments.</p>
+</div><div class="doc-block" data-diff="same"><h3>Default Key</h3>
+</div><div class="doc-block" data-diff="same"><p><code>Cacheable</code> captures the method invocation before it reaches the runtime. The default <code>HashCacheKeyStrategy</code> hashes the following data with SHA-256:</p>
+</div><div class="doc-block" data-diff="same"><ul><li>Runtime key namespace (<code>namespace</code> on <code>CacheRuntime</code>, <code>&#039;magix&#039;</code> by default)</li><li>The concrete class the boundary was invoked on</li><li>The declaring class and method name</li><li>Every method argument, associated with its parameter name</li><li>Cache policy version</li><li>A fingerprint of the effective declaration</li></ul>
+</div><div class="doc-block" data-diff="same"><p>The result is an opaque 64-character key. Calls with the same normalized invocation produce the same key, while a different argument, version, or declaration produces a different key. Because the concrete class is part of the key, a subclass never shares entries with its parent.</p>
+</div><div class="doc-block" data-diff="same"><p>The declaration fingerprint covers the resolved policy, behaviors, scopes, and key attributes: changing any of them invalidates old entries, which are then no longer read but remain in the backend until their physical expiration.</p>
+</div><div class="doc-block" data-diff="same"><p>Default values are included even when the caller omits them. Variadic arguments are included individually and preserve their captured positions.</p>
+</div><div class="doc-block" data-diff="same"><h3>Argument Requirements</h3>
+</div><div class="doc-block" data-diff="same"><p>The default strategy uses PHP serialization before hashing, so scalar values, arrays, and serializable value objects can be used directly:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>)]
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(<span class="tok-id">int</span> <span class="tok-var">$productId</span>, <span class="tok-id">string</span> <span class="tok-var">$locale</span> = <span class="tok-str">&#039;en&#039;</span>): <span class="tok-id">Cached</span>
+{
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-com">/* ... */</span>);
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>A direct resource argument is rejected. Values that PHP cannot serialize, such as closures, are also rejected. Reduce them to stable data with <code>#[CacheKey]</code>, or use <code>#[CacheIgnore]</code> only when they cannot affect the result.</p>
+</div><div class="doc-block" data-diff="same"><h3>Reduce an Argument</h3>
+</div><div class="doc-block" data-diff="same"><p>Use <code>#[CacheKey]</code> when only part of an object determines the output or when its default serialized representation is unstable. The reducer must be a public static callable:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>&lt;?<span class="tok-id">php</span>
+
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\Cache</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheKey</span>;
+
+<span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">ProductRequestKey</span>
+{
+    <span class="tok-com">/** @return array{id: int, locale: string} */</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">function</span> <span class="tok-id">reduce</span>(<span class="tok-id">ProductRequest</span> <span class="tok-var">$request</span>): <span class="tok-kw">array</span>
+    {
+        <span class="tok-kw">return</span> [
+            <span class="tok-str">&#039;id&#039;</span> =&gt; <span class="tok-var">$request</span>-&gt;<span class="tok-id">productId</span>,
+            <span class="tok-str">&#039;locale&#039;</span> =&gt; <span class="tok-var">$request</span>-&gt;<span class="tok-id">locale</span>,
+        ];
+    }
+}
+
+<span class="tok-kw">final</span> <span class="tok-kw">class</span> <span class="tok-id">ProductQuery</span>
+{
+    <span class="tok-kw">use</span> <span class="tok-id">Cacheable</span>;
+
+    #[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>)]
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(
+        #[<span class="tok-id">CacheKey</span>([<span class="tok-id">ProductRequestKey</span>::<span class="tok-kw">class</span>, <span class="tok-str">&#039;reduce&#039;</span>])]
+        <span class="tok-id">ProductRequest</span> <span class="tok-var">$request</span>,
+    ): <span class="tok-id">Cached</span> {
+        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-com">/* ... */</span>);
+    }
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The reducer output becomes the argument&#039;s key representation. It must itself be serializable and must include every input property that can change the query result.</p>
+</div><div class="doc-block" data-diff="same"><h3>Ignore an Argument</h3>
+</div><div class="doc-block" data-diff="same"><p>Use <code>#[CacheIgnore]</code> for operational data that cannot affect the returned value, such as a trace identifier:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheIgnore</span>;
+
+#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>)]
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(
+    <span class="tok-id">int</span> <span class="tok-var">$productId</span>,
+    #[<span class="tok-id">CacheIgnore</span>] <span class="tok-id">string</span> <span class="tok-var">$traceId</span> = <span class="tok-str">&#039;&#039;</span>,
+): <span class="tok-id">Cached</span> {
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-com">/* ... */</span>);
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>Calls with the same <code>$productId</code> share an entry even when <code>$traceId</code> differs.</p>
+</div><div class="doc-block" data-diff="same"><blockquote><p>[!WARNING] Ignoring a value that changes the output can return data for the wrong request. Prefer <code>#[CacheKey]</code> when a smaller stable representation exists.</p>
+</blockquote>
+</div><div class="doc-block" data-diff="same"><h3>Private Variants</h3>
+</div><div class="doc-block" data-diff="same"><p><code>#[CacheScope]</code> restricts visibility but does not remove the parameter from the key. This makes personalized variants private while keeping them separated per principal:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheScope</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\Visibility</span>;
+
+#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>)]
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(
+    #[<span class="tok-id">CacheScope</span>(<span class="tok-id">Visibility</span>::<span class="tok-kw">Private</span>)] <span class="tok-id">int</span> <span class="tok-var">$viewerId</span>,
+    <span class="tok-id">int</span> <span class="tok-var">$productId</span>,
+): <span class="tok-id">Cached</span> {
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-com">/* ... */</span>);
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p><code>$viewerId</code> remains in the generated key, and the result visibility becomes <code>Private</code>.</p>
+</div><div class="doc-block" data-diff="same"><p>A scoped parameter may only be ignored when its scope is <code>Visibility::NoStore</code>. This is useful for unkeyable inputs that must disable storage entirely:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Closure</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheIgnore</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheScope</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\Visibility</span>;
+
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(
+    #[<span class="tok-id">CacheIgnore</span>]
+    #[<span class="tok-id">CacheScope</span>(<span class="tok-id">Visibility</span>::<span class="tok-id">NoStore</span>)]
+    <span class="tok-id">Closure</span> <span class="tok-var">$load</span>,
+): <span class="tok-id">Cached</span> {
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-kw">fn</span> (): <span class="tok-id">Cached</span> =&gt; <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(<span class="tok-var">$load</span>()));
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><h3>Versioned Keys</h3>
+</div><div class="doc-block" data-diff="same"><p>Policy versions provide explicit key invalidation when the meaning or shape of a cached result changes without a change to the declaration itself:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">300</span>, <span class="tok-id">version</span>: <span class="tok-str">&#039;product-v2&#039;</span>)]</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The version is part of the hash input. After changing it, old entries are no longer read but remain in the backend until their physical expiration.</p>
+</div><div class="doc-block" data-diff="same"><h3>Custom Key Strategy</h3>
+</div><div class="doc-block" data-diff="same"><p>Implement <code>CacheKeyStrategy</code> when the application needs namespaced, observable, or backend-specific keys:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>&lt;?<span class="tok-id">php</span>
+
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\CacheKeyContext</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\CacheKeyStrategy</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Override</span>;
+
+<span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">PrefixedCacheKeyStrategy</span> <span class="tok-kw">implements</span> <span class="tok-id">CacheKeyStrategy</span>
+{
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(
+        <span class="tok-kw">private</span> <span class="tok-id">string</span> <span class="tok-var">$prefix</span>,
+        <span class="tok-kw">private</span> <span class="tok-id">HashCacheKeyStrategy</span> <span class="tok-var">$hash</span> = <span class="tok-kw">new</span> <span class="tok-id">HashCacheKeyStrategy</span>(),
+    ) {
+    }
+
+    #[<span class="tok-id">Override</span>]
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">generate</span>(<span class="tok-id">CacheKeyContext</span> <span class="tok-var">$context</span>): <span class="tok-id">string</span>
+    {
+        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">prefix</span>.<span class="tok-str">&#039;:&#039;</span>.<span class="tok-var">$this</span>-&gt;<span class="tok-id">hash</span>-&gt;<span class="tok-id">generate</span>(<span class="tok-var">$context</span>);
+    }
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>Install it on the runtime at registration time:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\CacheRuntime</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\CacheRuntimeRegistry</span>;
+
+<span class="tok-id">CacheRuntimeRegistry</span>::<span class="tok-id">register</span>(<span class="tok-str">&#039;default&#039;</span>, <span class="tok-kw">new</span> <span class="tok-id">CacheRuntime</span>(
+    <span class="tok-id">cache</span>: <span class="tok-var">$magixCache</span>,
+    <span class="tok-id">keyStrategy</span>: <span class="tok-kw">new</span> <span class="tok-id">PrefixedCacheKeyStrategy</span>(<span class="tok-str">&#039;storefront&#039;</span>),
+));</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The strategy receives already bound, ignored, and reduced arguments in <code>CacheKeyContext::$arguments</code>, together with the runtime namespace, classes, method, version, and declaration fingerprint. Its output must satisfy the key rules of the configured cache backend.</p>
+</div><div class="doc-block" data-diff="same"><p>Use <code>CacheKeyStrategy</code> for key format changes. Use a <code>Cache</code> decorator when keys need to route to different storage tiers.</p>
+</div></section>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../../../assets/search-index.js" defer></script>
+<script src="../../../../assets/app.js" defer></script>
+</body>
+</html>

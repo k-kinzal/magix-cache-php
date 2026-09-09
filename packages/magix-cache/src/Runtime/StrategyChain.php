@@ -31,7 +31,7 @@ final readonly class StrategyChain
      */
     public function bind(CacheInvocation $invocation, ?CacheTtlResolver $ttlResolver = null): NextCacheStrategy
     {
-        $terminal = new TerminalCacheStrategy($this->cache, $this->classifier, $invocation->origin, $this->observer, $invocation->policy, $ttlResolver, $invocation->parameterTtl);
+        $terminal = new TerminalCacheStrategy($this->cache, $this->classifier, $invocation->origin, $invocation->policy, $this->observer, $ttlResolver, $invocation->parameterTtl);
         $strategy = $invocation->strategy?->instantiate();
 
         return $strategy === null ? NextCacheStrategy::of($terminal) : NextCacheStrategy::of($strategy, $terminal);

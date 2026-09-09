@@ -227,16 +227,6 @@ To add a tag deliberately, pass the combined tag list to `withTags()`. An empty 
 
 ## Migrating an Existing Strategy
 
-Replace `constrain(CacheMetadata::forTtl($ttl, $baseTime))` with `withTtl($ttl)`.
-For other fields use `withMetadata($result->cached->metadata->withTags(...))`
-or the corresponding field-copy method. Dependencies still bubble through
-`Cached` composition. Local fields now override: fixed TTLs may extend child
-lifetimes, explicit tag lists replace rather than union, and explicit Shared
-can replace Private. Omitted tags and visibility are `null` and inherit.
-Use `Ttl::FromUpstream` for an inherited deadline capped by a policy maximum.
-Replace `CachePolicy::restrictVisibility()` with `withVisibility()` when setting visibility programmatically. Existing cache keys change to distinguish these semantics.
-
-
 Change `create(): CacheStrategy` to `create(): StrategyDefinition` and each constructed child from `new Child(...)` to `StrategyDefinition::of(Child::class, ...)`. Update `get/fetch/set` to the protocol above. Replace the bundled stale strategy's `accepts` closure argument with its `exceptions` list; custom decisions belong in a custom Strategy's `fetch()` implementation.
 
 Move invocation-local fields such as a fallback candidate into the Strategy. Remove calls to `retainStale()`, `stale()`, `staleWithin()`, `suppressStore()`, and `extendRetention()` on `CacheOperation`. Use the successful result's `baseTime`, the explicit `CacheAnswer`, and the write request's `retainUntil()` instead. An origin failure is now an `OriginFailure` result; catch around delegation only for declared failures from the delegate itself.

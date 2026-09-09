@@ -44,8 +44,8 @@ final readonly class TerminalCacheStrategy implements CacheStrategy
         private GuardedCache $cache,
         private ?BackendErrorClassifier $classifier,
         private Closure $origin,
+        private CachePolicy $policy,
         private ?CacheObserver $observer = null,
-        private ?CachePolicy $policy = null,
         private ?CacheTtlResolver $ttlResolver = null,
         private ?int $parameterTtl = null,
     ) {
@@ -83,10 +83,8 @@ final readonly class TerminalCacheStrategy implements CacheStrategy
 
         $baseTime = $operation->now();
 
-        if ($this->policy !== null) {
-            $metadata = (new OriginOverrides())->apply($this->policy, $this->ttlResolver, $result, $operation->key(), $baseTime, $this->parameterTtl);
-            $result = Cached::of($result->value(), $metadata);
-        }
+        $metadata = (new OriginOverrides())->apply($this->policy, $this->ttlResolver, $result, $operation->key(), $baseTime, $this->parameterTtl);
+        $result = Cached::of($result->value(), $metadata);
 
         return new OriginResult($result, $baseTime);
     }

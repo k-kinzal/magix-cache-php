@@ -136,25 +136,35 @@ The root's `key` and `policy` are `none (uncached entry point)` and `storable` i
 | `--path` | Composer autoload roots | Directory or file to scan, repeatable |
 | `--format` | `tree` | `tree`, `json`, or `mermaid` |
 | `--depth` | `8` | Maximum dependency depth to expand |
-| `--show-uncached` | off | Also show ordinary callees beyond the paths already displayed for cache propagation gaps |
-| `--ignore` | none | Hide matching class or `Class::method` subtrees; repeatable and independent of `--show-uncached` |
+| `--uncached` | `between` | Ordinary method rows: `between` cache boundaries, `all`, or `none` |
+| `--ignore` | none | Hide matching class or `Class::method` subtrees; repeatable and independent of `--uncached` |
 
 ### Inspecting ordinary calls and hiding subtrees
 
-Use `--show-uncached` to inspect methods that have not been made into cache boundaries:
+Choose how many ordinary method rows to display:
+
+| Mode | `CachedA → Helper → CachedB` | `CachedA → Helper → Leaf` (both ordinary) |
+|---|---|---|
+| `--uncached=between` (default) | Keep `Helper` between the cache boundaries | Omit the wholly uncached branch |
+| `--uncached=all` | Keep `Helper` | Show the entire branch, including leaves |
+| `--uncached=none` | Omit `Helper` and display `CachedB` under `CachedA` | Omit the wholly uncached branch |
+
+The explicitly selected root remains visible in every mode, including an uncached entry point. In `between` and `none`, ordinary methods before the first cache boundary are also omitted: `Controller → Helper → CachedB` displays `Controller → CachedB`. The displayed connections can therefore span omitted calls; they do not prove direct calls or metadata propagation.
+
+Use `--uncached=all` to inspect methods that have not been made into cache boundaries:
 
 ```bash
-vendor/bin/magix analyze PageQuery::execute --show-uncached \
+vendor/bin/magix analyze PageQuery::execute --uncached=all \
   --ignore 'Inventory*' --ignore '*Manager'
 ```
 
 Ordinary callees are labelled `uncached`; their lack of a boundary is not an error. They are followed recursively within the scanned sources and the existing `--depth` limit, including concrete methods with no further calls. This uses the same call resolution as the cache analysis: it does not infer database access, execute application code, or discover dynamically named calls and unscanned implementations. A method that calls `cached()` remains a cache boundary and still reports a missing `#[Cache]` policy as a problem.
 
-Without `--show-uncached`, the tree includes intermediate uncached methods when tracing an uncached entry point, and paths from a cache parent through uncached methods to a cache child. The latter are reported as analysis gaps. The flag adds other inspection paths inside cache boundaries and ordinary leaves. It does not change the computed TTL, visibility, tags, storability, problems, or gaps of existing nodes. Following an ordinary helper is not proof that its result carries cache metadata: a helper can extract a plain value with `value()`.
+The default `between` mode keeps only ordinary methods with both a cached ancestor and a cached descendant on the analyzed path. Ordinary side branches are omitted even when they hang off a visible intermediate method. These cache-to-cache paths are reported as analysis gaps. Every mode preserves the computed TTL, visibility, tags, storability, problems, and gaps of existing nodes. Following an ordinary helper is not proof that its result carries cache metadata: a helper can extract a plain value with `value()`.
 
-`--ignore` applies to cached and uncached nodes alike, with or without `--show-uncached`. A match hides that node and its entire subtree; descendants are never promoted to the parent. Other paths to the same method remain visible unless they also match. Multiple patterns are combined with OR. The selected root is subject to the same filter: if all roots are ignored, the command succeeds with `[]` in JSON and an explanatory message in the text formats.
+`--ignore` applies to cached and uncached nodes alike in every mode, before ordinary rows are omitted. A match hides that node and its entire subtree; descendants of an ignored node are never promoted to the parent, even with `--uncached=none`. Other paths to the same method remain visible unless they also match. Multiple patterns are combined with OR. The selected root is subject to the same filter: if all roots are ignored, the command succeeds with `[]` in JSON and an explanatory message in the text formats.
 
-Filtering happens after analysis. An ignored dependency still constrains its ancestors' TTL and visibility, contributes tags, and can cause an ancestor to be invalid. Analysis gaps and uncertainty also remain on the affected parent when their paths are hidden. Diagnostics may consequently refer to a hidden dependency. Neither display option changes cache composition or the runtime. The depth limit counts actual method calls before filtering; hidden branches do not free depth for other calls.
+Filtering happens after analysis and is shared by tree, JSON, and Mermaid output. An ignored dependency still constrains its ancestors' TTL and visibility, contributes tags, and can cause an ancestor to be invalid. Analysis gaps and uncertainty also remain on the affected parent when their paths are hidden, including with `--uncached=none`. Diagnostics may consequently name a hidden ordinary method. Neither display option changes cache composition or the runtime. The depth limit counts actual method calls before filtering; hidden branches do not free depth for other calls.
 
 | Pattern | Matches |
 |---|---|
@@ -208,7 +218,7 @@ analysis. An uncached entry point alone does not create a gap.
 
 Detection is limited to resolved calls in scanned sources within `--depth`.
 Recursion and depth cutoffs do not invent unseen cache children; use
-`--show-uncached` to inspect truncated ordinary paths and increase `--depth` when
+`--uncached=all` to inspect truncated ordinary paths and increase `--depth` when
 needed. No gap is not proof that every runtime dependency has been found.
 
 JSON includes an `analysisGaps` list on every node. Each gap has

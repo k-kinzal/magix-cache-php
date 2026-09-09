@@ -262,7 +262,7 @@ final class TreeRendererTest extends TestCase
         $tester->execute([
             'boundary' => 'InspectionQuery::execute',
             '--path' => ['packages/magix-cache-cli/tests/Fixture'],
-            '--show-uncached' => true,
+            '--uncached' => 'all',
         ], ['decorated' => true]);
 
         $tester->assertCommandIsSuccessful();

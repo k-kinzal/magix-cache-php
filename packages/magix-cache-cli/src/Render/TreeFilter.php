@@ -7,7 +7,7 @@ namespace Magix\Cache\Cli\Render;
 use Magix\Cache\Cli\Graph\CacheNode;
 
 /**
- * Prunes ignored subtrees after analysis, preserving each remaining node's effects.
+ * Selects visible rows and prunes ignored subtrees without changing analysis results.
  */
 final readonly class TreeFilter
 {
@@ -15,15 +15,20 @@ final readonly class TreeFilter
      * Creates an independent display filter shared by every output format.
      *
      * @param list<IgnorePattern> $patterns
+     * @param UncachedMode $uncached Ordinary rows to retain; omitted rows promote their children, while ignore matches prune the entire subtree.
      */
-    public function __construct(private array $patterns = [])
-    {
+    public function __construct(
+        private array $patterns = [],
+        private UncachedMode $uncached = UncachedMode::Between,
+    ) {
     }
 
     /**
-     * Returns the visible tree, or null when its root is ignored.
+     * Returns the visible tree, retaining the selected root unless it is ignored.
+     *
+     * @param bool $cachedAncestor Whether a cache boundary precedes this node on the original path.
      */
-    public function apply(CacheNode $node): ?CacheNode
+    public function apply(CacheNode $node, bool $cachedAncestor = false): ?CacheNode
     {
         foreach ($this->patterns as $pattern) {
             if ($pattern->matches($node->boundary)) {
@@ -32,12 +37,19 @@ final readonly class TreeFilter
         }
 
         $children = [];
+        $cachedAncestor = $cachedAncestor || $node->boundary->isCacheBoundary;
 
         foreach ($node->children as $child) {
-            $visible = $this->apply($child);
+            $visible = $this->apply($child, $cachedAncestor);
 
-            if ($visible !== null) {
+            if ($visible === null) {
+                continue;
+            }
+
+            if ($this->uncached->keeps($visible, $cachedAncestor)) {
                 $children[] = $visible;
+            } else {
+                $children = [...$children, ...$visible->children];
             }
         }
 

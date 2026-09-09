@@ -59,7 +59,7 @@
 <span class="src-line" id="L23"><a class="ln" href="#L23">23</a><span class="tok-com">     * @param list&lt;string&gt; $tags</span></span>
 <span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-com">     * @param list&lt;string&gt; $problems Reasons the boundary cannot work as written.</span></span>
 <span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-com">     * @param StrategyEffect|null $strategy The analyzed strategy composition, when one is declared.</span></span>
-<span class="src-line" id="L26"><a class="ln" href="#L26">26</a><span class="tok-com">     * @param array{ttl?: string, visibility?: string} $localRestrictions Local settings that provably restrict composed constraints; absent keys make no claim.</span></span>
+<span class="src-line" id="L26"><a class="ln" href="#L26">26</a><span class="tok-com">     * @param array{ttl?: string, visibility?: string, tags?: string} $localOverrides Explicit local fields that replace bubbled metadata; absent keys make no claim.</span></span>
 <span class="src-line" id="L27"><a class="ln" href="#L27">27</a><span class="tok-com">     * @param list&lt;ExpirationEstimate&gt; $expirationConstraints Daily candidates that may only be shortened by further composition.</span></span>
 <span class="src-line" id="L28"><a class="ln" href="#L28">28</a><span class="tok-com">     */</span></span>
 <span class="src-line" id="L29"><a class="ln" href="#L29">29</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(</span>
@@ -72,7 +72,7 @@
 <span class="src-line" id="L36"><a class="ln" href="#L36">36</a>        <span class="tok-kw">public</span> ?<span class="tok-id">StrategyEffect</span> <span class="tok-var">$strategy</span> = <span class="tok-id">null</span>,</span>
 <span class="src-line" id="L37"><a class="ln" href="#L37">37</a>        <span class="tok-kw">public</span> <span class="tok-id">bool</span> <span class="tok-var">$visibilityUnknown</span> = <span class="tok-id">false</span>,</span>
 <span class="src-line" id="L38"><a class="ln" href="#L38">38</a>        <span class="tok-kw">public</span> <span class="tok-id">bool</span> <span class="tok-var">$tagsUnknown</span> = <span class="tok-id">false</span>,</span>
-<span class="src-line" id="L39"><a class="ln" href="#L39">39</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$localRestrictions</span> = [],</span>
+<span class="src-line" id="L39"><a class="ln" href="#L39">39</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$localOverrides</span> = [],</span>
 <span class="src-line" id="L40"><a class="ln" href="#L40">40</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$expirationConstraints</span> = [],</span>
 <span class="src-line" id="L41"><a class="ln" href="#L41">41</a>    ) {</span>
 <span class="src-line" id="L42"><a class="ln" href="#L42">42</a>        <span class="tok-var">$this</span>-&gt;<span class="tok-id">ttl</span> = <span class="tok-var">$ttl</span> ?? <span class="tok-id">TtlEstimate</span>::<span class="tok-id">unknown</span>();</span>

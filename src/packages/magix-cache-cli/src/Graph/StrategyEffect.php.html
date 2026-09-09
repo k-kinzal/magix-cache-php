@@ -43,32 +43,32 @@
 <span class="src-line" id="L7"><a class="ln" href="#L7">7</a><span class="tok-com">/**</span></span>
 <span class="src-line" id="L8"><a class="ln" href="#L8">8</a><span class="tok-com"> * Holds the composed contract of the strategy a boundary declares.</span></span>
 <span class="src-line" id="L9"><a class="ln" href="#L9">9</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-com"> * The lifetime is the candidate constraint the composed strategies add on</span></span>
-<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com"> * the normal origin path, before the policy and the upstream expiration are</span></span>
-<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * applied; the candidate a strategy chooses and the effective lifetime that</span></span>
-<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> * survives composition stay two different things. Whether a finite</span></span>
-<span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com"> * constraint is added at all is kept as its own three-valued answer, because</span></span>
-<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com"> * a missing contract never counts as &quot;adds nothing&quot;.</span></span>
-<span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-com"> */</span></span>
-<span class="src-line" id="L17"><a class="ln" href="#L17">17</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">StrategyEffect</span></span>
-<span class="src-line" id="L18"><a class="ln" href="#L18">18</a>{</span>
-<span class="src-line" id="L19"><a class="ln" href="#L19">19</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com">     * Creates the analyzed effect of one declared strategy composition.</span></span>
-<span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L22"><a class="ln" href="#L22">22</a><span class="tok-com">     * @param string $label The declared construction, such as ProductCacheStrategy::create(min: 60).</span></span>
-<span class="src-line" id="L23"><a class="ln" href="#L23">23</a><span class="tok-com">     * @param TtlEstimate $ttl Candidate constraint the composition adds on the normal origin path.</span></span>
-<span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-com">     * @param list&lt;StrategyStep&gt; $steps Contributions in composition order.</span></span>
-<span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-com">     * @param bool|null $addsConstraint Whether a finite constraint is definitely added; null when undeclared parts leave it open.</span></span>
-<span class="src-line" id="L26"><a class="ln" href="#L26">26</a><span class="tok-com">     * @param list&lt;string&gt; $problems Declarations that cannot work as written.</span></span>
-<span class="src-line" id="L27"><a class="ln" href="#L27">27</a><span class="tok-com">     * @param list&lt;ExpirationEstimate&gt; $expirations Candidate daily expiration constraints.</span></span>
-<span class="src-line" id="L28"><a class="ln" href="#L28">28</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L29"><a class="ln" href="#L29">29</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(</span>
-<span class="src-line" id="L30"><a class="ln" href="#L30">30</a>        <span class="tok-kw">public</span> <span class="tok-id">string</span> <span class="tok-var">$label</span>,</span>
-<span class="src-line" id="L31"><a class="ln" href="#L31">31</a>        <span class="tok-kw">public</span> <span class="tok-id">TtlEstimate</span> <span class="tok-var">$ttl</span>,</span>
-<span class="src-line" id="L32"><a class="ln" href="#L32">32</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$steps</span> = [],</span>
-<span class="src-line" id="L33"><a class="ln" href="#L33">33</a>        <span class="tok-kw">public</span> ?<span class="tok-id">bool</span> <span class="tok-var">$addsConstraint</span> = <span class="tok-id">null</span>,</span>
-<span class="src-line" id="L34"><a class="ln" href="#L34">34</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$problems</span> = [],</span>
-<span class="src-line" id="L35"><a class="ln" href="#L35">35</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$expirations</span> = [],</span>
+<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-com"> * The lifetime belongs to the outermost expiration writer on the fetch</span></span>
+<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com"> * return path. Dependency and policy deadlines have lower priority. Steps</span></span>
+<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * keep each child&#039;s candidate even when a later override replaces it.</span></span>
+<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> * overridesExpiration is false for pass-through and null for opaque code.</span></span>
+<span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com"> */</span></span>
+<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">StrategyEffect</span></span>
+<span class="src-line" id="L16"><a class="ln" href="#L16">16</a>{</span>
+<span class="src-line" id="L17"><a class="ln" href="#L17">17</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com">     * Creates the analyzed effect of one declared strategy composition.</span></span>
+<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com">     * @param string $label The declared construction, such as ProductCacheStrategy::create(min: 60).</span></span>
+<span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com">     * @param TtlEstimate $ttl Winning expiration override on the normal origin path.</span></span>
+<span class="src-line" id="L22"><a class="ln" href="#L22">22</a><span class="tok-com">     * @param list&lt;StrategyStep&gt; $steps Contributions in composition order.</span></span>
+<span class="src-line" id="L23"><a class="ln" href="#L23">23</a><span class="tok-com">     * @param bool|null $overridesExpiration Whether expiration is definitely replaced; null for an opaque final writer.</span></span>
+<span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-com">     * @param list&lt;string&gt; $problems Declarations that cannot work as written.</span></span>
+<span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-com">     * @param list&lt;ExpirationEstimate&gt; $expirations Candidate daily expiration constraints.</span></span>
+<span class="src-line" id="L26"><a class="ln" href="#L26">26</a><span class="tok-com">     * @param bool $metadataUnknown Whether non-expiration metadata can be overridden by custom code.</span></span>
+<span class="src-line" id="L27"><a class="ln" href="#L27">27</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L28"><a class="ln" href="#L28">28</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(</span>
+<span class="src-line" id="L29"><a class="ln" href="#L29">29</a>        <span class="tok-kw">public</span> <span class="tok-id">string</span> <span class="tok-var">$label</span>,</span>
+<span class="src-line" id="L30"><a class="ln" href="#L30">30</a>        <span class="tok-kw">public</span> <span class="tok-id">TtlEstimate</span> <span class="tok-var">$ttl</span>,</span>
+<span class="src-line" id="L31"><a class="ln" href="#L31">31</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$steps</span> = [],</span>
+<span class="src-line" id="L32"><a class="ln" href="#L32">32</a>        <span class="tok-kw">public</span> ?<span class="tok-id">bool</span> <span class="tok-var">$overridesExpiration</span> = <span class="tok-id">null</span>,</span>
+<span class="src-line" id="L33"><a class="ln" href="#L33">33</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$problems</span> = [],</span>
+<span class="src-line" id="L34"><a class="ln" href="#L34">34</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$expirations</span> = [],</span>
+<span class="src-line" id="L35"><a class="ln" href="#L35">35</a>        <span class="tok-kw">public</span> <span class="tok-id">bool</span> <span class="tok-var">$metadataUnknown</span> = <span class="tok-id">false</span>,</span>
 <span class="src-line" id="L36"><a class="ln" href="#L36">36</a>    ) {</span>
 <span class="src-line" id="L37"><a class="ln" href="#L37">37</a>    }</span>
 <span class="src-line" id="L38"><a class="ln" href="#L38">38</a>}</span>

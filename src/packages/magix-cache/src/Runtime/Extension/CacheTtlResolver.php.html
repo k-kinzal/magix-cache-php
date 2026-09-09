@@ -41,11 +41,11 @@
 <span class="src-line" id="L5"><a class="ln" href="#L5">5</a><span class="tok-kw">namespace</span> <span class="tok-id">Magix\Cache\Runtime\Extension</span>;</span>
 <span class="src-line" id="L6"><a class="ln" href="#L6">6</a></span>
 <span class="src-line" id="L7"><a class="ln" href="#L7">7</a><span class="tok-com">/**</span></span>
-<span class="src-line" id="L8"><a class="ln" href="#L8">8</a><span class="tok-com"> * Derives an additional lifetime constraint from one successful origin result.</span></span>
+<span class="src-line" id="L8"><a class="ln" href="#L8">8</a><span class="tok-com"> * Chooses a lifetime override from one successful origin result.</span></span>
 <span class="src-line" id="L9"><a class="ln" href="#L9">9</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-com"> * A resolver only proposes an expiration candidate: the runtime meets it with</span></span>
-<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com"> * the origin metadata, so a resolver can never replace metadata or extend an</span></span>
-<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * expiration a dependency already imposed. Implementations are registered with</span></span>
+<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-com"> * The runtime sets expiration to the origin base time plus this lifetime,</span></span>
+<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com"> * replacing inherited, policy and parameter expiration. Other fields remain</span></span>
+<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * unchanged; a Strategy may override expiration afterward. Implementations are registered with</span></span>
 <span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> * a runtime at bootstrap and referenced from #[DynamicTtl] by class name.</span></span>
 <span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com"> */</span></span>
 <span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-kw">interface</span> <span class="tok-id">CacheTtlResolver</span></span>

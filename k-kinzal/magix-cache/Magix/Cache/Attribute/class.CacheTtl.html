@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CacheTtl — magix-cache-php</title>
 <link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/k-kinzal/magix-cache/Magix/Cache/Attribute/class.CacheTtl.html">
-<meta name="description" content="Adds the parameter&#039;s non-negative integer seconds as a lifetime constraint.">
+<meta name="description" content="Overrides expiration with the parameter&#039;s non-negative integer seconds.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="magix-cache-php">
 <meta property="og:title" content="CacheTtl — magix-cache-php">
-<meta property="og:description" content="Adds the parameter&#039;s non-negative integer seconds as a lifetime constraint.">
+<meta property="og:description" content="Overrides expiration with the parameter&#039;s non-negative integer seconds.">
 <meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/k-kinzal/magix-cache/Magix/Cache/Attribute/class.CacheTtl.html">
 <meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/assets/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -35,8 +35,8 @@
 <main class="content">
 <div class="symbol-head"><h1><span class="chip chip-kind k-class">class</span>CacheTtl</h1><div class="symbol-meta"><a class="chip chip-layer" href="../../../../../k-kinzal/magix-cache/layer.Attribute.html" title="deptrac layer">Attribute</a><a class="src-link" href="../../../../../src/packages/magix-cache/src/Attribute/CacheTtl.php.html#L15">packages/magix-cache/src/Attribute/CacheTtl.php:15</a></div></div>
 <pre class="signature"><code><span class="t-key">final</span> <span class="t-key">class</span> <span class="sig-name">CacheTtl</span></code></pre>
-<p class="lede">Adds the parameter&#039;s non-negative integer seconds as a lifetime constraint.</p>
-<div class="doc-body"><p>The constraint is evaluated at the origin base time and met with all other constraints, including a fixed policy TTL. The parameter remains keyed.</p>
+<p class="lede">Overrides expiration with the parameter&#039;s non-negative integer seconds.</p>
+<div class="doc-body"><p>The lifetime is evaluated at the origin base time and replaces the policy and inherited expiration. The parameter remains keyed.</p>
 </div>
 <section class="relations"><h2 id="relations">Relations<a class="anchor" href="#relations">§</a></h2>
 <details class="usage-details"><summary>Constant reads <span class="count">4</span></summary><ul class="usage-list"><li><span class="usage-kind">class-const</span> <a href="../../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Reader/class.ParameterConfigurationReader.html" title="Magix\Cache\Cli\Reader\ParameterConfigurationReader">Magix\Cache\Cli\Reader\ParameterConfigurationReader::read()</a> <a class="usage-loc" href="../../../../../src/packages/magix-cache-cli/src/Reader/ParameterConfigurationReader.php.html#L32">packages/magix-cache-cli/src/Reader/ParameterConfigurationReader.php:32</a></li><li><span class="usage-kind">class-const</span> <a href="../../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Reader/class.ParameterConfigurationReader.html" title="Magix\Cache\Cli\Reader\ParameterConfigurationReader">Magix\Cache\Cli\Reader\ParameterConfigurationReader::read()</a> <a class="usage-loc" href="../../../../../src/packages/magix-cache-cli/src/Reader/ParameterConfigurationReader.php.html#L56">packages/magix-cache-cli/src/Reader/ParameterConfigurationReader.php:56</a></li><li><span class="usage-kind">class-const</span> <a href="../../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Parameter/class.ParameterBinding.html" title="Magix\Cache\Runtime\Parameter\ParameterBinding">Magix\Cache\Runtime\Parameter\ParameterBinding::read()</a> <a class="usage-loc" href="../../../../../src/packages/magix-cache/src/Runtime/Parameter/ParameterBinding.php.html#L41">packages/magix-cache/src/Runtime/Parameter/ParameterBinding.php:41</a></li><li><span class="usage-kind">class-const</span> <a href="../../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Parameter/class.ParameterBinding.html" title="Magix\Cache\Runtime\Parameter\ParameterBinding">Magix\Cache\Runtime\Parameter\ParameterBinding::read()</a> <a class="usage-loc" href="../../../../../src/packages/magix-cache/src/Runtime/Parameter/ParameterBinding.php.html#L65">packages/magix-cache/src/Runtime/Parameter/ParameterBinding.php:65</a></li></ul></details>

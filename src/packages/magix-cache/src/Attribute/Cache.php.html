@@ -61,15 +61,15 @@
 <span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-com">     *</span></span>
 <span class="src-line" id="L26"><a class="ln" href="#L26">26</a><span class="tok-com">     * @param int|Ttl $ttl Fixed lifetime in seconds, or a lifetime derived from upstream.</span></span>
 <span class="src-line" id="L27"><a class="ln" href="#L27">27</a><span class="tok-com">     * @param int|null $maxTtl Upper bound applied to a derived lifetime.</span></span>
-<span class="src-line" id="L28"><a class="ln" href="#L28">28</a><span class="tok-com">     * @param list&lt;string&gt; $tags</span></span>
+<span class="src-line" id="L28"><a class="ln" href="#L28">28</a><span class="tok-com">     * @param list&lt;string&gt;|null $tags Replacement tags; null inherits, [] clears.</span></span>
 <span class="src-line" id="L29"><a class="ln" href="#L29">29</a><span class="tok-com">     * @param string $runtime Name of a runtime registered at bootstrap.</span></span>
 <span class="src-line" id="L30"><a class="ln" href="#L30">30</a><span class="tok-com">     * @throws InvalidArgumentException when a lifetime is negative, a derived lifetime has no upper bound, the version is empty, a tag is unusable, or the runtime reference is empty</span></span>
 <span class="src-line" id="L31"><a class="ln" href="#L31">31</a><span class="tok-com">     */</span></span>
 <span class="src-line" id="L32"><a class="ln" href="#L32">32</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(</span>
 <span class="src-line" id="L33"><a class="ln" href="#L33">33</a>        <span class="tok-kw">public</span> <span class="tok-id">int</span>|<span class="tok-id">Ttl</span> <span class="tok-var">$ttl</span> = <span class="tok-id">Ttl</span>::<span class="tok-id">Auto</span>,</span>
 <span class="src-line" id="L34"><a class="ln" href="#L34">34</a>        <span class="tok-kw">public</span> ?<span class="tok-id">int</span> <span class="tok-var">$maxTtl</span> = <span class="tok-id">null</span>,</span>
-<span class="src-line" id="L35"><a class="ln" href="#L35">35</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$tags</span> = [],</span>
-<span class="src-line" id="L36"><a class="ln" href="#L36">36</a>        <span class="tok-kw">public</span> <span class="tok-id">Visibility</span> <span class="tok-var">$visibility</span> = <span class="tok-id">Visibility</span>::<span class="tok-id">Shared</span>,</span>
+<span class="src-line" id="L35"><a class="ln" href="#L35">35</a>        <span class="tok-kw">public</span> ?<span class="tok-kw">array</span> <span class="tok-var">$tags</span> = <span class="tok-id">null</span>,</span>
+<span class="src-line" id="L36"><a class="ln" href="#L36">36</a>        <span class="tok-kw">public</span> ?<span class="tok-id">Visibility</span> <span class="tok-var">$visibility</span> = <span class="tok-id">null</span>,</span>
 <span class="src-line" id="L37"><a class="ln" href="#L37">37</a>        <span class="tok-kw">public</span> <span class="tok-id">string</span> <span class="tok-var">$version</span> = <span class="tok-str">&#039;1&#039;</span>,</span>
 <span class="src-line" id="L38"><a class="ln" href="#L38">38</a>        <span class="tok-kw">public</span> <span class="tok-id">string</span> <span class="tok-var">$runtime</span> = <span class="tok-id">CacheRuntimeRegistry</span>::<span class="tok-id">DEFAULT_NAME</span>,</span>
 <span class="src-line" id="L39"><a class="ln" href="#L39">39</a>    ) {</span>

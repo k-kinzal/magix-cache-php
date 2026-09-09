@@ -48,11 +48,11 @@
 <span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\CacheTtlResolver</span>;</span>
 <span class="src-line" id="L13"><a class="ln" href="#L13">13</a></span>
 <span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com">/**</span></span>
-<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com"> * References a registered resolver that adds a per-result lifetime constraint.</span></span>
+<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com"> * References a registered resolver that overrides the per-result lifetime.</span></span>
 <span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-com"> *</span></span>
 <span class="src-line" id="L17"><a class="ln" href="#L17">17</a><span class="tok-com"> * The attribute carries only the reference: the resolver instance is</span></span>
-<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com"> * registered with the runtime at bootstrap, and the runtime meets the resolved</span></span>
-<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com"> * lifetime with the origin metadata using the fixed composition law. One</span></span>
+<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com"> * registered with the runtime at bootstrap. Its lifetime replaces policy,</span></span>
+<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com"> * parameter and inherited expiration; a Strategy may override it afterward. One</span></span>
 <span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com"> * boundary declares at most one resolver.</span></span>
 <span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com"> */</span></span>
 <span class="src-line" id="L22"><a class="ln" href="#L22">22</a>#[<span class="tok-id">Attribute</span>(<span class="tok-id">Attribute</span>::<span class="tok-id">TARGET_CLASS</span> | <span class="tok-id">Attribute</span>::<span class="tok-id">TARGET_METHOD</span>)]</span>

@@ -111,8 +111,8 @@
 <span class="src-line" id="L75"><a class="ln" href="#L75">75</a></span>
 <span class="src-line" id="L76"><a class="ln" href="#L76">76</a>        <span class="tok-var">$values</span> = (<span class="tok-kw">new</span> <span class="tok-id">CallArguments</span>())-&gt;<span class="tok-id">bind</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">method</span>, <span class="tok-var">$arguments</span>);</span>
 <span class="src-line" id="L77"><a class="ln" href="#L77">77</a>        <span class="tok-var">$ttl</span> = <span class="tok-id">null</span>;</span>
-<span class="src-line" id="L78"><a class="ln" href="#L78">78</a>        <span class="tok-var">$tags</span> = [];</span>
-<span class="src-line" id="L79"><a class="ln" href="#L79">79</a>        <span class="tok-var">$visibility</span> = <span class="tok-id">Visibility</span>::<span class="tok-id">Shared</span>;</span>
+<span class="src-line" id="L78"><a class="ln" href="#L78">78</a>        <span class="tok-var">$tags</span> = <span class="tok-id">null</span>;</span>
+<span class="src-line" id="L79"><a class="ln" href="#L79">79</a>        <span class="tok-var">$visibility</span> = <span class="tok-id">null</span>;</span>
 <span class="src-line" id="L80"><a class="ln" href="#L80">80</a>        <span class="tok-var">$strategy</span> = [];</span>
 <span class="src-line" id="L81"><a class="ln" href="#L81">81</a></span>
 <span class="src-line" id="L82"><a class="ln" href="#L82">82</a>        <span class="tok-kw">foreach</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">bindings</span> <span class="tok-kw">as</span> <span class="tok-var">$binding</span>) {</span>
@@ -120,15 +120,15 @@
 <span class="src-line" id="L84"><a class="ln" href="#L84">84</a></span>
 <span class="src-line" id="L85"><a class="ln" href="#L85">85</a>            <span class="tok-kw">if</span> (<span class="tok-var">$binding</span>-&gt;<span class="tok-id">ttl</span>) {</span>
 <span class="src-line" id="L86"><a class="ln" href="#L86">86</a>                <span class="tok-var">$seconds</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">ttl</span>(<span class="tok-var">$value</span>);</span>
-<span class="src-line" id="L87"><a class="ln" href="#L87">87</a>                <span class="tok-var">$ttl</span> = <span class="tok-var">$ttl</span> === <span class="tok-id">null</span> ? <span class="tok-var">$seconds</span> : <span class="tok-id">min</span>(<span class="tok-var">$ttl</span>, <span class="tok-var">$seconds</span>);</span>
+<span class="src-line" id="L87"><a class="ln" href="#L87">87</a>                <span class="tok-var">$ttl</span> = <span class="tok-var">$seconds</span>;</span>
 <span class="src-line" id="L88"><a class="ln" href="#L88">88</a>            }</span>
 <span class="src-line" id="L89"><a class="ln" href="#L89">89</a></span>
 <span class="src-line" id="L90"><a class="ln" href="#L90">90</a>            <span class="tok-kw">if</span> (<span class="tok-var">$binding</span>-&gt;<span class="tok-id">tags</span>) {</span>
-<span class="src-line" id="L91"><a class="ln" href="#L91">91</a>                <span class="tok-var">$tags</span> = [...<span class="tok-var">$tags</span>, ...<span class="tok-var">$this</span>-&gt;<span class="tok-id">tags</span>(<span class="tok-var">$value</span>)];</span>
+<span class="src-line" id="L91"><a class="ln" href="#L91">91</a>                <span class="tok-var">$tags</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">tags</span>(<span class="tok-var">$value</span>);</span>
 <span class="src-line" id="L92"><a class="ln" href="#L92">92</a>            }</span>
 <span class="src-line" id="L93"><a class="ln" href="#L93">93</a></span>
 <span class="src-line" id="L94"><a class="ln" href="#L94">94</a>            <span class="tok-kw">if</span> (<span class="tok-var">$binding</span>-&gt;<span class="tok-id">visibility</span>) {</span>
-<span class="src-line" id="L95"><a class="ln" href="#L95">95</a>                <span class="tok-var">$visibility</span> = <span class="tok-var">$visibility</span>-&gt;<span class="tok-id">meet</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">visibility</span>(<span class="tok-var">$value</span>));</span>
+<span class="src-line" id="L95"><a class="ln" href="#L95">95</a>                <span class="tok-var">$visibility</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">visibility</span>(<span class="tok-var">$value</span>);</span>
 <span class="src-line" id="L96"><a class="ln" href="#L96">96</a>            }</span>
 <span class="src-line" id="L97"><a class="ln" href="#L97">97</a></span>
 <span class="src-line" id="L98"><a class="ln" href="#L98">98</a>            <span class="tok-kw">if</span> (<span class="tok-var">$binding</span>-&gt;<span class="tok-id">strategyArgument</span> !== <span class="tok-id">null</span>) {</span>

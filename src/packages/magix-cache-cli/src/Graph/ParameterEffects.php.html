@@ -70,7 +70,7 @@
 <span class="src-line" id="L34"><a class="ln" href="#L34">34</a>            }</span>
 <span class="src-line" id="L35"><a class="ln" href="#L35">35</a>        }</span>
 <span class="src-line" id="L36"><a class="ln" href="#L36">36</a></span>
-<span class="src-line" id="L37"><a class="ln" href="#L37">37</a>        <span class="tok-kw">return</span> <span class="tok-var">$sources</span>;</span>
+<span class="src-line" id="L37"><a class="ln" href="#L37">37</a>        <span class="tok-kw">return</span> <span class="tok-var">$sources</span> === [] ? [] : [<span class="tok-id">end</span>(<span class="tok-var">$sources</span>)];</span>
 <span class="src-line" id="L38"><a class="ln" href="#L38">38</a>    }</span>
 <span class="src-line" id="L39"><a class="ln" href="#L39">39</a></span>
 <span class="src-line" id="L40"><a class="ln" href="#L40">40</a>    <span class="tok-com">/**</span></span>
@@ -184,34 +184,71 @@
 <span class="src-line" id="L148"><a class="ln" href="#L148">148</a><span class="tok-com">     */</span></span>
 <span class="src-line" id="L149"><a class="ln" href="#L149">149</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">apply</span>(<span class="tok-id">BoundaryDeclaration</span> <span class="tok-var">$boundary</span>, <span class="tok-id">DependencyConstraint</span> <span class="tok-var">$constraint</span>, <span class="tok-id">CacheEffect</span> <span class="tok-var">$effect</span>): <span class="tok-id">CacheEffect</span></span>
 <span class="src-line" id="L150"><a class="ln" href="#L150">150</a>    {</span>
-<span class="src-line" id="L151"><a class="ln" href="#L151">151</a>        <span class="tok-var">$visibilitySources</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">sources</span>(<span class="tok-var">$boundary</span>, <span class="tok-str">&#039;visibility&#039;</span>);</span>
-<span class="src-line" id="L152"><a class="ln" href="#L152">152</a>        <span class="tok-var">$visibilityUnknown</span> = <span class="tok-var">$effect</span>-&gt;<span class="tok-id">visibility</span> !== <span class="tok-id">Visibility</span>::<span class="tok-id">NoStore</span></span>
-<span class="src-line" id="L153"><a class="ln" href="#L153">153</a>            &amp;&amp; (<span class="tok-var">$constraint</span>-&gt;<span class="tok-id">visibilityUnknown</span> || <span class="tok-var">$visibilitySources</span> !== []);</span>
-<span class="src-line" id="L154"><a class="ln" href="#L154">154</a>        <span class="tok-var">$tagsUnknown</span> = <span class="tok-var">$constraint</span>-&gt;<span class="tok-id">tagsUnknown</span> || <span class="tok-var">$this</span>-&gt;<span class="tok-id">sources</span>(<span class="tok-var">$boundary</span>, <span class="tok-str">&#039;tags&#039;</span>) !== [];</span>
-<span class="src-line" id="L155"><a class="ln" href="#L155">155</a>        <span class="tok-var">$problems</span> = [...<span class="tok-var">$effect</span>-&gt;<span class="tok-id">problems</span>, ...<span class="tok-var">$this</span>-&gt;<span class="tok-id">problems</span>(<span class="tok-var">$boundary</span>)];</span>
-<span class="src-line" id="L156"><a class="ln" href="#L156">156</a>        <span class="tok-var">$reason</span> = <span class="tok-var">$effect</span>-&gt;<span class="tok-id">visibilityReason</span>;</span>
-<span class="src-line" id="L157"><a class="ln" href="#L157">157</a></span>
-<span class="src-line" id="L158"><a class="ln" href="#L158">158</a>        <span class="tok-kw">if</span> (<span class="tok-var">$visibilityUnknown</span>) {</span>
-<span class="src-line" id="L159"><a class="ln" href="#L159">159</a>            <span class="tok-var">$dependency</span> = <span class="tok-var">$visibilitySources</span> === [] ? <span class="tok-str">&#039;dependency metadata&#039;</span> : <span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$visibilitySources</span>);</span>
-<span class="src-line" id="L160"><a class="ln" href="#L160">160</a>            <span class="tok-var">$reason</span> = (<span class="tok-var">$reason</span> === <span class="tok-id">null</span> ? <span class="tok-str">&#039;&#039;</span> : <span class="tok-var">$reason</span>.<span class="tok-str">&#039;; &#039;</span>).<span class="tok-str">&#039;may be further restricted by &#039;</span>.<span class="tok-var">$dependency</span>;</span>
-<span class="src-line" id="L161"><a class="ln" href="#L161">161</a>        }</span>
-<span class="src-line" id="L162"><a class="ln" href="#L162">162</a></span>
-<span class="src-line" id="L163"><a class="ln" href="#L163">163</a>        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">CacheEffect</span>(</span>
-<span class="src-line" id="L164"><a class="ln" href="#L164">164</a>            <span class="tok-id">ttl</span>: <span class="tok-var">$problems</span> === [] ? <span class="tok-var">$effect</span>-&gt;<span class="tok-id">ttl</span> : <span class="tok-id">TtlEstimate</span>::<span class="tok-id">invalid</span>(<span class="tok-var">$problems</span>[<span class="tok-num">0</span>]),</span>
-<span class="src-line" id="L165"><a class="ln" href="#L165">165</a>            <span class="tok-id">visibility</span>: <span class="tok-var">$effect</span>-&gt;<span class="tok-id">visibility</span>,</span>
-<span class="src-line" id="L166"><a class="ln" href="#L166">166</a>            <span class="tok-id">storable</span>: <span class="tok-var">$effect</span>-&gt;<span class="tok-id">storable</span> &amp;&amp; !<span class="tok-var">$visibilityUnknown</span> &amp;&amp; <span class="tok-var">$problems</span> === [],</span>
-<span class="src-line" id="L167"><a class="ln" href="#L167">167</a>            <span class="tok-id">tags</span>: <span class="tok-var">$effect</span>-&gt;<span class="tok-id">tags</span>,</span>
-<span class="src-line" id="L168"><a class="ln" href="#L168">168</a>            <span class="tok-id">visibilityReason</span>: <span class="tok-var">$reason</span>,</span>
-<span class="src-line" id="L169"><a class="ln" href="#L169">169</a>            <span class="tok-id">problems</span>: <span class="tok-var">$problems</span>,</span>
-<span class="src-line" id="L170"><a class="ln" href="#L170">170</a>            <span class="tok-id">strategy</span>: <span class="tok-var">$effect</span>-&gt;<span class="tok-id">strategy</span>,</span>
-<span class="src-line" id="L171"><a class="ln" href="#L171">171</a>            <span class="tok-id">expirationConstraints</span>: <span class="tok-var">$effect</span>-&gt;<span class="tok-id">expirationConstraints</span>,</span>
-<span class="src-line" id="L172"><a class="ln" href="#L172">172</a>            <span class="tok-id">visibilityUnknown</span>: <span class="tok-var">$visibilityUnknown</span>,</span>
-<span class="src-line" id="L173"><a class="ln" href="#L173">173</a>            <span class="tok-id">tagsUnknown</span>: <span class="tok-var">$tagsUnknown</span>,</span>
-<span class="src-line" id="L174"><a class="ln" href="#L174">174</a>            <span class="tok-id">localRestrictions</span>: <span class="tok-var">$problems</span> === [] ? (<span class="tok-kw">new</span> <span class="tok-id">LocalRestrictions</span>())-&gt;<span class="tok-id">describe</span>(<span class="tok-var">$boundary</span>, <span class="tok-var">$constraint</span>, <span class="tok-var">$effect</span>, <span class="tok-var">$visibilityUnknown</span>) : [],</span>
-<span class="src-line" id="L175"><a class="ln" href="#L175">175</a>        );</span>
-<span class="src-line" id="L176"><a class="ln" href="#L176">176</a>    }</span>
-<span class="src-line" id="L177"><a class="ln" href="#L177">177</a>}</span>
-<span class="src-line" id="L178"><a class="ln" href="#L178">178</a></span>
+<span class="src-line" id="L151"><a class="ln" href="#L151">151</a>        [<span class="tok-var">$visibility</span>, <span class="tok-var">$visibilityUnknown</span>, <span class="tok-var">$reason</span>] = <span class="tok-var">$this</span>-&gt;<span class="tok-id">visibility</span>(<span class="tok-var">$boundary</span>, <span class="tok-var">$constraint</span>, <span class="tok-var">$effect</span>);</span>
+<span class="src-line" id="L152"><a class="ln" href="#L152">152</a>        [<span class="tok-var">$tags</span>, <span class="tok-var">$tagsUnknown</span>] = <span class="tok-var">$this</span>-&gt;<span class="tok-id">tags</span>(<span class="tok-var">$boundary</span>, <span class="tok-var">$constraint</span>, <span class="tok-var">$effect</span>);</span>
+<span class="src-line" id="L153"><a class="ln" href="#L153">153</a>        <span class="tok-var">$problems</span> = [...<span class="tok-var">$effect</span>-&gt;<span class="tok-id">problems</span>, ...<span class="tok-var">$this</span>-&gt;<span class="tok-id">problems</span>(<span class="tok-var">$boundary</span>)];</span>
+<span class="src-line" id="L154"><a class="ln" href="#L154">154</a></span>
+<span class="src-line" id="L155"><a class="ln" href="#L155">155</a>        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">CacheEffect</span>(</span>
+<span class="src-line" id="L156"><a class="ln" href="#L156">156</a>            <span class="tok-id">ttl</span>: <span class="tok-var">$problems</span> === [] ? <span class="tok-var">$effect</span>-&gt;<span class="tok-id">ttl</span> : <span class="tok-id">TtlEstimate</span>::<span class="tok-id">invalid</span>(<span class="tok-var">$problems</span>[<span class="tok-num">0</span>]),</span>
+<span class="src-line" id="L157"><a class="ln" href="#L157">157</a>            <span class="tok-id">visibility</span>: <span class="tok-var">$visibility</span>,</span>
+<span class="src-line" id="L158"><a class="ln" href="#L158">158</a>            <span class="tok-id">storable</span>: <span class="tok-var">$effect</span>-&gt;<span class="tok-id">storable</span> &amp;&amp; !<span class="tok-var">$visibilityUnknown</span> &amp;&amp; <span class="tok-var">$problems</span> === [],</span>
+<span class="src-line" id="L159"><a class="ln" href="#L159">159</a>            <span class="tok-id">tags</span>: <span class="tok-var">$tags</span>,</span>
+<span class="src-line" id="L160"><a class="ln" href="#L160">160</a>            <span class="tok-id">visibilityReason</span>: <span class="tok-var">$reason</span>,</span>
+<span class="src-line" id="L161"><a class="ln" href="#L161">161</a>            <span class="tok-id">problems</span>: <span class="tok-var">$problems</span>,</span>
+<span class="src-line" id="L162"><a class="ln" href="#L162">162</a>            <span class="tok-id">strategy</span>: <span class="tok-var">$effect</span>-&gt;<span class="tok-id">strategy</span>,</span>
+<span class="src-line" id="L163"><a class="ln" href="#L163">163</a>            <span class="tok-id">expirationConstraints</span>: <span class="tok-var">$effect</span>-&gt;<span class="tok-id">expirationConstraints</span>,</span>
+<span class="src-line" id="L164"><a class="ln" href="#L164">164</a>            <span class="tok-id">visibilityUnknown</span>: <span class="tok-var">$visibilityUnknown</span>,</span>
+<span class="src-line" id="L165"><a class="ln" href="#L165">165</a>            <span class="tok-id">tagsUnknown</span>: <span class="tok-var">$tagsUnknown</span>,</span>
+<span class="src-line" id="L166"><a class="ln" href="#L166">166</a>            <span class="tok-id">localOverrides</span>: <span class="tok-var">$problems</span> === [] ? (<span class="tok-kw">new</span> <span class="tok-id">LocalOverrides</span>())-&gt;<span class="tok-id">describe</span>(<span class="tok-var">$boundary</span>, <span class="tok-var">$constraint</span>, <span class="tok-var">$effect</span>) : [],</span>
+<span class="src-line" id="L167"><a class="ln" href="#L167">167</a>        );</span>
+<span class="src-line" id="L168"><a class="ln" href="#L168">168</a>    }</span>
+<span class="src-line" id="L169"><a class="ln" href="#L169">169</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L170"><a class="ln" href="#L170">170</a><span class="tok-com">     * Applies explicit visibility writers without keeping an obsolete floor.</span></span>
+<span class="src-line" id="L171"><a class="ln" href="#L171">171</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L172"><a class="ln" href="#L172">172</a><span class="tok-com">     * @return array{Visibility, bool, string|null}</span></span>
+<span class="src-line" id="L173"><a class="ln" href="#L173">173</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L174"><a class="ln" href="#L174">174</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">visibility</span>(<span class="tok-id">BoundaryDeclaration</span> <span class="tok-var">$boundary</span>, <span class="tok-id">DependencyConstraint</span> <span class="tok-var">$constraint</span>, <span class="tok-id">CacheEffect</span> <span class="tok-var">$effect</span>): <span class="tok-kw">array</span></span>
+<span class="src-line" id="L175"><a class="ln" href="#L175">175</a>    {</span>
+<span class="src-line" id="L176"><a class="ln" href="#L176">176</a>        <span class="tok-kw">if</span> (<span class="tok-var">$effect</span>-&gt;<span class="tok-id">strategy</span>?-&gt;<span class="tok-id">metadataUnknown</span> === <span class="tok-id">true</span>) {</span>
+<span class="src-line" id="L177"><a class="ln" href="#L177">177</a>            <span class="tok-kw">return</span> [<span class="tok-id">Visibility</span>::<span class="tok-id">Shared</span>, <span class="tok-id">true</span>, <span class="tok-str">&#039;custom Strategy metadata overrides are not analyzed&#039;</span>];</span>
+<span class="src-line" id="L178"><a class="ln" href="#L178">178</a>        }</span>
+<span class="src-line" id="L179"><a class="ln" href="#L179">179</a></span>
+<span class="src-line" id="L180"><a class="ln" href="#L180">180</a>        <span class="tok-var">$sources</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">sources</span>(<span class="tok-var">$boundary</span>, <span class="tok-str">&#039;visibility&#039;</span>);</span>
+<span class="src-line" id="L181"><a class="ln" href="#L181">181</a></span>
+<span class="src-line" id="L182"><a class="ln" href="#L182">182</a>        <span class="tok-kw">if</span> (<span class="tok-var">$sources</span> !== []) {</span>
+<span class="src-line" id="L183"><a class="ln" href="#L183">183</a>            <span class="tok-kw">return</span> [<span class="tok-id">Visibility</span>::<span class="tok-id">Shared</span>, <span class="tok-id">true</span>, <span class="tok-str">&#039;overridden by &#039;</span>.<span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$sources</span>)];</span>
+<span class="src-line" id="L184"><a class="ln" href="#L184">184</a>        }</span>
+<span class="src-line" id="L185"><a class="ln" href="#L185">185</a></span>
+<span class="src-line" id="L186"><a class="ln" href="#L186">186</a>        <span class="tok-var">$policy</span> = <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">policy</span>;</span>
+<span class="src-line" id="L187"><a class="ln" href="#L187">187</a></span>
+<span class="src-line" id="L188"><a class="ln" href="#L188">188</a>        <span class="tok-kw">if</span> (<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">scope</span>() !== <span class="tok-id">null</span> || <span class="tok-var">$policy</span>?-&gt;<span class="tok-id">visibility</span> !== <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L189"><a class="ln" href="#L189">189</a>            <span class="tok-kw">return</span> [<span class="tok-var">$effect</span>-&gt;<span class="tok-id">visibility</span>, <span class="tok-id">false</span>, <span class="tok-var">$effect</span>-&gt;<span class="tok-id">visibilityReason</span>];</span>
+<span class="src-line" id="L190"><a class="ln" href="#L190">190</a>        }</span>
+<span class="src-line" id="L191"><a class="ln" href="#L191">191</a></span>
+<span class="src-line" id="L192"><a class="ln" href="#L192">192</a>        <span class="tok-kw">if</span> (<span class="tok-var">$policy</span>-&gt;<span class="tok-id">visibilityUnknown</span> ?? <span class="tok-id">false</span>) {</span>
+<span class="src-line" id="L193"><a class="ln" href="#L193">193</a>            <span class="tok-kw">return</span> [<span class="tok-id">Visibility</span>::<span class="tok-id">Shared</span>, <span class="tok-id">true</span>, <span class="tok-str">&#039;the declared visibility cannot be read statically&#039;</span>];</span>
+<span class="src-line" id="L194"><a class="ln" href="#L194">194</a>        }</span>
+<span class="src-line" id="L195"><a class="ln" href="#L195">195</a></span>
+<span class="src-line" id="L196"><a class="ln" href="#L196">196</a>        <span class="tok-kw">return</span> [<span class="tok-var">$effect</span>-&gt;<span class="tok-id">visibility</span>, <span class="tok-var">$constraint</span>-&gt;<span class="tok-id">visibilityUnknown</span> &amp;&amp; <span class="tok-var">$effect</span>-&gt;<span class="tok-id">visibility</span> !== <span class="tok-id">Visibility</span>::<span class="tok-id">NoStore</span>, <span class="tok-var">$effect</span>-&gt;<span class="tok-id">visibilityReason</span>];</span>
+<span class="src-line" id="L197"><a class="ln" href="#L197">197</a>    }</span>
+<span class="src-line" id="L198"><a class="ln" href="#L198">198</a></span>
+<span class="src-line" id="L199"><a class="ln" href="#L199">199</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L200"><a class="ln" href="#L200">200</a><span class="tok-com">     * A replacement tag list removes previously known tags and uncertainty.</span></span>
+<span class="src-line" id="L201"><a class="ln" href="#L201">201</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L202"><a class="ln" href="#L202">202</a><span class="tok-com">     * @return array{list&lt;string&gt;, bool}</span></span>
+<span class="src-line" id="L203"><a class="ln" href="#L203">203</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L204"><a class="ln" href="#L204">204</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">tags</span>(<span class="tok-id">BoundaryDeclaration</span> <span class="tok-var">$boundary</span>, <span class="tok-id">DependencyConstraint</span> <span class="tok-var">$constraint</span>, <span class="tok-id">CacheEffect</span> <span class="tok-var">$effect</span>): <span class="tok-kw">array</span></span>
+<span class="src-line" id="L205"><a class="ln" href="#L205">205</a>    {</span>
+<span class="src-line" id="L206"><a class="ln" href="#L206">206</a>        <span class="tok-var">$policy</span> = <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">policy</span>;</span>
+<span class="src-line" id="L207"><a class="ln" href="#L207">207</a></span>
+<span class="src-line" id="L208"><a class="ln" href="#L208">208</a>        <span class="tok-kw">if</span> (<span class="tok-var">$effect</span>-&gt;<span class="tok-id">strategy</span>?-&gt;<span class="tok-id">metadataUnknown</span> === <span class="tok-id">true</span> || <span class="tok-var">$this</span>-&gt;<span class="tok-id">sources</span>(<span class="tok-var">$boundary</span>, <span class="tok-str">&#039;tags&#039;</span>) !== [] || (<span class="tok-var">$policy</span>-&gt;<span class="tok-id">tagsUnknown</span> ?? <span class="tok-id">false</span>)) {</span>
+<span class="src-line" id="L209"><a class="ln" href="#L209">209</a>            <span class="tok-kw">return</span> [[], <span class="tok-id">true</span>];</span>
+<span class="src-line" id="L210"><a class="ln" href="#L210">210</a>        }</span>
+<span class="src-line" id="L211"><a class="ln" href="#L211">211</a></span>
+<span class="src-line" id="L212"><a class="ln" href="#L212">212</a>        <span class="tok-kw">return</span> [<span class="tok-var">$effect</span>-&gt;<span class="tok-id">tags</span>, <span class="tok-var">$policy</span>?-&gt;<span class="tok-id">tags</span> === <span class="tok-id">null</span> &amp;&amp; <span class="tok-var">$constraint</span>-&gt;<span class="tok-id">tagsUnknown</span>];</span>
+<span class="src-line" id="L213"><a class="ln" href="#L213">213</a>    }</span>
+<span class="src-line" id="L214"><a class="ln" href="#L214">214</a>}</span>
+<span class="src-line" id="L215"><a class="ln" href="#L215">215</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

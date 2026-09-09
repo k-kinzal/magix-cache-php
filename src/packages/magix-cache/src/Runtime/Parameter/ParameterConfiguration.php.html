@@ -51,28 +51,28 @@
 <span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">ParameterConfiguration</span></span>
 <span class="src-line" id="L16"><a class="ln" href="#L16">16</a>{</span>
 <span class="src-line" id="L17"><a class="ln" href="#L17">17</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com">     * @param int&lt;0, max&gt;|null $ttl Validated additional lifetime in seconds.</span></span>
-<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com">     * @param list&lt;non-empty-string&gt; $tags Validated cache tokens.</span></span>
+<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com">     * @param int&lt;0, max&gt;|null $ttl Validated override lifetime in seconds.</span></span>
+<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com">     * @param list&lt;non-empty-string&gt;|null $tags Validated cache tokens.</span></span>
 <span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com">     * @param array&lt;string, mixed&gt; $strategyArguments Values passed to create().</span></span>
 <span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com">     */</span></span>
 <span class="src-line" id="L22"><a class="ln" href="#L22">22</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(</span>
 <span class="src-line" id="L23"><a class="ln" href="#L23">23</a>        <span class="tok-kw">public</span> ?<span class="tok-id">int</span> <span class="tok-var">$ttl</span> = <span class="tok-id">null</span>,</span>
-<span class="src-line" id="L24"><a class="ln" href="#L24">24</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$tags</span> = [],</span>
-<span class="src-line" id="L25"><a class="ln" href="#L25">25</a>        <span class="tok-kw">public</span> <span class="tok-id">Visibility</span> <span class="tok-var">$visibility</span> = <span class="tok-id">Visibility</span>::<span class="tok-id">Shared</span>,</span>
+<span class="src-line" id="L24"><a class="ln" href="#L24">24</a>        <span class="tok-kw">public</span> ?<span class="tok-kw">array</span> <span class="tok-var">$tags</span> = <span class="tok-id">null</span>,</span>
+<span class="src-line" id="L25"><a class="ln" href="#L25">25</a>        <span class="tok-kw">public</span> ?<span class="tok-id">Visibility</span> <span class="tok-var">$visibility</span> = <span class="tok-id">null</span>,</span>
 <span class="src-line" id="L26"><a class="ln" href="#L26">26</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$strategyArguments</span> = [],</span>
 <span class="src-line" id="L27"><a class="ln" href="#L27">27</a>    ) {</span>
 <span class="src-line" id="L28"><a class="ln" href="#L28">28</a>    }</span>
 <span class="src-line" id="L29"><a class="ln" href="#L29">29</a></span>
 <span class="src-line" id="L30"><a class="ln" href="#L30">30</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L31"><a class="ln" href="#L31">31</a><span class="tok-com">     * Returns the policy restricted by parameter visibility and tags.</span></span>
+<span class="src-line" id="L31"><a class="ln" href="#L31">31</a><span class="tok-com">     * Overrides explicitly bound tags and visibility; omitted bindings inherit.</span></span>
 <span class="src-line" id="L32"><a class="ln" href="#L32">32</a><span class="tok-com">     */</span></span>
 <span class="src-line" id="L33"><a class="ln" href="#L33">33</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">policy</span>(<span class="tok-id">CachePolicy</span> <span class="tok-var">$policy</span>): <span class="tok-id">CachePolicy</span></span>
 <span class="src-line" id="L34"><a class="ln" href="#L34">34</a>    {</span>
 <span class="src-line" id="L35"><a class="ln" href="#L35">35</a>        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">CachePolicy</span>(</span>
 <span class="src-line" id="L36"><a class="ln" href="#L36">36</a>            <span class="tok-id">ttl</span>: <span class="tok-var">$policy</span>-&gt;<span class="tok-id">ttl</span>,</span>
 <span class="src-line" id="L37"><a class="ln" href="#L37">37</a>            <span class="tok-id">maxTtl</span>: <span class="tok-var">$policy</span>-&gt;<span class="tok-id">maxTtl</span>,</span>
-<span class="src-line" id="L38"><a class="ln" href="#L38">38</a>            <span class="tok-id">tags</span>: [...<span class="tok-var">$policy</span>-&gt;<span class="tok-id">tags</span>, ...<span class="tok-var">$this</span>-&gt;<span class="tok-id">tags</span>],</span>
-<span class="src-line" id="L39"><a class="ln" href="#L39">39</a>            <span class="tok-id">visibility</span>: <span class="tok-var">$policy</span>-&gt;<span class="tok-id">visibility</span>-&gt;<span class="tok-id">meet</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">visibility</span>),</span>
+<span class="src-line" id="L38"><a class="ln" href="#L38">38</a>            <span class="tok-id">tags</span>: <span class="tok-var">$this</span>-&gt;<span class="tok-id">tags</span> ?? <span class="tok-var">$policy</span>-&gt;<span class="tok-id">tags</span>,</span>
+<span class="src-line" id="L39"><a class="ln" href="#L39">39</a>            <span class="tok-id">visibility</span>: <span class="tok-var">$this</span>-&gt;<span class="tok-id">visibility</span> ?? <span class="tok-var">$policy</span>-&gt;<span class="tok-id">visibility</span>,</span>
 <span class="src-line" id="L40"><a class="ln" href="#L40">40</a>            <span class="tok-id">version</span>: <span class="tok-var">$policy</span>-&gt;<span class="tok-id">version</span>,</span>
 <span class="src-line" id="L41"><a class="ln" href="#L41">41</a>        );</span>
 <span class="src-line" id="L42"><a class="ln" href="#L42">42</a>    }</span>

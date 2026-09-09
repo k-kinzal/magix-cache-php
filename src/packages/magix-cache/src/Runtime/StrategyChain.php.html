@@ -42,37 +42,38 @@
 <span class="src-line" id="L6"><a class="ln" href="#L6">6</a></span>
 <span class="src-line" id="L7"><a class="ln" href="#L7">7</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\BackendErrorClassifier</span>;</span>
 <span class="src-line" id="L8"><a class="ln" href="#L8">8</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\CacheObserver</span>;</span>
-<span class="src-line" id="L9"><a class="ln" href="#L9">9</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Strategy\NextCacheStrategy</span>;</span>
-<span class="src-line" id="L10"><a class="ln" href="#L10">10</a></span>
-<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com">/**</span></span>
-<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * Binds newly constructed strategies to this execution&#039;s terminal stages.</span></span>
-<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com"> * @internal</span></span>
-<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com"> */</span></span>
-<span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">StrategyChain</span></span>
-<span class="src-line" id="L17"><a class="ln" href="#L17">17</a>{</span>
-<span class="src-line" id="L18"><a class="ln" href="#L18">18</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com">     * Supplies the guarded storage capabilities of one runtime execution.</span></span>
-<span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L21"><a class="ln" href="#L21">21</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(<span class="tok-kw">private</span> <span class="tok-id">GuardedCache</span> <span class="tok-var">$cache</span>, <span class="tok-kw">private</span> ?<span class="tok-id">BackendErrorClassifier</span> <span class="tok-var">$classifier</span>, <span class="tok-kw">private</span> ?<span class="tok-id">CacheObserver</span> <span class="tok-var">$observer</span>)</span>
-<span class="src-line" id="L22"><a class="ln" href="#L22">22</a>    {</span>
-<span class="src-line" id="L23"><a class="ln" href="#L23">23</a>    }</span>
-<span class="src-line" id="L24"><a class="ln" href="#L24">24</a></span>
-<span class="src-line" id="L25"><a class="ln" href="#L25">25</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L26"><a class="ln" href="#L26">26</a><span class="tok-com">     * Creates an independent composition for the invocation.</span></span>
-<span class="src-line" id="L27"><a class="ln" href="#L27">27</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L28"><a class="ln" href="#L28">28</a><span class="tok-com">     * @template T</span></span>
-<span class="src-line" id="L29"><a class="ln" href="#L29">29</a><span class="tok-com">     * @param CacheInvocation&lt;T&gt; $invocation</span></span>
-<span class="src-line" id="L30"><a class="ln" href="#L30">30</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L31"><a class="ln" href="#L31">31</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">bind</span>(<span class="tok-id">CacheInvocation</span> <span class="tok-var">$invocation</span>): <span class="tok-id">NextCacheStrategy</span></span>
-<span class="src-line" id="L32"><a class="ln" href="#L32">32</a>    {</span>
-<span class="src-line" id="L33"><a class="ln" href="#L33">33</a>        <span class="tok-var">$terminal</span> = <span class="tok-kw">new</span> <span class="tok-id">TerminalCacheStrategy</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">cache</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">classifier</span>, <span class="tok-var">$invocation</span>-&gt;<span class="tok-id">origin</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">observer</span>);</span>
-<span class="src-line" id="L34"><a class="ln" href="#L34">34</a>        <span class="tok-var">$strategy</span> = <span class="tok-var">$invocation</span>-&gt;<span class="tok-id">strategy</span>?-&gt;<span class="tok-id">instantiate</span>();</span>
-<span class="src-line" id="L35"><a class="ln" href="#L35">35</a></span>
-<span class="src-line" id="L36"><a class="ln" href="#L36">36</a>        <span class="tok-kw">return</span> <span class="tok-var">$strategy</span> === <span class="tok-id">null</span> ? <span class="tok-id">NextCacheStrategy</span>::<span class="tok-id">of</span>(<span class="tok-var">$terminal</span>) : <span class="tok-id">NextCacheStrategy</span>::<span class="tok-id">of</span>(<span class="tok-var">$strategy</span>, <span class="tok-var">$terminal</span>);</span>
-<span class="src-line" id="L37"><a class="ln" href="#L37">37</a>    }</span>
-<span class="src-line" id="L38"><a class="ln" href="#L38">38</a>}</span>
-<span class="src-line" id="L39"><a class="ln" href="#L39">39</a></span>
+<span class="src-line" id="L9"><a class="ln" href="#L9">9</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\CacheTtlResolver</span>;</span>
+<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Strategy\NextCacheStrategy</span>;</span>
+<span class="src-line" id="L11"><a class="ln" href="#L11">11</a></span>
+<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com">/**</span></span>
+<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> * Binds newly constructed strategies to this execution&#039;s terminal stages.</span></span>
+<span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com"> *</span></span>
+<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com"> * @internal</span></span>
+<span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-com"> */</span></span>
+<span class="src-line" id="L17"><a class="ln" href="#L17">17</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">StrategyChain</span></span>
+<span class="src-line" id="L18"><a class="ln" href="#L18">18</a>{</span>
+<span class="src-line" id="L19"><a class="ln" href="#L19">19</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com">     * Supplies the guarded storage capabilities of one runtime execution.</span></span>
+<span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L22"><a class="ln" href="#L22">22</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(<span class="tok-kw">private</span> <span class="tok-id">GuardedCache</span> <span class="tok-var">$cache</span>, <span class="tok-kw">private</span> ?<span class="tok-id">BackendErrorClassifier</span> <span class="tok-var">$classifier</span>, <span class="tok-kw">private</span> ?<span class="tok-id">CacheObserver</span> <span class="tok-var">$observer</span>)</span>
+<span class="src-line" id="L23"><a class="ln" href="#L23">23</a>    {</span>
+<span class="src-line" id="L24"><a class="ln" href="#L24">24</a>    }</span>
+<span class="src-line" id="L25"><a class="ln" href="#L25">25</a></span>
+<span class="src-line" id="L26"><a class="ln" href="#L26">26</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L27"><a class="ln" href="#L27">27</a><span class="tok-com">     * Creates an independent composition for the invocation.</span></span>
+<span class="src-line" id="L28"><a class="ln" href="#L28">28</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L29"><a class="ln" href="#L29">29</a><span class="tok-com">     * @template T</span></span>
+<span class="src-line" id="L30"><a class="ln" href="#L30">30</a><span class="tok-com">     * @param CacheInvocation&lt;T&gt; $invocation</span></span>
+<span class="src-line" id="L31"><a class="ln" href="#L31">31</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L32"><a class="ln" href="#L32">32</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">bind</span>(<span class="tok-id">CacheInvocation</span> <span class="tok-var">$invocation</span>, ?<span class="tok-id">CacheTtlResolver</span> <span class="tok-var">$ttlResolver</span> = <span class="tok-id">null</span>): <span class="tok-id">NextCacheStrategy</span></span>
+<span class="src-line" id="L33"><a class="ln" href="#L33">33</a>    {</span>
+<span class="src-line" id="L34"><a class="ln" href="#L34">34</a>        <span class="tok-var">$terminal</span> = <span class="tok-kw">new</span> <span class="tok-id">TerminalCacheStrategy</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">cache</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">classifier</span>, <span class="tok-var">$invocation</span>-&gt;<span class="tok-id">origin</span>, <span class="tok-var">$invocation</span>-&gt;<span class="tok-id">policy</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">observer</span>, <span class="tok-var">$ttlResolver</span>, <span class="tok-var">$invocation</span>-&gt;<span class="tok-id">parameterTtl</span>);</span>
+<span class="src-line" id="L35"><a class="ln" href="#L35">35</a>        <span class="tok-var">$strategy</span> = <span class="tok-var">$invocation</span>-&gt;<span class="tok-id">strategy</span>?-&gt;<span class="tok-id">instantiate</span>();</span>
+<span class="src-line" id="L36"><a class="ln" href="#L36">36</a></span>
+<span class="src-line" id="L37"><a class="ln" href="#L37">37</a>        <span class="tok-kw">return</span> <span class="tok-var">$strategy</span> === <span class="tok-id">null</span> ? <span class="tok-id">NextCacheStrategy</span>::<span class="tok-id">of</span>(<span class="tok-var">$terminal</span>) : <span class="tok-id">NextCacheStrategy</span>::<span class="tok-id">of</span>(<span class="tok-var">$strategy</span>, <span class="tok-var">$terminal</span>);</span>
+<span class="src-line" id="L38"><a class="ln" href="#L38">38</a>    }</span>
+<span class="src-line" id="L39"><a class="ln" href="#L39">39</a>}</span>
+<span class="src-line" id="L40"><a class="ln" href="#L40">40</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

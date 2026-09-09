@@ -43,10 +43,10 @@
 <span class="src-line" id="L7"><a class="ln" href="#L7">7</a><span class="tok-kw">use</span> <span class="tok-id">Attribute</span>;</span>
 <span class="src-line" id="L8"><a class="ln" href="#L8">8</a></span>
 <span class="src-line" id="L9"><a class="ln" href="#L9">9</a><span class="tok-com">/**</span></span>
-<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-com"> * Adds the parameter&#039;s non-negative integer seconds as a lifetime constraint.</span></span>
+<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-com"> * Overrides expiration with the parameter&#039;s non-negative integer seconds.</span></span>
 <span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * The constraint is evaluated at the origin base time and met with all other</span></span>
-<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> * constraints, including a fixed policy TTL. The parameter remains keyed.</span></span>
+<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * The lifetime is evaluated at the origin base time and replaces the policy</span></span>
+<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> * and inherited expiration. The parameter remains keyed.</span></span>
 <span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com"> */</span></span>
 <span class="src-line" id="L15"><a class="ln" href="#L15">15</a>#[<span class="tok-id">Attribute</span>(<span class="tok-id">Attribute</span>::<span class="tok-id">TARGET_PARAMETER</span>)]</span>
 <span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">CacheTtl</span></span>

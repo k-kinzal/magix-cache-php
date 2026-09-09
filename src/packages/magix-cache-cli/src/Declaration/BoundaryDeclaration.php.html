@@ -97,13 +97,13 @@
 <span class="src-line" id="L61"><a class="ln" href="#L61">61</a>    <span class="tok-com">/**</span></span>
 <span class="src-line" id="L62"><a class="ln" href="#L62">62</a><span class="tok-com">     * Returns the visibility that scoped parameters impose on this boundary.</span></span>
 <span class="src-line" id="L63"><a class="ln" href="#L63">63</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L64"><a class="ln" href="#L64">64</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">scope</span>(): <span class="tok-id">Visibility</span></span>
+<span class="src-line" id="L64"><a class="ln" href="#L64">64</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">scope</span>(): ?<span class="tok-id">Visibility</span></span>
 <span class="src-line" id="L65"><a class="ln" href="#L65">65</a>    {</span>
-<span class="src-line" id="L66"><a class="ln" href="#L66">66</a>        <span class="tok-var">$visibility</span> = <span class="tok-id">Visibility</span>::<span class="tok-id">Shared</span>;</span>
+<span class="src-line" id="L66"><a class="ln" href="#L66">66</a>        <span class="tok-var">$visibility</span> = <span class="tok-id">null</span>;</span>
 <span class="src-line" id="L67"><a class="ln" href="#L67">67</a></span>
 <span class="src-line" id="L68"><a class="ln" href="#L68">68</a>        <span class="tok-kw">foreach</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">parameters</span> <span class="tok-kw">as</span> <span class="tok-var">$parameter</span>) {</span>
 <span class="src-line" id="L69"><a class="ln" href="#L69">69</a>            <span class="tok-kw">if</span> (<span class="tok-var">$parameter</span>-&gt;<span class="tok-id">scope</span> !== <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L70"><a class="ln" href="#L70">70</a>                <span class="tok-var">$visibility</span> = <span class="tok-var">$visibility</span>-&gt;<span class="tok-id">meet</span>(<span class="tok-var">$parameter</span>-&gt;<span class="tok-id">scope</span>);</span>
+<span class="src-line" id="L70"><a class="ln" href="#L70">70</a>                <span class="tok-var">$visibility</span> = <span class="tok-var">$parameter</span>-&gt;<span class="tok-id">scope</span>;</span>
 <span class="src-line" id="L71"><a class="ln" href="#L71">71</a>            }</span>
 <span class="src-line" id="L72"><a class="ln" href="#L72">72</a>        }</span>
 <span class="src-line" id="L73"><a class="ln" href="#L73">73</a></span>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MagixCache CLI — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/pr/21/k-kinzal/magix-cache-cli/doc/README.md.html">
+<meta name="description" content="MagixCache CLI, a document of the k-kinzal/magix-cache-cli package.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="MagixCache CLI — magix-cache-php">
+<meta property="og:description" content="MagixCache CLI, a document of the k-kinzal/magix-cache-cli package.">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/pr/21/k-kinzal/magix-cache-cli/doc/README.md.html">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/pr/21/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}document.documentElement.dataset.diffMode=localStorage.getItem("docgen-diff-mode")||"inline"}catch(e){}</script>
+</head>
+<body data-root="../../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../index.html">magix-cache-php</a></div><div class="sb-pkg"><a href="../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></div><nav class="sb-block"><div class="sb-title">Package</div><ul class="sb-list"><li data-diff="modified"><a href="../../../k-kinzal/magix-cache-cli/all-items.html">All items</a></li><li data-diff="modified"><a href="../../../k-kinzal/magix-cache-cli/index.html#documents">Documents</a></li></ul><div class="sb-kind" data-diff="modified">Layers</div><ul class="sb-list"><li data-diff="same"><a href="../../../k-kinzal/magix-cache-cli/layer.CliConsole.html">CliConsole</a></li><li data-diff="modified"><a href="../../../k-kinzal/magix-cache-cli/layer.CliDeclaration.html">CliDeclaration</a></li><li data-diff="modified"><a href="../../../k-kinzal/magix-cache-cli/layer.CliGraph.html">CliGraph</a></li><li data-diff="same"><a href="../../../k-kinzal/magix-cache-cli/layer.CliKey.html">CliKey</a></li><li data-diff="same"><a href="../../../k-kinzal/magix-cache-cli/layer.CliReader.html">CliReader</a></li><li data-diff="modified"><a href="../../../k-kinzal/magix-cache-cli/layer.CliRender.html">CliRender</a></li><li data-diff="same"><a href="../../../k-kinzal/magix-cache-cli/layer.CliSource.html">CliSource</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Namespaces</div><ul class="sb-list"><li data-diff="same"><a href="../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Console/index.html" title="Magix\Cache\Cli\Console">Magix\Cache\Cli\Console</a></li><li data-diff="modified"><a href="../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Declaration/index.html" title="Magix\Cache\Cli\Declaration">Magix\Cache\Cli\Declaration</a></li><li data-diff="modified"><a href="../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Graph/index.html" title="Magix\Cache\Cli\Graph">Magix\Cache\Cli\Graph</a></li><li data-diff="same"><a href="../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Key/index.html" title="Magix\Cache\Cli\Key">Magix\Cache\Cli\Key</a></li><li data-diff="same"><a href="../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Reader/index.html" title="Magix\Cache\Cli\Reader">Magix\Cache\Cli\Reader</a></li><li data-diff="modified"><a href="../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Render/index.html" title="Magix\Cache\Cli\Render">Magix\Cache\Cli\Render</a></li><li data-diff="same"><a href="../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Source/index.html" title="Magix\Cache\Cli\Source">Magix\Cache\Cli\Source</a></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><a href="../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a><span class="crumb-sep">::</span><span class="crumb-current">README.md</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<span class="diff-range" title="Comparing 26e48ab to working tree">26e48ab <span class="diff-arrow">→</span> working tree</span><div class="diff-modes" id="diff-modes" role="group" aria-label="Diff display mode"><button type="button" class="diff-mode" data-diff-mode="off" title="Documentation of the head revision, without diff marks">Off</button><button type="button" class="diff-mode" data-diff-mode="inline" title="Every page with additions and removals marked">Diff</button><button type="button" class="diff-mode" data-diff-mode="changes" title="Only what the head revision added, changed, or removed">Changes</button></div><a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<p class="diff-empty" id="diff-empty" data-changes="Nothing on this page changed between 26e48ab and working tree." data-off="This page documents what 26e48ab had and working tree no longer has. Switch to Diff to read it." hidden></p>
+<div class="symbol-head"><h1><span class="chip chip-kind k-document">document</span>MagixCache CLI</h1><div class="symbol-meta"><span class="src-link">README.md</span></div></div>
+<section class="readme" data-diff="modified"><div class="doc-block" data-diff="same"><h2>MagixCache CLI</h2>
+</div><div class="doc-block" data-diff="same"><p><a href="https://github.com/k-kinzal/magix-cache/actions"><span class="md-target" title="https://github.com/k-kinzal/magix-cache/actions/workflows/ci.yml/badge.svg">GitHub Actions</span></a> <a href="https://opensource.org/licenses/MIT"><span class="md-target" title="https://img.shields.io/badge/License-MIT-yellow.svg">License: MIT</span></a></p>
+</div><div class="doc-block" data-diff="removed"><p><code>magix</code> makes the caches of a MagixCache project visible. It reads the source of a project without running it, resolves every <code>cached()</code> call site, and composes the constraints of the boundaries that call each other, exactly the way <code>CacheRuntime</code> does at runtime.</p>
+</div><div class="doc-block" data-diff="added"><p><code>magix</code> makes the caches of a MagixCache project visible. It reads the source of a project without running it, resolves every <code>cached()</code> call site, and bubbles dependencies and applies explicit boundary overrides in the same order as <code>CacheRuntime</code> does at runtime.</p>
+</div><div class="doc-block" data-diff="same"><p>The result answers the questions that are otherwise only observable in production: what is actually cached, for how long, under which key, and who is allowed to read the entry.</p>
+</div><div class="doc-block" data-diff="same"><h3>Features</h3>
+</div><div class="doc-block" data-diff="removed"><ul><li>Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node</li><li>Ordinary method display with <code>--uncached=between|all|none</code> (default: <code>between</code> cache boundaries), and independent subtree filters with repeatable <code>--ignore</code> patterns</li><li>Explicit analysis gaps when a cache boundary reaches another cache through ordinary methods, with unverified metadata kept unknown</li><li>The reason behind each effective value, such as which dependency capped a TTL or made a result private</li><li>White rows for provably storable caches and gray rows for other nodes, so the extent of cache bubbling is visible at a glance</li><li>Yellow fields where local TTL, <code>maxTtl</code>, or visibility settings restrict a storable result</li><li>Composed strategy contracts, bound to the same <code>create()</code> the runtime calls, with candidate ranges such as <code>30-60s</code> kept apart from the effective TTL</li><li>The default hash strategy&#039;s cache key for a call in the configured runtime namespace</li><li>Tree, JSON, and Mermaid output for terminals, editors, and documentation</li></ul>
+</div><div class="doc-block" data-diff="added"><ul><li>Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node</li><li>Ordinary method display with <code>--uncached=between|all|none</code> (default: <code>between</code> cache boundaries), and independent subtree filters with repeatable <code>--ignore</code> patterns</li><li>Explicit analysis gaps when a cache boundary reaches another cache through ordinary methods, with unverified metadata kept unknown</li><li>The reason behind each effective value, including inherited metadata and explicit local overrides</li><li>White rows for provably storable caches and gray rows for other nodes, so the extent of cache bubbling is visible at a glance</li><li>Yellow fields where local TTL, <code>maxTtl</code>, tags or visibility settings override a storable result</li><li>Composed strategy contracts, bound to the same <code>create()</code> the runtime calls, with candidate ranges such as <code>30-60s</code> kept apart from the effective TTL</li><li>The default hash strategy&#039;s cache key for a call in the configured runtime namespace</li><li>Tree, JSON, and Mermaid output for terminals, editors, and documentation</li></ul>
+</div><div class="doc-block" data-diff="same"><h3>Requirements</h3>
+</div><div class="doc-block" data-diff="same"><ul><li>PHP 8.3 or later</li><li>Composer</li><li>A project that uses <span class="md-target" title="../magix-cache/">k-kinzal/magix-cache</span></li></ul>
+</div><div class="doc-block" data-diff="same"><h3>Installation</h3>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>composer require --dev k-kinzal/magix-cache-cli</code></pre>
+</div><div class="doc-block" data-diff="same"><h3>Quick Start</h3>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>vendor/bin/magix analyze ProductPageQuery::execute</code></pre>
+</div><div class="doc-block" data-diff="removed"><pre class="code-block"><code>App\Query\ProductPageQuery::execute
+  src/Query/ProductPageQuery.php:34
+
+  ttl          20s (declared 120s, capped by ProductQuery::execute)
+  visibility   private (restricted by ViewerQuery::execute)
+  storable     yes
+  tags         inventory, page, product, viewer
+  key          $productId, $viewerId (ignored: $trace)  version 1
+  policy       #[Cache(ttl: 120s, tags: [page])]
+
+ProductPageQuery::execute  ttl 20s (declared 120s)  private  tags inventory,page,product,viewer
+|-- ProductQuery::execute  ttl 20s  shared  tags product
+|-- InventoryQuery::execute  ttl 60s  shared  tags inventory
+`-- ViewerQuery::execute  ttl 30s  private  tags viewer</code></pre>
+</div><div class="doc-block" data-diff="removed"><p>The boundary declares 120 seconds, but <code>ProductQuery</code> expires after 20, and <code>ViewerQuery</code> is personalized, so the page is stored privately for 20 seconds. Nothing needs to be executed to see this.</p>
+</div><div class="doc-block" data-diff="removed"><p>In a color terminal, these storable boundaries appear white. A <code>NoStore</code> result and the parents it constrains appear gray, while stored children remain white. Uncached methods, missing <code>#[Cache]</code> declarations, zero TTLs, and results whose storage depends on runtime values are also gray. <code>shared</code> and <code>private</code> retain their text labels without separate colors. Use <code>--ansi</code> to force colors or <code>--no-ansi</code> for plain text.</p>
+</div><div class="doc-block" data-diff="added"><pre class="code-block"><code>App\Query\ProductPageQuery::execute
+  src/Query/ProductPageQuery.php:34
+
+  ttl          120s
+  visibility   private (inherited from ViewerQuery::execute)
+  storable     yes
+  tags         page
+  key          $productId, $viewerId (ignored: $trace)  version 1
+  policy       #[Cache(ttl: 120s, tags: [page])]
+
+ProductPageQuery::execute  ttl 120s  private  tags page
+|-- ProductQuery::execute  ttl 20s  shared  tags product
+|-- InventoryQuery::execute  ttl 60s  shared  tags inventory
+`-- ViewerQuery::execute  ttl 30s  private  tags viewer</code></pre>
+</div><div class="doc-block" data-diff="added"><p>The boundary explicitly chooses 120 seconds and replaces tags with <code>page</code>. Its omitted visibility inherits Private from <code>ViewerQuery</code>. The child&#039;s 20-second TTL does not cap the parent&#039;s explicit override. Nothing needs to be executed to see this.</p>
+</div><div class="doc-block" data-diff="added"><p>In a color terminal, these storable boundaries appear white. A <code>NoStore</code> result and parents that inherit it appear gray, while stored children remain white. Uncached methods, missing <code>#[Cache]</code> declarations, zero TTLs, and results whose storage depends on runtime values are also gray. <code>shared</code> and <code>private</code> retain their text labels without separate colors. Use <code>--ansi</code> to force colors or <code>--no-ansi</code> for plain text.</p>
+</div><div class="doc-block" data-diff="same"><p>For a parent that only bubbles up child constraints, declare <code>#[Cache]</code> without a TTL. The tree shows the effective values directly, without a <code>(declared Ttl::Auto)</code> annotation, and the policy row uses <code>#[Cache]</code> (or includes any additional options). Explicit <code>ttl: Ttl::Auto</code> renders the same way. Fixed TTL declarations, upstream caps, and unknown or invalid lifetime diagnostics remain visible; JSON retains the normalized TTL mode in <code>policy.ttl</code>.</p>
+</div><div class="doc-block" data-diff="same"><h3>Commands</h3>
+</div><div class="doc-block" data-diff="same"><div class="table-wrap"><table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>magix analyze &lt;boundary&gt;</code></td><td>Expands a cache boundary or uncached controller action into its composed cache tree</td></tr><tr><td><code>magix key &lt;boundary&gt; [arguments]</code></td><td>Prints the cache key one call produces</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="same"><p>Every command scans the Composer autoload roots of the current directory by default. Use <code>--path</code> once per directory or file to scan something else:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>vendor/bin/magix analyze ProductPageQuery::execute --path=src/Query --path=modules</code></pre>
+</div><div class="doc-block" data-diff="same"><p>See <a href="../../../k-kinzal/magix-cache-cli/doc/docs/commands.md.html">Commands</a> for every option. <code>magix list</code> lists the available commands.</p>
+</div><div class="doc-block" data-diff="same"><h3>How It Works</h3>
+</div><div class="doc-block" data-diff="same"><p><code>magix analyze</code> never executes application code. Each PHP file below the scanned paths is parsed, and every method that calls <code>$this-&gt;cached()</code> becomes a boundary. The <code>#[Cache]</code> declaration, behavior attributes such as <code>#[DynamicTtl]</code>, and parameter attributes are read from the syntax tree, and calls to other boundaries are resolved through the declared types of properties, local variables, and interfaces.</p>
+</div><div class="doc-block" data-diff="removed"><p>The composition rules are the ones the runtime applies: the earliest expiration wins, cacheability is combined with logical AND, the strictest visibility wins, and tags are unioned. A fixed TTL is always bounded by the expiration its dependencies impose.</p>
+</div><div class="doc-block" data-diff="added"><p>The composition rules are the ones the runtime applies: the earliest expiration wins, cacheability is combined with logical AND, the strictest visibility wins, and tags are unioned. These are bubbling rules. Explicit parent fields override afterward: fixed TTL replaces expiration, tags replace the tag list, and visibility replaces scope. Strategies override after policy and invocation settings.</p>
+</div><div class="doc-block" data-diff="same"><p>Because the analysis is static, the effective TTL is an honest estimate rather than a guess. A lifetime is reported as a number only when it is statically determined; a boundary that is provably without expiration is <code>unconstrained</code>; anything that depends on runtime values, such as a <code>#[DynamicTtl]</code> resolver or an upstream the analyzer cannot see, is <code>unknown</code>, together with the tightest provable upper bound such as <code>unknown (≤30s)</code>; and a declaration that throws at runtime is <code>invalid</code>. A call that resolves to several implementations expands into all of them.</p>
+</div><div class="doc-block" data-diff="same"><p>The call graph follows dependencies inside composition callbacks, including <code>traverse()</code>, and preserves both dependencies when <code>unzip()</code> selects one side of a pair. It does not prove which callbacks execute or whether an iterable is non-empty. Check the empty collection path separately: <code>sequence()</code> and <code>traverse()</code> return unconstrained metadata for empty input, so an automatic parent TTL still needs a finite constraint from elsewhere on that path.</p>
+</div><div class="doc-block" data-diff="same"><p>A cache parent calling a cache child through ordinary methods is reported as <code>cache propagation unanalyzed</code>. Those methods might return <code>Cached</code> intact or detach its metadata with <code>value()</code>; the call graph does not prove either. The report keeps the parent&#039;s TTL, visibility, and tags uncertain while preserving proven constraints. The default <code>--uncached=between</code> shows the intermediate methods; <code>all</code> also shows wholly uncached branches, and <code>none</code> omits ordinary rows while keeping cached descendants and gap diagnostics. JSON exposes these paths in <code>analysisGaps</code>. See <a href="../../../k-kinzal/magix-cache-cli/doc/docs/commands.md.html#cache-propagation-gaps">analysis gaps</a> for the distinction from ordinary uncached calls and invalid declarations.</p>
+</div><div class="doc-block" data-diff="same"><p><code>magix key</code> is the one exception: it loads the referenced class through the Composer autoloader and runs its <code>#[CacheKey]</code> reducers and strategy factories. It computes the default hash strategy&#039;s key with the runtime&#039;s default namespace, <code>magix</code>; supply <code>--namespace</code> when the application configures another namespace. The boundary body is not called and no cache entries are read or written.</p>
+</div><div class="doc-block" data-diff="same"><h3>Documentation</h3>
+</div><div class="doc-block" data-diff="same"><ul><li><a href="../../../k-kinzal/magix-cache-cli/doc/docs/commands.md.html">Commands</a>: Every command, option, and output format</li><li><span class="md-target" title="../magix-cache/README.md">MagixCache</span>: The library these commands analyze</li><li><a href="../../../k-kinzal/magix-cache-cli/doc/README.md.html">Package Overview</a>: View every package in this monorepo</li></ul>
+</div><div class="doc-block" data-diff="same"><h3>License</h3>
+</div><div class="doc-block" data-diff="same"><p>This project is licensed under the MIT License. See the <span class="md-target" title="LICENSE">LICENSE</span> file for details.</p>
+</div><div class="doc-block" data-diff="same"><h3>Acknowledgements</h3>
+</div><div class="doc-block" data-diff="same"><ul><li><a href="https://github.com/nikic/PHP-Parser">nikic/php-parser</a> for the syntax trees the analysis is built on</li><li><a href="https://symfony.com/doc/current/components/console.html">Symfony Console</a> for the command line interface</li></ul>
+</div><div class="doc-block" data-diff="same"><h3>Parameter Configuration</h3>
+</div><div class="doc-block" data-diff="same"><p><code>magix analyze</code> understands <code>CacheTtl</code>, <code>CacheTags</code>, <code>CacheVisibility</code>, and <code>StrategyArgument</code> on boundary parameters. Configuration values remain runtime-dependent even when defaults are declared. TTL caps are preserved, strategy labels show their source parameters, and dynamic visibility and tags remain explicit throughout the dependency tree. JSON includes <code>visibilityUnknown</code> and <code>tagsUnknown</code> alongside the proven metadata bounds.</p>
+</div><div class="doc-block" data-diff="same"><p>The analysis reports invalid parameter declarations and missing or conflicting factory destinations in the affected node&#039;s problems. <code>magix key</code> uses the runtime binding and key construction, including the evaluated configuration component. See the core package&#039;s <span class="md-target" title="../magix-cache/docs/parameter-configuration.md">Parameter Configuration</span> guide.</p>
+</div></section>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../../assets/search-index.js" defer></script>
+<script src="../../../assets/app.js" defer></script>
+</body>
+</html>

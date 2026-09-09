@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MagixCache Laravel Integration — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/pr/22/k-kinzal/magix-cache-laravel/doc/README.md.html">
+<meta name="description" content="MagixCache Laravel Integration, a document of the k-kinzal/magix-cache-laravel package.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="MagixCache Laravel Integration — magix-cache-php">
+<meta property="og:description" content="MagixCache Laravel Integration, a document of the k-kinzal/magix-cache-laravel package.">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/pr/22/k-kinzal/magix-cache-laravel/doc/README.md.html">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/pr/22/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}document.documentElement.dataset.diffMode=localStorage.getItem("docgen-diff-mode")||"inline"}catch(e){}</script>
+</head>
+<body data-root="../../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../index.html">magix-cache-php</a></div><div class="sb-pkg"><a href="../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></div><nav class="sb-block"><div class="sb-title">Package</div><ul class="sb-list"><li data-diff="same"><a href="../../../k-kinzal/magix-cache-laravel/all-items.html">All items</a></li><li data-diff="same"><a href="../../../k-kinzal/magix-cache-laravel/index.html#documents">Documents</a></li></ul><div class="sb-kind" data-diff="same">Layers</div><ul class="sb-list"><li data-diff="same"><a href="../../../k-kinzal/magix-cache-laravel/layer.Laravel.html">Laravel</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Namespaces</div><ul class="sb-list"><li data-diff="same"><a href="../../../k-kinzal/magix-cache-laravel/Magix/Cache/Laravel/index.html" title="Magix\Cache\Laravel">Magix\Cache\Laravel</a></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><a href="../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a><span class="crumb-sep">::</span><span class="crumb-current">README.md</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<span class="diff-range" title="Comparing 76a11ef to working tree">76a11ef <span class="diff-arrow">→</span> working tree</span><div class="diff-modes" id="diff-modes" role="group" aria-label="Diff display mode"><button type="button" class="diff-mode" data-diff-mode="off" title="Documentation of the head revision, without diff marks">Off</button><button type="button" class="diff-mode" data-diff-mode="inline" title="Every page with additions and removals marked">Diff</button><button type="button" class="diff-mode" data-diff-mode="changes" title="Only what the head revision added, changed, or removed">Changes</button></div><a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<p class="diff-empty" id="diff-empty" data-changes="Nothing on this page changed between 76a11ef and working tree." data-off="This page documents what 76a11ef had and working tree no longer has. Switch to Diff to read it." hidden></p>
+<div class="symbol-head"><h1><span class="chip chip-kind k-document">document</span>MagixCache Laravel Integration</h1><div class="symbol-meta"><span class="src-link">README.md</span></div></div>
+<section class="readme" data-diff="same"><div class="doc-block" data-diff="same"><h2>MagixCache Laravel Integration</h2>
+</div><div class="doc-block" data-diff="same"><p><a href="https://github.com/k-kinzal/magix-cache/actions"><span class="md-target" title="https://github.com/k-kinzal/magix-cache/actions/workflows/ci.yml/badge.svg">GitHub Actions</span></a> <a href="https://opensource.org/licenses/MIT"><span class="md-target" title="https://img.shields.io/badge/License-MIT-yellow.svg">License: MIT</span></a></p>
+</div><div class="doc-block" data-diff="same"><p>The Laravel integration connects MagixCache to Laravel 12 and 13. It registers a <code>CacheRuntime</code> backed by Laravel&#039;s default cache store as the <code>default</code> runtime reference, allowing cached queries to work without manual runtime configuration.</p>
+</div><div class="doc-block" data-diff="same"><p>Laravel continues to own the storage backend and its configuration.</p>
+</div><div class="doc-block" data-diff="same"><h3>Features</h3>
+</div><div class="doc-block" data-diff="same"><ul><li>Supports Laravel 12 and 13</li><li>Registers automatically through Laravel Package Discovery</li><li>Uses Laravel&#039;s default <code>cache.store</code></li><li>Adapts the store through the MagixCache PSR-16 adapter</li><li>Registers <code>CacheRuntime</code> as a container singleton</li><li>Fixes the <code>default</code> reference in <code>CacheRuntimeRegistry</code> with a container-backed provider</li><li>Supports every cache backend exposed by Laravel&#039;s cache configuration</li></ul>
+</div><div class="doc-block" data-diff="same"><h3>Requirements</h3>
+</div><div class="doc-block" data-diff="same"><ul><li>PHP 8.3 or later</li><li>Laravel 12 or 13</li><li>A configured Laravel cache store</li></ul>
+</div><div class="doc-block" data-diff="same"><h3>Installation</h3>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>composer require k-kinzal/magix-cache-laravel</code></pre>
+</div><div class="doc-block" data-diff="same"><h3>Quick Start</h3>
+</div><div class="doc-block" data-diff="same"><p>Package Discovery registers the runtime automatically. Add <code>Cacheable</code> to a query and return a <code>Cached</code> value.</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>&lt;?<span class="tok-id">php</span>
+
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\Cache</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cacheable</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cached</span>;
+
+<span class="tok-kw">final</span> <span class="tok-kw">class</span> <span class="tok-id">ProductQuery</span>
+{
+    <span class="tok-kw">use</span> <span class="tok-id">Cacheable</span>;
+
+    #[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">20</span>, <span class="tok-id">tags</span>: [<span class="tok-str">&#039;products&#039;</span>])]
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(<span class="tok-id">int</span> <span class="tok-var">$productId</span>): <span class="tok-id">Cached</span>
+    {
+        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(
+            <span class="tok-kw">fn</span> (): <span class="tok-id">Cached</span> =&gt; <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(<span class="tok-id">Product</span>::<span class="tok-id">query</span>()-&gt;<span class="tok-id">findOrFail</span>(<span class="tok-var">$productId</span>)),
+        );
+    }
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The query uses the application&#039;s configured <code>cache.store</code>, including Redis, Memcached, database, and other Laravel cache drivers.</p>
+</div><div class="doc-block" data-diff="same"><h3>How Registration Works</h3>
+</div><div class="doc-block" data-diff="same"><p>At boot the service provider fixes the <code>default</code> runtime reference in <code>CacheRuntimeRegistry</code> to a provider closure that resolves <code>CacheRuntime</code> through the container on every lookup, so the registry never holds a runtime instance across requests. Runtime names are registered once per process and never rebound; if the application has already registered <code>default</code> during bootstrap — for example to add TTL resolvers, error classifiers, or an observer — the provider leaves that registration in place.</p>
+</div><div class="doc-block" data-diff="same"><h3>Documentation</h3>
+</div><div class="doc-block" data-diff="same"><p>For more detailed information, check out the documentation:</p>
+</div><div class="doc-block" data-diff="same"><ul><li><span class="md-target" title="../magix-cache/README.md">MagixCache Core</span>: Policies, cache keys, composition, and PSR adapters</li><li><span class="md-target" title="../magix-cache/docs/cache-behaviors.md">Cache Behaviors</span>: Stale-if-error, dynamic TTL, and backend-failure bypass</li><li><a href="../../../k-kinzal/magix-cache-laravel/doc/README.md.html">Package Overview</a>: View every package in this monorepo</li></ul>
+</div><div class="doc-block" data-diff="same"><h3>License</h3>
+</div><div class="doc-block" data-diff="same"><p>This project is licensed under the MIT License. See the <span class="md-target" title="LICENSE">LICENSE</span> file for details.</p>
+</div><div class="doc-block" data-diff="same"><h3>Acknowledgements</h3>
+</div><div class="doc-block" data-diff="same"><ul><li><a href="https://laravel.com/">Laravel</a> for the framework and cache abstraction</li><li>All contributors who have helped improve MagixCache</li></ul>
+</div></section>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../../assets/search-index.js" defer></script>
+<script src="../../../assets/app.js" defer></script>
+</body>
+</html>

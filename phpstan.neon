@@ -19,6 +19,16 @@ parameters:
             - PHPUnit\Framework\MockObject\Exception
     stubFiles:
         - phpstan-stubs/serialize.stub
+    ignoreErrors:
+        # Attribute repeatability is public PHP behavior, enforced only when
+        # ReflectionAttribute::newInstance() materializes the declarations.
+        # This regression test reads public attributes, never private state;
+        # direct constructor calls cannot detect a missing IS_REPEATABLE flag.
+        -
+            identifier: customRules.noReflectionInTestClass
+            message: '#^Replace ReflectionMethod usage with assertions against public behavior\. Test classes must not use Reflection\.$#'
+            path: packages/magix-cache/tests/Unit/Strategy/Contract/ExpiresAtTest.php
+            count: 1
     customRules:
         broadCatchAllowedPaths:
             # Boundaries where the failure arrives from code this library does

@@ -83,7 +83,7 @@ final readonly class StrategyReader
             hasCreate: $hasCreate,
             composed: $composed,
             ttl: $this->contract($node->getMethod('fetch')),
-            expiration: $this->expiration($node->getMethod('fetch')),
+            expirations: $this->expirations($node->getMethod('fetch')),
             assumptions: $hasCreate ? $this->assumptions($create) : [],
             notes: $notes,
             constructible: $leaf && !$node->isAbstract(),
@@ -135,32 +135,24 @@ final readonly class StrategyReader
     }
 
     /**
-     * Returns the daily expiration contract declared on the origin operation.
+     * Returns every daily expiration contract on the origin operation, in order.
+     *
+     * @return list<ExpirationContract>
      */
-    public function expiration(?ClassMethod $method): ?ExpirationContract
+    public function expirations(?ClassMethod $method): array
     {
-        $attributes = [];
+        $contracts = [];
+        $reader = new ExpirationReader();
 
         foreach ($method->attrGroups ?? [] as $group) {
             foreach ($group->attrs as $attribute) {
                 if ($attribute->name->toString() === ExpiresAt::class) {
-                    $attributes[] = $attribute;
+                    $contracts[] = $reader->read($attribute);
                 }
             }
         }
 
-        if ($attributes === []) {
-            return null;
-        }
-
-        $contract = (new ExpirationReader())->read($attributes[0]);
-
-        return count($attributes) === 1 ? $contract : new ExpirationContract(
-            $contract->at,
-            $contract->until,
-            $contract->timezone,
-            [...$contract->problems, '#[ExpiresAt] cannot be repeated'],
-        );
+        return $contracts;
     }
 
     /**

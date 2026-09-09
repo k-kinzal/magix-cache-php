@@ -520,7 +520,7 @@ final class StrategyResolverTest extends TestCase
     public function testContractedMeetsClockAndTtlContractsAndReportsInvalidClocks(): void
     {
         $resolver = new StrategyResolver(new Catalog([]));
-        $child = new StrategyDeclaration('App\Daily', ttl: new TtlContract(oneOf: [new TtlContract(30, 30), new TtlContract(600, 900)]), expiration: new \Magix\Cache\Cli\Declaration\ExpirationContract('12:00', '12:15', 'Asia/Tokyo'));
+        $child = new StrategyDeclaration('App\Daily', ttl: new TtlContract(oneOf: [new TtlContract(30, 30), new TtlContract(600, 900)]), expirations: [new \Magix\Cache\Cli\Declaration\ExpirationContract('12:00', '12:15', 'Asia/Tokyo')]);
         [$step, $problems, $adds] = $resolver->contracted($child, new StrategyInstantiation('App\Daily'), []);
 
         self::assertSame('≤900s', $step->ttl->label(), 'an absolute expiration may shorten either duration alternative');
@@ -529,7 +529,7 @@ final class StrategyResolverTest extends TestCase
         self::assertSame([], $problems);
         self::assertSame('daily 12:00-12:15 Asia/Tokyo', $step->expirations[0]->label());
 
-        $invalid = new StrategyDeclaration('App\Invalid', expiration: new \Magix\Cache\Cli\Declaration\ExpirationContract('24:00'));
+        $invalid = new StrategyDeclaration('App\Invalid', expirations: [new \Magix\Cache\Cli\Declaration\ExpirationContract('24:00')]);
         [$invalidStep, $invalidProblems] = $resolver->contracted($invalid, new StrategyInstantiation('App\Invalid'), []);
         self::assertSame(TtlEstimateState::Invalid, $invalidStep->ttl->state);
         self::assertSame(['#[ExpiresAt] on Invalid::fetch(): at must be a valid HH:MM or HH:MM:SS time'], $invalidProblems);
@@ -537,7 +537,7 @@ final class StrategyResolverTest extends TestCase
 
     public function testStepPreservesAnExpirationContractDespiteAnAssumeTtlForUnannotatedChildren(): void
     {
-        $child = new ClassDeclaration('App\Daily', strategy: new StrategyDeclaration('App\Daily', expiration: new \Magix\Cache\Cli\Declaration\ExpirationContract('12:00')));
+        $child = new ClassDeclaration('App\Daily', strategy: new StrategyDeclaration('App\Daily', expirations: [new \Magix\Cache\Cli\Declaration\ExpirationContract('12:00')]));
         $resolver = new StrategyResolver(new Catalog([$child]));
         $parent = new StrategyDeclaration('App\Parent', assumptions: [new TtlAssumption('App\Daily', min: 60, max: 60)]);
         [$step, $problems, $adds] = $resolver->step($parent, new StrategyInstantiation('App\Daily'), []);
@@ -547,5 +547,44 @@ final class StrategyResolverTest extends TestCase
         self::assertTrue($adds);
         self::assertSame([], $problems);
         self::assertSame('daily 12:00 UTC', $step->expirations[0]->label());
+    }
+
+    public function testStepBindsEveryRepeatedReflectedClockContract(): void
+    {
+        $class = \Tests\Package\Cli\Fixture\Expiration\MultipleExpirationStrategy::class;
+        $resolver = new StrategyResolver(new Catalog([]));
+        [$step, $problems, $adds] = $resolver->step(new StrategyDeclaration('Parent'), new StrategyInstantiation($class, [
+            new StrategyArgument('at', '18:00'),
+            new StrategyArgument('until', null),
+            new StrategyArgument('timezone', 'Asia/Tokyo'),
+        ]), []);
+
+        self::assertSame([], $problems);
+        self::assertTrue($adds);
+        self::assertTrue($step->ttl->hasFiniteExpiration());
+        self::assertNull($step->ttl->upperBound);
+        self::assertEquals([
+            new \Magix\Cache\Cli\Graph\ExpirationEstimate('09:00', timezone: 'Asia/Tokyo'),
+            new \Magix\Cache\Cli\Graph\ExpirationEstimate('23:55:30', '00:10:15', 'America/New_York', window: true),
+            new \Magix\Cache\Cli\Graph\ExpirationEstimate('18:00', timezone: 'Asia/Tokyo'),
+        ], $step->expirations);
+    }
+
+    public function testContractedReportsProblemsInEveryRepeatedClockDeclaration(): void
+    {
+        $child = new StrategyDeclaration('App\Daily', expirations: [
+            new \Magix\Cache\Cli\Declaration\ExpirationContract('12:00'),
+            new \Magix\Cache\Cli\Declaration\ExpirationContract(new ContractReference(ContractSource::Constructor, 'missing')),
+            new \Magix\Cache\Cli\Declaration\ExpirationContract('24:00', timezone: 'No/Such_Zone'),
+        ]);
+        [$step, $problems] = (new StrategyResolver(new Catalog([])))->contracted($child, new StrategyInstantiation('App\Daily'), []);
+
+        self::assertSame(TtlEstimateState::Invalid, $step->ttl->state);
+        self::assertSame([
+            "#[ExpiresAt] on Daily::fetch(): references ConstructorArg('missing'), but no such parameter is declared",
+            '#[ExpiresAt] on Daily::fetch(): at must be a valid HH:MM or HH:MM:SS time',
+            '#[ExpiresAt] on Daily::fetch(): timezone must be an IANA timezone identifier',
+        ], $problems);
+        self::assertSame([], $step->expirations);
     }
 }

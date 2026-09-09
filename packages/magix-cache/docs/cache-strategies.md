@@ -179,6 +179,16 @@ use Magix\Cache\Strategy\Contract\ExpiresAt;
 
 This is an analysis contract for an existing `fetch()` implementation. It promises that every successful normal origin path adds a finite expiration at a future occurrence of the local time or within the declared window. It does not schedule eviction or implement a timer. The strategy selects the occurrence and the point within the window (for example, by a stable cache-key hash), defines rollover and daylight-saving behavior for missing/repeated local times, and meets the absolute expiration into `OriginResult` metadata. Evaluate that choice against `OriginResult::baseTime` in `fetch()`, since `create()` definitions with static arguments are memoized. Fresh hits keep their existing expiration; stale answers keep their expired metadata.
 
+Repeat `#[ExpiresAt]` on the same `fetch()` to declare multiple daily times or windows:
+
+```php
+#[ExpiresAt('09:00', timezone: 'Asia/Tokyo')]
+#[ExpiresAt('12:00', until: '12:15', timezone: 'Asia/Tokyo')]
+#[ExpiresAt('18:00', timezone: 'Asia/Tokyo')]
+```
+
+Each declaration contributes a simultaneous constraint, just as separate composed strategies do. A strategy that chooses the next occurrence of each point can use this to describe several daily cutoffs. Each window keeps its own end, timezone, and constructor references. The CLI displays `earliest of (daily 09:00 Asia/Tokyo; daily 12:00-12:15 Asia/Tokyo; daily 18:00 Asia/Tokyo)` and preserves each declaration in JSON. Repeating the attribute does not declare mutually exclusive branches or change the strategy implementation. Existing single declarations keep their syntax and behavior.
+
 The CLI shows the candidate times separately from durations:
 
 ```text

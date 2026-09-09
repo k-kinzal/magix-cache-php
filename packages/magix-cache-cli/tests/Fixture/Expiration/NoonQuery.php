@@ -62,4 +62,31 @@ final class NoonQuery
     {
         return $this->cached(static fn (): Cached => Cached::of('value'));
     }
+
+    /**
+     * @return Cached<string>
+     */
+    #[UseStrategy(MultipleExpirationStrategy::class, timezone: 'Asia/Tokyo')]
+    public function multiple(): Cached
+    {
+        return $this->cached(static fn (): Cached => Cached::of('value'));
+    }
+
+    /**
+     * @return Cached<string>
+     */
+    #[UseStrategy(MultipleExpirationStrategy::class, timezone: 'Asia/Tokyo')]
+    public function multipleDynamic(#[StrategyArgument('at')] string $cutoff = '18:00'): Cached
+    {
+        return $this->cached(static fn (): Cached => Cached::of('value'));
+    }
+
+    /**
+     * @return Cached<string>
+     */
+    #[UseStrategy(MultipleExpirationComposition::class)]
+    public function multipleComposed(): Cached
+    {
+        return $this->cached(static fn (): Cached => Cached::of('value'));
+    }
 }

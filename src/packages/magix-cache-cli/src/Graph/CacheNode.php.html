@@ -48,22 +48,34 @@
 <span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">CacheNode</span></span>
 <span class="src-line" id="L13"><a class="ln" href="#L13">13</a>{</span>
 <span class="src-line" id="L14"><a class="ln" href="#L14">14</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com">     * Creates a cache tree node.</span></span>
-<span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L17"><a class="ln" href="#L17">17</a><span class="tok-com">     * @param list&lt;CacheNode&gt; $children</span></span>
-<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com">     * @param list&lt;string&gt; $notes Observations about how the tree was resolved.</span></span>
-<span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com">     * @param list&lt;CacheGap&gt; $gaps Cache paths whose metadata propagation is not verified.</span></span>
-<span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L21"><a class="ln" href="#L21">21</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(</span>
-<span class="src-line" id="L22"><a class="ln" href="#L22">22</a>        <span class="tok-kw">public</span> <span class="tok-id">BoundaryDeclaration</span> <span class="tok-var">$boundary</span>,</span>
-<span class="src-line" id="L23"><a class="ln" href="#L23">23</a>        <span class="tok-kw">public</span> <span class="tok-id">CacheEffect</span> <span class="tok-var">$effect</span>,</span>
-<span class="src-line" id="L24"><a class="ln" href="#L24">24</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$children</span> = [],</span>
-<span class="src-line" id="L25"><a class="ln" href="#L25">25</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$notes</span> = [],</span>
-<span class="src-line" id="L26"><a class="ln" href="#L26">26</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$gaps</span> = [],</span>
-<span class="src-line" id="L27"><a class="ln" href="#L27">27</a>    ) {</span>
-<span class="src-line" id="L28"><a class="ln" href="#L28">28</a>    }</span>
-<span class="src-line" id="L29"><a class="ln" href="#L29">29</a>}</span>
-<span class="src-line" id="L30"><a class="ln" href="#L30">30</a></span>
+<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com">     * @var list&lt;string&gt; Warnings from the original subtree, retained across display filtering.</span></span>
+<span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L17"><a class="ln" href="#L17">17</a>    <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$analysisWarnings</span>;</span>
+<span class="src-line" id="L18"><a class="ln" href="#L18">18</a></span>
+<span class="src-line" id="L19"><a class="ln" href="#L19">19</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com">     * Creates a cache tree node.</span></span>
+<span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L22"><a class="ln" href="#L22">22</a><span class="tok-com">     * @param list&lt;CacheNode&gt; $children</span></span>
+<span class="src-line" id="L23"><a class="ln" href="#L23">23</a><span class="tok-com">     * @param list&lt;string&gt; $notes Observations about how the tree was resolved.</span></span>
+<span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-com">     * @param list&lt;CacheGap&gt; $gaps Cache paths whose metadata propagation is not verified.</span></span>
+<span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-com">     * @param list&lt;string&gt;|null $analysisWarnings Null collects warnings from the original subtree; filters pass the existing collection.</span></span>
+<span class="src-line" id="L26"><a class="ln" href="#L26">26</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L27"><a class="ln" href="#L27">27</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(</span>
+<span class="src-line" id="L28"><a class="ln" href="#L28">28</a>        <span class="tok-kw">public</span> <span class="tok-id">BoundaryDeclaration</span> <span class="tok-var">$boundary</span>,</span>
+<span class="src-line" id="L29"><a class="ln" href="#L29">29</a>        <span class="tok-kw">public</span> <span class="tok-id">CacheEffect</span> <span class="tok-var">$effect</span>,</span>
+<span class="src-line" id="L30"><a class="ln" href="#L30">30</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$children</span> = [],</span>
+<span class="src-line" id="L31"><a class="ln" href="#L31">31</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$notes</span> = [],</span>
+<span class="src-line" id="L32"><a class="ln" href="#L32">32</a>        <span class="tok-kw">public</span> <span class="tok-kw">array</span> <span class="tok-var">$gaps</span> = [],</span>
+<span class="src-line" id="L33"><a class="ln" href="#L33">33</a>        ?<span class="tok-kw">array</span> <span class="tok-var">$analysisWarnings</span> = <span class="tok-id">null</span>,</span>
+<span class="src-line" id="L34"><a class="ln" href="#L34">34</a>    ) {</span>
+<span class="src-line" id="L35"><a class="ln" href="#L35">35</a>        <span class="tok-var">$this</span>-&gt;<span class="tok-id">analysisWarnings</span> = <span class="tok-var">$analysisWarnings</span> ?? <span class="tok-id">array_values</span>(<span class="tok-id">array_unique</span>([</span>
+<span class="src-line" id="L36"><a class="ln" href="#L36">36</a>            ...<span class="tok-id">array_map</span>(<span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">string</span> <span class="tok-var">$note</span>): <span class="tok-id">string</span> =&gt; <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">shortId</span>().<span class="tok-str">&#039;: &#039;</span>.<span class="tok-var">$note</span>, <span class="tok-var">$notes</span>),</span>
+<span class="src-line" id="L37"><a class="ln" href="#L37">37</a>            ...<span class="tok-id">array_map</span>(<span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">CacheGap</span> <span class="tok-var">$gap</span>): <span class="tok-id">string</span> =&gt; <span class="tok-var">$gap</span>-&gt;<span class="tok-id">label</span>(), <span class="tok-var">$gaps</span>),</span>
+<span class="src-line" id="L38"><a class="ln" href="#L38">38</a>            ...<span class="tok-id">array_merge</span>(...<span class="tok-id">array_map</span>(<span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">self</span> <span class="tok-var">$child</span>): <span class="tok-kw">array</span> =&gt; <span class="tok-var">$child</span>-&gt;<span class="tok-id">analysisWarnings</span>, <span class="tok-var">$children</span>)),</span>
+<span class="src-line" id="L39"><a class="ln" href="#L39">39</a>        ]));</span>
+<span class="src-line" id="L40"><a class="ln" href="#L40">40</a>    }</span>
+<span class="src-line" id="L41"><a class="ln" href="#L41">41</a>}</span>
+<span class="src-line" id="L42"><a class="ln" href="#L42">42</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

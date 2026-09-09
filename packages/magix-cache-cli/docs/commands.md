@@ -55,10 +55,10 @@ The header block describes the boundary itself:
 |---|---|
 | `ttl` | Expiration after composition, followed by the reason it differs from the declaration. A number appears only when it is statically determined; a proven range keeps its bounds — `30-60s`, `30-?s` (the `?` is undetermined, not unlimited), `≤60s` — and otherwise the estimate is `unconstrained` (provably no expiration), `unknown` with the runtime condition, or `invalid` when the declaration throws at runtime |
 | `strategy` | The `#[UseStrategy]` construction, one line per composed strategy with its contracted candidate range, and `(assumed)` where an explicit `#[AssumeTtl]` replaced the contract. Only shown when a strategy is declared |
-| `strategy ttl` | The candidate constraint the composition adds on the normal origin path, before dependencies and the policy cap it; disjoint alternatives stay distinct, such as `30/600-900s` |
+| `strategy ttl` | The winning Strategy expiration override on the normal origin path; disjoint alternatives stay distinct, such as `30/600-900s` |
 | `visibility` | `shared`, `private`, or `nostore` after composition, followed by what restricted it |
 | `storable` | Whether static analysis can prove that this boundary stores its result; `no` also covers runtime-dependent results |
-| `tags` | Policy tags unioned with the tags of every dependency |
+| `tags` | Bubbled dependency tags, replaced when the boundary explicitly sets tags |
 | `key` | The parameters that form the key, the ignored ones, and the policy version |
 | `policy` | The declaration as it is written in the source |
 
@@ -70,11 +70,11 @@ Terminal colors follow the **effective result after composition**:
 |---|---|
 | White row | A boundary whose effective result is provably storable, including an automatic `#[Cache]` that carries child constraints upward |
 | Gray row | An uncached method, a missing policy, `NoStore`, zero TTL, an invalid declaration, or a result whose storage cannot be proven statically |
-| Yellow field | A local setting restricts a result that remains storable |
+| Yellow field | A local setting overrides a result that remains storable |
 | Red diagnostic | An invalid lifetime, a problem that makes the declaration fail, or an explicit `cache propagation unanalyzed` gap |
 
 Follow the white rows to see how far cacheable results bubble. `NoStore` turns
-the affected parents gray; stored descendants remain white. An uncached entry
+parents that inherit it gray; stored descendants remain white. An uncached entry
 point stays gray even when its summary contains a finite TTL from called caches.
 Gray can also mean that storage depends on runtime values: read the TTL condition
 and visibility label to distinguish uncertainty from a definite stop.
@@ -82,27 +82,23 @@ Both `shared` and `private` caches use white; their text labels preserve the
 visibility distinction. Notes use gray, and ordinary TTL values follow the row
 color.
 
-Yellow fields mark **local restrictions**: a boundary's fixed TTL or `maxTtl`
-shortens the composed lifetime, or its policy/scoped parameters impose a stricter
-visibility than its dependencies. The header and affected tree nodes use color
-alone to identify where local settings limit metadata bubbling while the result
-remains storable. Non-storable rows keep their gray color. Tags still union;
-adding a tag is not a bubbling stop.
+Yellow fields mark **local overrides** of TTL, visibility or tags when a
+boundary has dependencies and its result remains storable. Explicit settings
+are shown even when numerically equal to inherited values: they still own that
+field. Ordinary leaf declarations have no dependency bubbling to override.
+FromUpstream is highlighted when its maximum changes a proven lifetime.
 
-A cap can affect only some TTL alternatives: a composed `30/600-900s` under a
-local TTL of 300 seconds is highlighted as `30/300s`.
-A policy cap on a declared strategy composition is also highlighted.
-Equal or looser settings, ordinary leaf declarations, and inherited restrictions
-are not highlighted. Runtime choices, unresolved dependencies, and invalid
-declarations are not presented as proven stops; an absent highlight does not prove
-that bubbling continues at runtime.
+A fixed parent TTL of 300 seconds replaces a bubbled `30/600-900s` with `300s`.
+An automatic parent keeps `30/600-900s`; FromUpstream with maxTtl 300 yields
+`30/300s`. Strategies have higher priority than policy and runtime parameters;
+outer fetch wrappers override inner ones. Unknown writers remain unknown.
 
 Use `--ansi` to force terminal colors or `--no-ansi` to disable them. Plain text
 keeps the same labels and diagnostics without escape codes or extra annotations.
 JSON retains the same data. Mermaid keeps its existing yellow styling for local
-restrictions; the white/gray row palette applies to the terminal tree.
+overrides; the white/gray row palette applies to the terminal tree.
 
-Disjoint lifetime contracts such as `#[Ttl(30, new TtlRange(min: 600, max: 900))]` render as `30/600-900s` in the tree and Mermaid output. Parent policies cap each alternative separately: a 300-second parent yields `30/300s`, while an automatic parent preserves `30/600-900s`. The analyzer does not infer the conditions selecting the alternatives or correlations between separate strategies.
+Disjoint lifetime contracts such as `#[Ttl(30, new TtlRange(min: 600, max: 900))]` render as `30/600-900s` in the tree and Mermaid output. A fixed 300-second parent yields `300s`, while an automatic parent preserves `30/600-900s`. FromUpstream caps each alternative separately. The analyzer does not infer the conditions selecting the alternatives or correlations between separate strategies.
 
 JSON retains the existing `state`, `seconds`, `lowerBound`, `upperBound`, and `reason` fields. When alternatives remain disjoint it also includes a normalized `ranges` list, for example `[{"min": 30, "max": 30}, {"min": 600, "max": 900}]`. The enclosing bounds alone do not describe the gaps. An unknown estimate with a proven finite expiration also includes `"finite": true`; an unknown numeric lifetime is not the same as an expiration that might be absent. Single intervals and determined values do not need a `ranges` field.
 
@@ -308,3 +304,6 @@ contract supplies finite-expiration proof to automatic parent policies.
 See [Daily Expiration Times and Distribution Windows](../../magix-cache/docs/cache-strategies.md#daily-expiration-times-and-distribution-windows)
 for constructor references, invocation-dependent values, composition, timezone
 semantics, and the responsibility of the strategy implementation.
+
+
+The CLI's TTL/ExpiresAt contracts describe expiration only. For custom Strategies, tags and visibility remain unknown because arbitrary metadata overrides are not proven by those contracts. The bundled KeySpreadExpirationStrategy and StaleIfErrorCacheStrategy preserve those fields on normal origin success. A later parent can explicitly replace unknown fields; AssumeTtl only resolves expiration, never other metadata.

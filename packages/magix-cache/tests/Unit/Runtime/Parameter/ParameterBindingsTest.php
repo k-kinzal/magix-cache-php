@@ -54,7 +54,7 @@ final class ParameterBindingsTest extends TestCase
 
         $invocation = $bindings->invocation([30, ['b', 'a', 'b']], static fn (): Cached => Cached::of('origin'));
 
-        self::assertSame(['static', 'a', 'b'], $invocation->policy->tags);
+        self::assertSame(['a', 'b'], $invocation->policy->tags);
     }
 
     public function testVisibilityPreservesTheNoStoreRestriction(): void

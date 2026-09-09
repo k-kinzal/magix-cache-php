@@ -6,9 +6,11 @@ namespace Magix\Cache\Runtime;
 
 use Closure;
 use Magix\Cache\Cached;
+use Magix\Cache\CachePolicy;
 use Magix\Cache\Runtime\Extension\BackendErrorClassifier;
 use Magix\Cache\Runtime\Extension\CacheEvent;
 use Magix\Cache\Runtime\Extension\CacheObserver;
+use Magix\Cache\Runtime\Extension\CacheTtlResolver;
 use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
@@ -20,7 +22,7 @@ use Override;
 use RuntimeException;
 
 /**
- * Executes the fixed storage and origin stage bodies without feature policy.
+ * Executes the fixed storage and origin stage bodies and the boundary overrides before returning to strategies.
  *
  * Lookups expose retained data, origin calls report success or declared
  * failure, and writes recheck storage eligibility. Strategies own all
@@ -36,12 +38,16 @@ final readonly class TerminalCacheStrategy implements CacheStrategy
      * Creates the terminal of one runtime execution.
      *
      * @param Closure(): Cached<mixed> $origin
+     * @param int<0, max>|null $parameterTtl Validated invocation lifetime.
      */
     public function __construct(
         private GuardedCache $cache,
         private ?BackendErrorClassifier $classifier,
         private Closure $origin,
         private ?CacheObserver $observer = null,
+        private ?CachePolicy $policy = null,
+        private ?CacheTtlResolver $ttlResolver = null,
+        private ?int $parameterTtl = null,
     ) {
         $this->converter = new CacheEntryConverter();
     }
@@ -75,7 +81,14 @@ final readonly class TerminalCacheStrategy implements CacheStrategy
             return new OriginFailure($error);
         }
 
-        return new OriginResult($result, $operation->now());
+        $baseTime = $operation->now();
+
+        if ($this->policy !== null) {
+            $metadata = (new OriginOverrides())->apply($this->policy, $this->ttlResolver, $result, $operation->key(), $baseTime, $this->parameterTtl);
+            $result = Cached::of($result->value(), $metadata);
+        }
+
+        return new OriginResult($result, $baseTime);
     }
 
     /**

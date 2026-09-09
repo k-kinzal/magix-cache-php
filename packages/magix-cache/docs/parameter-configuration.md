@@ -1,6 +1,6 @@
 # Parameter Configuration
 
-A boundary can declare that its method parameters supply cache constraints or
+A boundary can declare that its method parameters supply cache overrides or
 arguments to the active strategy factory. The parameter attribute identifies the
 source directly, so renaming that boundary parameter does not break the binding.
 
@@ -35,30 +35,29 @@ the method's default when omitted. Positional and named calls behave the same.
 `cached()` still takes exactly one closure; the binding comes from attributes.
 The values are captured when the boundary enters `cached()`.
 
-## Cache constraints
+## Cache overrides
 
-| Parameter attribute | Required value | Composition |
+| Parameter attribute | Required value | Effect |
 | --- | --- | --- |
-| `#[CacheTtl]` | Non-negative `int` seconds | Earliest expiration wins |
-| `#[CacheTags]` | `list<string>` of valid cache tags | Tags are unioned with policy and dependency tags |
-| `#[CacheVisibility]` | A `Metadata\Visibility` enum value | The stricter visibility wins |
+| `#[CacheTtl]` | Non-negative `int` seconds | Replaces expiration at the origin base time |
+| `#[CacheTags]` | `list<string>` of valid tags | Replaces tags; `[]` clears them |
+| `#[CacheVisibility]` | A `Metadata\Visibility` enum value | Replaces visibility, including Shared |
 
-These attributes add constraints. With `#[Cache(ttl: 60)]` and a parameter TTL of
-30 seconds the result has at most 30 seconds; a dependency expiring in 20 seconds
-still caps it at 20 seconds. All lifetime constraints use the same origin base
-time. A zero TTL expires immediately and is not stored. `#[Cache]`, whose policy
-is `Ttl::Auto`, can derive its expiration from a `CacheTtl` parameter alone.
-`Ttl::FromUpstream` can also derive from it, keeping its required `maxTtl` cap.
-A `DynamicTtl` resolver adds another constraint at that same time.
+With `#[Cache(ttl: 60)]`, a parameter TTL of 90 replaces both that policy TTL
+and a dependency's remaining 20 seconds. A final zero TTL prevents storage.
+Parameters can supply an automatic boundary's finite expiration. A dynamic TTL
+runs next, then Strategies; each explicit writer can replace the earlier value.
+All relative lifetimes use one origin base time.
 
-Visibility and tags are bound before lookup. `Visibility::Shared` cannot relax
-an existing private policy or scope; `Visibility::NoStore` prevents both cache
-reads and writes. `CacheVisibility` supplies an invocation value, while the
-existing `CacheScope` declares a fixed visibility restriction.
+Visibility and tags are bound before lookup. Shared can replace a private
+policy or scope. NoStore skips reads; final NoStore metadata prevents writes.
+CacheVisibility supplies invocation data, while CacheScope declares fixed
+parameter visibility. Unannotated fields inherit the policy and dependencies.
 
-Several parameters may supply TTLs, tags or visibility; all their constraints
-are combined. Each attribute appears at most once on a given parameter. One
-parameter can supply both a cache constraint and a compatible strategy argument:
+When several parameters supply the same field, the last in method declaration
+order wins, regardless of named-call argument order. Every supplied value is
+validated. Each attribute appears at most once on a parameter. One parameter
+can supply a field and a compatible strategy argument:
 
 ```php
 #[CacheTtl]
@@ -121,14 +120,13 @@ strategy arguments through construction definitions and contract references.
 A supplied parameter is runtime-dependent even if the boundary or factory has
 a default; the analyzer never substitutes that default for every invocation.
 
-A parameter TTL satisfies the requirement for a finite constraint in `Auto` and
-`FromUpstream`, while its value stays unknown. Proven policy and dependency caps
-survive. For example, a dynamic TTL with a 60-second policy is bounded by 60
-seconds, and a dependency capped at 20 seconds narrows it further.
+A parameter TTL proves finite expiration, but its value remains unknown even
+when a default exists. It replaces previous policy and dependency bounds.
+Dynamic TTL behaves the same way; a known Strategy override can replace either.
 
-Dynamic visibility is shown as the proven restriction `or stricter`; dynamic
-tags are shown separately from known tags as `+ runtime tags`. JSON exposes
-`visibilityUnknown` and `tagsUnknown`, and these flags propagate to parents.
+Parameter visibility and tags replace earlier known fields with uncertainty.
+JSON exposes `visibilityUnknown` and `tagsUnknown`; an inheriting parent carries
+them forward, while an explicit parent field replaces that uncertainty.
 
 `magix analyze` reports ignored or variadic sources, repeated attributes,
 incompatible constraint types, duplicate destinations, missing active strategies,

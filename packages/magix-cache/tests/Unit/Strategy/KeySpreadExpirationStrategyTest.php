@@ -49,7 +49,7 @@ final class KeySpreadExpirationStrategyTest extends TestCase
         self::assertSame($expiresAt, $fetched2->cached->metadata->expiresAt);
     }
 
-    public function testFetchNeverExtendsAnExistingExpiration(): void
+    public function testFetchOverridesAnExistingExpiration(): void
     {
         $strategy = new KeySpreadExpirationStrategy(minimum: 30, maximum: 60);
         $terminal = new AnsweringStrategy(hit: null, fetched: Cached::of('value', new CacheMetadata(expiresAt: 110.0)));
@@ -57,7 +57,8 @@ final class KeySpreadExpirationStrategyTest extends TestCase
 
         $fetched3 = $strategy->fetch($operation, NextCacheStrategy::of($terminal));
         self::assertInstanceOf(OriginResult::class, $fetched3);
-        self::assertSame(110.0, $fetched3->cached->metadata->expiresAt);
+        self::assertGreaterThanOrEqual(130.0, $fetched3->cached->metadata->expiresAt);
+        self::assertLessThanOrEqual(160.0, $fetched3->cached->metadata->expiresAt);
     }
 
     public function testFetchPinsTheConstraintWhenTheBoundsAreEqual(): void

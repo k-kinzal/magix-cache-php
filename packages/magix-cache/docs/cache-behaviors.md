@@ -74,7 +74,7 @@ At judgement time `s`, a retained entry is eligible only while `expiresAt <= s` 
 
 The exception list is the whole contract, and it only accepts declared behavior: every declared type must be a `RuntimeException` subtype, and an empty list is rejected when the behavior is enabled. Bugs — the `LogicException` family and PHP `Error`s — are never `RuntimeException`, so they can never be answered with stale data. When an origin meets an expected outage in a foreign exception hierarchy (an HTTP client failure, a database driver exception), it translates that failure into its own declared type, the way `UpstreamUnavailable extends RuntimeException` does above. A failure that matches no declared type propagates unchanged — the caller still catches the exact exception its origin raised.
 
-A served stale value keeps its expired expiration. A parent that composes it inherits the expired constraint through the metadata meet, so the parent cannot re-store the result as fresh. Extending retention never changes the expiration itself; see [Storage Adapters](storage-adapters.md#logical-expiration-and-physical-retention).
+A served stale value keeps its expired expiration. A parent that composes it inherits the expired constraint through the metadata meet, so an automatic parent cannot re-store it as fresh. An explicit parent TTL may replace that expired deadline. Extending retention never changes the expiration itself; see [Storage Adapters](storage-adapters.md#logical-expiration-and-physical-retention).
 
 `#[StaleIfError]` declares the same `StaleIfErrorCacheStrategy` available to compositions. The strategy is constructed for each invocation and owns its own candidate and reuse judgement; the runtime has no separate attribute fallback path.
 
@@ -135,9 +135,9 @@ The context exposes:
 | `result` | Successful origin `Cached` result |
 | `now` | The same base time the policy is evaluated at, as a Unix timestamp |
 
-The resolver must return a lifetime of zero or more seconds; a negative return value is a configuration error. The resolved lifetime is met into the origin metadata with the fixed composition law, so it can only shorten an existing expiration, never extend one. The resolver runs only after a successful origin call — not on a fresh hit and not for a stale fallback.
+The resolver must return a lifetime of zero or more seconds; a negative return value is a configuration error. The resolved lifetime replaces the policy, parameter and inherited expiration at the origin base time. A subsequent Strategy override has higher priority. The resolver runs only after a successful origin call — not on a fresh hit and not for a stale fallback.
 
-The default `Ttl::Auto` pairs naturally with a dynamic TTL because it inherits the expiration the resolver supplied. A fixed TTL also composes: the earlier of the fixed and resolved expirations wins.
+The default `Ttl::Auto` pairs naturally with a dynamic TTL because it inherits the expiration the resolver supplied. A dynamic TTL overrides a fixed policy TTL; a later Strategy override wins over the resolver.
 
 One boundary declares at most one resolver. Referencing a resolver that is not registered with the boundary's runtime is a definition error (`LogicException`), not a silent fallback.
 

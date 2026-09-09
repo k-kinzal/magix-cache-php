@@ -13,7 +13,7 @@ use InvalidArgumentException;
  *
  * On the normal origin path the strategy chooses a future occurrence of
  * the declared local time, or a time in the inclusive at..until window,
- * and meets that finite expiration into the origin metadata. An until
+ * and replaces the origin expiration with its selected finite deadline. An until
  * earlier than at ends on the following local date; equal endpoints mean
  * a single time. The strategy owns the selection, distribution, rollover,
  * and daylight-saving rules. This attribute neither schedules eviction
@@ -24,7 +24,8 @@ use InvalidArgumentException;
  * times and timezone without inventing a duration from its own clock.
  * Repeat this attribute for multiple daily times or windows on one fetch().
  * Each declaration contributes a constraint: the selected absolute
- * expirations meet at the earliest one, including across timezones.
+ * expirations meet at the earliest one, including across timezones, within this one fetch contract. Other
+ * strategies override this result in fetch return order.
  */
 #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 final readonly class ExpiresAt

@@ -75,8 +75,8 @@ final readonly class ParameterBindings
 
         $values = (new CallArguments())->bind($this->method, $arguments);
         $ttl = null;
-        $tags = [];
-        $visibility = Visibility::Shared;
+        $tags = null;
+        $visibility = null;
         $strategy = [];
 
         foreach ($this->bindings as $binding) {
@@ -84,15 +84,15 @@ final readonly class ParameterBindings
 
             if ($binding->ttl) {
                 $seconds = $this->ttl($value);
-                $ttl = $ttl === null ? $seconds : min($ttl, $seconds);
+                $ttl = $seconds;
             }
 
             if ($binding->tags) {
-                $tags = [...$tags, ...$this->tags($value)];
+                $tags = $this->tags($value);
             }
 
             if ($binding->visibility) {
-                $visibility = $visibility->meet($this->visibility($value));
+                $visibility = $this->visibility($value);
             }
 
             if ($binding->strategyArgument !== null) {

@@ -7,12 +7,10 @@ namespace Magix\Cache\Cli\Graph;
 /**
  * Holds the composed contract of the strategy a boundary declares.
  *
- * The lifetime is the candidate constraint the composed strategies add on
- * the normal origin path, before the policy and the upstream expiration are
- * applied; the candidate a strategy chooses and the effective lifetime that
- * survives composition stay two different things. Whether a finite
- * constraint is added at all is kept as its own three-valued answer, because
- * a missing contract never counts as "adds nothing".
+ * The lifetime belongs to the outermost expiration writer on the fetch
+ * return path. Dependency and policy deadlines have lower priority. Steps
+ * keep each child's candidate even when a later override replaces it.
+ * overridesExpiration is false for pass-through and null for opaque code.
  */
 final readonly class StrategyEffect
 {
@@ -20,19 +18,21 @@ final readonly class StrategyEffect
      * Creates the analyzed effect of one declared strategy composition.
      *
      * @param string $label The declared construction, such as ProductCacheStrategy::create(min: 60).
-     * @param TtlEstimate $ttl Candidate constraint the composition adds on the normal origin path.
+     * @param TtlEstimate $ttl Winning expiration override on the normal origin path.
      * @param list<StrategyStep> $steps Contributions in composition order.
-     * @param bool|null $addsConstraint Whether a finite constraint is definitely added; null when undeclared parts leave it open.
+     * @param bool|null $overridesExpiration Whether expiration is definitely replaced; null for an opaque final writer.
      * @param list<string> $problems Declarations that cannot work as written.
      * @param list<ExpirationEstimate> $expirations Candidate daily expiration constraints.
+     * @param bool $metadataUnknown Whether non-expiration metadata can be overridden by custom code.
      */
     public function __construct(
         public string $label,
         public TtlEstimate $ttl,
         public array $steps = [],
-        public ?bool $addsConstraint = null,
+        public ?bool $overridesExpiration = null,
         public array $problems = [],
         public array $expirations = [],
+        public bool $metadataUnknown = false,
     ) {
     }
 }

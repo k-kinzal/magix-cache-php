@@ -7,7 +7,7 @@ namespace Magix\Cache\Strategy\Contract;
 use InvalidArgumentException;
 
 /**
- * Describes one inclusive alternative for the finite constraint a strategy adds.
+ * Describes one inclusive alternative for the finite lifetime a strategy selects.
  *
  * Bounds are seconds relative to the origin base time. A missing bound is
  * undetermined, not a promise of unlimited retention. References are bound

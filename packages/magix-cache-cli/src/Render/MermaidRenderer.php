@@ -50,7 +50,7 @@ final readonly class MermaidRenderer
 
         if ($node->gaps !== []) {
             $statements[] = '    style '.$id.' fill:#f8d7da,stroke:#b02a37,color:#842029';
-        } elseif ($effect->localRestrictions !== []) {
+        } elseif ($effect->localOverrides !== []) {
             $statements[] = '    style '.$id.' fill:#fff3cd,stroke:#b58100,color:#664d03';
         }
 

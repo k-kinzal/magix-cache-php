@@ -11,6 +11,8 @@ use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\StrategyInstantiation;
 use Magix\Cache\Cli\Declaration\TtlAssumption;
 use Magix\Cache\Cli\Declaration\TtlContract;
+use Magix\Cache\Strategy\KeySpreadExpirationStrategy;
+use Magix\Cache\Strategy\StaleIfErrorCacheStrategy;
 
 use function strrpos;
 use function substr;
@@ -21,7 +23,7 @@ use function substr;
  * The resolver binds the #[UseStrategy] arguments to the same create() the
  * runtime calls, follows the composed constructions in order, binds each
  * child contract's explicit references to the constructor values it was
- * built with, and meets the child contracts into one candidate constraint.
+ * built with, and selects overrides in fetch return order (outermost wins).
  * A composition never re-declares child contracts; only an explicit
  * assumption replaces the one analysis item it names. What stays unknown
  * stays unknown — it is never converted into a default or into "no
@@ -56,6 +58,7 @@ final readonly class StrategyResolver
             return new StrategyEffect(
                 label: $use->label(),
                 ttl: TtlEstimate::unknown(condition: $use->strategy.' was not found in the scanned sources'),
+                metadataUnknown: true,
             );
         }
 
@@ -77,7 +80,7 @@ final readonly class StrategyResolver
         $composed = $this->composition($declaration, $environment);
         $ttl = $problems === [] ? $composed->ttl : TtlEstimate::invalid($problems[0]);
 
-        return new StrategyEffect($use->label(), $ttl, $composed->steps, $composed->addsConstraint, [...$problems, ...$composed->problems], $composed->expirations);
+        return new StrategyEffect($use->label(), $ttl, $composed->steps, $composed->overridesExpiration, [...$problems, ...$composed->problems], $composed->expirations, $composed->metadataUnknown);
     }
 
     /**
@@ -104,7 +107,7 @@ final readonly class StrategyResolver
         if ($declaration->composed === null) {
             $condition = $declaration->notes[0] ?? ('the composition of '.$declaration->shortName().' cannot be read statically');
 
-            return new StrategyEffect('', TtlEstimate::unknown(condition: $condition));
+            return new StrategyEffect('', TtlEstimate::unknown(condition: $condition), metadataUnknown: true);
         }
 
         $ttl = TtlEstimate::unconstrained();
@@ -113,18 +116,22 @@ final readonly class StrategyResolver
         $problems = [];
         $adds = false;
         $open = false;
+        $metadataUnknown = false;
 
-        foreach ($declaration->composed as $instantiation) {
+        foreach (array_reverse($declaration->composed) as $instantiation) {
             [$step, $stepProblems, $stepAdds] = $this->step($declaration, $instantiation, $environment);
             $steps[] = $step;
-            $expirations = [...$expirations, ...$step->expirations];
+            $metadataUnknown = $metadataUnknown || $step->metadataUnknown;
             $problems = [...$problems, ...$stepProblems];
-            $ttl = $ttl->meet($step->ttl);
-            $adds = $adds || $stepAdds === true;
-            $open = $open || $stepAdds === null;
+            if ($stepAdds !== false) {
+                $ttl = $step->ttl;
+                $expirations = $step->expirations;
+                $adds = $stepAdds === true;
+                $open = $stepAdds === null;
+            }
         }
 
-        return new StrategyEffect('', $ttl, $steps, $adds ? true : ($open ? null : false), $problems, $expirations);
+        return new StrategyEffect('', $problems === [] ? $ttl : TtlEstimate::invalid($problems[0]), array_reverse($steps), $adds ? true : ($open ? null : false), $problems, $expirations, $metadataUnknown);
     }
 
     /**
@@ -155,7 +162,7 @@ final readonly class StrategyResolver
 
             $condition = $this->shortName($instantiation->class).'::create() cannot be analyzed statically';
 
-            return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition)), [], null];
+            return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition), metadataUnknown: true), [], null];
         }
 
         if ($child !== null && !$child->constructible) {
@@ -172,7 +179,7 @@ final readonly class StrategyResolver
             if ($child === null) {
                 $condition = $instantiation->class.' was not found in the scanned sources';
 
-                return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition)), [], null];
+                return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition), metadataUnknown: true), [], null];
             }
         }
 
@@ -192,7 +199,7 @@ final readonly class StrategyResolver
         $composed = $this->composition($child, $childEnvironment);
         $ttl = $problems === [] ? $composed->ttl : TtlEstimate::invalid($problems[0]);
 
-        return [new StrategyStep($instantiation->class, $ttl, expirations: $composed->expirations), [...$problems, ...$composed->problems], $composed->addsConstraint];
+        return [new StrategyStep($instantiation->class, $ttl, expirations: $composed->expirations, metadataUnknown: $composed->metadataUnknown), [...$problems, ...$composed->problems], $composed->overridesExpiration];
     }
 
     /**
@@ -222,7 +229,7 @@ final readonly class StrategyResolver
             return [new StrategyStep($child->name, TtlEstimate::invalid($problems[0])), $problems, true];
         }
 
-        return [new StrategyStep($child->name, $estimate, expirations: $expirations), [], !$contract->unconstrained || $expirations !== []];
+        return [new StrategyStep($child->name, $estimate, expirations: $expirations, metadataUnknown: !in_array($child->name, [KeySpreadExpirationStrategy::class, StaleIfErrorCacheStrategy::class], true)), [], !$contract->unconstrained || $expirations !== []];
     }
 
     /**
@@ -240,7 +247,7 @@ final readonly class StrategyResolver
             return [new StrategyStep($class, TtlEstimate::invalid($problems[0]), assumed: true), $problems, true];
         }
 
-        return [new StrategyStep($class, $estimate, assumed: true), [], !$assumption->unconstrained];
+        return [new StrategyStep($class, $estimate, assumed: true, metadataUnknown: true), [], !$assumption->unconstrained];
     }
 
     /**

@@ -44,7 +44,7 @@ final class TreeRendererTest extends TestCase
     public function testRestrictedHighlightsLocalCapsAndKeepsUnrestrictedFields(): void
     {
         $renderer = new TreeRenderer();
-        $effect = new CacheEffect(ttl: TtlEstimate::known(20), storable: true, localRestrictions: ['ttl' => 'local ttl 20s; composed 60s']);
+        $effect = new CacheEffect(ttl: TtlEstimate::known(20), storable: true, localOverrides: ['ttl' => 'local ttl 20s; composed 60s']);
 
         self::assertSame(
             '<fg=yellow>20s</>',

@@ -64,4 +64,16 @@ final class DeclarationFingerprintTest extends TestCase
         self::assertNotSame($classLevel->fingerprint, $methodLevel->fingerprint);
         self::assertNotSame($classLevel->fingerprint, $disabled->fingerprint);
     }
+    public function testCalculateDistinguishesInheritanceFromExplicitEmptyAndSharedFields(): void
+    {
+        $resolver = new CacheDefinitionResolver();
+        $query = new DeclaredQuery();
+        $inherited = $resolver->resolve($query, 'inheritedFields')->keyContext([1]);
+        $tags = $resolver->resolve($query, 'clearedTags')->keyContext([1]);
+        $visibility = $resolver->resolve($query, 'sharedVisibility')->keyContext([1]);
+
+        self::assertNotSame($inherited->fingerprint, $tags->fingerprint);
+        self::assertNotSame($inherited->fingerprint, $visibility->fingerprint);
+        self::assertNotSame($tags->fingerprint, $visibility->fingerprint);
+    }
 }

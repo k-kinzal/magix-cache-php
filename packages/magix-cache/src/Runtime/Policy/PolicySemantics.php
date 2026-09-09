@@ -4,56 +4,52 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Runtime\Policy;
 
-use function is_int;
-
 use LogicException;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\Metadata\CacheMetadata;
 
 /**
- * Computes the additional constraint a resolved policy imposes at one instant.
+ * Applies explicit policy fields without recomposing dependency metadata.
  *
- * The result is pure: it depends only on the policy, the upstream expiration,
- * and the evaluation time. The runtime obtains the final metadata by meeting
- * the origin metadata with this constraint, so a declared lifetime can never
- * extend an expiration a dependency already imposed.
+ * Auto inherits expiration. FromUpstream caps the inherited expiration.
+ * A fixed TTL replaces it. Unspecified tags and visibility are preserved.
+ * Finite-expiration validation runs after dynamic and strategy overrides.
  */
 final readonly class PolicySemantics
 {
     /**
-     * Returns the constraint to meet with the origin metadata.
+     * Returns the metadata after applying the policy at the origin base time.
      *
-     * @param float|null $upstreamExpiresAt The expiration already carried by the origin metadata.
-     * @param float $now The base time taken right after the origin succeeded.
-     * @throws LogicException when a derived lifetime has no finite upstream expiration to derive from
+     * @throws LogicException when FromUpstream has no maximum lifetime
      */
-    public function constraint(CachePolicy $policy, ?float $upstreamExpiresAt, float $now): CacheMetadata
+    public function apply(CachePolicy $policy, CacheMetadata $metadata, float $baseTime): CacheMetadata
     {
         if (is_int($policy->ttl)) {
-            return new CacheMetadata(
-                expiresAt: $now + $policy->ttl,
-                tags: $policy->tags,
-                visibility: $policy->visibility,
-            );
+            $metadata = $metadata->withExpiration($baseTime + $policy->ttl);
+        } elseif ($policy->ttl === Ttl::FromUpstream) {
+            $maximum = $policy->maxTtl ?? throw new LogicException('Ttl::FromUpstream requires maxTtl.');
+
+            if ($metadata->expiresAt !== null) {
+                $metadata = $metadata->withExpiration(min($metadata->expiresAt, $baseTime + $maximum));
+            }
         }
 
-        if ($upstreamExpiresAt === null) {
-            throw new LogicException('Ttl::'.$policy->ttl->name.' requires a finite dependency or upstream expiration.');
+        if ($policy->tags !== null) {
+            $metadata = $metadata->withTags($policy->tags);
         }
 
-        if ($policy->ttl === Ttl::FromUpstream) {
-            $maxTtl = $policy->maxTtl ?? throw new LogicException('Ttl::FromUpstream requires maxTtl.');
+        return $policy->visibility === null ? $metadata : $metadata->withVisibility($policy->visibility);
+    }
 
-            return new CacheMetadata(
-                expiresAt: $now + $maxTtl,
-                tags: $policy->tags,
-                visibility: $policy->visibility,
-            );
+    /**
+     * Checks the final expiration after all explicit overrides have run.
+     *
+     * @throws LogicException when an automatic boundary has no finite expiration
+     */
+    public function validate(CachePolicy $policy, CacheMetadata $metadata): void
+    {
+        if ($policy->ttl instanceof Ttl && $metadata->expiresAt === null) {
+            throw new LogicException('Ttl::'.$policy->ttl->name.' requires a finite expiration from the origin or an override.');
         }
-
-        return new CacheMetadata(
-            tags: $policy->tags,
-            visibility: $policy->visibility,
-        );
     }
 }

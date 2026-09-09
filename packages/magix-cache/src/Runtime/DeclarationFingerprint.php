@@ -69,10 +69,11 @@ final readonly class DeclarationFingerprint
         }
 
         $encoded = json_encode([
+            'semantics' => 'metadata-overrides-v1',
             'ttl' => is_int($policy->ttl) ? $policy->ttl : 'Ttl::'.$policy->ttl->name,
             'maxTtl' => $policy->maxTtl,
-            'tags' => (new CacheTokenSet())->tags($policy->tags),
-            'visibility' => $policy->visibility->name,
+            'tags' => $policy->tags === null ? null : (new CacheTokenSet())->tags($policy->tags),
+            'visibility' => $policy->visibility?->name,
             'version' => $policy->version,
             'staleIfError' => $staleIfError === null ? null : [$staleIfError->maxAge, $exceptions],
             'dynamicTtl' => $dynamicTtl?->resolver,

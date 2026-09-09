@@ -20,52 +20,46 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Visibility::class)]
 final class PolicySemanticsTest extends TestCase
 {
-    public function testConstraintOfAFixedLifetimeNeverExtendsTheUpstreamExpiration(): void
+    public function testApplyFixedLifetimeOverridesUpstreamAndPreservesOtherFields(): void
     {
-        $upstream = new CacheMetadata(expiresAt: 105.0);
-        $constraint = (new PolicySemantics())->constraint(new CachePolicy(ttl: 20), 105.0, 100.0);
+        $upstream = new CacheMetadata(expiresAt: 105.0, cacheable: false, tags: ['dependency'], visibility: Visibility::Private, reasons: ['source']);
+        $result = (new PolicySemantics())->apply(new CachePolicy(ttl: 60), $upstream, 100.0);
 
-        self::assertSame(120.0, $constraint->expiresAt);
-        self::assertSame(105.0, $upstream->meet($constraint)->expiresAt);
+        self::assertEquals($upstream->withExpiration(160.0), $result);
+        self::assertSame(105.0, $upstream->expiresAt);
     }
 
-    public function testConstraintOfAFixedLifetimeStandsAloneWithoutUpstream(): void
+    public function testApplyUnspecifiedFieldsInheritAndExplicitEmptyOrSharedFieldsReplace(): void
     {
-        $constraint = (new PolicySemantics())->constraint(new CachePolicy(ttl: 20), null, 100.0);
+        $upstream = new CacheMetadata(expiresAt: 105.0, tags: ['dependency'], visibility: Visibility::Private);
+        $semantics = new PolicySemantics();
 
-        self::assertSame(120.0, $constraint->expiresAt);
+        self::assertEquals($upstream, $semantics->apply(new CachePolicy(), $upstream, 100.0));
+        $result = $semantics->apply(new CachePolicy(tags: [], visibility: Visibility::Shared), $upstream, 100.0);
+        self::assertSame([], $result->tags);
+        self::assertSame(Visibility::Shared, $result->visibility);
+        self::assertSame(105.0, $result->expiresAt);
+        $semantics->validate(new CachePolicy(), $result);
     }
 
-    public function testConstraintCarriesTheDeclaredTagsAndVisibility(): void
+    public function testApplyFromUpstreamExplicitlyCapsWithoutExtending(): void
     {
-        $constraint = (new PolicySemantics())->constraint(
-            new CachePolicy(ttl: 20, tags: ['boundary'], visibility: Visibility::Private),
-            null,
-            100.0,
-        );
-
-        self::assertSame(['boundary'], $constraint->tags);
-        self::assertSame(Visibility::Private, $constraint->visibility);
+        $semantics = new PolicySemantics();
+        $policy = new CachePolicy(ttl: Ttl::FromUpstream, maxTtl: 10);
+        self::assertSame(110.0, $semantics->apply($policy, new CacheMetadata(expiresAt: 120.0), 100.0)->expiresAt);
+        self::assertSame(105.0, $semantics->apply($policy, new CacheMetadata(expiresAt: 105.0), 100.0)->expiresAt);
     }
 
-    public function testConstraintOfAutoInheritsTheFiniteUpstreamExpiration(): void
+    public function testApplyFixedLifetimeCanExplicitlyRefreshAnExpiredDependency(): void
     {
-        $upstream = new CacheMetadata(expiresAt: 110.0);
-        $constraint = (new PolicySemantics())->constraint(new CachePolicy(ttl: Ttl::Auto), 110.0, 100.0);
+        $result = (new PolicySemantics())->apply(new CachePolicy(ttl: 60), new CacheMetadata(expiresAt: 90.0), 100.0);
 
-        self::assertNull($constraint->expiresAt);
-        self::assertSame(110.0, $upstream->meet($constraint)->expiresAt);
+        self::assertSame(160.0, $result->expiresAt);
     }
-
-    public function testConstraintOfFromUpstreamCapsTheUpstreamExpiration(): void
+    public function testValidateAcceptsAnExpirationSuppliedByALaterOverride(): void
     {
-        $upstream = new CacheMetadata(expiresAt: 120.0);
-        $constraint = (new PolicySemantics())->constraint(
-            new CachePolicy(ttl: Ttl::FromUpstream, maxTtl: 10),
-            120.0,
-            100.0,
-        );
-
-        self::assertSame(110.0, $upstream->meet($constraint)->expiresAt);
+        $metadata = CacheMetadata::top()->withExpiration(160.0);
+        (new PolicySemantics())->validate(new CachePolicy(), $metadata);
+        self::assertSame(160.0, $metadata->expiresAt);
     }
 }

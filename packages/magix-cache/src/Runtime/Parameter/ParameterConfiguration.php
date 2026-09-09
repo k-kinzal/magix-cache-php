@@ -15,28 +15,28 @@ use Magix\Cache\Metadata\Visibility;
 final readonly class ParameterConfiguration
 {
     /**
-     * @param int<0, max>|null $ttl Validated additional lifetime in seconds.
-     * @param list<non-empty-string> $tags Validated cache tokens.
+     * @param int<0, max>|null $ttl Validated override lifetime in seconds.
+     * @param list<non-empty-string>|null $tags Validated cache tokens.
      * @param array<string, mixed> $strategyArguments Values passed to create().
      */
     public function __construct(
         public ?int $ttl = null,
-        public array $tags = [],
-        public Visibility $visibility = Visibility::Shared,
+        public ?array $tags = null,
+        public ?Visibility $visibility = null,
         public array $strategyArguments = [],
     ) {
     }
 
     /**
-     * Returns the policy restricted by parameter visibility and tags.
+     * Overrides explicitly bound tags and visibility; omitted bindings inherit.
      */
     public function policy(CachePolicy $policy): CachePolicy
     {
         return new CachePolicy(
             ttl: $policy->ttl,
             maxTtl: $policy->maxTtl,
-            tags: [...$policy->tags, ...$this->tags],
-            visibility: $policy->visibility->meet($this->visibility),
+            tags: $this->tags ?? $policy->tags,
+            visibility: $this->visibility ?? $policy->visibility,
             version: $policy->version,
         );
     }

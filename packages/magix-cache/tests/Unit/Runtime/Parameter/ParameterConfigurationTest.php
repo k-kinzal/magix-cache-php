@@ -15,14 +15,14 @@ use PHPUnit\Framework\TestCase;
 #[UsesNamespace('Magix\Cache')]
 final class ParameterConfigurationTest extends TestCase
 {
-    public function testPolicyKeepsStaticRestrictionsAndAddsParameterTags(): void
+    public function testPolicyReplacesExplicitlyBoundFields(): void
     {
         $static = new CachePolicy(ttl: 60, tags: ['static'], visibility: Visibility::Private);
         $parameters = new ParameterConfiguration(ttl: 10, tags: ['dynamic'], visibility: Visibility::Shared);
         $policy = $parameters->policy($static);
 
         self::assertSame(60, $policy->ttl, 'the parameter TTL is applied separately at the origin base time');
-        self::assertSame(Visibility::Private, $policy->visibility);
-        self::assertSame(['static', 'dynamic'], $policy->tags);
+        self::assertSame(Visibility::Shared, $policy->visibility);
+        self::assertSame(['dynamic'], $policy->tags);
     }
 }

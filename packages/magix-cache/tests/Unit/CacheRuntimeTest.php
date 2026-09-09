@@ -65,7 +65,7 @@ final class CacheRuntimeTest extends TestCase
         self::assertSame(1, $calls);
     }
 
-    public function testExecuteNeverExtendsAnUpstreamExpiration(): void
+    public function testExecuteOverridesAnUpstreamExpiration(): void
     {
         $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
         $invocation = new CacheInvocation(
@@ -77,7 +77,7 @@ final class CacheRuntimeTest extends TestCase
             ),
         );
 
-        self::assertSame(105.0, $runtime->execute($invocation)->metadata->expiresAt);
+        self::assertSame(120.0, $runtime->execute($invocation)->metadata->expiresAt);
     }
 
     public function testExecuteReturnsATtlZeroResultWithoutStoringIt(): void
@@ -344,7 +344,7 @@ final class CacheRuntimeTest extends TestCase
         self::assertLessThanOrEqual(160.0, $expiresAt);
     }
 
-    public function testExecuteNeverLetsAStrategyExtendAnUpstreamExpiration(): void
+    public function testExecuteLetsAStrategyOverrideAnUpstreamExpiration(): void
     {
         $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
         $invocation = new CacheInvocation(
@@ -354,7 +354,7 @@ final class CacheRuntimeTest extends TestCase
             strategy: StrategyDefinition::of(KeySpreadExpirationStrategy::class, minimum: 30, maximum: 60),
         );
 
-        self::assertSame(105.0, $runtime->execute($invocation)->metadata->expiresAt);
+        self::assertGreaterThanOrEqual(130.0, $runtime->execute($invocation)->metadata->expiresAt);
     }
 
     public function testExecuteServesStaleThroughAComposedStrategyWithoutTheBehaviorAttribute(): void
@@ -498,5 +498,35 @@ final class CacheRuntimeTest extends TestCase
             new CachePolicy(ttl: 10),
             static fn (): Cached => throw $error,
         ));
+    }
+    public function testExecuteOuterStrategyOverridesDynamicParameterPolicyAndDependencyTtls(): void
+    {
+        $clock = new MutableClock(100.25);
+        $resolver = new FixedTtlResolver(15);
+        $runtime = new CacheRuntime(new MemoryCache(), $clock, ttlResolvers: [$resolver]);
+        $source = new CacheMetadata(expiresAt: 120.0, tags: ['source'], visibility: Visibility::Private);
+        $outer = StrategyDefinition::of(KeySpreadExpirationStrategy::class, minimum: 60, maximum: 60);
+        $inner = StrategyDefinition::of(KeySpreadExpirationStrategy::class, minimum: 30, maximum: 30);
+        $invocation = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'priority'),
+            policy: new CachePolicy(ttl: 5),
+            origin: static fn (): Cached => Cached::of('value', $source),
+            dynamicTtl: new DynamicTtl(resolver: FixedTtlResolver::class),
+            parameterTtl: 10,
+            strategy: StrategyDefinition::compose($outer, $inner),
+        );
+        $first = $runtime->execute($invocation);
+        self::assertEquals($source->withExpiration(160.25), $first->metadata);
+        $clock->advance(5.0);
+        self::assertEquals($first, $runtime->execute($invocation));
+        self::assertSame(1, $resolver->calls);
+
+        $reversed = new CacheInvocation(
+            context: new CacheKeyContext('', 'App\\Q', 'App\\Q', 'execute', [], '1', 'reversed'),
+            policy: new CachePolicy(ttl: 90),
+            origin: static fn (): Cached => Cached::of('value', $source),
+            strategy: StrategyDefinition::compose($inner, $outer),
+        );
+        self::assertEquals($source->withExpiration(135.25), $runtime->execute($reversed)->metadata);
     }
 }

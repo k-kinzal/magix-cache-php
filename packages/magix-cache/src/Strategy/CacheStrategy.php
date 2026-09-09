@@ -39,13 +39,14 @@ interface CacheStrategy
     public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead;
 
     /**
-     * Produces the value of the boundary with this strategy's constraints.
+     * Produces the value of the boundary with this strategy's explicit overrides.
      *
      * Delegating reaches the origin computation at the end of the chain.
-     * OriginResult carries the successful value and its single base time;
-     * constraints are added through its metadata meet. OriginFailure carries
+     * OriginResult carries the successful value after local policy, parameter
+     * and dynamic overrides, with its single base time. withTtl() and
+     * withMetadata() replace fields; outer fetch wrappers run last. OriginFailure carries
      * only declared origin behavior. CacheAnswer ends the execution without
-     * applying origin constraints or storing the answer again.
+     * applying origin overrides or storing the answer again.
      *
      * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
      * @throws RuntimeException when the origin or a delegate fails with declared behavior

@@ -8,16 +8,15 @@ use Attribute;
 use InvalidArgumentException;
 
 /**
- * Declares the lifetime constraint a strategy adds on the normal origin path.
+ * Declares the lifetime override a strategy makes on the normal origin path.
  *
  * The contract is about the candidate constraint the operation contributes,
  * not about the format of an algorithm: a declaration with bounds promises
- * that the strategy meets one finite lifetime constraint into the produced
- * metadata, that the constraint lies within the declared bounds relative to
- * the base time, and that the strategy never extends an expiration a
- * dependency already imposed. A missing bound is undetermined, not
+ * that the strategy replaces expiration with a finite lifetime within the
+ * declared bounds relative to the origin base time. This override may extend
+ * an inherited or policy deadline. A missing bound is undetermined, not
  * unlimited. Omitting the attribute, or supplying no arguments, declares
- * that the operation adds no lifetime constraint at all.
+ * that the operation preserves the incoming expiration.
  * With positional alternatives, the constraint belongs to the union of the
  * declared points and ranges. Alternatives describe possible outcomes, not simultaneous
  * constraints, and do not prove which runtime condition selects each one.
@@ -39,7 +38,7 @@ final readonly class Ttl
     public int|ConstructorArg|Arg|null $max;
 
     /**
-     * Whether no lifetime arguments were supplied and no constraint is added.
+     * Whether no lifetime arguments were supplied and expiration is preserved.
      */
     public bool $unconstrained;
 

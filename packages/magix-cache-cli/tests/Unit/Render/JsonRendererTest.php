@@ -96,7 +96,7 @@ final class JsonRendererTest extends TestCase
 
         self::assertSame('App\PageQuery::execute', $tree['boundary']);
         self::assertSame(
-            ['source' => 'MethodAttribute', 'ttl' => '120s', 'maxTtl' => null, 'tags' => ['page'], 'visibility' => 'shared', 'version' => '1', 'runtime' => 'default'],
+            ['source' => 'MethodAttribute', 'ttl' => '120s', 'maxTtl' => null, 'tags' => ['page'], 'visibility' => null, 'version' => '1', 'runtime' => 'default'],
             $tree['policy'],
         );
         self::assertSame([['name' => 'viewerId', 'type' => 'int', 'ignored' => false, 'scope' => 'private', 'reducer' => null, 'configuration' => null]], $tree['key']);
@@ -131,14 +131,14 @@ final class JsonRendererTest extends TestCase
             label: 'ProductCacheStrategy::create(min: 30)',
             ttl: TtlEstimate::unknown(60, null, 30),
             steps: [new StrategyStep('App\\Spread', TtlEstimate::unknown(60, null, 30), assumed: true)],
-            addsConstraint: true,
+            overridesExpiration: true,
             problems: [],
         );
 
         $encoded = (new JsonRenderer())->strategy($strategy);
 
         self::assertSame('ProductCacheStrategy::create(min: 30)', $encoded['declared']);
-        self::assertSame(true, $encoded['addsConstraint']);
+        self::assertSame(true, $encoded['overridesExpiration']);
         self::assertSame(
             ['state' => 'unknown', 'seconds' => null, 'lowerBound' => 30, 'upperBound' => 60, 'reason' => null],
             $encoded['ttl'],

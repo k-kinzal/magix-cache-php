@@ -40,7 +40,7 @@ final readonly class CacheTree
         $id = $boundary->id();
 
         if (in_array($id, $visited, true)) {
-            $effect = new CacheEffect(TtlEstimate::unknown(condition: 'recursive dependency, not analyzed'), $boundary->scope(), visibilityUnknown: $boundary->scope() !== Visibility::NoStore);
+            $effect = new CacheEffect(TtlEstimate::unknown(condition: 'recursive dependency, not analyzed'), $boundary->scope() ?? Visibility::Shared, visibilityUnknown: $boundary->scope() !== Visibility::NoStore);
 
             return new CacheNode($boundary, $effect, [], ['recursive dependency, not expanded again']);
         }

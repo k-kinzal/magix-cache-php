@@ -13,11 +13,10 @@ use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 
 /**
- * Declares how a cache boundary constrains and stores its result.
+ * Declares explicit overrides for a cache boundary.
  *
- * A policy only ever adds constraints: a fixed lifetime is always bounded by
- * the upstream expiration, and no policy setting can extend an expiration a
- * dependency already imposed.
+ * Omitted fields inherit bubbled metadata. A fixed TTL replaces expiration;
+ * Auto inherits it and FromUpstream explicitly caps the inherited deadline.
  */
 final readonly class CachePolicy
 {
@@ -26,14 +25,14 @@ final readonly class CachePolicy
      *
      * @param int|Ttl $ttl Fixed lifetime in seconds, or a lifetime derived from upstream.
      * @param int|null $maxTtl Upper bound applied to a derived lifetime.
-     * @param list<string> $tags
+     * @param list<string>|null $tags Replacement tags; null inherits, [] clears.
      * @throws InvalidArgumentException when a lifetime is negative, a derived lifetime has no upper bound, the version is empty, or a tag is unusable
      */
     public function __construct(
         public int|Ttl $ttl = Ttl::Auto,
         public ?int $maxTtl = null,
-        public array $tags = [],
-        public Visibility $visibility = Visibility::Shared,
+        public ?array $tags = null,
+        public ?Visibility $visibility = null,
         public string $version = '1',
     ) {
         if (is_int($ttl) && $ttl < 0) {
@@ -52,16 +51,16 @@ final readonly class CachePolicy
             throw new InvalidArgumentException('Cache version must not be empty.');
         }
 
-        (new CacheTokenSet())->tags($tags);
+        if ($tags !== null) {
+            (new CacheTokenSet())->tags($tags);
+        }
     }
 
     /**
-     * Returns this policy with an additional visibility constraint.
+     * Returns this policy with an explicit visibility override.
      */
-    public function restrictVisibility(Visibility $visibility): self
+    public function withVisibility(Visibility $visibility): self
     {
-        $visibility = $this->visibility->meet($visibility);
-
         if ($visibility === $this->visibility) {
             return $this;
         }

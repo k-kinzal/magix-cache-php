@@ -3,7 +3,7 @@
 [![GitHub Actions](https://github.com/k-kinzal/magix-cache/actions/workflows/ci.yml/badge.svg)](https://github.com/k-kinzal/magix-cache/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-`magix` makes the caches of a MagixCache project visible. It reads the source of a project without running it, resolves every `cached()` call site, and composes the constraints of the boundaries that call each other, exactly the way `CacheRuntime` does at runtime.
+`magix` makes the caches of a MagixCache project visible. It reads the source of a project without running it, resolves every `cached()` call site, and bubbles dependencies and applies explicit boundary overrides in the same order as `CacheRuntime` does at runtime.
 
 The result answers the questions that are otherwise only observable in production: what is actually cached, for how long, under which key, and who is allowed to read the entry.
 
@@ -12,9 +12,9 @@ The result answers the questions that are otherwise only observable in productio
 - Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node
 - Ordinary method display with `--uncached=between|all|none` (default: `between` cache boundaries), and independent subtree filters with repeatable `--ignore` patterns
 - Explicit analysis gaps when a cache boundary reaches another cache through ordinary methods, with unverified metadata kept unknown
-- The reason behind each effective value, such as which dependency capped a TTL or made a result private
+- The reason behind each effective value, including inherited metadata and explicit local overrides
 - White rows for provably storable caches and gray rows for other nodes, so the extent of cache bubbling is visible at a glance
-- Yellow fields where local TTL, `maxTtl`, or visibility settings restrict a storable result
+- Yellow fields where local TTL, `maxTtl`, tags or visibility settings override a storable result
 - Composed strategy contracts, bound to the same `create()` the runtime calls, with candidate ranges such as `30-60s` kept apart from the effective TTL
 - The default hash strategy's cache key for a call in the configured runtime namespace
 - Tree, JSON, and Mermaid output for terminals, editors, and documentation
@@ -41,22 +41,22 @@ vendor/bin/magix analyze ProductPageQuery::execute
 App\Query\ProductPageQuery::execute
   src/Query/ProductPageQuery.php:34
 
-  ttl          20s (declared 120s, capped by ProductQuery::execute)
-  visibility   private (restricted by ViewerQuery::execute)
+  ttl          120s
+  visibility   private (inherited from ViewerQuery::execute)
   storable     yes
-  tags         inventory, page, product, viewer
+  tags         page
   key          $productId, $viewerId (ignored: $trace)  version 1
   policy       #[Cache(ttl: 120s, tags: [page])]
 
-ProductPageQuery::execute  ttl 20s (declared 120s)  private  tags inventory,page,product,viewer
+ProductPageQuery::execute  ttl 120s  private  tags page
 |-- ProductQuery::execute  ttl 20s  shared  tags product
 |-- InventoryQuery::execute  ttl 60s  shared  tags inventory
 `-- ViewerQuery::execute  ttl 30s  private  tags viewer
 ```
 
-The boundary declares 120 seconds, but `ProductQuery` expires after 20, and `ViewerQuery` is personalized, so the page is stored privately for 20 seconds. Nothing needs to be executed to see this.
+The boundary explicitly chooses 120 seconds and replaces tags with `page`. Its omitted visibility inherits Private from `ViewerQuery`. The child's 20-second TTL does not cap the parent's explicit override. Nothing needs to be executed to see this.
 
-In a color terminal, these storable boundaries appear white. A `NoStore` result and the parents it constrains appear gray, while stored children remain white. Uncached methods, missing `#[Cache]` declarations, zero TTLs, and results whose storage depends on runtime values are also gray. `shared` and `private` retain their text labels without separate colors. Use `--ansi` to force colors or `--no-ansi` for plain text.
+In a color terminal, these storable boundaries appear white. A `NoStore` result and parents that inherit it appear gray, while stored children remain white. Uncached methods, missing `#[Cache]` declarations, zero TTLs, and results whose storage depends on runtime values are also gray. `shared` and `private` retain their text labels without separate colors. Use `--ansi` to force colors or `--no-ansi` for plain text.
 
 For a parent that only bubbles up child constraints, declare `#[Cache]` without a TTL. The tree shows the effective values directly, without a `(declared Ttl::Auto)` annotation, and the policy row uses `#[Cache]` (or includes any additional options). Explicit `ttl: Ttl::Auto` renders the same way. Fixed TTL declarations, upstream caps, and unknown or invalid lifetime diagnostics remain visible; JSON retains the normalized TTL mode in `policy.ttl`.
 
@@ -79,7 +79,7 @@ See [Commands](docs/commands.md) for every option. `magix list` lists the availa
 
 `magix analyze` never executes application code. Each PHP file below the scanned paths is parsed, and every method that calls `$this->cached()` becomes a boundary. The `#[Cache]` declaration, behavior attributes such as `#[DynamicTtl]`, and parameter attributes are read from the syntax tree, and calls to other boundaries are resolved through the declared types of properties, local variables, and interfaces.
 
-The composition rules are the ones the runtime applies: the earliest expiration wins, cacheability is combined with logical AND, the strictest visibility wins, and tags are unioned. A fixed TTL is always bounded by the expiration its dependencies impose.
+The composition rules are the ones the runtime applies: the earliest expiration wins, cacheability is combined with logical AND, the strictest visibility wins, and tags are unioned. These are bubbling rules. Explicit parent fields override afterward: fixed TTL replaces expiration, tags replace the tag list, and visibility replaces scope. Strategies override after policy and invocation settings.
 
 Because the analysis is static, the effective TTL is an honest estimate rather than a guess. A lifetime is reported as a number only when it is statically determined; a boundary that is provably without expiration is `unconstrained`; anything that depends on runtime values, such as a `#[DynamicTtl]` resolver or an upstream the analyzer cannot see, is `unknown`, together with the tightest provable upper bound such as `unknown (≤30s)`; and a declaration that throws at runtime is `invalid`. A call that resolves to several implementations expands into all of them.
 

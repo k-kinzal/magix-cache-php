@@ -61,13 +61,13 @@ final readonly class BoundaryDeclaration
     /**
      * Returns the visibility that scoped parameters impose on this boundary.
      */
-    public function scope(): Visibility
+    public function scope(): ?Visibility
     {
-        $visibility = Visibility::Shared;
+        $visibility = null;
 
         foreach ($this->parameters as $parameter) {
             if ($parameter->scope !== null) {
-                $visibility = $visibility->meet($parameter->scope);
+                $visibility = $parameter->scope;
             }
         }
 

@@ -56,8 +56,8 @@ final class PolicyReaderTest extends TestCase
 
         self::assertSame(Ttl::Auto, $policy->ttl);
         self::assertNull($policy->maxTtl);
-        self::assertSame([], $policy->tags);
-        self::assertSame(Visibility::Shared, $policy->visibility);
+        self::assertNull($policy->tags);
+        self::assertNull($policy->visibility);
         self::assertSame('1', $policy->version);
         self::assertSame('default', $policy->runtime);
     }
@@ -74,5 +74,27 @@ final class PolicyReaderTest extends TestCase
 
         self::assertNull($policy->ttl);
         self::assertSame('default', $policy->runtime);
+    }
+    public function testReadDistinguishesExplicitEmptyAndSharedFieldsFromInheritance(): void
+    {
+        $policy = (new PolicyReader())->read([
+            new Arg(new Array_([]), name: new Identifier('tags')),
+            new Arg(new ClassConstFetch(new Name(Visibility::class), 'Shared'), name: new Identifier('visibility')),
+        ], PolicySource::MethodAttribute);
+
+        self::assertSame([], $policy->tags);
+        self::assertSame(Visibility::Shared, $policy->visibility);
+        self::assertSame('#[Cache(tags: [], visibility: Shared)]', $policy->label());
+    }
+
+    public function testReadKeepsOpaqueMetadataOverridesUnknown(): void
+    {
+        $policy = (new PolicyReader())->read([
+            new Arg(new Variable('tags'), name: new Identifier('tags')),
+            new Arg(new Variable('visibility'), name: new Identifier('visibility')),
+        ], PolicySource::MethodAttribute);
+
+        self::assertTrue($policy->tagsUnknown);
+        self::assertTrue($policy->visibilityUnknown);
     }
 }

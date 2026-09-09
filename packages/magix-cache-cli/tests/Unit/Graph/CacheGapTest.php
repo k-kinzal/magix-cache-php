@@ -49,11 +49,11 @@ final class CacheGapTest extends TestCase
         self::assertSame([$parent, $bridge, $lookup, $child], $node->gaps[0]->path);
         self::assertSame('cache propagation unanalyzed: ParentQuery::get -> Bridge::get -> Lookup::get -> Child::get', $node->gaps[0]->label());
         self::assertSame($child, $node->children[0]->children[0]->children[0]->boundary);
-        self::assertSame(TtlEstimateState::Unknown, $node->effect->ttl->state);
-        self::assertSame($upper, $node->effect->ttl->upperBound);
+        self::assertSame(is_int($ttl) ? TtlEstimateState::Known : TtlEstimateState::Unknown, $node->effect->ttl->state);
+        self::assertSame($upper, $node->effect->ttl->seconds ?? $node->effect->ttl->upperBound);
         self::assertSame(Visibility::Shared, $node->effect->visibility);
         self::assertTrue($node->effect->visibilityUnknown);
-        self::assertTrue($node->effect->tagsUnknown);
+        self::assertFalse($node->effect->tagsUnknown);
         self::assertSame(['parent'], $node->effect->tags);
         self::assertFalse($node->effect->storable);
         self::assertSame([], $node->effect->problems);
@@ -61,8 +61,9 @@ final class CacheGapTest extends TestCase
         $ancestor = $tree->build($outer);
         self::assertFalse($ancestor->effect->storable);
         self::assertTrue($ancestor->effect->visibilityUnknown);
-        self::assertTrue($ancestor->effect->tagsUnknown);
-        self::assertSame(TtlEstimateState::Unknown, $ancestor->effect->ttl->state);
+        self::assertFalse($ancestor->effect->tagsUnknown);
+        self::assertSame(TtlEstimateState::Known, $ancestor->effect->ttl->state);
+        self::assertSame(120, $ancestor->effect->ttl->seconds);
         self::assertSame([], $ancestor->gaps);
         self::assertSame([], $tree->build($bridge)->gaps);
     }

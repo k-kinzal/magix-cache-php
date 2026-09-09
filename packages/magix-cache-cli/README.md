@@ -10,7 +10,7 @@ The result answers the questions that are otherwise only observable in productio
 ## Features
 
 - Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node
-- Optional ordinary method calls with `--show-uncached`, and independent subtree filters with repeatable `--ignore` patterns
+- Ordinary method display with `--uncached=between|all|none` (default: `between` cache boundaries), and independent subtree filters with repeatable `--ignore` patterns
 - Explicit analysis gaps when a cache boundary reaches another cache through ordinary methods, with unverified metadata kept unknown
 - The reason behind each effective value, such as which dependency capped a TTL or made a result private
 - White rows for provably storable caches and gray rows for other nodes, so the extent of cache bubbling is visible at a glance
@@ -86,10 +86,13 @@ Because the analysis is static, the effective TTL is an honest estimate rather t
 The call graph follows dependencies inside composition callbacks, including `traverse()`, and preserves both dependencies when `unzip()` selects one side of a pair. It does not prove which callbacks execute or whether an iterable is non-empty. Check the empty collection path separately: `sequence()` and `traverse()` return unconstrained metadata for empty input, so an automatic parent TTL still needs a finite constraint from elsewhere on that path.
 
 A cache parent calling a cache child through ordinary methods is reported as
-`cache propagation unanalyzed`, even without `--show-uncached`. Those methods
-might return `Cached` intact or detach its metadata with `value()`; the call graph
-does not prove either. The report displays the intervening path and keeps the
-parent's TTL, visibility, and tags uncertain while preserving proven constraints.
+`cache propagation unanalyzed`. Those methods might return `Cached` intact or
+detach its metadata with `value()`; the call graph does not prove either. The
+report keeps the parent's TTL, visibility, and tags uncertain while preserving
+proven constraints. The default `--uncached=between` shows the intermediate
+methods; `all` also shows wholly uncached branches, and `none` omits ordinary
+rows while keeping cached descendants and gap diagnostics. `--show-uncached`
+remains an alias for `--uncached=all`.
 JSON exposes these paths in `analysisGaps`. See [analysis gaps](docs/commands.md#cache-propagation-gaps)
 for the distinction from ordinary uncached calls and invalid declarations.
 

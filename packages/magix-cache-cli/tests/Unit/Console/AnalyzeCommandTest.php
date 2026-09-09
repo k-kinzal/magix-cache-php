@@ -203,7 +203,7 @@ final class AnalyzeCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         self::assertStringContainsString('ttl          20s', $tester->getDisplay());
-        self::assertStringContainsString('ProductController::show (uncached)', $tester->getDisplay());
+        self::assertStringNotContainsString('ProductController::show (uncached)', $tester->getDisplay());
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
     }
 
@@ -224,7 +224,7 @@ final class AnalyzeCommandTest extends TestCase
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
     }
 
-    public function testAnalyzeRendersJsonAndMermaidOutput(): void
+    public function testRenderSupportsJsonAndMermaidOutput(): void
     {
         $application = (new Application(dirname(__DIR__, 5)))->console();
         $json = new CommandTester($application->find('analyze'));
@@ -587,5 +587,124 @@ final class AnalyzeCommandTest extends TestCase
         yield 'fixed' => ['fixed', 60];
         yield 'bounded' => ['bounded', 30];
         yield 'uncached entry' => ['show', 30];
+    }
+
+    /**
+     * @param list<string> $expected
+     * @param list<string> $expectedIgnored
+     * @throws JsonException
+     */
+    #[DataProvider('providerUncachedJsonModes')]
+    public function testJsonModesPreserveAnalysisAndPromoteCachedChildren(string $mode, array $expected, array $expectedIgnored): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => 'InspectionQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture'], '--format' => 'json'];
+        $tester->execute([...$arguments, '--uncached' => 'all']);
+        $complete = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($complete);
+        $tester->execute([...$arguments, '--uncached' => $mode]);
+        $tester->assertCommandIsSuccessful();
+        $visible = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($visible);
+        self::assertSame($complete['effective'], $visible['effective']);
+        self::assertSame($complete['analysisGaps'], $visible['analysisGaps']);
+        self::assertIsArray($visible['dependencies']);
+        self::assertSame($expected, array_column($visible['dependencies'], 'boundary'));
+
+        $tester->execute([...$arguments, '--uncached' => $mode, '--ignore' => ['*Lookup']]);
+        $ignored = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($ignored);
+        self::assertSame($complete['effective'], $ignored['effective']);
+        self::assertSame($complete['analysisGaps'], $ignored['analysisGaps']);
+        self::assertIsArray($ignored['dependencies']);
+        self::assertSame($expectedIgnored, array_column($ignored['dependencies'], 'boundary'));
+    }
+
+    /**
+     * @param list<string> $expected
+     */
+    #[DataProvider('providerUncachedTextFormatsAndModes')]
+    public function testTextFormatsShowOnlyTheSelectedOrdinaryRows(string $format, string $mode, array $expected): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $tester->execute(['boundary' => 'InspectionQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture'], '--format' => $format, '--uncached' => $mode]);
+
+        $tester->assertCommandIsSuccessful();
+        $output = $tester->getDisplay();
+        self::assertStringContainsString('cache propagation unanalyzed:', $output);
+        self::assertStringContainsString($format === 'tree' ? 'ProductQuery::execute  ttl 20s' : 'ProductQuery::execute<br/>20s', $output);
+
+        preg_match_all('/([A-Za-z]+::[A-Za-z]+) \(uncached\)/', $output, $matches);
+        self::assertSame($expected, $matches[1]);
+    }
+
+    #[DataProvider('providerUncachedFormats')]
+    public function testDefaultIsBetweenAndLegacyFlagSelectsAll(string $format): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => 'InspectionQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture/Display', 'packages/magix-cache-cli/tests/Fixture/Project'], '--format' => $format];
+        $tester->execute($arguments);
+        $default = $tester->getDisplay();
+        $tester->execute([...$arguments, '--uncached' => 'between']);
+        self::assertSame($default, $tester->getDisplay());
+
+        $tester->execute([...$arguments, '--uncached' => 'all']);
+        $all = $tester->getDisplay();
+        $tester->execute([...$arguments, '--show-uncached' => true]);
+        self::assertSame($all, $tester->getDisplay());
+        $tester->execute([...$arguments, '--show-uncached' => true, '--uncached' => 'none']);
+        self::assertSame($all, $tester->getDisplay());
+    }
+
+    #[DataProvider('providerUncachedFormats')]
+    public function testNoneRetainsAnExplicitUncachedRootAndHonorsTheOriginalDepth(string $format): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => 'ProductController::index', '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'], '--format' => $format, '--uncached' => 'none'];
+        $tester->execute($arguments);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('ProductController::index', $tester->getDisplay());
+        self::assertStringNotContainsString($format === 'json' ? '"kind": "uncached"' : '(uncached)', $tester->getDisplay());
+        self::assertStringContainsString('ProductQuery::execute', $tester->getDisplay());
+
+        $tester->execute([...$arguments, '--depth' => 1]);
+        self::assertStringNotContainsString('ProductQuery::execute', $tester->getDisplay());
+        $tester->execute([...$arguments, '--ignore' => ['ProductController::show']]);
+        self::assertStringNotContainsString('ProductQuery::execute', $tester->getDisplay());
+        $tester->execute([...$arguments, '--ignore' => ['ProductController::index']]);
+        self::assertSame($format === 'json' ? '[]' : 'All matching roots were excluded by --ignore.', trim($tester->getDisplay()));
+    }
+
+    /**
+     * @return iterable<string, array{string, list<string>, list<string>}>
+     */
+    public static function providerUncachedJsonModes(): iterable
+    {
+        yield 'between' => ['between', [ViewerQuery::class.'::execute', InventoryLookup::class.'::get'], [ViewerQuery::class.'::execute']];
+        yield 'all' => ['all', [ViewerQuery::class.'::execute', InventoryLookup::class.'::get', InspectionQuery::class.'::offset'], [ViewerQuery::class.'::execute', InspectionQuery::class.'::offset']];
+        yield 'none' => ['none', [ViewerQuery::class.'::execute', ProductQuery::class.'::execute'], [ViewerQuery::class.'::execute']];
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function providerUncachedFormats(): iterable
+    {
+        foreach (['tree', 'json', 'mermaid'] as $format) {
+            yield $format => [$format];
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string, string, list<string>}>
+     */
+    public static function providerUncachedTextFormatsAndModes(): iterable
+    {
+        foreach (['tree', 'mermaid'] as $format) {
+            yield $format.' between' => [$format, 'between', ['InventoryLookup::get']];
+            yield $format.' all' => [$format, 'all', ['InventoryLookup::get', 'InspectionQuery::offset']];
+            yield $format.' none' => [$format, 'none', []];
+        }
     }
 }

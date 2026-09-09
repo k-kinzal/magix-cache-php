@@ -60,6 +60,8 @@ Runtimes are registered by name in `CacheRuntimeRegistry` at bootstrap and never
 
 Policy application is pure (`PolicySemantics`) and evaluated at one base time taken right after the origin succeeds: a fixed TTL is always bounded by the upstream expiration (there is no opt-out), `Ttl::Auto` and `Ttl::FromUpstream` require a finite upstream constraint, and a dynamic TTL is an additional constraint met into the result, never a replacement. A stale entry served after an eligible origin failure keeps its expired expiration, so a parent that composes it cannot restore it fresh. Store only cacheable results with permitted visibility and a future finite expiration, re-judged immediately before the write.
 
+Cache reuse preserves the complete evaluated metadata, including fractional absolute expiration, tags and reasons; hits never restart lifetimes or reapply origin constraints. For unchanged source results, declarations, evaluated constraints and base times, replacing any subtree with its stored result must leave all ancestor metadata equal. Protect this with the retained-subtree matrix in `tests/Integration/MetadataBubblingTest.php` in the core package, across memory and serialized PSR adapters. At different base times, recomputed relative lifetimes may differ while remaining bounded by dependency expiration; equality with a different source generation or arbitrary strategy decisions is not promised. See the core composition guide for the substitution proof and time bounds.
+
 ### Failure contract
 
 Failures are split by who has to act on them, and the split is enforced by php-ai-toolkit's rules plus PHPStan's checked-exception analysis.

@@ -9,11 +9,38 @@ use Magix\Cache\Strategy\Contract\ExpiresAt;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionAttribute;
+use ReflectionException;
+use ReflectionMethod;
 
 #[CoversClass(ExpiresAt::class)]
 #[UsesClass(ConstructorArg::class)]
 final class ExpiresAtTest extends TestCase
 {
+    /**
+     * @throws ReflectionException
+     */
+    public function testDeclaresMultipleDailyTimesAndWindowsOnOneMethod(): void
+    {
+        $strategy = new class () {
+            #[ExpiresAt('09:00', timezone: 'Asia/Tokyo')]
+            #[ExpiresAt('12:00', until: '12:15', timezone: 'Asia/Tokyo')]
+            #[ExpiresAt('23:55:30', until: '00:10:15', timezone: 'America/New_York')]
+            public function fetch(): string
+            {
+                return 'unused';
+            }
+        };
+        $attributes = (new ReflectionMethod($strategy, 'fetch'))->getAttributes(ExpiresAt::class);
+        $contracts = array_map(static fn (ReflectionAttribute $attribute): ExpiresAt => $attribute->newInstance(), $attributes);
+
+        self::assertEquals([
+            new ExpiresAt('09:00', timezone: 'Asia/Tokyo'),
+            new ExpiresAt('12:00', until: '12:15', timezone: 'Asia/Tokyo'),
+            new ExpiresAt('23:55:30', until: '00:10:15', timezone: 'America/New_York'),
+        ], $contracts);
+    }
+
     public function testDeclaresSingleTimesAndDistributedWindows(): void
     {
         $single = new ExpiresAt('12:00');

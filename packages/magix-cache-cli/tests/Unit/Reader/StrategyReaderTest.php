@@ -491,31 +491,57 @@ final class StrategyReaderTest extends TestCase
         $declaration = $reader->read($node);
 
         self::assertNotNull($declaration);
-        self::assertNotNull($declaration->expiration);
-        self::assertEquals(new ContractReference(ContractSource::Constructor, 'at'), $declaration->expiration->at);
-        self::assertSame('12:15', $declaration->expiration->until);
-        self::assertSame('Asia/Tokyo', $declaration->expiration->timezone);
-        self::assertNull($reader->expiration(null));
-        self::assertNull($reader->expiration(new ClassMethod('fetch')));
+        self::assertCount(1, $declaration->expirations);
+        self::assertEquals(new ContractReference(ContractSource::Constructor, 'at'), $declaration->expirations[0]->at);
+        self::assertSame('12:15', $declaration->expirations[0]->until);
+        self::assertSame('Asia/Tokyo', $declaration->expirations[0]->timezone);
+        self::assertSame([], $reader->expirations(null));
+        self::assertSame([], $reader->expirations(new ClassMethod('fetch')));
     }
 
-    public function testExpirationReportsRepeatedContractsAsDeclarationProblems(): void
+    public function testExpirationsPreservesRepeatedContractsInDeclarationOrder(): void
     {
         $code = <<<'SOURCE'
             <?php
             use Magix\Cache\Strategy\Contract\ExpiresAt;
             class DailyStrategy {
                 #[ExpiresAt('12:00')]
-                #[ExpiresAt('13:00')]
+                #[ExpiresAt('23:55:30', until: '00:10:15', timezone: 'Asia/Tokyo'), ExpiresAt('09:00', timezone: 'America/New_York')]
                 public function fetch() {}
             }
             SOURCE;
         $nodes = (new NodeTraverser(new NameResolver()))->traverse((new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? []);
         $method = (new NodeFinder())->findFirstInstanceOf($nodes, ClassMethod::class);
         self::assertInstanceOf(ClassMethod::class, $method);
-        $contract = (new StrategyReader())->expiration($method);
+        $contracts = (new StrategyReader())->expirations($method);
 
-        self::assertNotNull($contract);
-        self::assertSame(['#[ExpiresAt] cannot be repeated'], $contract->problems);
+        self::assertEquals([
+            new \Magix\Cache\Cli\Declaration\ExpirationContract('12:00'),
+            new \Magix\Cache\Cli\Declaration\ExpirationContract('23:55:30', '00:10:15', 'Asia/Tokyo'),
+            new \Magix\Cache\Cli\Declaration\ExpirationContract('09:00', timezone: 'America/New_York'),
+        ], $contracts);
+    }
+
+    public function testExpirationsKeepsMalformedArgumentsInLaterDeclarations(): void
+    {
+        $code = <<<'SOURCE'
+            <?php
+            use Magix\Cache\Strategy\Contract\ExpiresAt;
+            class DailyStrategy {
+                #[ExpiresAt('12:00')]
+                #[ExpiresAt('18:00', at: '19:00')]
+                #[ExpiresAt(timezone: 'Asia/Tokyo')]
+                public function fetch() {}
+            }
+            SOURCE;
+        $nodes = (new NodeTraverser(new NameResolver()))->traverse((new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? []);
+        $method = (new NodeFinder())->findFirstInstanceOf($nodes, ClassMethod::class);
+        self::assertInstanceOf(ClassMethod::class, $method);
+        $contracts = (new StrategyReader())->expirations($method);
+
+        self::assertCount(3, $contracts);
+        self::assertSame([], $contracts[0]->problems);
+        self::assertSame(['invalid or duplicate expiration argument at'], $contracts[1]->problems);
+        self::assertSame(['an expiration contract requires at'], $contracts[2]->problems);
     }
 }

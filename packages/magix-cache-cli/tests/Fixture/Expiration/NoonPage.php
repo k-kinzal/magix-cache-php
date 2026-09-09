@@ -57,4 +57,22 @@ final class NoonPage
     {
         return $this->bounded();
     }
+
+    /**
+     * @return Cached<string>
+     */
+    #[Cache]
+    public function multipleAutomatic(): Cached
+    {
+        return $this->cached(fn (): Cached => $this->query->multiple());
+    }
+
+    /**
+     * @return Cached<string>
+     */
+    #[Cache(ttl: 30)]
+    public function multipleComposed(): Cached
+    {
+        return $this->cached(fn (): Cached => $this->query->multipleComposed());
+    }
 }

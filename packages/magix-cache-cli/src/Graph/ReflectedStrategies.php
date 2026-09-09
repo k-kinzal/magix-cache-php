@@ -24,6 +24,7 @@ use Magix\Cache\Strategy\Contract\ExpiresAt;
 use Magix\Cache\Strategy\Contract\Ttl;
 use Magix\Cache\Strategy\Contract\TtlRange;
 use Magix\Cache\Strategy\StrategyDefinition;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -68,7 +69,7 @@ final readonly class ReflectedStrategies
             hasCreate: $hasCreate,
             composed: null,
             ttl: $leaf ? $this->contract($reflection) : null,
-            expiration: $leaf ? $this->expiration($reflection) : null,
+            expirations: $leaf ? $this->expirations($reflection) : [],
             assumptions: $hasCreate ? $this->assumptions($create) : [],
             constructible: $leaf && $reflection->isInstantiable(),
             definitionProblem: $hasCreate ? $this->definitionProblem($create) : null,
@@ -160,23 +161,30 @@ final readonly class ReflectedStrategies
     }
 
     /**
-     * Reads literal clock fields and references without constructing the attribute.
+     * Returns every reflected clock contract in declaration order.
      *
      * @param ReflectionClass<object> $reflection
+     * @return list<ExpirationContract>
      */
-    public function expiration(ReflectionClass $reflection): ?ExpirationContract
+    public function expirations(ReflectionClass $reflection): array
     {
         $attributes = $this->method($reflection, 'fetch')?->getAttributes(ExpiresAt::class) ?? [];
 
-        if ($attributes === []) {
-            return null;
-        }
+        return array_map(fn (ReflectionAttribute $attribute): ExpirationContract => $this->expiration($attribute), $attributes);
+    }
 
+    /**
+     * Reads literal clock fields and references without constructing the attribute.
+     *
+     * @param ReflectionAttribute<ExpiresAt> $attribute
+     */
+    public function expiration(ReflectionAttribute $attribute): ExpirationContract
+    {
         $values = [];
-        $problems = count($attributes) === 1 ? [] : ['#[ExpiresAt] cannot be repeated'];
+        $problems = [];
         $names = ['at', 'until', 'timezone'];
 
-        foreach ($attributes[0]->getArguments() as $key => $value) {
+        foreach ($attribute->getArguments() as $key => $value) {
             $name = is_int($key) ? ($names[$key] ?? '') : $key;
 
             if (!in_array($name, $names, true) || array_key_exists($name, $values)) {

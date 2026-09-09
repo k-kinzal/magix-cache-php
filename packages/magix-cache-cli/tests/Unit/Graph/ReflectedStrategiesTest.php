@@ -157,13 +157,34 @@ final class ReflectedStrategiesTest extends TestCase
         $declaration = $reader->read($class);
 
         self::assertNotNull($declaration);
-        $contract = $declaration->expiration;
-        self::assertNotNull($contract);
+        self::assertCount(1, $declaration->expirations);
+        $contract = $declaration->expirations[0];
         self::assertEquals(new ContractReference(ContractSource::Constructor, 'at'), $contract->at);
         self::assertEquals(new ContractReference(ContractSource::Constructor, 'until'), $contract->until);
         self::assertEquals(new ContractReference(ContractSource::Constructor, 'timezone'), $contract->timezone);
         self::assertSame('at', $declaration->parameters[0]->name);
         self::assertNull($declaration->composed, 'reflection does not execute an external factory');
         self::assertNull($reader->read(stdClass::class));
+    }
+
+    public function testExpirationsReadsEveryExternalClockContractWithoutCallingTheFactory(): void
+    {
+        $reader = new ReflectedStrategies();
+        $declaration = $reader->read(\Tests\Package\Cli\Fixture\Expiration\MultipleExpirationStrategy::class);
+
+        self::assertNotNull($declaration);
+        self::assertEquals([
+            new \Magix\Cache\Cli\Declaration\ExpirationContract('09:00', timezone: 'Asia/Tokyo'),
+            new \Magix\Cache\Cli\Declaration\ExpirationContract('23:55:30', '00:10:15', 'America/New_York'),
+            new \Magix\Cache\Cli\Declaration\ExpirationContract(
+                new ContractReference(ContractSource::Constructor, 'at'),
+                new ContractReference(ContractSource::Constructor, 'until'),
+                new ContractReference(ContractSource::Constructor, 'timezone'),
+            ),
+        ], $declaration->expirations);
+        self::assertNull($declaration->composed);
+        $untimed = $reader->read(KeySpreadExpirationStrategy::class);
+        self::assertNotNull($untimed);
+        self::assertSame([], $untimed->expirations);
     }
 }

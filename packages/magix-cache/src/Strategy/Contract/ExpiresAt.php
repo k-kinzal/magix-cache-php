@@ -22,8 +22,11 @@ use InvalidArgumentException;
  * These are candidate expirations: dependencies, other strategies and
  * policy TTLs can expire the result sooner. Analysis preserves the local
  * times and timezone without inventing a duration from its own clock.
+ * Repeat this attribute for multiple daily times or windows on one fetch().
+ * Each declaration contributes a constraint: the selected absolute
+ * expirations meet at the earliest one, including across timezones.
  */
-#[Attribute(Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 final readonly class ExpiresAt
 {
     /**

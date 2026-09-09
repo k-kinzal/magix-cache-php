@@ -164,7 +164,7 @@ final readonly class StrategyResolver
             return [new StrategyStep($child->name, TtlEstimate::invalid($problem)), [$problem], null];
         }
 
-        if ($child === null || ($child->ttl === null && $child->expiration === null)) {
+        if ($child === null || ($child->ttl === null && $child->expirations === [])) {
             if ($assumption !== null) {
                 return $this->assumed($instantiation->class, $assumption, $environment);
             }
@@ -211,8 +211,8 @@ final readonly class StrategyResolver
         $problems = [...$problems, ...$contractProblems];
         $expirations = [];
 
-        if ($child->expiration !== null) {
-            [$expiration, $expirationProblems] = (new ExpirationBinding())->resolve($child->expiration, $constructor, '#[ExpiresAt] on '.$child->shortName().'::fetch()');
+        foreach ($child->expirations as $expirationContract) {
+            [$expiration, $expirationProblems] = (new ExpirationBinding())->resolve($expirationContract, $constructor, '#[ExpiresAt] on '.$child->shortName().'::fetch()');
             $problems = [...$problems, ...$expirationProblems];
             $expirations[] = $expiration;
             $estimate = $estimate->meet(TtlEstimate::unknown(condition: 'duration depends on the origin time and daily expiration', finite: true));

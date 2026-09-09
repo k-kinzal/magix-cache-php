@@ -279,6 +279,15 @@ from TTL seconds. Omit `until` for a single time; overnight ranges retain a
 constraints can expire the result earlier. A parent with a 60-second TTL shows
 `≤60s` and keeps the wall-clock window.
 
+Repeat `#[ExpiresAt]` on the same `fetch()` for multiple times or windows, for
+example `#[ExpiresAt('09:00')]` followed by `#[ExpiresAt('18:00', until: '18:15')]`.
+All declarations are read and bound independently, including their timezones
+and constructor references. Tree and Mermaid display
+`earliest of (daily 09:00 UTC; daily 18:00-18:15 UTC)`; JSON retains both entries
+through nested compositions and parent policies. These simultaneous constraints
+meet at the earliest selected absolute expiration. Errors in any declaration
+are reported as strategy problems.
+
 Tree summaries and Mermaid nodes include the time constraints. JSON preserves
 structured clock fields in `strategy.expirations`, each strategy step's
 `expirations`, and `effective.expirationConstraints`. Those optional keys are

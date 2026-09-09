@@ -458,6 +458,67 @@ final class AnalyzeCommandTest extends TestCase
         yield 'window' => ['NoonQuery::window', 'daily 12:00-12:15 Asia/Tokyo'];
         yield 'overnight' => ['NoonQuery::overnight', 'daily 23:55:30-00:10:15 (+1 day) UTC'];
         yield 'runtime binding' => ['NoonQuery::dynamic', 'daily ?-12:15 Asia/Tokyo'];
+        yield 'multiple' => ['NoonQuery::multiple', 'earliest of (daily 09:00 Asia/Tokyo; daily 23:55:30-00:10:15 (+1 day) America/New_York; daily 18:00-18:15 Asia/Tokyo)'];
+        yield 'multiple runtime binding' => ['NoonQuery::multipleDynamic', 'earliest of (daily 09:00 Asia/Tokyo; daily 23:55:30-00:10:15 (+1 day) America/New_York; daily ?-18:15 Asia/Tokyo)'];
+    }
+
+    /**
+     * @throws JsonException
+     */
+    #[DataProvider('providerMultipleExpirationBoundaries')]
+    public function testAnalyzePreservesEveryRepeatedExpirationThroughCompositionAndPolicies(string $boundary, ?int $upperBound, ?string $at): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $tester->execute(['boundary' => $boundary, '--path' => ['packages/magix-cache-cli/tests/Fixture/Expiration'], '--format' => 'json']);
+        $tester->assertCommandIsSuccessful();
+        $data = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
+        self::assertIsArray($data['effective']);
+        self::assertIsArray($data['effective']['ttl']);
+        self::assertSame('unknown', $data['effective']['ttl']['state']);
+        self::assertNull($data['effective']['ttl']['seconds']);
+        self::assertSame($upperBound, $data['effective']['ttl']['upperBound']);
+        self::assertTrue($data['effective']['ttl']['finite']);
+        self::assertSame([], $data['effective']['problems']);
+        $expected = [
+            ['at' => '09:00', 'until' => null, 'timezone' => 'Asia/Tokyo', 'window' => false, 'crossesMidnight' => false, 'recurrence' => 'daily'],
+            ['at' => '23:55:30', 'until' => '00:10:15', 'timezone' => 'America/New_York', 'window' => true, 'crossesMidnight' => true, 'recurrence' => 'daily'],
+            ['at' => $at, 'until' => '18:15', 'timezone' => 'Asia/Tokyo', 'window' => true, 'crossesMidnight' => $at === null ? null : false, 'recurrence' => 'daily'],
+        ];
+        self::assertSame($expected, $data['effective']['expirationConstraints']);
+
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testAnalyzeKeepsRepeatedCandidateClocksInNestedStrategySteps(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $tester->execute(['boundary' => 'NoonQuery::multipleComposed', '--path' => ['packages/magix-cache-cli/tests/Fixture/Expiration'], '--format' => 'json']);
+        $tester->assertCommandIsSuccessful();
+        $data = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
+        self::assertIsArray($data['effective']);
+        self::assertIsArray($data['effective']['expirationConstraints']);
+        self::assertCount(3, $data['effective']['expirationConstraints']);
+        self::assertIsArray($data['strategy']);
+        self::assertSame($data['effective']['expirationConstraints'], $data['strategy']['expirations']);
+        self::assertIsArray($data['strategy']['steps']);
+        self::assertIsArray($data['strategy']['steps'][0]);
+        self::assertSame($data['strategy']['expirations'], $data['strategy']['steps'][0]['expirations']);
+    }
+
+    /**
+     * @return iterable<string, array{string, int|null, string|null}>
+     */
+    public static function providerMultipleExpirationBoundaries(): iterable
+    {
+        yield 'direct' => ['NoonQuery::multiple', null, '18:00'];
+        yield 'invocation' => ['NoonQuery::multipleDynamic', null, null];
+        yield 'nested composition' => ['NoonQuery::multipleComposed', 60, '18:00'];
+        yield 'automatic parent' => ['NoonPage::multipleAutomatic', null, '18:00'];
+        yield 'capped parent' => ['NoonPage::multipleComposed', 30, '18:00'];
     }
 
     /**

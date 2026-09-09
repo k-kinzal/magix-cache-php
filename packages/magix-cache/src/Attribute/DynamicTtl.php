@@ -12,11 +12,11 @@ use function is_a;
 use Magix\Cache\Runtime\Extension\CacheTtlResolver;
 
 /**
- * References a registered resolver that adds a per-result lifetime constraint.
+ * References a registered resolver that overrides the per-result lifetime.
  *
  * The attribute carries only the reference: the resolver instance is
- * registered with the runtime at bootstrap, and the runtime meets the resolved
- * lifetime with the origin metadata using the fixed composition law. One
+ * registered with the runtime at bootstrap. Its lifetime replaces policy,
+ * parameter and inherited expiration; a Strategy may override it afterward. One
  * boundary declares at most one resolver.
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]

@@ -28,9 +28,8 @@ use ReflectionMethod;
  *
  * A definition carries no per-invocation state: arguments and the origin
  * closure live in CacheInvocation, and the runtime is referenced by name only,
- * so memoizing a definition never retains a runtime instance. Constraints
- * from scoped parameters are folded into the policy with the meet, so a
- * method declaration cannot relax them.
+ * so memoizing a definition never retains a runtime instance. Explicit
+ * parameter settings override the static policy before execution.
  *
  * @internal
  */
@@ -74,7 +73,7 @@ final readonly class CacheDefinition
         public ?BypassCacheErrors $bypassCacheErrors = null,
         private ?UseStrategy $useStrategy = null,
     ) {
-        $visibility = Visibility::Shared;
+        $visibility = null;
 
         foreach ($method->getParameters() as $parameter) {
             $ignored = $parameter->getAttributes(CacheIgnore::class) !== [];
@@ -90,10 +89,10 @@ final readonly class CacheDefinition
                 throw new InvalidArgumentException('A scoped cache parameter cannot also be ignored unless its scope is NoStore.');
             }
 
-            $visibility = $visibility->meet($scope);
+            $visibility = $scope;
         }
 
-        $this->policy = $declaration->policy()->restrictVisibility($visibility);
+        $this->policy = $visibility === null ? $declaration->policy() : $declaration->policy()->withVisibility($visibility);
         $this->runtime = $declaration->runtime;
         $this->parameters = new ParameterBindings($method);
         $bindings = $this->parameters->strategyArguments();

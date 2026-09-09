@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Fixture;
 
-use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Strategy\CacheAnswer;
 use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\CacheRead;
@@ -66,7 +65,7 @@ final class StatefulStrategy implements CacheStrategy
         $result = ($this->child === null ? $next : $next->prepend($this->child))->fetch($operation);
 
         return $result instanceof OriginResult
-            ? $result->constrain(new CacheMetadata(tags: [$this->label.':'.$this->lookups.':'.$this->fetches, 'lookup:'.$this->lookupKey]))
+            ? $result->withMetadata($result->cached->metadata->withTags([...$result->cached->metadata->tags, $this->label.':'.$this->lookups.':'.$this->fetches, 'lookup:'.$this->lookupKey]))
             : $result;
     }
 

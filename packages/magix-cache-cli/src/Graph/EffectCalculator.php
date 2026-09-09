@@ -21,10 +21,9 @@ use function sort;
  * Applies the composition rules of MagixCache to a statically read boundary.
  *
  * The calculator works on TtlEstimate values, so "no constraint" and "not
- * statically decidable" stay separate all the way to the output. A declared
- * strategy contributes its candidate constraint the way the runtime meets
- * it: before the policy is applied, so a derived policy can take its
- * lifetime from what the strategy contracts guarantee.
+ * statically decidable" stay separate all the way to the output. Dependency
+ * composition uses meet. Explicit local settings replace the selected fields
+ * in the same priority order as runtime, with strategies applied last.
  */
 final readonly class EffectCalculator
 {
@@ -86,24 +85,24 @@ final readonly class EffectCalculator
      */
     public function applyPolicy(BoundaryDeclaration $boundary, DependencyConstraint $constraint, ?StrategyEffect $strategy = null): CacheEffect
     {
-        $visibility = $constraint->visibility;
-        $reason = $constraint->visibilitySource === null ? null : 'restricted by '.$constraint->visibilitySource;
-        $scope = $boundary->scope();
-
-        if ($scope->meet($visibility) !== $visibility) {
-            $visibility = $scope->meet($visibility);
-            $reason = 'restricted by a scoped parameter';
-        }
-
         $policy = $boundary->policy;
+        $visibility = $constraint->visibility;
+        $reason = $constraint->visibilitySource === null ? null : 'inherited from '.$constraint->visibilitySource;
 
         if ($policy === null) {
             return $this->missingPolicy($constraint, $strategy, $visibility, $reason);
         }
 
-        if ($policy->visibility->meet($visibility) !== $visibility) {
-            $visibility = $policy->visibility->meet($visibility);
+        if ($policy->visibility !== null) {
+            $visibility = $policy->visibility;
             $reason = 'declared by the policy';
+        }
+
+        $scope = $boundary->scope();
+
+        if ($scope !== null) {
+            $visibility = $scope;
+            $reason = 'declared by a scoped parameter';
         }
 
         $estimate = $this->lifetime($boundary, $policy, $constraint, $strategy);
@@ -116,11 +115,11 @@ final readonly class EffectCalculator
             ttl: $estimate,
             visibility: $visibility,
             storable: $this->storable($estimate, $visibility, $problems),
-            tags: $this->tags(array_merge($constraint->tags, $policy->tags)),
+            tags: $this->tags($policy->tags ?? $constraint->tags),
             visibilityReason: $reason,
             problems: $problems,
             strategy: $strategy,
-            expirationConstraints: [...$constraint->expirationConstraints, ...($strategy->expirations ?? [])],
+            expirationConstraints: $this->expirations($boundary, $constraint, $strategy),
         );
 
         return (new ParameterEffects())->apply($boundary, $constraint, $effect);
@@ -144,95 +143,77 @@ final readonly class EffectCalculator
     }
 
     /**
-     * Returns the lifetime estimate a policy resolves to for one boundary.
+     * Applies policy, parameter TTL, dynamic TTL and strategy overrides.
      *
-     * The candidate constraint of a declared strategy is met into the
-     * upstream constraint first, mirroring the runtime stage order.
+     * An invalid dependency remains a problem: overriding its metadata cannot
+     * repair a boundary that fails before returning a value.
      */
     public function lifetime(BoundaryDeclaration $boundary, PolicyDeclaration $policy, DependencyConstraint $constraint, ?StrategyEffect $strategy = null): TtlEstimate
     {
-        $declared = $policy->ttl;
         $upstream = $constraint->ttl;
-        $candidate = $strategy?->ttl;
-        $combined = $candidate === null ? $upstream : $upstream->meet($candidate);
+
+        if ($upstream->state === TtlEstimateState::Invalid) {
+            return $upstream;
+        }
+
         $parameterTtl = (new ParameterEffects())->ttl($boundary);
-        $combined = $parameterTtl === null ? $combined : $combined->meet($parameterTtl);
-        $source = $candidate !== null && !$combined->equals($upstream)
-            ? 'the declared strategy'
-            : ($constraint->ttlSource ?? 'a dependency');
+        $willOverride = $parameterTtl !== null || $boundary->hasDynamicTtl || ($strategy !== null && $strategy->overridesExpiration !== false);
+        $estimate = match (true) {
+            $policy->ttl === null => TtlEstimate::unknown(condition: 'the declared ttl cannot be read statically'),
+            is_int($policy->ttl) => $this->fixed($policy->ttl),
+            default => $this->derived($policy->ttl, $policy->maxTtl, $boundary, $upstream, $constraint->ttlSource ?? 'a dependency', $willOverride),
+        };
 
-        if ($combined->state === TtlEstimateState::Invalid) {
-            $estimate = $combined;
-        } elseif ($declared === null) {
-            $estimate = TtlEstimate::unknown(condition: 'the declared ttl cannot be read statically');
-        } elseif (is_int($declared)) {
-            $estimate = $this->fixed($declared, $combined, $source);
-        } else {
-            $estimate = $this->derived($declared, $policy->maxTtl, $boundary, $combined, $source, $strategy?->addsConstraint === true || $parameterTtl !== null);
+        if ($estimate->state === TtlEstimateState::Invalid) {
+            return $estimate;
         }
 
-        if ($candidate !== null && $upstream->state === TtlEstimateState::Unknown && !$upstream->hasFiniteExpiration()
-            && $estimate->state === TtlEstimateState::Unknown && $estimate->reason === null) {
-            $estimate = $estimate->withCondition('an upstream expiration may shorten the lifetime');
-        }
+        $estimate = $parameterTtl ?? $estimate;
 
         if ($boundary->hasDynamicTtl) {
-            $estimate = $estimate->meet(TtlEstimate::unknown(
-                condition: 'a #[DynamicTtl] resolver decides the final lifetime at runtime',
-            ));
+            $estimate = TtlEstimate::unknown(condition: 'a #[DynamicTtl] resolver decides the lifetime at runtime', lowerBound: 0, finite: true);
         }
 
-        return $parameterTtl === null ? $estimate : $parameterTtl->meet($estimate);
+        return $strategy !== null && $strategy->overridesExpiration !== false ? $strategy->ttl : $estimate;
     }
 
     /**
-     * Returns the estimate of a fixed lifetime bounded by its upstream.
-     *
-     * A fixed lifetime is always capped by the upstream expiration and never
-     * fails: with no upstream constraint the declared value stands, and with
-     * an unknown upstream the declared value remains as an upper bound while
-     * a proven lower bound survives.
+     * A fixed policy replaces the inherited lifetime, including unknown bounds.
      */
-    public function fixed(int $declared, TtlEstimate $upstream, string $source): TtlEstimate
+    public function fixed(int $declared): TtlEstimate
     {
-        if ($upstream->seconds !== null) {
-            if ($upstream->seconds < $declared) {
-                return TtlEstimate::known($upstream->seconds, 'declared '.$declared.'s, capped by '.$source);
-            }
+        return TtlEstimate::known($declared);
+    }
 
-            return TtlEstimate::known($declared);
+    /**
+     * Keeps daily deadlines only while their expiration survives overrides.
+     *
+     * @return list<ExpirationEstimate>
+     */
+    public function expirations(BoundaryDeclaration $boundary, DependencyConstraint $constraint, ?StrategyEffect $strategy): array
+    {
+        if ($strategy !== null && $strategy->overridesExpiration !== false) {
+            return $strategy->expirations;
         }
 
-        if ($upstream->state === TtlEstimateState::Unconstrained) {
-            return TtlEstimate::known($declared);
+        if ($boundary->hasDynamicTtl || (new ParameterEffects())->ttl($boundary) !== null || !$boundary->policy?->ttl instanceof Ttl) {
+            return [];
         }
 
-        $met = TtlEstimate::known($declared)->meet($upstream);
-
-        if ($met->seconds !== null) {
-            return $met->seconds === $declared
-                ? TtlEstimate::known($declared)
-                : TtlEstimate::known($met->seconds, 'declared '.$declared.'s, capped by '.$source);
-        }
-
-        if ($upstream->hasFiniteExpiration() && $met->reason === null) {
-            return $met;
-        }
-
-        return $met->withCondition('an upstream expiration may shorten the declared '.$declared.'s');
+        return $constraint->expirationConstraints;
     }
 
     /**
      * Returns the estimate of a lifetime derived from the upstream expiration.
      *
      * Ttl::Auto and Ttl::FromUpstream require a finite upstream expiration.
-     * A strategy whose contracts definitely add a finite constraint fulfills
+     * A later expiration override can fulfill
      * the requirement; otherwise a confirmed missing expiration is an error
      * unless the boundary itself supplies metadata or resolves a lifetime at
      * runtime, and an unknown one keeps the requirement as a runtime
      * condition.
      */
-    public function derived(Ttl $declared, ?int $maxTtl, BoundaryDeclaration $boundary, TtlEstimate $upstream, string $source, bool $strategyAddsConstraint = false): TtlEstimate
+    public function derived(Ttl $declared, ?int $maxTtl, BoundaryDeclaration $boundary, TtlEstimate $upstream, string $source, bool $willOverride = false): TtlEstimate
     {
         if ($declared === Ttl::FromUpstream && $maxTtl === null) {
             return TtlEstimate::invalid('Ttl::FromUpstream requires maxTtl, so the declaration cannot be constructed');
@@ -249,14 +230,18 @@ final readonly class EffectCalculator
         if ($upstream->state === TtlEstimateState::Unknown) {
             $capped = $cap === null ? $upstream : $upstream->meet(TtlEstimate::known($cap));
 
-            if ($strategyAddsConstraint || $upstream->hasFiniteExpiration()) {
+            if ($willOverride || $upstream->hasFiniteExpiration()) {
                 return $capped;
             }
 
             return $capped->withCondition('requires a finite upstream expiration at runtime');
         }
 
-        if ($boundary->suppliesMetadata || $boundary->hasDynamicTtl) {
+        if ($willOverride) {
+            return TtlEstimate::unconstrained();
+        }
+
+        if ($boundary->suppliesMetadata) {
             return TtlEstimate::unknown(
                 upperBound: $cap,
                 condition: 'requires the boundary to supply a finite expiration at runtime',

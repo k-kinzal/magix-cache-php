@@ -20,17 +20,19 @@ final readonly class PolicyDeclaration
      * Creates a statically read cache policy.
      *
      * @param int|Ttl|null $ttl Null when the declared expression cannot be read statically.
-     * @param list<string> $tags
+     * @param list<string>|null $tags Null inherits; an empty list clears.
      * @param string $runtime Name of the runtime the declaration references.
      */
     public function __construct(
         public PolicySource $source,
         public int|Ttl|null $ttl = Ttl::Auto,
         public ?int $maxTtl = null,
-        public array $tags = [],
-        public Visibility $visibility = Visibility::Shared,
+        public ?array $tags = null,
+        public ?Visibility $visibility = null,
         public string $version = '1',
         public string $runtime = CacheRuntimeRegistry::DEFAULT_NAME,
+        public bool $tagsUnknown = false,
+        public bool $visibilityUnknown = false,
     ) {
     }
 
@@ -45,11 +47,11 @@ final readonly class PolicyDeclaration
             $options[] = 'maxTtl: '.$this->maxTtl;
         }
 
-        if ($this->tags !== []) {
+        if ($this->tags !== null) {
             $options[] = 'tags: ['.implode(', ', $this->tags).']';
         }
 
-        if ($this->visibility !== Visibility::Shared) {
+        if ($this->visibility !== null) {
             $options[] = 'visibility: '.$this->visibility->name;
         }
 

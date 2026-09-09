@@ -14,31 +14,29 @@ use Magix\Cache\Runtime\Extension\DynamicTtlContext;
 use Magix\Cache\Runtime\Policy\PolicySemantics;
 
 /**
- * Applies the fixed success-stage constraint order at one base time.
+ * Applies policy, parameter TTL and dynamic TTL in ascending priority.
  *
- * Parameter and dynamic-TTL constraints are met before the policy, all
- * evaluated at the same base time taken right after the origin succeeded.
- * Every step goes through the metadata meet, so no step can relax what a
- * dependency already imposed.
+ * All relative expirations use the same time taken after origin success.
+ * Strategies receive this result and may override its metadata afterward.
  *
  * @internal
  */
-final readonly class OriginConstraints
+final readonly class OriginOverrides
 {
     /**
-     * Creates the success-stage constraint application.
+     * Creates the success-stage override application.
      */
     public function __construct(private PolicySemantics $semantics = new PolicySemantics())
     {
     }
 
     /**
-     * Returns the origin metadata with all declared constraints applied.
+     * Returns metadata with explicit boundary settings applied.
      *
      * @param Cached<mixed> $result
-     * @param int<0, max>|null $parameterTtl Validated parameter constraint at the same base time.
+     * @param int<0, max>|null $parameterTtl Validated parameter override at the same base time.
      * @throws InvalidArgumentException when the resolver returns a negative lifetime
-     * @throws LogicException when a derived lifetime has no finite upstream expiration to derive from
+     * @throws LogicException when FromUpstream has no maximum lifetime
      */
     public function apply(
         CachePolicy $policy,
@@ -48,10 +46,10 @@ final readonly class OriginConstraints
         float $baseTime,
         ?int $parameterTtl = null,
     ): CacheMetadata {
-        $metadata = $result->metadata;
+        $metadata = $this->semantics->apply($policy, $result->metadata, $baseTime);
 
         if ($parameterTtl !== null) {
-            $metadata = $metadata->meet(CacheMetadata::forTtl($parameterTtl, $baseTime));
+            $metadata = $metadata->withExpiration($baseTime + $parameterTtl);
         }
 
         if ($resolver !== null) {
@@ -61,9 +59,9 @@ final readonly class OriginConstraints
                 throw new InvalidArgumentException('A dynamically resolved TTL must be zero or greater.');
             }
 
-            $metadata = $metadata->meet(CacheMetadata::forTtl($ttl, $baseTime));
+            $metadata = $metadata->withExpiration($baseTime + $ttl);
         }
 
-        return $metadata->meet($this->semantics->constraint($policy, $metadata->expiresAt, $baseTime));
+        return $metadata;
     }
 }

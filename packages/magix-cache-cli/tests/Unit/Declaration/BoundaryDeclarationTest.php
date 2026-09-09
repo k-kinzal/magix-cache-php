@@ -32,7 +32,7 @@ final class BoundaryDeclarationTest extends TestCase
         self::assertSame('ProductQuery::execute', $global->shortId());
     }
 
-    public function testScopeReturnsTheStrictestParameterVisibility(): void
+    public function testScopeReturnsTheLastExplicitParameterVisibility(): void
     {
         $boundary = new BoundaryDeclaration(
             class: 'App\Query\ProductQuery',
@@ -47,6 +47,6 @@ final class BoundaryDeclarationTest extends TestCase
         $shared = new BoundaryDeclaration('App\Query\ProductQuery', 'other', 'src/ProductQuery.php', 30);
 
         self::assertSame(Visibility::Private, $boundary->scope());
-        self::assertSame(Visibility::Shared, $shared->scope());
+        self::assertNull($shared->scope());
     }
 }

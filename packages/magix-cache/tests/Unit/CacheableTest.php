@@ -168,7 +168,7 @@ final class CacheableTest extends TestCase
         self::assertSame(2, $query->calls);
     }
 
-    public function testCachedBindsDefaultsNamesAndMetadataConstraints(): void
+    public function testCachedBindsDefaultsNamesAndMetadataOverrides(): void
     {
         CacheRuntimeRegistry::register('default', new CacheRuntime(new MemoryCache(), new MutableClock(100.0)));
         $query = new ParameterQuery();
@@ -178,7 +178,7 @@ final class CacheableTest extends TestCase
 
         self::assertEquals($default, $same);
         self::assertSame(130.0, $default->metadata->expiresAt);
-        self::assertSame(160.0, $restricted->metadata->expiresAt);
+        self::assertSame(190.0, $restricted->metadata->expiresAt);
         self::assertSame(['dynamic', 'static'], $restricted->metadata->tags);
         self::assertSame(Visibility::Private, $restricted->metadata->visibility);
         self::assertSame(2, $query->calls);
@@ -209,13 +209,13 @@ final class CacheableTest extends TestCase
         self::assertSame(2, $query->calls);
     }
 
-    public function testCachedParameterTtlsMeetDependenciesAndEachOther(): void
+    public function testCachedLastParameterTtlOverridesDependenciesAndEarlierParameters(): void
     {
         CacheRuntimeRegistry::register('default', new CacheRuntime(new MemoryCache(), new MutableClock(100.0)));
         $query = new ParameterQuery();
         $dependency = Cached::of('dependency', new CacheMetadata(expiresAt: 120.0));
 
-        self::assertSame(120.0, $query->composed($dependency, 90)->metadata->expiresAt);
+        self::assertSame(160.0, $query->composed($dependency, 90)->metadata->expiresAt);
         self::assertSame(105.0, $query->composed($dependency, 90, 5)->metadata->expiresAt);
     }
 
@@ -243,7 +243,7 @@ final class CacheableTest extends TestCase
         $subsequent = $query->nested(30, true);
         $both = $query->both(15);
 
-        self::assertSame(110.0, $outer->metadata->expiresAt);
+        self::assertSame(160.0, $outer->metadata->expiresAt);
         self::assertSame(130.0, $subsequent->metadata->expiresAt);
         self::assertSame(115.0, $both->metadata->expiresAt);
         self::assertContains('both:1:1', $both->metadata->tags);

@@ -25,9 +25,8 @@ use function sort;
 /**
  * Digests one effective declaration into a canonical cache-key component.
  *
- * Any change to the resolved policy, behaviors, scope, or key settings changes
- * the fingerprint, so entries stored under an older declaration can no longer
- * answer a lookup.
+ * Records the user's resolved policy, behaviors, scope, and key settings.
+ * Library releases and internal semantics versions are not key declarations.
  *
  * @internal
  */
@@ -71,8 +70,8 @@ final readonly class DeclarationFingerprint
         $encoded = json_encode([
             'ttl' => is_int($policy->ttl) ? $policy->ttl : 'Ttl::'.$policy->ttl->name,
             'maxTtl' => $policy->maxTtl,
-            'tags' => (new CacheTokenSet())->tags($policy->tags),
-            'visibility' => $policy->visibility->name,
+            'tags' => $policy->tags === null ? null : (new CacheTokenSet())->tags($policy->tags),
+            'visibility' => $policy->visibility?->name,
             'version' => $policy->version,
             'staleIfError' => $staleIfError === null ? null : [$staleIfError->maxAge, $exceptions],
             'dynamicTtl' => $dynamicTtl?->resolver,

@@ -148,7 +148,7 @@ final class EffectCalculatorTest extends TestCase
         self::assertSame('RateQuery::execute', $constraint->ttlSource);
     }
 
-    public function testApplyPolicyCapsAFixedTtlByItsDependencies(): void
+    public function testApplyPolicyOverridesTtlAndExplicitTags(): void
     {
         $boundary = new BoundaryDeclaration(
             class: 'App\PageQuery',
@@ -163,9 +163,9 @@ final class EffectCalculatorTest extends TestCase
             new DependencyConstraint(TtlEstimate::known(20), 'ProductQuery::execute', tags: ['product']),
         );
 
-        self::assertSame(20, $effect->ttl->seconds);
-        self::assertSame('declared 120s, capped by ProductQuery::execute', $effect->ttl->reason);
-        self::assertSame(['page', 'product'], $effect->tags);
+        self::assertSame(120, $effect->ttl->seconds);
+        self::assertNull($effect->ttl->reason);
+        self::assertSame(['page'], $effect->tags);
         self::assertTrue($effect->storable);
     }
 
@@ -194,7 +194,7 @@ final class EffectCalculatorTest extends TestCase
         $effect = (new EffectCalculator())->calculate($boundary, new DependencyConstraint());
 
         self::assertSame(Visibility::Private, $effect->visibility);
-        self::assertSame('restricted by a scoped parameter', $effect->visibilityReason);
+        self::assertSame('declared by a scoped parameter', $effect->visibilityReason);
     }
 
     public function testCalculateDoesNotStoreAnUnknownLifetime(): void
@@ -211,12 +211,12 @@ final class EffectCalculatorTest extends TestCase
         $effect = (new EffectCalculator())->calculate($boundary, new DependencyConstraint());
 
         self::assertSame(TtlEstimateState::Unknown, $effect->ttl->state);
-        self::assertSame(30, $effect->ttl->upperBound);
+        self::assertNull($effect->ttl->upperBound);
         self::assertFalse($effect->storable);
         self::assertSame([], $effect->problems);
     }
 
-    public function testLifetimeKeepsAFixedTtlUnknownUnderAnUnknownUpstream(): void
+    public function testLifetimeFixedTtlReplacesAnUnknownUpstream(): void
     {
         $calculator = new EffectCalculator();
         $boundary = new BoundaryDeclaration('App\PageQuery', 'execute', 'a.php', 1);
@@ -227,8 +227,8 @@ final class EffectCalculatorTest extends TestCase
             new DependencyConstraint(TtlEstimate::unknown(), 'RateQuery::execute'),
         );
 
-        self::assertSame(TtlEstimateState::Unknown, $estimate->state);
-        self::assertSame(30, $estimate->upperBound);
+        self::assertSame(TtlEstimateState::Known, $estimate->state);
+        self::assertSame(30, $estimate->seconds);
     }
 
     public function testLifetimeKeepsAnUnreadableTtlUnknown(): void
@@ -256,32 +256,32 @@ final class EffectCalculatorTest extends TestCase
         self::assertSame($invalid, $estimate);
     }
 
-    public function testFixedIsCappedByAKnownUpstreamAndStandsAlone(): void
+    public function testFixedDeclaresExactlyTheChosenLifetime(): void
     {
         $calculator = new EffectCalculator();
 
-        $capped = $calculator->fixed(20, TtlEstimate::known(10), 'ProductQuery::execute');
-        $reached = $calculator->fixed(20, TtlEstimate::known(60), 'ProductQuery::execute');
-        $alone = $calculator->fixed(20, TtlEstimate::unconstrained(), 'a dependency');
+        $capped = $calculator->fixed(20);
+        $reached = $calculator->fixed(20);
+        $alone = $calculator->fixed(20);
 
-        self::assertSame(10, $capped->seconds);
-        self::assertSame('declared 20s, capped by ProductQuery::execute', $capped->reason);
+        self::assertSame(20, $capped->seconds);
+        self::assertNull($capped->reason);
         self::assertSame(20, $reached->seconds);
         self::assertNull($reached->reason);
         self::assertSame(20, $alone->seconds);
     }
 
-    public function testFixedKeepsOnlyAnUpperBoundUnderAnUnknownUpstream(): void
+    public function testFixedZeroIsAKnownLifetime(): void
     {
         $calculator = new EffectCalculator();
 
-        $bounded = $calculator->fixed(30, TtlEstimate::unknown(), 'a dependency');
-        $tighter = $calculator->fixed(30, TtlEstimate::unknown(10), 'a dependency');
+        $bounded = $calculator->fixed(30);
+        $tighter = $calculator->fixed(0);
 
-        self::assertSame(TtlEstimateState::Unknown, $bounded->state);
-        self::assertSame(30, $bounded->upperBound);
-        self::assertSame(TtlEstimateState::Unknown, $tighter->state);
-        self::assertSame(10, $tighter->upperBound);
+        self::assertSame(TtlEstimateState::Known, $bounded->state);
+        self::assertSame(30, $bounded->seconds);
+        self::assertSame(TtlEstimateState::Known, $tighter->state);
+        self::assertSame(0, $tighter->seconds);
     }
 
     public function testDerivedInheritsAndCapsAKnownUpstream(): void
@@ -335,12 +335,13 @@ final class EffectCalculatorTest extends TestCase
         $resolving = new BoundaryDeclaration('App\RateQuery', 'execute', 'b.php', 1, hasDynamicTtl: true);
 
         $supplied = $calculator->derived(Ttl::Auto, null, $supplying, TtlEstimate::unconstrained(), 'a dependency');
-        $resolved = $calculator->derived(Ttl::FromUpstream, 30, $resolving, TtlEstimate::unconstrained(), 'a dependency');
+        $resolved = $calculator->lifetime($resolving, new PolicyDeclaration(PolicySource::MethodAttribute, Ttl::FromUpstream, maxTtl: 30), new DependencyConstraint());
 
         self::assertSame(TtlEstimateState::Unknown, $supplied->state);
         self::assertNull($supplied->upperBound);
         self::assertSame(TtlEstimateState::Unknown, $resolved->state);
-        self::assertSame(30, $resolved->upperBound);
+        self::assertNull($resolved->upperBound);
+        self::assertTrue($resolved->hasFiniteExpiration());
     }
 
     public function testTagsAreDeduplicatedAndSorted(): void
@@ -353,7 +354,7 @@ final class EffectCalculatorTest extends TestCase
         $calculator = new EffectCalculator();
         $boundary = new BoundaryDeclaration('App\PromotedQuery', 'execute', 'a.php', 1);
         $policy = new PolicyDeclaration(PolicySource::MethodAttribute, ttl: Ttl::Auto);
-        $strategy = new StrategyEffect('S::create(min: 30)', TtlEstimate::unknown(60, null, 30), addsConstraint: true);
+        $strategy = new StrategyEffect('S::create(min: 30)', TtlEstimate::unknown(60, null, 30), overridesExpiration: true);
 
         $estimate = $calculator->lifetime($boundary, $policy, new DependencyConstraint(), $strategy);
 
@@ -363,32 +364,32 @@ final class EffectCalculatorTest extends TestCase
         self::assertNull($estimate->reason);
     }
 
-    public function testLifetimeKeepsCandidateAndEffectiveLifetimesApart(): void
+    public function testLifetimeStrategyOverridesDependencies(): void
     {
         $calculator = new EffectCalculator();
         $boundary = new BoundaryDeclaration('App\SeasonalQuery', 'execute', 'a.php', 1);
         $policy = new PolicyDeclaration(PolicySource::MethodAttribute, ttl: Ttl::Auto);
-        $strategy = new StrategyEffect('S::create(min: 30)', TtlEstimate::unknown(60, null, 30), addsConstraint: true);
+        $strategy = new StrategyEffect('S::create(min: 30)', TtlEstimate::unknown(60, null, 30), overridesExpiration: true);
         $constraint = new DependencyConstraint(TtlEstimate::known(20), 'ProductQuery::execute');
 
         $estimate = $calculator->lifetime($boundary, $policy, $constraint, $strategy);
 
-        self::assertSame(20, $estimate->seconds, 'the upstream expiration shortens the candidate');
+        self::assertSame($strategy->ttl, $estimate);
         self::assertSame('30-60s', $strategy->ttl->label(), 'the candidate range itself stays untouched');
     }
 
-    public function testLifetimeMarksAnUnknownUpstreamAsAShorteningCondition(): void
+    public function testLifetimeStrategyOverridesUnknownDependencyBounds(): void
     {
         $calculator = new EffectCalculator();
         $boundary = new BoundaryDeclaration('App\SeasonalQuery', 'execute', 'a.php', 1);
         $policy = new PolicyDeclaration(PolicySource::MethodAttribute, ttl: Ttl::Auto);
-        $strategy = new StrategyEffect('S::create(min: 30)', TtlEstimate::unknown(60, null, 30), addsConstraint: true);
+        $strategy = new StrategyEffect('S::create(min: 30)', TtlEstimate::unknown(60, null, 30), overridesExpiration: true);
         $constraint = new DependencyConstraint(TtlEstimate::unknown());
 
         $estimate = $calculator->lifetime($boundary, $policy, $constraint, $strategy);
 
-        self::assertSame('≤60s', $estimate->label());
-        self::assertSame('an upstream expiration may shorten the lifetime', $estimate->reason);
+        self::assertSame('30-60s', $estimate->label());
+        self::assertNull($estimate->reason);
     }
 
     public function testCalculateSurfacesStrategyProblemsOnTheEffect(): void
@@ -431,7 +432,7 @@ final class EffectCalculatorTest extends TestCase
         self::assertSame(['own'], $calculator->problems(['own'], null));
     }
 
-    public function testCalculateParameterTtlSuppliesAutoAndPreservesProvenCaps(): void
+    public function testCalculateParameterTtlOverridesPolicyAndDependencies(): void
     {
         $calculator = new EffectCalculator();
         $parameter = new KeyParameter('ttl', 'int', configuration: new ParameterConfiguration(ttl: true));
@@ -459,7 +460,7 @@ final class EffectCalculatorTest extends TestCase
         $bounded = $calculator->calculate($capped, new DependencyConstraint(TtlEstimate::known(20)));
 
         self::assertSame(TtlEstimateState::Unknown, $bounded->ttl->state);
-        self::assertSame(20, $bounded->ttl->upperBound);
+        self::assertNull($bounded->ttl->upperBound);
         self::assertSame(0, $bounded->ttl->lowerBound);
         self::assertStringContainsString('$ttl', $bounded->ttl->reason ?? '');
     }
@@ -514,7 +515,7 @@ final class EffectCalculatorTest extends TestCase
         self::assertCount(2, $node->children);
         self::assertSame(20, $node->effect->ttl->seconds);
         self::assertSame(Visibility::Private, $node->effect->visibility);
-        self::assertSame(['page', 'product', 'viewer'], $node->effect->tags);
+        self::assertSame(['page'], $node->effect->tags);
         self::assertSame([], $node->effect->problems);
     }
 
@@ -544,5 +545,32 @@ final class EffectCalculatorTest extends TestCase
         self::assertFalse($effect->storable);
         self::assertSame([$expiration], $effect->expirationConstraints);
         self::assertSame(['no #[Cache] attribute on the method or its concrete class, so cached() throws a LogicException'], $effect->problems);
+    }
+    public function testExpirationsFollowTheHighestPriorityExpirationWriter(): void
+    {
+        $clock = new \Magix\Cache\Cli\Graph\ExpirationEstimate('12:00');
+        $constraint = new DependencyConstraint(TtlEstimate::unknown(finite: true), expirationConstraints: [$clock]);
+        $auto = new BoundaryDeclaration('Page', 'auto', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute));
+        $fixed = new BoundaryDeclaration('Page', 'fixed', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 60));
+        $calculator = new EffectCalculator();
+
+        self::assertSame([$clock], $calculator->expirations($auto, $constraint, null));
+        self::assertSame([], $calculator->expirations($fixed, $constraint, null));
+        $strategy = new StrategyEffect('S::create()', TtlEstimate::known(90), overridesExpiration: true);
+        self::assertSame([], $calculator->expirations($auto, $constraint, $strategy));
+        self::assertSame(90, $calculator->calculate($fixed, $constraint, $strategy)->ttl->seconds);
+    }
+    public function testApplyPolicyExplicitFieldsReplaceInheritedMetadataUncertainty(): void
+    {
+        $constraint = new DependencyConstraint(TtlEstimate::unknown(20), visibility: Visibility::Private, tags: ['child'], visibilityUnknown: true, tagsUnknown: true);
+        $boundary = new BoundaryDeclaration('ParentQuery', 'get', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 60, tags: [], visibility: Visibility::Shared));
+        $effect = (new EffectCalculator())->calculate($boundary, $constraint);
+
+        self::assertSame(60, $effect->ttl->seconds);
+        self::assertSame([], $effect->tags);
+        self::assertSame(Visibility::Shared, $effect->visibility);
+        self::assertFalse($effect->visibilityUnknown);
+        self::assertFalse($effect->tagsUnknown);
+        self::assertTrue($effect->storable);
     }
 }

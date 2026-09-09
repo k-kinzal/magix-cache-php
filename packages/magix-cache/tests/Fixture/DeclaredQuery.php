@@ -9,6 +9,7 @@ use Magix\Cache\Attribute\Cache;
 use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\StaleIfError;
 use Magix\Cache\Cached;
+use Magix\Cache\Metadata\Visibility;
 use RuntimeException;
 
 /**
@@ -57,4 +58,31 @@ final readonly class DeclaredQuery
     {
         return Cached::of('same:'.$id);
     }
+    /**
+     * @return Cached<int>
+     */
+    #[Cache(ttl: 30)]
+    public function inheritedFields(int $id): Cached
+    {
+        return Cached::of($id);
+    }
+
+    /**
+     * @return Cached<int>
+     */
+    #[Cache(ttl: 30, tags: [])]
+    public function clearedTags(int $id): Cached
+    {
+        return Cached::of($id);
+    }
+
+    /**
+     * @return Cached<int>
+     */
+    #[Cache(ttl: 30, visibility: Visibility::Shared)]
+    public function sharedVisibility(int $id): Cached
+    {
+        return Cached::of($id);
+    }
+
 }

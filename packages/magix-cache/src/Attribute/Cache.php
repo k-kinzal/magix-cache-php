@@ -25,15 +25,15 @@ final readonly class Cache
      *
      * @param int|Ttl $ttl Fixed lifetime in seconds, or a lifetime derived from upstream.
      * @param int|null $maxTtl Upper bound applied to a derived lifetime.
-     * @param list<string> $tags
+     * @param list<string>|null $tags Replacement tags; null inherits, [] clears.
      * @param string $runtime Name of a runtime registered at bootstrap.
      * @throws InvalidArgumentException when a lifetime is negative, a derived lifetime has no upper bound, the version is empty, a tag is unusable, or the runtime reference is empty
      */
     public function __construct(
         public int|Ttl $ttl = Ttl::Auto,
         public ?int $maxTtl = null,
-        public array $tags = [],
-        public Visibility $visibility = Visibility::Shared,
+        public ?array $tags = null,
+        public ?Visibility $visibility = null,
         public string $version = '1',
         public string $runtime = CacheRuntimeRegistry::DEFAULT_NAME,
     ) {

@@ -78,7 +78,7 @@ final class ParameterEffectsTest extends TestCase
         self::assertFalse($effects->accepts('string', 'int'));
     }
 
-    public function testApplyKeepsProvenVisibilityAndTagsWhileMarkingRuntimeAdditions(): void
+    public function testApplyRuntimeOverridesReplaceStaticMetadata(): void
     {
         $boundary = new BoundaryDeclaration('Query', 'fetch', 'a.php', 1, parameters: [
             new KeyParameter('visibility', Visibility::class, configuration: new ParameterConfiguration(visibility: true)),
@@ -91,10 +91,38 @@ final class ParameterEffectsTest extends TestCase
             tags: ['fixed'],
         ));
 
-        self::assertSame(Visibility::Private, $effect->visibility);
+        self::assertSame(Visibility::Shared, $effect->visibility);
         self::assertTrue($effect->visibilityUnknown);
-        self::assertSame(['fixed'], $effect->tags);
+        self::assertSame([], $effect->tags);
         self::assertTrue($effect->tagsUnknown);
         self::assertFalse($effect->storable);
+    }
+    public function testVisibilityCustomStrategyErasesEarlierVisibilityBounds(): void
+    {
+        $boundary = new BoundaryDeclaration('Query', 'get', 'a.php', 1);
+        $effect = new CacheEffect(
+            TtlEstimate::known(60),
+            visibility: Visibility::Private,
+            strategy: new \Magix\Cache\Cli\Graph\StrategyEffect('Custom', TtlEstimate::known(60), metadataUnknown: true)
+        );
+        [$visibility, $unknown, $reason] = (new ParameterEffects())->visibility($boundary, new DependencyConstraint(), $effect);
+
+        self::assertSame(Visibility::Shared, $visibility);
+        self::assertTrue($unknown);
+        self::assertSame('custom Strategy metadata overrides are not analyzed', $reason);
+    }
+
+    public function testTagsCustomStrategyReplacesKnownTagsWithUncertainty(): void
+    {
+        $boundary = new BoundaryDeclaration('Query', 'get', 'a.php', 1);
+        $effect = new CacheEffect(
+            TtlEstimate::known(60),
+            tags: ['fixed'],
+            strategy: new \Magix\Cache\Cli\Graph\StrategyEffect('Custom', TtlEstimate::known(60), metadataUnknown: true)
+        );
+        [$tags, $unknown] = (new ParameterEffects())->tags($boundary, new DependencyConstraint(), $effect);
+
+        self::assertSame([], $tags);
+        self::assertTrue($unknown);
     }
 }

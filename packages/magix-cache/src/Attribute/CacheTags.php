@@ -7,7 +7,7 @@ namespace Magix\Cache\Attribute;
 use Attribute;
 
 /**
- * Adds the parameter's list of cache tags to the policy and dependency tags.
+ * Replaces the policy and inherited tags with this parameter's list.
  *
  * Every tag must be a valid cache token. The parameter remains keyed.
  */

@@ -19,12 +19,14 @@ final readonly class StrategyStep
      * @param TtlEstimate $ttl Candidate constraint this step contributes.
      * @param bool $assumed True when an explicit assumption replaced the contract.
      * @param list<ExpirationEstimate> $expirations Candidate daily expiration constraints.
+     * @param bool $metadataUnknown Whether non-expiration metadata can be overridden by custom code.
      */
     public function __construct(
         public string $strategy,
         public TtlEstimate $ttl,
         public bool $assumed = false,
         public array $expirations = [],
+        public bool $metadataUnknown = false,
     ) {
     }
 

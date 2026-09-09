@@ -7,7 +7,6 @@ namespace Magix\Cache\Strategy;
 use function crc32;
 
 use InvalidArgumentException;
-use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Strategy\Contract\ConstructorArg;
 use Magix\Cache\Strategy\Contract\Ttl;
 use Override;
@@ -16,7 +15,7 @@ use RuntimeException;
 /**
  * Spreads expirations across keys to avoid synchronized expiry.
  *
- * On the normal origin path the strategy meets one lifetime constraint into
+ * On the normal origin path the strategy overrides the lifetime of
  * the produced metadata, chosen deterministically from the key so that
  * entries written in the same instant expire spread over the declared range
  * instead of together. Knowing the range does not mean the runtime values
@@ -57,7 +56,7 @@ final readonly class KeySpreadExpirationStrategy implements CacheStrategy
     }
 
     /**
-     * Meets the key-derived lifetime constraint into the origin result.
+     * Overrides the origin lifetime with the key-derived lifetime.
      *
      * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
      * @throws RuntimeException when the origin or a delegate fails with declared behavior
@@ -73,9 +72,7 @@ final readonly class KeySpreadExpirationStrategy implements CacheStrategy
         }
 
         $spread = crc32($operation->key()) % ($this->maximum - $this->minimum + 1);
-        $constraint = CacheMetadata::forTtl($this->minimum + $spread, $result->baseTime);
-
-        return $result->constrain($constraint);
+        return $result->withTtl($this->minimum + $spread);
     }
 
     /**

@@ -37,7 +37,7 @@ final readonly class TreeRenderer
             '  visibility   '.$this->restricted($effect->visibilityLabel(), $effect, 'visibility')
                 .($effect->visibilityReason === null ? '' : ' ('.$effect->visibilityReason.')'),
             '  storable     '.($effect->storable ? 'yes' : 'no'),
-            '  tags         '.$effect->tagsLabel(),
+            '  tags         '.$this->restricted($effect->tagsLabel(), $effect, 'tags'),
             '  key          '.$this->key($node->boundary),
             '  policy       '.($node->boundary->isCacheBoundary ? ($node->boundary->policy?->label() ?? 'not declared') : 'none (uncached entry point)'),
             '',
@@ -143,7 +143,7 @@ final readonly class TreeRenderer
         }
 
         if ($effect->tags !== [] || $effect->tagsUnknown) {
-            $parts[] = 'tags '.$effect->tagsLabel(',');
+            $parts[] = 'tags '.$this->restricted($effect->tagsLabel(','), $effect, 'tags');
         }
 
         return $this->highlight(implode('  ', $parts), $node);
@@ -173,13 +173,13 @@ final readonly class TreeRenderer
     }
 
     /**
-     * Highlights a locally restricted field only while the result remains storable.
+     * Highlights a explicitly overridden field only while the result remains storable.
      *
-     * @param 'ttl'|'visibility' $field
+     * @param 'ttl'|'visibility'|'tags' $field
      */
     public function restricted(string $label, CacheEffect $effect, string $field): string
     {
-        if (!$effect->storable || !isset($effect->localRestrictions[$field])) {
+        if (!$effect->storable || !isset($effect->localOverrides[$field])) {
             return $label;
         }
 

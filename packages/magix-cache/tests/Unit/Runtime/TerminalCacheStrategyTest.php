@@ -7,6 +7,7 @@ namespace Tests\Unit\Runtime;
 use Magix\Cache\Attribute\StaleIfError;
 use Magix\Cache\Cache\CacheEntry;
 use Magix\Cache\Cached;
+use Magix\Cache\CachePolicy;
 use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Runtime\Extension\CacheEvent;
 use Magix\Cache\Runtime\GuardedCache;
@@ -28,10 +29,13 @@ use Tests\Fixture\UpstreamUnavailable;
 #[UsesClass(StaleIfError::class)]
 #[UsesClass(CacheEntry::class)]
 #[UsesClass(Cached::class)]
+#[UsesClass(CachePolicy::class)]
 #[UsesClass(CacheMetadata::class)]
 #[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 #[UsesClass(\Magix\Cache\Runtime\CacheEntryConverter::class)]
 #[UsesClass(GuardedCache::class)]
+#[UsesClass(\Magix\Cache\Runtime\OriginOverrides::class)]
+#[UsesClass(\Magix\Cache\Runtime\Policy\PolicySemantics::class)]
 #[UsesClass(CacheOperation::class)]
 #[UsesClass(NextCacheStrategy::class)]
 #[UsesClass(OriginFailure::class)]
@@ -48,6 +52,7 @@ final class TerminalCacheStrategyTest extends TestCase
             cache: new GuardedCache($storage),
             classifier: null,
             origin: static fn (): Cached => Cached::of('origin'),
+            policy: new CachePolicy(ttl: 60),
         );
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
@@ -62,6 +67,7 @@ final class TerminalCacheStrategyTest extends TestCase
             cache: new GuardedCache($storage),
             classifier: null,
             origin: static fn (): Cached => Cached::of('origin'),
+            policy: new CachePolicy(ttl: 60),
         );
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
@@ -77,6 +83,7 @@ final class TerminalCacheStrategyTest extends TestCase
             cache: new GuardedCache(new MemoryCache()),
             classifier: null,
             origin: static fn (): Cached => Cached::of('origin'),
+            policy: new CachePolicy(ttl: 60),
         );
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
@@ -85,6 +92,7 @@ final class TerminalCacheStrategyTest extends TestCase
         self::assertInstanceOf(OriginResult::class, $result);
         self::assertSame('origin', $result->cached->value());
         self::assertSame(100.0, $result->baseTime);
+        self::assertSame(160.0, $result->cached->metadata->expiresAt);
     }
 
     public function testFetchReportsTheOriginalFailureWithoutAnsweringIt(): void
@@ -94,6 +102,7 @@ final class TerminalCacheStrategyTest extends TestCase
             cache: new GuardedCache(new MemoryCache()),
             classifier: null,
             origin: static fn (): Cached => throw $error,
+            policy: new CachePolicy(ttl: 60),
         );
         $result = $terminal->fetch(new CacheOperation('key', static fn (): float => 100.0), NextCacheStrategy::end());
 
@@ -108,6 +117,7 @@ final class TerminalCacheStrategyTest extends TestCase
             cache: new GuardedCache($storage),
             classifier: null,
             origin: static fn (): Cached => Cached::of('origin'),
+            policy: new CachePolicy(ttl: 60),
         );
         $operation = new CacheOperation('key', static fn (): float => 100.0);
 
@@ -126,6 +136,7 @@ final class TerminalCacheStrategyTest extends TestCase
             cache: new GuardedCache(new MemoryCache(), $observer),
             classifier: null,
             origin: static fn (): Cached => Cached::of('origin'),
+            policy: new CachePolicy(ttl: 60),
             observer: $observer,
         );
         $operation = new CacheOperation('key', static fn (): float => 100.0);
@@ -138,7 +149,7 @@ final class TerminalCacheStrategyTest extends TestCase
     public function testFetchDoesNotClassifyAFailureAfterOriginSuccessAsAnOriginFailure(): void
     {
         $error = new RuntimeException('clock failed');
-        $terminal = new TerminalCacheStrategy(new GuardedCache(new MemoryCache()), null, static fn (): Cached => Cached::of('origin'));
+        $terminal = new TerminalCacheStrategy(new GuardedCache(new MemoryCache()), null, static fn (): Cached => Cached::of('origin'), new CachePolicy(ttl: 60));
         $operation = new CacheOperation('key', static fn (): float => throw $error);
 
         $this->expectExceptionObject($error);

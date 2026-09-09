@@ -6,6 +6,7 @@ namespace Magix\Cache\Runtime;
 
 use Magix\Cache\Runtime\Extension\BackendErrorClassifier;
 use Magix\Cache\Runtime\Extension\CacheObserver;
+use Magix\Cache\Runtime\Extension\CacheTtlResolver;
 use Magix\Cache\Strategy\NextCacheStrategy;
 
 /**
@@ -28,9 +29,9 @@ final readonly class StrategyChain
      * @template T
      * @param CacheInvocation<T> $invocation
      */
-    public function bind(CacheInvocation $invocation): NextCacheStrategy
+    public function bind(CacheInvocation $invocation, ?CacheTtlResolver $ttlResolver = null): NextCacheStrategy
     {
-        $terminal = new TerminalCacheStrategy($this->cache, $this->classifier, $invocation->origin, $this->observer);
+        $terminal = new TerminalCacheStrategy($this->cache, $this->classifier, $invocation->origin, $invocation->policy, $this->observer, $ttlResolver, $invocation->parameterTtl);
         $strategy = $invocation->strategy?->instantiate();
 
         return $strategy === null ? NextCacheStrategy::of($terminal) : NextCacheStrategy::of($strategy, $terminal);

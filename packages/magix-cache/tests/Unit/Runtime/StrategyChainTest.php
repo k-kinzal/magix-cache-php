@@ -30,6 +30,8 @@ use Tests\Fixture\StatefulStrategy;
 #[UsesClass(\Magix\Cache\Strategy\StrategyArguments::class)]
 #[UsesClass(\Magix\Cache\Strategy\NextCacheStrategy::class)]
 #[UsesClass(\Magix\Cache\Runtime\TerminalCacheStrategy::class)]
+#[UsesClass(\Magix\Cache\Runtime\OriginOverrides::class)]
+#[UsesClass(\Magix\Cache\Runtime\Policy\PolicySemantics::class)]
 #[UsesClass(\Magix\Cache\Runtime\CacheEntryConverter::class)]
 #[UsesClass(CacheOperation::class)]
 #[UsesClass(CacheWrite::class)]

@@ -79,7 +79,9 @@ final class SourceParserTest extends TestCase
 
         $child = $tree->build($catalog->candidates(\Tests\Package\Cli\Fixture\TtlAlternatives\TimedQuery::class, 'execute')[0]);
         self::assertSame('30/600-900s', $child->effect->strategy?->ttl->label());
-        self::assertTrue($child->effect->storable);
+        self::assertFalse($child->effect->storable);
+        self::assertTrue($child->effect->visibilityUnknown);
+        self::assertTrue($child->effect->tagsUnknown);
     }
 
     /**
@@ -87,10 +89,10 @@ final class SourceParserTest extends TestCase
      */
     public static function providerAlternativeParents(): iterable
     {
-        yield 'auto' => ['automatic', '30/600-900s', true];
-        yield 'bounded' => ['bounded', '30/600-700s', true];
-        yield 'fixed' => ['fixed', '30/300s', true];
-        yield 'shorter' => ['shorter', '20s', true];
+        yield 'auto' => ['automatic', '30/600-900s', false];
+        yield 'bounded' => ['bounded', '30/600-700s', false];
+        yield 'fixed' => ['fixed', '300s', false];
+        yield 'shorter' => ['shorter', '20s', false];
         yield 'uncached' => ['show', '30/600-700s', false];
     }
 
@@ -132,8 +134,8 @@ final class SourceParserTest extends TestCase
         self::assertSame('ParameterizedStrategy::create(minimum: $min)', $node->effect->strategy?->label);
         $rendered = (new TreeRenderer())->render($node);
 
-        self::assertStringContainsString('private or stricter', $rendered);
-        self::assertStringContainsString('fixed + runtime tags', $rendered);
+        self::assertStringContainsString('shared or stricter', $rendered);
+        self::assertStringContainsString('runtime tags', $rendered);
         self::assertStringContainsString('cache ttl', $rendered);
         $json = (new JsonRenderer())->tree($node);
         self::assertIsArray($json['effective']);

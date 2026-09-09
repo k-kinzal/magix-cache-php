@@ -45,8 +45,8 @@ final readonly class PolicyReader
         $values = $this->arguments->values($arguments, self::OPTIONS);
         $ttl = $values['ttl'] ?? Ttl::Auto;
         $maxTtl = $values['maxTtl'] ?? null;
-        $tags = $values['tags'] ?? [];
-        $visibility = $values['visibility'] ?? Visibility::Shared;
+        $tags = $values['tags'] ?? null;
+        $visibility = $values['visibility'] ?? null;
         $version = $values['version'] ?? '1';
         $runtime = $values['runtime'] ?? CacheRuntimeRegistry::DEFAULT_NAME;
 
@@ -54,10 +54,12 @@ final readonly class PolicyReader
             source: $source,
             ttl: is_int($ttl) || $ttl instanceof Ttl ? $ttl : null,
             maxTtl: is_int($maxTtl) ? $maxTtl : null,
-            tags: is_array($tags) ? array_values(array_filter($tags, is_string(...))) : [],
-            visibility: $visibility instanceof Visibility ? $visibility : Visibility::Shared,
+            tags: is_array($tags) ? array_values(array_filter($tags, is_string(...))) : null,
+            visibility: $visibility instanceof Visibility ? $visibility : null,
             version: is_string($version) && $version !== LiteralReader::UNRESOLVED ? $version : '1',
             runtime: is_string($runtime) && $runtime !== LiteralReader::UNRESOLVED ? $runtime : CacheRuntimeRegistry::DEFAULT_NAME,
+            tagsUnknown: $tags !== null && !is_array($tags),
+            visibilityUnknown: $visibility !== null && !$visibility instanceof Visibility,
         );
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Fixture\Project;
 
-use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Strategy\CacheAnswer;
 use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\CacheRead;
@@ -56,7 +55,7 @@ final readonly class ProductFreshnessStrategy implements CacheStrategy
 
         $volatility = max($this->minimum, $this->lifetime($result->cached->value()));
 
-        return $result->constrain(CacheMetadata::forTtl($volatility, $result->baseTime));
+        return $result->withTtl($volatility);
     }
 
     /**

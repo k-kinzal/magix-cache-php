@@ -24,15 +24,15 @@ final class CachePolicyTest extends TestCase
         self::assertSame('2', $policy->version);
     }
 
-    public function testRestrictVisibilityOnlyMakesPolicyStricter(): void
+    public function testWithVisibilityReplacesTheDeclaredVisibility(): void
     {
         $policy = new CachePolicy(ttl: 30, tags: ['product:1']);
-        $private = $policy->restrictVisibility(Visibility::Private);
+        $private = $policy->withVisibility(Visibility::Private);
 
         self::assertNotSame($policy, $private);
         self::assertSame(Visibility::Private, $private->visibility);
         self::assertSame(30, $private->ttl);
         self::assertSame(['product:1'], $private->tags);
-        self::assertSame($private, $private->restrictVisibility(Visibility::Shared));
+        self::assertSame(Visibility::Shared, $private->withVisibility(Visibility::Shared)->visibility);
     }
 }

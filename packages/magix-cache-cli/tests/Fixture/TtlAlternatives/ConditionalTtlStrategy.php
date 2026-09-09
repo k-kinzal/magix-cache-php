@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Package\Cli\Fixture\TtlAlternatives;
 
 use InvalidArgumentException;
-use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Strategy\CacheAnswer;
 use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\CacheRead;
@@ -71,7 +70,7 @@ final readonly class ConditionalTtlStrategy implements CacheStrategy
             ? $this->minimum + crc32($operation->key()) % ($this->maximum - $this->minimum + 1)
             : $this->normal;
 
-        return $result->constrain(CacheMetadata::forTtl($ttl, $result->baseTime));
+        return $result->withTtl($ttl);
     }
 
     /**

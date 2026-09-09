@@ -139,4 +139,44 @@ final class CacheMetadataTest extends TestCase
         self::assertFalse((new CacheMetadata(expiresAt: 101.0, cacheable: false))->isStorable(100.0));
         self::assertFalse((new CacheMetadata(expiresAt: 101.0, visibility: Visibility::NoStore))->isStorable(100.0));
     }
+    public function testWithExpirationCanExtendOrClearOnlyTheExpiration(): void
+    {
+        $original = new CacheMetadata(expiresAt: 120.0, tags: ['source'], visibility: Visibility::Private);
+        self::assertEquals(new CacheMetadata(expiresAt: 160.0, tags: ['source'], visibility: Visibility::Private), $original->withExpiration(160.0));
+        self::assertEquals(new CacheMetadata(tags: ['source'], visibility: Visibility::Private), $original->withExpiration(null));
+        self::assertSame(120.0, $original->expiresAt);
+    }
+
+    public function testWithCacheabilityCanExplicitlyPermitStorage(): void
+    {
+        $original = new CacheMetadata(expiresAt: 160.0, cacheable: false, reasons: ['source']);
+        self::assertTrue($original->withCacheability(true)->isStorable(100.0));
+        self::assertSame(['source'], $original->withCacheability(true)->reasons);
+        self::assertFalse($original->cacheable);
+    }
+
+    public function testWithTagsReplacesAndClearsWithoutChangingExpiration(): void
+    {
+        $original = new CacheMetadata(expiresAt: 160.0, tags: ['source']);
+        self::assertSame(['new'], $original->withTags(['new', 'new'])->tags);
+        self::assertSame([], $original->withTags([])->tags);
+        self::assertSame(160.0, $original->withTags([])->expiresAt);
+        self::assertSame(['source'], $original->tags);
+    }
+
+    public function testWithVisibilityCanExplicitlyShareAPrivateResult(): void
+    {
+        $original = new CacheMetadata(expiresAt: 160.0, visibility: Visibility::Private);
+        self::assertSame(Visibility::Shared, $original->withVisibility(Visibility::Shared)->visibility);
+        self::assertSame(160.0, $original->withVisibility(Visibility::Shared)->expiresAt);
+        self::assertSame(Visibility::Private, $original->visibility);
+    }
+
+    public function testWithReasonsReplacesOnlyDiagnostics(): void
+    {
+        $original = new CacheMetadata(cacheable: false, reasons: ['source']);
+        self::assertSame([], $original->withReasons([])->reasons);
+        self::assertSame(['new'], $original->withReasons(['new'])->reasons);
+        self::assertFalse($original->withReasons([])->cacheable);
+    }
 }

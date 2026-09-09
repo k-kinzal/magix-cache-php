@@ -59,7 +59,7 @@ final readonly class JsonRenderer
                 'ttl' => $policy->ttlLabel(),
                 'maxTtl' => $policy->maxTtl,
                 'tags' => $policy->tags,
-                'visibility' => strtolower($policy->visibility->name),
+                'visibility' => $policy->visibility === null ? null : strtolower($policy->visibility->name),
                 'version' => $policy->version,
                 'runtime' => $policy->runtime,
             ],
@@ -116,7 +116,7 @@ final readonly class JsonRenderer
         return [
             'declared' => $strategy->label,
             'ttl' => $strategy->ttl->jsonSerialize(),
-            'addsConstraint' => $strategy->addsConstraint,
+            'overridesExpiration' => $strategy->overridesExpiration,
             ...($strategy->expirations === [] ? [] : ['expirations' => $strategy->expirations]),
             'steps' => array_map(
                 static fn (StrategyStep $step): array => [

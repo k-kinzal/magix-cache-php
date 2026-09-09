@@ -34,7 +34,7 @@ final readonly class ParameterEffects
             }
         }
 
-        return $sources;
+        return $sources === [] ? [] : [end($sources)];
     }
 
     /**
@@ -148,30 +148,67 @@ final readonly class ParameterEffects
      */
     public function apply(BoundaryDeclaration $boundary, DependencyConstraint $constraint, CacheEffect $effect): CacheEffect
     {
-        $visibilitySources = $this->sources($boundary, 'visibility');
-        $visibilityUnknown = $effect->visibility !== Visibility::NoStore
-            && ($constraint->visibilityUnknown || $visibilitySources !== []);
-        $tagsUnknown = $constraint->tagsUnknown || $this->sources($boundary, 'tags') !== [];
+        [$visibility, $visibilityUnknown, $reason] = $this->visibility($boundary, $constraint, $effect);
+        [$tags, $tagsUnknown] = $this->tags($boundary, $constraint, $effect);
         $problems = [...$effect->problems, ...$this->problems($boundary)];
-        $reason = $effect->visibilityReason;
-
-        if ($visibilityUnknown) {
-            $dependency = $visibilitySources === [] ? 'dependency metadata' : implode(', ', $visibilitySources);
-            $reason = ($reason === null ? '' : $reason.'; ').'may be further restricted by '.$dependency;
-        }
 
         return new CacheEffect(
             ttl: $problems === [] ? $effect->ttl : TtlEstimate::invalid($problems[0]),
-            visibility: $effect->visibility,
+            visibility: $visibility,
             storable: $effect->storable && !$visibilityUnknown && $problems === [],
-            tags: $effect->tags,
+            tags: $tags,
             visibilityReason: $reason,
             problems: $problems,
             strategy: $effect->strategy,
             expirationConstraints: $effect->expirationConstraints,
             visibilityUnknown: $visibilityUnknown,
             tagsUnknown: $tagsUnknown,
-            localRestrictions: $problems === [] ? (new LocalRestrictions())->describe($boundary, $constraint, $effect, $visibilityUnknown) : [],
+            localOverrides: $problems === [] ? (new LocalOverrides())->describe($boundary, $constraint, $effect) : [],
         );
+    }
+    /**
+     * Applies explicit visibility writers without keeping an obsolete floor.
+     *
+     * @return array{Visibility, bool, string|null}
+     */
+    public function visibility(BoundaryDeclaration $boundary, DependencyConstraint $constraint, CacheEffect $effect): array
+    {
+        if ($effect->strategy?->metadataUnknown === true) {
+            return [Visibility::Shared, true, 'custom Strategy metadata overrides are not analyzed'];
+        }
+
+        $sources = $this->sources($boundary, 'visibility');
+
+        if ($sources !== []) {
+            return [Visibility::Shared, true, 'overridden by '.implode(', ', $sources)];
+        }
+
+        $policy = $boundary->policy;
+
+        if ($boundary->scope() !== null || $policy?->visibility !== null) {
+            return [$effect->visibility, false, $effect->visibilityReason];
+        }
+
+        if ($policy->visibilityUnknown ?? false) {
+            return [Visibility::Shared, true, 'the declared visibility cannot be read statically'];
+        }
+
+        return [$effect->visibility, $constraint->visibilityUnknown && $effect->visibility !== Visibility::NoStore, $effect->visibilityReason];
+    }
+
+    /**
+     * A replacement tag list removes previously known tags and uncertainty.
+     *
+     * @return array{list<string>, bool}
+     */
+    public function tags(BoundaryDeclaration $boundary, DependencyConstraint $constraint, CacheEffect $effect): array
+    {
+        $policy = $boundary->policy;
+
+        if ($effect->strategy?->metadataUnknown === true || $this->sources($boundary, 'tags') !== [] || ($policy->tagsUnknown ?? false)) {
+            return [[], true];
+        }
+
+        return [$effect->tags, $policy?->tags === null && $constraint->tagsUnknown];
     }
 }

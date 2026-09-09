@@ -36,7 +36,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\StrategyResolver::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\ParameterEffects::class)]
-#[UsesClass(\Magix\Cache\Cli\Graph\LocalRestrictions::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\LocalOverrides::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\ParameterStrategyBinding::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
@@ -63,7 +63,7 @@ final class CacheTreeTest extends TestCase
         self::assertSame(TtlEstimateState::Unknown, $limited->children[0]->effect->ttl->state);
     }
 
-    public function testBuildDoesNotHighlightRestrictionsAgainstTruncatedVisibility(): void
+    public function testBuildExplicitVisibilityOverridesTruncatedDependencies(): void
     {
         $inner = new BoundaryDeclaration('InnerQuery', 'execute', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 60), dependencies: [new DependencyCall('InnerQuery', 'execute', 2)]);
         $outer = new BoundaryDeclaration('OuterQuery', 'execute', 'b.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 20, visibility: \Magix\Cache\Metadata\Visibility::Private), dependencies: [new DependencyCall('InnerQuery', 'execute', 2)]);
@@ -74,10 +74,10 @@ final class CacheTreeTest extends TestCase
         $limited = $tree->build($outer, 1);
         $recursive = $tree->build($outer);
 
-        self::assertTrue($limited->effect->visibilityUnknown);
-        self::assertSame([], $limited->effect->localRestrictions);
-        self::assertTrue($recursive->effect->visibilityUnknown);
-        self::assertSame([], $recursive->effect->localRestrictions);
+        self::assertFalse($limited->effect->visibilityUnknown);
+        self::assertArrayHasKey('visibility', $limited->effect->localOverrides);
+        self::assertFalse($recursive->effect->visibilityUnknown);
+        self::assertArrayHasKey('visibility', $recursive->effect->localOverrides);
     }
 
     public function testBuildKeepsUncachedRootDepthLimitsAndRecursionUnknown(): void
@@ -136,7 +136,7 @@ final class CacheTreeTest extends TestCase
 
         $node = (new CacheTree($catalog))->build($page);
 
-        self::assertSame(20, $node->effect->ttl->seconds);
+        self::assertSame(120, $node->effect->ttl->seconds);
         self::assertCount(1, $node->children);
         self::assertSame('App\ProductQuery::execute', $node->children[0]->boundary->id());
     }
@@ -161,8 +161,8 @@ final class CacheTreeTest extends TestCase
         self::assertSame(TtlEstimateState::Unknown, $recursive->children[0]->effect->ttl->state);
         self::assertSame([], $limited->children);
         self::assertSame(['depth limit reached, dependencies not expanded'], $limited->notes);
-        self::assertSame(TtlEstimateState::Unknown, $limited->effect->ttl->state);
-        self::assertSame(20, $limited->effect->ttl->upperBound);
+        self::assertSame(TtlEstimateState::Known, $limited->effect->ttl->state);
+        self::assertSame(20, $limited->effect->ttl->seconds);
     }
 
     public function testBuildNotesWhenACallHasSeveralImplementations(): void
@@ -187,6 +187,6 @@ final class CacheTreeTest extends TestCase
         $node = (new CacheTree($catalog))->build($home);
 
         self::assertSame(['App\FeedQuery::execute resolves to 2 implementations'], $node->notes);
-        self::assertSame(5, $node->effect->ttl->seconds);
+        self::assertSame(120, $node->effect->ttl->seconds);
     }
 }

@@ -8,14 +8,14 @@ use Magix\Cache\Cached;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Runtime\Extension\DynamicTtlContext;
-use Magix\Cache\Runtime\OriginConstraints;
+use Magix\Cache\Runtime\OriginOverrides;
 use Magix\Cache\Runtime\Policy\Ttl;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixture\FixedTtlResolver;
 
-#[CoversClass(OriginConstraints::class)]
+#[CoversClass(OriginOverrides::class)]
 #[UsesClass(Cached::class)]
 #[UsesClass(CachePolicy::class)]
 #[UsesClass(CacheMetadata::class)]
@@ -23,22 +23,22 @@ use Tests\Fixture\FixedTtlResolver;
 #[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
 #[UsesClass(\Magix\Cache\Runtime\Policy\PolicySemantics::class)]
-final class OriginConstraintsTest extends TestCase
+final class OriginOverridesTest extends TestCase
 {
-    public function testApplyNeverExtendsAnUpstreamExpiration(): void
+    public function testApplyOverridesAnUpstreamExpiration(): void
     {
         $result = Cached::of('value', new CacheMetadata(expiresAt: 105.0));
 
-        $metadata = (new OriginConstraints())->apply(new CachePolicy(ttl: 20), null, $result, 'key', 100.0);
+        $metadata = (new OriginOverrides())->apply(new CachePolicy(ttl: 20), null, $result, 'key', 100.0);
 
-        self::assertSame(105.0, $metadata->expiresAt);
+        self::assertSame(120.0, $metadata->expiresAt);
     }
 
-    public function testApplyMeetsTheDynamicLifetimeBeforeThePolicy(): void
+    public function testDynamicLifetimeSuppliesAnAutomaticBoundary(): void
     {
         $result = Cached::of('value');
 
-        $metadata = (new OriginConstraints())->apply(
+        $metadata = (new OriginOverrides())->apply(
             new CachePolicy(ttl: Ttl::Auto),
             new FixedTtlResolver(5),
             $result,
@@ -49,11 +49,11 @@ final class OriginConstraintsTest extends TestCase
         self::assertSame(105.0, $metadata->expiresAt);
     }
 
-    public function testApplyTakesTheMinimumOfUpstreamDynamicAndPolicyExpirations(): void
+    public function testDynamicLifetimeOverridesThePolicy(): void
     {
         $result = Cached::of('value', new CacheMetadata(expiresAt: 112.0));
 
-        $metadata = (new OriginConstraints())->apply(
+        $metadata = (new OriginOverrides())->apply(
             new CachePolicy(ttl: 20),
             new FixedTtlResolver(5),
             $result,
@@ -64,9 +64,9 @@ final class OriginConstraintsTest extends TestCase
         self::assertSame(105.0, $metadata->expiresAt);
     }
 
-    public function testApplyUsesOneBaseTimeForParameterDynamicAndPolicyConstraints(): void
+    public function testDynamicLifetimeOverridesParametersAtOneBaseTime(): void
     {
-        $metadata = (new OriginConstraints())->apply(
+        $metadata = (new OriginOverrides())->apply(
             new CachePolicy(ttl: 60),
             new FixedTtlResolver(20),
             Cached::of('value', new CacheMetadata(expiresAt: 150.0)),
@@ -75,6 +75,6 @@ final class OriginConstraintsTest extends TestCase
             parameterTtl: 5,
         );
 
-        self::assertSame(105.0, $metadata->expiresAt);
+        self::assertSame(120.0, $metadata->expiresAt);
     }
 }

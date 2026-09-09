@@ -179,7 +179,7 @@ final class ProductPageQuery
 }
 ```
 
-The TTL can be omitted: `#[Cache]` alone inherits the composed constraints, and this example adds only a page tag. If the product expires in 20 seconds and inventory expires in 60 seconds, the composed page expires in 20 seconds. Cacheability, visibility, tags, and diagnostic reasons are also combined conservatively — a declared TTL can shorten the result's lifetime but never extend what a dependency imposed. See [Cache Composition](cache-composition.md) for all composition rules, including the `value()` pitfall.
+The TTL can be omitted: `#[Cache]` alone inherits the composed constraints, and this example explicitly replaces the tag list with a page tag. If the product expires in 20 seconds and inventory expires in 60 seconds, the composed page expires in 20 seconds. Cacheability, visibility, tags, and diagnostic reasons are also combined conservatively — an explicit parent TTL replaces the bubbled lifetime and can extend it. See [Cache Composition](cache-composition.md) for all composition rules, including the `value()` pitfall.
 
 ## Select a Runtime per Boundary
 

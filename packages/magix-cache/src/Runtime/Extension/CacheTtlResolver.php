@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Magix\Cache\Runtime\Extension;
 
 /**
- * Derives an additional lifetime constraint from one successful origin result.
+ * Chooses a lifetime override from one successful origin result.
  *
- * A resolver only proposes an expiration candidate: the runtime meets it with
- * the origin metadata, so a resolver can never replace metadata or extend an
- * expiration a dependency already imposed. Implementations are registered with
+ * The runtime sets expiration to the origin base time plus this lifetime,
+ * replacing inherited, policy and parameter expiration. Other fields remain
+ * unchanged; a Strategy may override expiration afterward. Implementations are registered with
  * a runtime at bootstrap and referenced from #[DynamicTtl] by class name.
  */
 interface CacheTtlResolver

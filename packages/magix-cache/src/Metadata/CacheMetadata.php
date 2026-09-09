@@ -12,12 +12,13 @@ use function is_finite;
 use function min;
 
 /**
- * Immutable cache constraints that compose only through the fixed meet law.
+ * Immutable cache metadata: meet dependencies, explicitly replace local fields.
  *
- * The meet is the sole way to add constraints to existing metadata: it selects
+ * Dependency bubbling uses meet: it selects
  * the earliest finite expiration, combines cacheability with AND, chooses the
  * stricter visibility, and unions tags and diagnostic reasons. top() is its
  * identity, and every composition is as strict as or stricter than each input.
+ * Explicit boundary overrides use the with* methods and may relax a field.
  */
 final readonly class CacheMetadata
 {
@@ -39,7 +40,7 @@ final readonly class CacheMetadata
     public array $tags;
 
     /**
-     * The most restrictive storage visibility observed so far.
+     * Storage visibility after dependency bubbling and explicit overrides.
      */
     public Visibility $visibility;
 
@@ -131,6 +132,52 @@ final readonly class CacheMetadata
         }
 
         return $result;
+    }
+
+    /**
+     * Replaces only expiration; null removes the expiration.
+     *
+     * @throws InvalidArgumentException when the expiration is not finite
+     */
+    public function withExpiration(?float $expiresAt): self
+    {
+        return new self(expiresAt: $expiresAt, cacheable: $this->cacheable, tags: $this->tags, visibility: $this->visibility, reasons: $this->reasons);
+    }
+
+    /**
+     * Replaces only cacheability, preserving visibility and other fields.
+     */
+    public function withCacheability(bool $cacheable): self
+    {
+        return new self(expiresAt: $this->expiresAt, cacheable: $cacheable, tags: $this->tags, visibility: $this->visibility, reasons: $this->reasons);
+    }
+
+    /**
+     * Replaces only tags; an empty list clears them.
+     *
+     * @param list<string> $tags
+     */
+    public function withTags(array $tags): self
+    {
+        return new self(expiresAt: $this->expiresAt, cacheable: $this->cacheable, tags: $tags, visibility: $this->visibility, reasons: $this->reasons);
+    }
+
+    /**
+     * Replaces only storage visibility.
+     */
+    public function withVisibility(Visibility $visibility): self
+    {
+        return new self(expiresAt: $this->expiresAt, cacheable: $this->cacheable, tags: $this->tags, visibility: $visibility, reasons: $this->reasons);
+    }
+
+    /**
+     * Replaces only diagnostics; an empty list clears them.
+     *
+     * @param list<string> $reasons
+     */
+    public function withReasons(array $reasons): self
+    {
+        return new self(expiresAt: $this->expiresAt, cacheable: $this->cacheable, tags: $this->tags, visibility: $this->visibility, reasons: $reasons);
     }
 
     /**

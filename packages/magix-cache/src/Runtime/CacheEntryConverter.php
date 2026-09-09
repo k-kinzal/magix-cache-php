@@ -18,7 +18,8 @@ final readonly class CacheEntryConverter
      * Returns the stored value with the exact metadata it was stored with.
      *
      * A retained expired entry keeps its expired expiration, so a parent that
-     * composes it inherits the expired constraint and cannot restore it fresh.
+     * only composes it inherits the expired deadline. An explicit parent TTL
+     * override may choose a new deadline before conversion.
      *
      * @template T
      * @param CacheEntry<T> $entry

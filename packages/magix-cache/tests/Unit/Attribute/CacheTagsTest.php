@@ -21,6 +21,6 @@ final class CacheTagsTest extends TestCase
         $definition = (new CacheDefinitionResolver())->resolve(new ParameterQuery(), 'fetch');
         $invocation = $definition->invocation([30, ['dynamic']], static fn (): Cached => Cached::of('origin'));
 
-        self::assertSame(['static', 'dynamic'], $invocation->policy->tags);
+        self::assertSame(['dynamic'], $invocation->policy->tags);
     }
 }

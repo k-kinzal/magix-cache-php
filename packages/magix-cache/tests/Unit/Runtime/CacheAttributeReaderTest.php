@@ -27,7 +27,7 @@ final class CacheAttributeReaderTest extends TestCase
 
         self::assertNotNull($declaration);
         self::assertSame(30, $declaration->ttl);
-        self::assertSame([], $declaration->tags);
+        self::assertNull($declaration->tags);
     }
 
     public function testReadFallsBackToTheConcreteClassDeclaration(): void

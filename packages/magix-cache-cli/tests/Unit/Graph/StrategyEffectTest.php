@@ -28,7 +28,7 @@ final class StrategyEffectTest extends TestCase
         self::assertSame('Composite::create(min: 45)', $effect->label);
         self::assertSame($ttl, $effect->ttl);
         self::assertSame([$step], $effect->steps);
-        self::assertTrue($effect->addsConstraint);
+        self::assertTrue($effect->overridesExpiration);
         self::assertSame(['a problem'], $effect->problems);
     }
 
@@ -41,7 +41,7 @@ final class StrategyEffectTest extends TestCase
         self::assertSame('', $effect->label);
         self::assertSame($ttl, $effect->ttl);
         self::assertSame([], $effect->steps);
-        self::assertNull($effect->addsConstraint);
+        self::assertNull($effect->overridesExpiration);
         self::assertSame([], $effect->problems);
     }
 }

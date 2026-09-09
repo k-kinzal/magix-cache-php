@@ -38,12 +38,14 @@ A method-level `#[Cache]` wins over the class-level one as a whole; the two are 
 |---|---|---|---|
 | `ttl` | `int\|Ttl` | `Ttl::Auto` | Selects the boundary expiration |
 | `maxTtl` | `?int` | `null` | Upper bound for `Ttl::FromUpstream` (required in that mode) |
-| `tags` | `list<string>` | `[]` | Adds cache invalidation or response tags |
-| `visibility` | `Visibility` | `Visibility::Shared` | Restricts where the result may be stored |
+| `tags` | `?list<string>` | `null` | Inherits when omitted; an explicit list replaces tags, including `[]` |
+| `visibility` | `?Visibility` | `null` | Inherits when omitted; an explicit enum replaces visibility |
 | `version` | `string` | `'1'` | Changes the generated cache key |
 | `runtime` | `string` | `'default'` | Name of a runtime registered at bootstrap |
 
-The same constraint options are carried by the shared `CachePolicy` value type, which `#[Cache]` converts to internally. A policy only ever adds constraints: no setting can extend an expiration a dependency already imposed, or relax cacheability, visibility, tags, or reasons.
+The shared `CachePolicy` value type has the same options. Bubbling and overrides are separate: composition gathers dependency metadata, then explicitly configured boundary fields replace the inherited fields.
+
+Priority is `dependency metadata → policy → parameter settings → dynamic TTL → Strategy`, with the later writer winning for each field. Unspecified fields inherit. Cacheability and reasons remain unchanged unless a Strategy explicitly replaces them.
 
 ## Fixed TTL
 
@@ -53,9 +55,9 @@ An integer TTL is relative to the base time taken right after the origin result 
 #[Cache(ttl: 60)]
 ```
 
-A fixed TTL is always bounded by the upstream expiration; there is no opt-out. If a dependency has 20 seconds left, a 60-second boundary still expires after 20 seconds.
+A fixed TTL replaces the inherited expiration. If a dependency has 20 seconds left, `#[Cache(ttl: 60)]` makes the parent expire 60 seconds after its origin succeeds. This is an intentional parent cache policy. Use `Ttl::FromUpstream` to retain a dependency cap instead.
 
-A TTL of `0` is valid, but its expiration is not in the future, so the result is returned without being stored and the next call executes the origin again.
+A final TTL of `0` expires immediately and prevents storage. A higher-priority parameter, dynamic TTL or Strategy may explicitly replace a policy TTL of zero.
 
 ## Automatic TTL
 
@@ -81,9 +83,9 @@ public function execute(int $productId): Cached
 
 The composed expiration, cacheability, visibility, tags, and diagnostic reasons are preserved. The omitted TTL defaults to `Ttl::Auto`, so writing `#[Cache(ttl: Ttl::Auto)]` explicitly has the same effect. Other options can be supplied independently, such as `#[Cache(tags: ['product-pages'])]`.
 
-The automatic policy requires a finite expiration from the returned `Cached` value or another constraint. Returning `Cached::of($value)` with no finite constraint is a definition error and the runtime throws a `LogicException`.
+The automatic policy requires a finite final expiration from the returned `Cached` value or an override. Returning `Cached::of($value)` with no finite constraint is a definition error and the runtime throws a `LogicException`.
 
-A `#[DynamicTtl]` resolver can supply the finite expiration before the automatic policy is applied. See [Cache Behaviors](cache-behaviors.md#dynamic-ttl).
+A parameter, `#[DynamicTtl]` resolver or Strategy can supply that expiration; validation runs after all overrides. See [Cache Behaviors](cache-behaviors.md#dynamic-ttl).
 
 ## Upstream TTL
 
@@ -107,11 +109,11 @@ public function execute(): Cached
 }
 ```
 
-The effective expiration is the earlier of the upstream expiration and `now + maxTtl`. `maxTtl` is required for this mode, and like `Ttl::Auto`, a missing finite upstream expiration is a definition error at runtime.
+At policy application, the expiration becomes the earlier of the inherited expiration and `baseTime + maxTtl`. `maxTtl` is required. A later parameter, dynamic TTL or Strategy override takes precedence over this cap. Like `Ttl::Auto`, the final result must have a finite expiration.
 
 ## Tags
 
-Policy tags are unioned with tags from every dependency:
+Policy tags replace the inherited tag list. Omit tags to inherit; use `tags: []` to clear them:
 
 ```php
 #[Cache(ttl: 30, tags: ['products', 'product:42'])]
@@ -131,9 +133,9 @@ Visibility becomes more restrictive as results are composed:
 | `Visibility::Private` | May be stored when the key identifies the private variant |
 | `Visibility::NoStore` | Must not be read from or written to storage |
 
-The order is `Shared < Private < NoStore`; a parent boundary cannot loosen a dependency's visibility. A boundary whose effective visibility is `NoStore` skips the cache lookup entirely and always executes the origin.
+Dependency bubbling uses `Shared < Private < NoStore`. Explicit parent visibility replaces the inherited choice, so Shared can override Private. Visibility resolved before lookup as NoStore skips reads; final NoStore metadata prevents writes. Strategy overrides run during fetch and cannot retroactively enable a skipped lookup.
 
-Declare a boundary-wide restriction in the policy:
+Declare a boundary-wide override in the policy:
 
 ```php
 use Magix\Cache\Metadata\Visibility;
@@ -156,7 +158,7 @@ public function execute(
 }
 ```
 
-`#[CacheScope]` defaults to `Visibility::Private`. The visibility a scoped parameter imposes is folded into the policy with the meet, so the method declaration cannot relax it.
+`#[CacheScope]` defaults to `Visibility::Private`. Scoped visibility overrides the static policy. When multiple parameters carry scopes, the last in declaration order wins; invocation-bound `CacheVisibility` and Strategy overrides take precedence afterward.
 
 An ignored parameter cannot also be scoped unless its scope is `NoStore`. This special combination lets an unkeyable value force execution without storage:
 
@@ -188,7 +190,7 @@ return Cached::of(
 );
 ```
 
-Uncacheable metadata sets `cacheable` to `false`, visibility to `NoStore`, and retains the reason. Once introduced, later composition or policies cannot make the result cacheable again.
+Uncacheable metadata sets `cacheable` to `false`, visibility to `NoStore`, and retains the reason. Bubbling preserves both prohibitions. A TTL-only policy leaves them intact. A Strategy can explicitly override cacheability and visibility when that is its intended behavior; clearing a diagnostic reason alone does not enable storage.
 
 ## Cache Version
 
@@ -200,10 +202,10 @@ The version is part of the default cache key. A fingerprint of the effective dec
 
 Versions must be non-empty strings. Changing the version leaves old backend entries in place until their physical expiration; it only moves new reads and writes to a different key.
 
-## Constraints From Parameters
+## Overrides From Parameters
 
 Use `#[CacheTtl]`, `#[CacheTags]`, and `#[CacheVisibility]` on method parameters
-when callers supply these values. Their constraints compose with this policy
-and dependencies through the same fixed meet law. See
+when callers supply these values. They replace the corresponding policy and
+inherited fields; the last annotated parameter wins per field. See
 [Parameter Configuration](parameter-configuration.md) for binding, validation,
 key behavior and static analysis.

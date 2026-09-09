@@ -42,19 +42,19 @@ final class AnalyzeCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $output = $tester->getDisplay();
-        self::assertStringContainsString('ttl          20s (inherited from BubblingPageQuery::execute)', $output);
+        self::assertStringContainsString('ttl          120s (inherited from BubblingPageQuery::execute)', $output);
         self::assertStringContainsString('visibility   private', $output);
-        self::assertStringContainsString('tags         inventory, page, product, viewer', $output);
+        self::assertStringContainsString('tags         page', $output);
         self::assertStringContainsString('storable     yes', $output);
         self::assertStringContainsString('policy       #[Cache]', $output);
-        self::assertStringContainsString('BubblingPageQuery::explicit  ttl 20s  private', $output);
-        self::assertStringContainsString('BubblingPageQuery::execute  ttl 20s  private', $output);
-        self::assertStringContainsString('ProductPageQuery::execute  ttl 20s (declared 120s)', $output);
+        self::assertStringContainsString('BubblingPageQuery::explicit  ttl 120s  private', $output);
+        self::assertStringContainsString('BubblingPageQuery::execute  ttl 120s  private', $output);
+        self::assertStringContainsString('ProductPageQuery::execute  ttl 120s', $output);
         self::assertStringNotContainsString('Ttl::Auto', $output);
         self::assertStringNotContainsString('local restriction:', $output);
     }
 
-    public function testAnalyzeHighlightsPartialCapsWithoutCollapsingTtlAlternatives(): void
+    public function testAnalyzeKeepsAParentOverrideGrayWhenStrategyMetadataIsUnknown(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
 
@@ -64,12 +64,13 @@ final class AnalyzeCommandTest extends TestCase
         ], ['decorated' => true]);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringContainsString("\033[33m30/300s\033[39m", $tester->getDisplay());
+        self::assertStringContainsString('300s', $tester->getDisplay());
+        self::assertStringNotContainsString("\033[33m300s\033[39m", $tester->getDisplay());
         self::assertStringNotContainsString('local restriction:', $tester->getDisplay());
         self::assertStringContainsString('TimedQuery::execute', $tester->getDisplay());
     }
 
-    public function testAnalyzeHighlightsLocalRestrictionsAtTheRootAndInsideTheTree(): void
+    public function testAnalyzeHighlightsLocalOverridesAtTheRootAndInsideTheTree(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $arguments = ['boundary' => 'RestrictedPageQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture/Project']];
@@ -105,11 +106,11 @@ final class AnalyzeCommandTest extends TestCase
 
         self::assertIsArray($data);
         self::assertIsArray($data['effective']);
-        self::assertArrayNotHasKey('localRestrictions', $data['effective']);
+        self::assertArrayNotHasKey('localOverrides', $data['effective']);
         self::assertIsArray($data['dependencies']);
         self::assertIsArray($data['dependencies'][0]);
         self::assertIsArray($data['dependencies'][0]['effective']);
-        self::assertArrayNotHasKey('localRestrictions', $data['dependencies'][0]['effective']);
+        self::assertArrayNotHasKey('localOverrides', $data['dependencies'][0]['effective']);
 
         $tester->execute([...$arguments, '--format' => 'mermaid']);
 
@@ -218,8 +219,8 @@ final class AnalyzeCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         self::assertStringContainsString('ProductPageQuery::execute', $tester->getDisplay());
-        self::assertStringContainsString('20s (declared 120s, capped by ProductQuery::execute)', $tester->getDisplay());
-        self::assertStringContainsString('private (restricted by ViewerQuery::execute)', $tester->getDisplay());
+        self::assertStringContainsString('ttl          120s', $tester->getDisplay());
+        self::assertStringContainsString('private (inherited from ViewerQuery::execute)', $tester->getDisplay());
         self::assertStringContainsString('$productId, $viewerId (ignored: $trace)', $tester->getDisplay());
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
     }
@@ -284,8 +285,8 @@ final class AnalyzeCommandTest extends TestCase
         self::assertSame([ViewerQuery::class.'::execute', InventoryLookup::class.'::get'], array_column($baseline['dependencies'], 'boundary'));
         self::assertIsArray($baseline['effective']);
         self::assertIsArray($baseline['effective']['ttl']);
-        self::assertSame('unknown', $baseline['effective']['ttl']['state']);
-        self::assertSame(30, $baseline['effective']['ttl']['upperBound']);
+        self::assertSame('known', $baseline['effective']['ttl']['state']);
+        self::assertSame(120, $baseline['effective']['ttl']['seconds']);
         self::assertFalse($baseline['effective']['storable']);
         self::assertTrue($baseline['effective']['visibilityUnknown']);
         self::assertTrue($baseline['effective']['tagsUnknown']);
@@ -516,9 +517,8 @@ final class AnalyzeCommandTest extends TestCase
     {
         yield 'direct' => ['NoonQuery::multiple', null, '18:00'];
         yield 'invocation' => ['NoonQuery::multipleDynamic', null, null];
-        yield 'nested composition' => ['NoonQuery::multipleComposed', 60, '18:00'];
+        yield 'nested composition' => ['NoonQuery::multipleComposed', null, '18:00'];
         yield 'automatic parent' => ['NoonPage::multipleAutomatic', null, '18:00'];
-        yield 'capped parent' => ['NoonPage::multipleComposed', 30, '18:00'];
     }
 
     /**
@@ -553,7 +553,7 @@ final class AnalyzeCommandTest extends TestCase
     /**
      * @throws JsonException
      */
-    public function testAnalyzePreservesNestedCandidatesAndFiniteProofAcrossDifferentTimezones(): void
+    public function testAnalyzeOutermostClockOverridesInnerClocksAndDurations(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $arguments = ['boundary' => 'NoonQuery::composed', '--path' => ['packages/magix-cache-cli/tests/Fixture/Expiration']];
@@ -563,19 +563,19 @@ final class AnalyzeCommandTest extends TestCase
         self::assertIsArray($data);
         self::assertIsArray($data['strategy']);
         self::assertIsArray($data['strategy']['expirations']);
-        self::assertCount(2, $data['strategy']['expirations']);
+        self::assertCount(1, $data['strategy']['expirations']);
         self::assertIsArray($data['strategy']['steps']);
         self::assertIsArray($data['strategy']['steps'][0]);
         self::assertArrayHasKey('expirations', $data['strategy']['steps'][0]);
         self::assertIsArray($data['effective']);
         self::assertIsArray($data['effective']['ttl']);
-        self::assertSame(60, $data['effective']['ttl']['upperBound']);
+        self::assertNull($data['effective']['ttl']['upperBound']);
         self::assertNull($data['effective']['ttl']['lowerBound']);
         self::assertTrue($data['effective']['ttl']['finite']);
         self::assertSame([], $data['effective']['problems']);
 
         $tester->execute([...$arguments, '--format' => 'mermaid']);
-        self::assertStringContainsString('earliest of (daily 12:00-12:15 Asia/Tokyo; daily 09:00 America/New_York)', $tester->getDisplay());
+        self::assertStringContainsString('expires by daily 12:00-12:15 Asia/Tokyo', $tester->getDisplay());
     }
 
     /**
@@ -584,7 +584,6 @@ final class AnalyzeCommandTest extends TestCase
     public static function providerExpirationPolicies(): iterable
     {
         yield 'auto' => ['automatic', null];
-        yield 'fixed' => ['fixed', 60];
         yield 'bounded' => ['bounded', 30];
         yield 'uncached entry' => ['show', 30];
     }
@@ -699,5 +698,36 @@ final class AnalyzeCommandTest extends TestCase
             yield $format.' all' => [$format, 'all', ['InventoryLookup::get', 'InspectionQuery::offset']];
             yield $format.' none' => [$format, 'none', []];
         }
+    }
+    /**
+     * @return iterable<string, array{string, int}>
+     */
+    public static function providerClockOverrides(): iterable
+    {
+        yield 'single clock' => ['fixed', 60];
+        yield 'multiple clocks' => ['multipleComposed', 30];
+    }
+
+    /**
+     * @throws JsonException
+     */
+    #[DataProvider('providerClockOverrides')]
+    public function testAnalyzeFixedPolicyReplacesDailyExpirationConstraints(string $method, int $ttl): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => 'NoonPage::'.$method, '--path' => ['packages/magix-cache-cli/tests/Fixture/Expiration']];
+        $tester->execute([...$arguments, '--format' => 'json']);
+        $tester->assertCommandIsSuccessful();
+        $data = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
+        self::assertIsArray($data['effective']);
+        self::assertIsArray($data['effective']['ttl']);
+        self::assertSame('known', $data['effective']['ttl']['state']);
+        self::assertSame($ttl, $data['effective']['ttl']['seconds']);
+        self::assertArrayNotHasKey('expirationConstraints', $data['effective']);
+        self::assertIsArray($data['dependencies']);
+        self::assertIsArray($data['dependencies'][0]);
+        self::assertIsArray($data['dependencies'][0]['effective']);
+        self::assertArrayHasKey('expirationConstraints', $data['dependencies'][0]['effective']);
     }
 }

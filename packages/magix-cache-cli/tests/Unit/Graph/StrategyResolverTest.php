@@ -74,7 +74,7 @@ final class StrategyResolverTest extends TestCase
         self::assertTrue($adds);
     }
 
-    public function testResolveMeetsAlternativeContractsAcrossAComposition(): void
+    public function testResolveOutermostOverridePreservesItsAlternatives(): void
     {
         $first = new ClassDeclaration('First', strategy: new StrategyDeclaration('First', ttl: new TtlContract(oneOf: [new TtlContract(30, 30), new TtlContract(600, 900)])));
         $second = new ClassDeclaration('Second', strategy: new StrategyDeclaration('Second', ttl: new TtlContract(oneOf: [new TtlContract(60, 60), new TtlContract(700, 800)])));
@@ -84,9 +84,9 @@ final class StrategyResolverTest extends TestCase
         $effect = (new StrategyResolver(new Catalog([$first, $second, $composed])))->resolve($boundary);
 
         self::assertNotNull($effect);
-        self::assertSame('30/60/600-800s', $effect->ttl->label());
+        self::assertSame('30/600-900s', $effect->ttl->label());
         self::assertSame([], $effect->problems);
-        self::assertTrue($effect->addsConstraint);
+        self::assertTrue($effect->overridesExpiration);
     }
 
     public function testResolveReturnsNullWithoutADeclaredStrategy(): void
@@ -130,7 +130,7 @@ final class StrategyResolverTest extends TestCase
         self::assertInstanceOf(StrategyEffect::class, $effect);
         self::assertSame('Composite::create(min: 45)', $effect->label);
         self::assertSame('45-60s', $effect->ttl->label());
-        self::assertTrue($effect->addsConstraint);
+        self::assertTrue($effect->overridesExpiration);
         self::assertCount(1, $effect->steps);
         self::assertSame('App\Spread', $effect->steps[0]->strategy);
         self::assertSame([], $effect->problems);
@@ -229,7 +229,7 @@ final class StrategyResolverTest extends TestCase
         self::assertSame(TtlEstimateState::Unknown, $effect->ttl->state);
         self::assertSame(45, $effect->ttl->lowerBound);
         self::assertSame(60, $effect->ttl->upperBound);
-        self::assertTrue($effect->addsConstraint);
+        self::assertTrue($effect->overridesExpiration);
         self::assertCount(1, $effect->steps);
         self::assertSame([], $effect->problems);
     }
@@ -281,7 +281,7 @@ final class StrategyResolverTest extends TestCase
         $effect = $resolver->composition($declaration, []);
 
         self::assertSame('30/600-900s', $effect->ttl->label());
-        self::assertTrue($effect->addsConstraint);
+        self::assertTrue($effect->overridesExpiration);
         self::assertSame([], $effect->problems);
     }
 
@@ -586,5 +586,18 @@ final class StrategyResolverTest extends TestCase
             '#[ExpiresAt] on Daily::fetch(): timezone must be an IANA timezone identifier',
         ], $problems);
         self::assertSame([], $step->expirations);
+    }
+    public function testCompositionKnownOuterOverrideReplacesOpaqueInnerExpiration(): void
+    {
+        $known = new ClassDeclaration('Known', strategy: new StrategyDeclaration('Known', ttl: new TtlContract(60, 60)));
+        $resolver = new StrategyResolver(new Catalog([$known]));
+        $outerKnown = $resolver->composition(new StrategyDeclaration('Composition', composed: [new StrategyInstantiation('Known'), new StrategyInstantiation('Missing')]), []);
+        $outerOpaque = $resolver->composition(new StrategyDeclaration('Composition', composed: [new StrategyInstantiation('Missing'), new StrategyInstantiation('Known')]), []);
+
+        self::assertSame(60, $outerKnown->ttl->seconds);
+        self::assertTrue($outerKnown->overridesExpiration);
+        self::assertSame(TtlEstimateState::Unknown, $outerOpaque->ttl->state);
+        self::assertNull($outerOpaque->ttl->upperBound);
+        self::assertNull($outerOpaque->overridesExpiration);
     }
 }

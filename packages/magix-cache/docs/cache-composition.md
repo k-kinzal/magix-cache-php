@@ -6,7 +6,7 @@ This guide explains how `Cached<T>` propagates cache constraints through multi-s
 
 A query result is only as cacheable as the data used to build it. If a page combines a product that expires in 20 seconds with inventory that expires in 60 seconds, caching the page for 60 seconds would allow stale product data to survive too long.
 
-MagixCache keeps the value and its constraints together in `Cached<T>`. Composition merges those constraints with a fixed meet law, so a parent result cannot become less restricted than a dependency.
+MagixCache keeps the value and its constraints together in `Cached<T>`. Composition merges those constraints with a fixed meet law, so composition preserves each dependency's constraints. Explicit parent overrides are applied separately.
 
 ## Transform One Value
 
@@ -183,7 +183,7 @@ Inventory: expires in 60s, Private, tags [inventory]
 Result:    expires in 20s, Private, tags [inventory, products]
 ```
 
-An uncacheable or `NoStore` dependency makes the composed result uncacheable or `NoStore`. A later policy cannot loosen those constraints.
+An uncacheable or `NoStore` dependency makes the composed result uncacheable or `NoStore`. An omitted parent field inherits them; an explicitly configured field replaces its inherited value.
 
 ## Metadata Invariance Across Cache Hits
 
@@ -200,16 +200,17 @@ This is equality of metadata values (`CacheMetadata::equals()`), not PHP object 
 
 ### Why Subtree Replacement Preserves Constraints
 
-Write `M ∧ N` for `M->meet(N)`, and let `C` be the constraints evaluated at a boundary. Its result carries:
+Write `M ∧ N` for `M->meet(N)`, and let `O` apply the explicit overrides evaluated at a boundary. Its result carries:
 
 ```text
-M_boundary = M_child1 ∧ ... ∧ M_childN ∧ C
+M_bubbled = M_child1 ∧ ... ∧ M_childN
+M_boundary = O(M_bubbled)
 restore(store(value, M_boundary)).metadata = M_boundary
 ```
 
-The storage round trip preserves every input to the parent's meet. Replacing one child therefore leaves that parent's result unchanged; applying the same argument up the graph proves the result for any combination of subtree hits. Associativity makes grouping irrelevant, commutativity makes constraint order irrelevant, and idempotence (`M ∧ M = M`) makes repeated shared dependencies harmless. These are laws of metadata composition; the value transforms still follow their declared order and behavior.
+The storage round trip preserves every input to the parent's meet and subsequent overrides. Replacing one child therefore leaves that parent's result unchanged; applying the same argument up the graph proves the result for any combination of subtree hits. Associativity makes grouping irrelevant, commutativity makes dependency constraint order irrelevant, and idempotence (`M ∧ M = M`) makes repeated shared dependencies harmless. These are laws of dependency composition. Explicit overrides are ordered and are not commutative; the same evaluated overrides applied to the same inherited metadata produce the same result. Value transforms follow their declared order and behavior.
 
-An uncacheable, `NoStore`, or already expired dependency cannot be stored along with its ancestors. Other branches may still hit, and their reuse cannot erase that dependency's restrictions. A retained stale result keeps all its original metadata, including the expired deadline, so composing it cannot produce a fresh, storable parent.
+An uncacheable, NoStore or expired dependency prevents storage in ancestors that inherit the corresponding fields. An explicit parent override may replace a field, including an expired deadline. Stale fallback itself keeps the stored metadata; a parent's explicit TTL can cache the composed result anew. A TTL override alone leaves cacheability and visibility unchanged.
 
 ### Time and Source Generations
 
@@ -220,9 +221,9 @@ Recomputing a boundary at a new time can legitimately change its own deadline:
 | At time 105, child expires at 120 | Parent with TTL 10, originally computed at time 100 |
 |---|---|
 | Parent hit | Keeps expiration 110 |
-| Parent miss, child hit | New parent expiration is `min(120, 105 + 10) = 115` |
+| Parent miss, child hit | New parent expiration is `105 + 10 = 115` |
 
-Both results respect the child. They do not have equal expirations because the parent was evaluated at different base times. If the only changed constraints are finite expiration times, each differing by at most `ε`, taking their minimum changes the composed expiration by at most `ε`; depth does not accumulate that error. There is no general error bound when source metadata, selected lifetimes, or strategy decisions change.
+They differ because the parent was evaluated at different base times. With an explicit parent TTL of 60, recomputation would expire at 165 even though the child expires at 120; an automatic parent keeps 120. If the only changed constraints are finite expiration times, each differing by at most `ε`, taking their minimum changes the composed expiration by at most `ε`; depth does not accumulate that error for pure bubbling. There is no general error bound when source metadata, selected lifetimes, or strategy decisions change.
 
 In particular, a hit represents the stored source generation. If an origin would now return different tags, visibility, cacheability, or data, a hit cannot discover those changes without revalidation. Source consistency and invalidation across generations remain application responsibilities. The guarantee is preservation of the constraints of the reused result, not equality with arbitrary future origin executions.
 
@@ -249,7 +250,7 @@ public function execute(int $productId): Cached
 }
 ```
 
-Omitting the TTL retains the composed expiration. Use bare `#[Cache]` when the parent adds no options; the example adds only a page tag. A fixed parent TTL is met with the composed metadata, so the earlier of its own expiration and the composed expiration always wins — a parent can never extend what a dependency imposed.
+Omitting TTL retains the composed expiration. Bare `#[Cache]` inherits all metadata; the example explicitly replaces tags with the page tag. A fixed parent TTL overrides the inherited deadline: child 20s plus parent `ttl: 60` produces a parent lifetime of 60s. `Ttl::FromUpstream` is the explicit choice to inherit with a maximum.
 
 ## Create Source Metadata
 
@@ -285,7 +286,7 @@ $result = Cached::of(
 );
 ```
 
-`CacheMetadata` is immutable and composes only through `meet()`; there are no setters that could relax a constraint.
+`CacheMetadata` is immutable. `meet()` bubbles dependencies. Its `withExpiration()`, `withTags()`, `withVisibility()`, `withCacheability()` and `withReasons()` methods create copies with one field explicitly replaced.
 
 ## Access Wrapped Values
 

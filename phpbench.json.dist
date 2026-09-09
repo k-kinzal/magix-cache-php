@@ -1,0 +1,43 @@
+{
+    "$schema": "./vendor/phpbench/phpbench/phpbench.schema.json",
+    "runner.bootstrap": "vendor/autoload.php",
+    "runner.path": "bench",
+    "runner.warmup": 2,
+    "runner.iterations": 10,
+    "runner.retry_threshold": 5,
+    "runner.php_config": {
+        "memory_limit": "512M",
+        "opcache.enable": "0",
+        "opcache.enable_cli": "0",
+        "xdebug.mode": "off"
+    },
+    "storage.xml_storage_path": "build/phpbench/storage",
+    "console.ansi": false,
+    "report.generators": {
+        "overhead": {
+            "generator": "component",
+            "title": "Magix Cache all-miss overhead per query tree (mode)",
+            "description": "Same origin work; warmed declarations; real in-memory reads and writes. Additional = all-miss - plain. Ratio = all-miss / plain.",
+            "components": [
+                {
+                    "component": "table_aggregate",
+                    "partition": [
+                        "suite_tag",
+                        "benchmark_class",
+                        "variant_name"
+                    ],
+                    "row": {
+                        "workload": "first(partition[\"variant_name\"])",
+                        "plain": "mode(partition[(subject_name = \"benchWithoutMagixCache\" or subject_name = \"benchWithoutMagixCacheLarge\")][\"result_time_avg\"]) as time",
+                        "all_miss": "mode(partition[(subject_name = \"benchMagixCacheAllMiss\" or subject_name = \"benchMagixCacheAllMissLarge\")][\"result_time_avg\"]) as time",
+                        "additional": "(mode(partition[(subject_name = \"benchMagixCacheAllMiss\" or subject_name = \"benchMagixCacheAllMissLarge\")][\"result_time_avg\"]) - mode(partition[(subject_name = \"benchWithoutMagixCache\" or subject_name = \"benchWithoutMagixCacheLarge\")][\"result_time_avg\"])) as time",
+                        "ratio": "format(\"%.2fx\", mode(partition[(subject_name = \"benchMagixCacheAllMiss\" or subject_name = \"benchMagixCacheAllMissLarge\")][\"result_time_avg\"]) / mode(partition[(subject_name = \"benchWithoutMagixCache\" or subject_name = \"benchWithoutMagixCacheLarge\")][\"result_time_avg\"]))"
+                    }
+                }
+            ]
+        }
+    },
+    "runner.php_env": {
+        "XDEBUG_MODE": "off"
+    }
+}

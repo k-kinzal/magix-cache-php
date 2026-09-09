@@ -295,7 +295,7 @@ final class AnalyzeCommandTest extends TestCase
         self::assertSame('unverified-cache-propagation', $baseline['analysisGaps'][0]['kind']);
         self::assertSame([InspectionQuery::class.'::execute', InventoryLookup::class.'::get', ProductQuery::class.'::execute'], $baseline['analysisGaps'][0]['path']);
 
-        $tester->execute([...$arguments, '--show-uncached' => true]);
+        $tester->execute([...$arguments, '--uncached' => 'all']);
         $tester->assertCommandIsSuccessful();
         $expanded = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
         self::assertIsArray($expanded);
@@ -311,7 +311,7 @@ final class AnalyzeCommandTest extends TestCase
         self::assertIsArray($expanded['dependencies'][1]['dependencies']);
         self::assertSame([ProductQuery::class.'::execute'], array_column($expanded['dependencies'][1]['dependencies'], 'boundary'));
 
-        $tester->execute([...$arguments, '--show-uncached' => true, '--ignore' => ['*Lookup', 'ViewerQuery']]);
+        $tester->execute([...$arguments, '--uncached' => 'all', '--ignore' => ['*Lookup', 'ViewerQuery']]);
         $filtered = json_decode($tester->getDisplay(), true, flags: JSON_THROW_ON_ERROR);
         self::assertIsArray($filtered);
         self::assertSame($expanded['effective'], $filtered['effective']);
@@ -320,15 +320,15 @@ final class AnalyzeCommandTest extends TestCase
         self::assertSame([InspectionQuery::class.'::offset'], array_column($filtered['dependencies'], 'boundary'));
     }
 
-    #[DataProvider('providerFormatsAndFlags')]
-    public function testCacheGapsAreVisibleWithoutOrdinaryCallInspection(string $format, bool $showUncached): void
+    #[DataProvider('providerFormatsAndUncachedModes')]
+    public function testCacheGapsRemainVisibleInEveryUncachedMode(string $format, string $uncached): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $tester->execute([
             'boundary' => 'InspectionQuery::execute',
             '--path' => ['packages/magix-cache-cli/tests/Fixture'],
             '--format' => $format,
-            '--show-uncached' => $showUncached,
+            '--uncached' => $uncached,
         ]);
 
         $tester->assertCommandIsSuccessful();
@@ -337,15 +337,15 @@ final class AnalyzeCommandTest extends TestCase
         self::assertStringContainsString('ProductQuery::execute', $tester->getDisplay());
     }
 
-    #[DataProvider('providerFormatsAndFlags')]
-    public function testIgnorePrunesCachedSubtreesIndependentlyOfShowUncached(string $format, bool $showUncached): void
+    #[DataProvider('providerFormatsAndUncachedModes')]
+    public function testIgnorePrunesCachedSubtreesIndependentlyOfUncachedMode(string $format, string $uncached): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $tester->execute([
             'boundary' => 'BubblingPageQuery::explicit',
             '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
             '--format' => $format,
-            '--show-uncached' => $showUncached,
+            '--uncached' => $uncached,
             '--ignore' => ['BubblingPageQuery::execute'],
         ]);
 
@@ -380,7 +380,7 @@ final class AnalyzeCommandTest extends TestCase
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
 
-        $arguments = ['boundary' => 'InspectionQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture'], '--format' => $format, '--show-uncached' => true];
+        $arguments = ['boundary' => 'InspectionQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture'], '--format' => $format, '--uncached' => 'all'];
         $tester->execute($arguments);
         self::assertStringContainsString('InventoryLookup::get (uncached)', $tester->getDisplay());
         self::assertStringContainsString('InspectionQuery::offset (uncached)', $tester->getDisplay());
@@ -394,15 +394,15 @@ final class AnalyzeCommandTest extends TestCase
         self::assertStringContainsString('InspectionQuery::offset (uncached)', $tester->getDisplay());
     }
 
-    #[DataProvider('providerFormatsAndFlags')]
-    public function testIgnoreAlsoAppliesToTheSelectedRoot(string $format, bool $showUncached): void
+    #[DataProvider('providerFormatsAndUncachedModes')]
+    public function testIgnoreAlsoAppliesToTheSelectedRoot(string $format, string $uncached): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $tester->execute([
             'boundary' => 'ProductController::show',
             '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
             '--format' => $format,
-            '--show-uncached' => $showUncached,
+            '--uncached' => $uncached,
             '--ignore' => ['*Controller'],
         ]);
 
@@ -411,13 +411,13 @@ final class AnalyzeCommandTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string, bool}>
+     * @return iterable<string, array{string, string}>
      */
-    public static function providerFormatsAndFlags(): iterable
+    public static function providerFormatsAndUncachedModes(): iterable
     {
         foreach (['tree', 'json', 'mermaid'] as $format) {
-            foreach ([false, true] as $flag) {
-                yield $format.($flag ? ' expanded' : ' default') => [$format, $flag];
+            foreach (['between', 'all', 'none'] as $mode) {
+                yield $format.' '.$mode => [$format, $mode];
             }
         }
     }
@@ -639,7 +639,7 @@ final class AnalyzeCommandTest extends TestCase
     }
 
     #[DataProvider('providerUncachedFormats')]
-    public function testDefaultIsBetweenAndLegacyFlagSelectsAll(string $format): void
+    public function testDefaultIsBetween(string $format): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $arguments = ['boundary' => 'InspectionQuery::execute', '--path' => ['packages/magix-cache-cli/tests/Fixture/Display', 'packages/magix-cache-cli/tests/Fixture/Project'], '--format' => $format];
@@ -647,13 +647,6 @@ final class AnalyzeCommandTest extends TestCase
         $default = $tester->getDisplay();
         $tester->execute([...$arguments, '--uncached' => 'between']);
         self::assertSame($default, $tester->getDisplay());
-
-        $tester->execute([...$arguments, '--uncached' => 'all']);
-        $all = $tester->getDisplay();
-        $tester->execute([...$arguments, '--show-uncached' => true]);
-        self::assertSame($all, $tester->getDisplay());
-        $tester->execute([...$arguments, '--show-uncached' => true, '--uncached' => 'none']);
-        self::assertSame($all, $tester->getDisplay());
     }
 
     #[DataProvider('providerUncachedFormats')]

@@ -53,7 +53,6 @@ final readonly class AnalyzeCommand
      *
      * @param array<array-key, mixed> $path
      * @param array<array-key, mixed> $ignore
-     * @param bool $showUncached Legacy alias selecting all ordinary calls, taking precedence over $uncached.
      * @param UncachedMode $uncached Show all ordinary calls, only those between cache boundaries (default), or none; the selected root and diagnostics remain visible.
      * @throws JsonException when the tree cannot be encoded as JSON
      */
@@ -67,8 +66,6 @@ final readonly class AnalyzeCommand
         string $format = 'tree',
         #[Option(description: 'Maximum dependency depth to expand')]
         int $depth = 8,
-        #[Option(description: 'Alias for --uncached=all; takes precedence over --uncached', name: 'show-uncached')]
-        bool $showUncached = false,
         #[Option(description: 'Hide matching class or Class::method subtrees (* and ? wildcards), repeatable')]
         array $ignore = [],
         #[Option(description: 'Ordinary method rows: between (cache boundaries), all, or none; retains the selected root and diagnostics')]
@@ -87,7 +84,7 @@ final readonly class AnalyzeCommand
         $tree = new CacheTree($catalog);
         $filter = new TreeFilter(
             array_values(array_map(static fn (string $pattern): IgnorePattern => new IgnorePattern($pattern), array_filter($ignore, is_string(...)))),
-            $showUncached ? UncachedMode::All : $uncached,
+            $uncached,
         );
         $nodes = array_values(array_filter(array_map(
             static fn (BoundaryDeclaration $found): ?CacheNode => $filter->apply($tree->build($found, $depth, includeUncached: true)),

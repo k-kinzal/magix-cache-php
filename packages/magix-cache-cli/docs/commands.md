@@ -137,7 +137,6 @@ The root's `key` and `policy` are `none (uncached entry point)` and `storable` i
 | `--format` | `tree` | `tree`, `json`, or `mermaid` |
 | `--depth` | `8` | Maximum dependency depth to expand |
 | `--uncached` | `between` | Ordinary method rows: `between` cache boundaries, `all`, or `none` |
-| `--show-uncached` | off | Compatibility alias for `--uncached=all`; takes precedence over `--uncached` |
 | `--ignore` | none | Hide matching class or `Class::method` subtrees; repeatable and independent of `--uncached` |
 
 ### Inspecting ordinary calls and hiding subtrees

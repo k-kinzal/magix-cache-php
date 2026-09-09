@@ -91,8 +91,7 @@ detach its metadata with `value()`; the call graph does not prove either. The
 report keeps the parent's TTL, visibility, and tags uncertain while preserving
 proven constraints. The default `--uncached=between` shows the intermediate
 methods; `all` also shows wholly uncached branches, and `none` omits ordinary
-rows while keeping cached descendants and gap diagnostics. `--show-uncached`
-remains an alias for `--uncached=all`.
+rows while keeping cached descendants and gap diagnostics.
 JSON exposes these paths in `analysisGaps`. See [analysis gaps](docs/commands.md#cache-propagation-gaps)
 for the distinction from ordinary uncached calls and invalid declarations.
 

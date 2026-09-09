@@ -82,8 +82,8 @@
 <span class="src-line" id="L44" data-diff="same"><a class="ln" href="#L44">44</a>        <span class="tok-kw">private</span> <span class="tok-id">GuardedCache</span> <span class="tok-var">$cache</span>,</span>
 <span class="src-line" id="L45" data-diff="same"><a class="ln" href="#L45">45</a>        <span class="tok-kw">private</span> ?<span class="tok-id">BackendErrorClassifier</span> <span class="tok-var">$classifier</span>,</span>
 <span class="src-line" id="L46" data-diff="same"><a class="ln" href="#L46">46</a>        <span class="tok-kw">private</span> <span class="tok-id">Closure</span> <span class="tok-var">$origin</span>,</span>
-<span class="src-line" id="L47" data-diff="same"><a class="ln" href="#L47">47</a>        <span class="tok-kw">private</span> ?<span class="tok-id">CacheObserver</span> <span class="tok-var">$observer</span> = <span class="tok-id">null</span>,</span>
-<span class="src-line" id="L48" data-diff="added"><a class="ln" href="#L48">48</a>        <span class="tok-kw">private</span> ?<span class="tok-id">CachePolicy</span> <span class="tok-var">$policy</span> = <span class="tok-id">null</span>,</span>
+<span class="src-line" id="L47" data-diff="added"><a class="ln" href="#L47">47</a>        <span class="tok-kw">private</span> <span class="tok-id">CachePolicy</span> <span class="tok-var">$policy</span>,</span>
+<span class="src-line" id="L48" data-diff="same"><a class="ln" href="#L48">48</a>        <span class="tok-kw">private</span> ?<span class="tok-id">CacheObserver</span> <span class="tok-var">$observer</span> = <span class="tok-id">null</span>,</span>
 <span class="src-line" id="L49" data-diff="added"><a class="ln" href="#L49">49</a>        <span class="tok-kw">private</span> ?<span class="tok-id">CacheTtlResolver</span> <span class="tok-var">$ttlResolver</span> = <span class="tok-id">null</span>,</span>
 <span class="src-line" id="L50" data-diff="added"><a class="ln" href="#L50">50</a>        <span class="tok-kw">private</span> ?<span class="tok-id">int</span> <span class="tok-var">$parameterTtl</span> = <span class="tok-id">null</span>,</span>
 <span class="src-line" id="L51" data-diff="same"><a class="ln" href="#L51">51</a>    ) {</span>
@@ -122,35 +122,33 @@
 <span class="src-line" data-diff="removed"><span class="ln">78</span>        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">OriginResult</span>(<span class="tok-var">$result</span>, <span class="tok-var">$operation</span>-&gt;<span class="tok-id">now</span>());</span>
 <span class="src-line" id="L84" data-diff="added"><a class="ln" href="#L84">84</a>        <span class="tok-var">$baseTime</span> = <span class="tok-var">$operation</span>-&gt;<span class="tok-id">now</span>();</span>
 <span class="src-line" id="L85" data-diff="added"><a class="ln" href="#L85">85</a></span>
-<span class="src-line" id="L86" data-diff="added"><a class="ln" href="#L86">86</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">policy</span> !== <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L87" data-diff="added"><a class="ln" href="#L87">87</a>            <span class="tok-var">$metadata</span> = (<span class="tok-kw">new</span> <span class="tok-id">OriginOverrides</span>())-&gt;<span class="tok-id">apply</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">policy</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">ttlResolver</span>, <span class="tok-var">$result</span>, <span class="tok-var">$operation</span>-&gt;<span class="tok-id">key</span>(), <span class="tok-var">$baseTime</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">parameterTtl</span>);</span>
-<span class="src-line" id="L88" data-diff="added"><a class="ln" href="#L88">88</a>            <span class="tok-var">$result</span> = <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(<span class="tok-var">$result</span>-&gt;<span class="tok-id">value</span>(), <span class="tok-var">$metadata</span>);</span>
-<span class="src-line" id="L89" data-diff="added"><a class="ln" href="#L89">89</a>        }</span>
-<span class="src-line" id="L90" data-diff="added"><a class="ln" href="#L90">90</a></span>
-<span class="src-line" id="L91" data-diff="added"><a class="ln" href="#L91">91</a>        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">OriginResult</span>(<span class="tok-var">$result</span>, <span class="tok-var">$baseTime</span>);</span>
-<span class="src-line" id="L92" data-diff="same"><a class="ln" href="#L92">92</a>    }</span>
-<span class="src-line" id="L93" data-diff="same"><a class="ln" href="#L93">93</a></span>
-<span class="src-line" id="L94" data-diff="same"><a class="ln" href="#L94">94</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L95" data-diff="same"><a class="ln" href="#L95">95</a><span class="tok-com">     * Rechecks storage eligibility and writes the explicit retention request.</span></span>
-<span class="src-line" id="L96" data-diff="same"><a class="ln" href="#L96">96</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L97" data-diff="same"><a class="ln" href="#L97">97</a><span class="tok-com">     * @param CacheWrite&lt;mixed&gt; $request</span></span>
-<span class="src-line" id="L98" data-diff="same"><a class="ln" href="#L98">98</a><span class="tok-com">     * @throws RuntimeException when the write fails and is not bypassed</span></span>
-<span class="src-line" id="L99" data-diff="same"><a class="ln" href="#L99">99</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L100" data-diff="same"><a class="ln" href="#L100">100</a>    #[<span class="tok-id">Override</span>]</span>
-<span class="src-line" id="L101" data-diff="same"><a class="ln" href="#L101">101</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">set</span>(<span class="tok-id">CacheOperation</span> <span class="tok-var">$operation</span>, <span class="tok-id">CacheWrite</span> <span class="tok-var">$request</span>, <span class="tok-id">NextCacheStrategy</span> <span class="tok-var">$next</span>): <span class="tok-id">void</span></span>
-<span class="src-line" id="L102" data-diff="same"><a class="ln" href="#L102">102</a>    {</span>
-<span class="src-line" id="L103" data-diff="same"><a class="ln" href="#L103">103</a>        <span class="tok-var">$entry</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">converter</span>-&gt;<span class="tok-id">toEntry</span>(<span class="tok-var">$request</span>-&gt;<span class="tok-id">cached</span>, <span class="tok-var">$operation</span>-&gt;<span class="tok-id">now</span>(), <span class="tok-var">$request</span>-&gt;<span class="tok-id">retainedUntil</span>);</span>
-<span class="src-line" id="L104" data-diff="same"><a class="ln" href="#L104">104</a></span>
-<span class="src-line" id="L105" data-diff="same"><a class="ln" href="#L105">105</a>        <span class="tok-kw">if</span> (<span class="tok-var">$entry</span> === <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L106" data-diff="same"><a class="ln" href="#L106">106</a>            <span class="tok-var">$this</span>-&gt;<span class="tok-id">observer</span>?-&gt;<span class="tok-id">observe</span>(<span class="tok-id">CacheEvent</span>::<span class="tok-id">StoreSkipped</span>, <span class="tok-var">$operation</span>-&gt;<span class="tok-id">key</span>());</span>
-<span class="src-line" id="L107" data-diff="same"><a class="ln" href="#L107">107</a></span>
-<span class="src-line" id="L108" data-diff="same"><a class="ln" href="#L108">108</a>            <span class="tok-kw">return</span>;</span>
-<span class="src-line" id="L109" data-diff="same"><a class="ln" href="#L109">109</a>        }</span>
-<span class="src-line" id="L110" data-diff="same"><a class="ln" href="#L110">110</a></span>
-<span class="src-line" id="L111" data-diff="same"><a class="ln" href="#L111">111</a>        <span class="tok-var">$this</span>-&gt;<span class="tok-id">cache</span>-&gt;<span class="tok-id">write</span>(<span class="tok-var">$operation</span>-&gt;<span class="tok-id">key</span>(), <span class="tok-var">$entry</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">classifier</span>);</span>
-<span class="src-line" id="L112" data-diff="same"><a class="ln" href="#L112">112</a>    }</span>
-<span class="src-line" id="L113" data-diff="same"><a class="ln" href="#L113">113</a>}</span>
-<span class="src-line" id="L114" data-diff="same"><a class="ln" href="#L114">114</a></span>
+<span class="src-line" id="L86" data-diff="added"><a class="ln" href="#L86">86</a>        <span class="tok-var">$metadata</span> = (<span class="tok-kw">new</span> <span class="tok-id">OriginOverrides</span>())-&gt;<span class="tok-id">apply</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">policy</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">ttlResolver</span>, <span class="tok-var">$result</span>, <span class="tok-var">$operation</span>-&gt;<span class="tok-id">key</span>(), <span class="tok-var">$baseTime</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">parameterTtl</span>);</span>
+<span class="src-line" id="L87" data-diff="added"><a class="ln" href="#L87">87</a>        <span class="tok-var">$result</span> = <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(<span class="tok-var">$result</span>-&gt;<span class="tok-id">value</span>(), <span class="tok-var">$metadata</span>);</span>
+<span class="src-line" id="L88" data-diff="added"><a class="ln" href="#L88">88</a></span>
+<span class="src-line" id="L89" data-diff="added"><a class="ln" href="#L89">89</a>        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">OriginResult</span>(<span class="tok-var">$result</span>, <span class="tok-var">$baseTime</span>);</span>
+<span class="src-line" id="L90" data-diff="same"><a class="ln" href="#L90">90</a>    }</span>
+<span class="src-line" id="L91" data-diff="same"><a class="ln" href="#L91">91</a></span>
+<span class="src-line" id="L92" data-diff="same"><a class="ln" href="#L92">92</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L93" data-diff="same"><a class="ln" href="#L93">93</a><span class="tok-com">     * Rechecks storage eligibility and writes the explicit retention request.</span></span>
+<span class="src-line" id="L94" data-diff="same"><a class="ln" href="#L94">94</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L95" data-diff="same"><a class="ln" href="#L95">95</a><span class="tok-com">     * @param CacheWrite&lt;mixed&gt; $request</span></span>
+<span class="src-line" id="L96" data-diff="same"><a class="ln" href="#L96">96</a><span class="tok-com">     * @throws RuntimeException when the write fails and is not bypassed</span></span>
+<span class="src-line" id="L97" data-diff="same"><a class="ln" href="#L97">97</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L98" data-diff="same"><a class="ln" href="#L98">98</a>    #[<span class="tok-id">Override</span>]</span>
+<span class="src-line" id="L99" data-diff="same"><a class="ln" href="#L99">99</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">set</span>(<span class="tok-id">CacheOperation</span> <span class="tok-var">$operation</span>, <span class="tok-id">CacheWrite</span> <span class="tok-var">$request</span>, <span class="tok-id">NextCacheStrategy</span> <span class="tok-var">$next</span>): <span class="tok-id">void</span></span>
+<span class="src-line" id="L100" data-diff="same"><a class="ln" href="#L100">100</a>    {</span>
+<span class="src-line" id="L101" data-diff="same"><a class="ln" href="#L101">101</a>        <span class="tok-var">$entry</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">converter</span>-&gt;<span class="tok-id">toEntry</span>(<span class="tok-var">$request</span>-&gt;<span class="tok-id">cached</span>, <span class="tok-var">$operation</span>-&gt;<span class="tok-id">now</span>(), <span class="tok-var">$request</span>-&gt;<span class="tok-id">retainedUntil</span>);</span>
+<span class="src-line" id="L102" data-diff="same"><a class="ln" href="#L102">102</a></span>
+<span class="src-line" id="L103" data-diff="same"><a class="ln" href="#L103">103</a>        <span class="tok-kw">if</span> (<span class="tok-var">$entry</span> === <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L104" data-diff="same"><a class="ln" href="#L104">104</a>            <span class="tok-var">$this</span>-&gt;<span class="tok-id">observer</span>?-&gt;<span class="tok-id">observe</span>(<span class="tok-id">CacheEvent</span>::<span class="tok-id">StoreSkipped</span>, <span class="tok-var">$operation</span>-&gt;<span class="tok-id">key</span>());</span>
+<span class="src-line" id="L105" data-diff="same"><a class="ln" href="#L105">105</a></span>
+<span class="src-line" id="L106" data-diff="same"><a class="ln" href="#L106">106</a>            <span class="tok-kw">return</span>;</span>
+<span class="src-line" id="L107" data-diff="same"><a class="ln" href="#L107">107</a>        }</span>
+<span class="src-line" id="L108" data-diff="same"><a class="ln" href="#L108">108</a></span>
+<span class="src-line" id="L109" data-diff="same"><a class="ln" href="#L109">109</a>        <span class="tok-var">$this</span>-&gt;<span class="tok-id">cache</span>-&gt;<span class="tok-id">write</span>(<span class="tok-var">$operation</span>-&gt;<span class="tok-id">key</span>(), <span class="tok-var">$entry</span>, <span class="tok-var">$this</span>-&gt;<span class="tok-id">classifier</span>);</span>
+<span class="src-line" id="L110" data-diff="same"><a class="ln" href="#L110">110</a>    }</span>
+<span class="src-line" id="L111" data-diff="same"><a class="ln" href="#L111">111</a>}</span>
+<span class="src-line" id="L112" data-diff="same"><a class="ln" href="#L112">112</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

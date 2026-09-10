@@ -73,9 +73,9 @@ $page = $product
 
 The mapping closure receives the unwrapped values. Its return value is wrapped in a new `Cached` carrying the met metadata of every input.
 
-## Combine Three to Five Values
+## Combine Three to Ten Values
 
-The same API is available for three, four, or five dependencies:
+The same API is available for three through ten dependencies:
 
 ```php
 $viewModel = $product
@@ -93,9 +93,9 @@ $viewModel = $product
     );
 ```
 
-Use `combine4()` and `combine5()` for four and five values respectively. Each method returns a typed capability whose `map()` closure receives the values in the same order.
+`combine4()` through `combine10()` follow the same shape for four to ten values. Each method returns a typed capability whose `map()` closure receives the values in the same order, so the arity and the type of every input are checked statically.
 
-For more than five inputs of different types, compose intermediate domain values and combine those results in another step. For a variable number of results, use `sequence()` or `traverse()` below.
+For more than ten inputs of different types, compose intermediate domain values and combine those results in another step. For a variable number of results, use `sequence()` or `traverse()` below.
 
 ## Flatten a Nested Cached Value
 

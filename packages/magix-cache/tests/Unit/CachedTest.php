@@ -8,10 +8,15 @@ use function array_diff;
 
 use Generator;
 use Magix\Cache\Cached;
+use Magix\Cache\Composition\Capability10;
 use Magix\Cache\Composition\Capability2;
 use Magix\Cache\Composition\Capability3;
 use Magix\Cache\Composition\Capability4;
 use Magix\Cache\Composition\Capability5;
+use Magix\Cache\Composition\Capability6;
+use Magix\Cache\Composition\Capability7;
+use Magix\Cache\Composition\Capability8;
+use Magix\Cache\Composition\Capability9;
 use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -27,6 +32,11 @@ use Tests\Fixture\KeyDto;
 #[UsesClass(Capability3::class)]
 #[UsesClass(Capability4::class)]
 #[UsesClass(Capability5::class)]
+#[UsesClass(Capability6::class)]
+#[UsesClass(Capability7::class)]
+#[UsesClass(Capability8::class)]
+#[UsesClass(Capability9::class)]
+#[UsesClass(Capability10::class)]
 final class CachedTest extends TestCase
 {
     public function testOfUsesTopMetadataByDefault(): void
@@ -162,6 +172,146 @@ final class CachedTest extends TestCase
             );
 
         self::assertSame([1, 'two', true, 4.0, null], $result->value());
+    }
+
+    public function testCombine6CreatesCapability6(): void
+    {
+        $result = Cached::of(1)
+            ->combine6(
+                Cached::of('two'),
+                Cached::of(true),
+                Cached::of(4.0),
+                Cached::of(null),
+                Cached::of(6),
+            )
+            ->map(
+                static fn (int $first, string $second, bool $third, float $fourth, null $fifth, int $sixth): array => [
+                    $first,
+                    $second,
+                    $third,
+                    $fourth,
+                    $fifth,
+                    $sixth,
+                ],
+            );
+
+        self::assertSame([1, 'two', true, 4.0, null, 6], $result->value());
+    }
+
+    public function testCombine7CreatesCapability7(): void
+    {
+        $result = Cached::of(1)
+            ->combine7(
+                Cached::of('two'),
+                Cached::of(true),
+                Cached::of(4.0),
+                Cached::of(null),
+                Cached::of(6),
+                Cached::of('seven'),
+            )
+            ->map(
+                static fn (int $first, string $second, bool $third, float $fourth, null $fifth, int $sixth, string $seventh): array => [
+                    $first,
+                    $second,
+                    $third,
+                    $fourth,
+                    $fifth,
+                    $sixth,
+                    $seventh,
+                ],
+            );
+
+        self::assertSame([1, 'two', true, 4.0, null, 6, 'seven'], $result->value());
+    }
+
+    public function testCombine8CreatesCapability8(): void
+    {
+        $result = Cached::of(1)
+            ->combine8(
+                Cached::of('two'),
+                Cached::of(true),
+                Cached::of(4.0),
+                Cached::of(null),
+                Cached::of(6),
+                Cached::of('seven'),
+                Cached::of(false),
+            )
+            ->map(
+                static fn (int $first, string $second, bool $third, float $fourth, null $fifth, int $sixth, string $seventh, bool $eighth): array => [
+                    $first,
+                    $second,
+                    $third,
+                    $fourth,
+                    $fifth,
+                    $sixth,
+                    $seventh,
+                    $eighth,
+                ],
+            );
+
+        self::assertSame([1, 'two', true, 4.0, null, 6, 'seven', false], $result->value());
+    }
+
+    public function testCombine9CreatesCapability9(): void
+    {
+        $result = Cached::of(1)
+            ->combine9(
+                Cached::of('two'),
+                Cached::of(true),
+                Cached::of(4.0),
+                Cached::of(null),
+                Cached::of(6),
+                Cached::of('seven'),
+                Cached::of(false),
+                Cached::of(9.0),
+            )
+            ->map(
+                static fn (int $first, string $second, bool $third, float $fourth, null $fifth, int $sixth, string $seventh, bool $eighth, float $ninth): array => [
+                    $first,
+                    $second,
+                    $third,
+                    $fourth,
+                    $fifth,
+                    $sixth,
+                    $seventh,
+                    $eighth,
+                    $ninth,
+                ],
+            );
+
+        self::assertSame([1, 'two', true, 4.0, null, 6, 'seven', false, 9.0], $result->value());
+    }
+
+    public function testCombine10CreatesCapability10(): void
+    {
+        $result = Cached::of(1)
+            ->combine10(
+                Cached::of('two'),
+                Cached::of(true),
+                Cached::of(4.0),
+                Cached::of(null),
+                Cached::of(6),
+                Cached::of('seven'),
+                Cached::of(false),
+                Cached::of(9.0),
+                Cached::of(null),
+            )
+            ->map(
+                static fn (int $first, string $second, bool $third, float $fourth, null $fifth, int $sixth, string $seventh, bool $eighth, float $ninth, null $tenth): array => [
+                    $first,
+                    $second,
+                    $third,
+                    $fourth,
+                    $fifth,
+                    $sixth,
+                    $seventh,
+                    $eighth,
+                    $ninth,
+                    $tenth,
+                ],
+            );
+
+        self::assertSame([1, 'two', true, 4.0, null, 6, 'seven', false, 9.0, null], $result->value());
     }
 
     public function testValueSupportsExplicitObjectAndStringAccess(): void

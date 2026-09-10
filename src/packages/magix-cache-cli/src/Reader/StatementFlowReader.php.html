@@ -79,7 +79,7 @@
 <span class="src-line" id="L43"><a class="ln" href="#L43">43</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">read</span>(<span class="tok-kw">array</span> <span class="tok-var">$statements</span>, <span class="tok-kw">array</span> <span class="tok-var">$variables</span> = [], <span class="tok-id">int</span> <span class="tok-var">$budget</span> = <span class="tok-num">24</span>): <span class="tok-id">MetadataFlow</span></span>
 <span class="src-line" id="L44"><a class="ln" href="#L44">44</a>    {</span>
 <span class="src-line" id="L45"><a class="ln" href="#L45">45</a>        <span class="tok-kw">if</span> (<span class="tok-var">$budget</span> &lt; <span class="tok-num">1</span>) {</span>
-<span class="src-line" id="L46"><a class="ln" href="#L46">46</a>            <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">MetadataFlow</span>(<span class="tok-str">&#039;unknown&#039;</span>);</span>
+<span class="src-line" id="L46"><a class="ln" href="#L46">46</a>            <span class="tok-kw">return</span> <span class="tok-id">MetadataFlow</span>::<span class="tok-id">unknown</span>(<span class="tok-str">&#039;control-flow-limit&#039;</span>, (<span class="tok-var">$statements</span>[<span class="tok-num">0</span>] ?? <span class="tok-id">null</span>)?-&gt;<span class="tok-id">getStartLine</span>() ?? <span class="tok-num">0</span>);</span>
 <span class="src-line" id="L47"><a class="ln" href="#L47">47</a>        }</span>
 <span class="src-line" id="L48"><a class="ln" href="#L48">48</a></span>
 <span class="src-line" id="L49"><a class="ln" href="#L49">49</a>        <span class="tok-kw">foreach</span> (<span class="tok-var">$statements</span> <span class="tok-kw">as</span> <span class="tok-var">$position</span> =&gt; <span class="tok-var">$statement</span>) {</span>
@@ -88,7 +88,7 @@
 <span class="src-line" id="L52"><a class="ln" href="#L52">52</a>            }</span>
 <span class="src-line" id="L53"><a class="ln" href="#L53">53</a></span>
 <span class="src-line" id="L54"><a class="ln" href="#L54">54</a>            <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">variables</span>-&gt;<span class="tok-id">aliases</span>(<span class="tok-var">$statement</span>)) {</span>
-<span class="src-line" id="L55"><a class="ln" href="#L55">55</a>                <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">MetadataFlow</span>(<span class="tok-str">&#039;unknown&#039;</span>);</span>
+<span class="src-line" id="L55"><a class="ln" href="#L55">55</a>                <span class="tok-kw">return</span> <span class="tok-id">MetadataFlow</span>::<span class="tok-id">unknown</span>(<span class="tok-str">&#039;aliased-binding&#039;</span>, <span class="tok-var">$statement</span>-&gt;<span class="tok-id">getStartLine</span>());</span>
 <span class="src-line" id="L56"><a class="ln" href="#L56">56</a>            }</span>
 <span class="src-line" id="L57"><a class="ln" href="#L57">57</a></span>
 <span class="src-line" id="L58"><a class="ln" href="#L58">58</a>            <span class="tok-kw">if</span> (<span class="tok-var">$statement</span> <span class="tok-kw">instanceof</span> <span class="tok-id">Stmt\Expression</span>) {</span>
@@ -157,7 +157,7 @@
 <span class="src-line" id="L121"><a class="ln" href="#L121">121</a>        <span class="tok-var">$branches</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">branches</span>(<span class="tok-var">$statement</span>);</span>
 <span class="src-line" id="L122"><a class="ln" href="#L122">122</a></span>
 <span class="src-line" id="L123"><a class="ln" href="#L123">123</a>        <span class="tok-kw">if</span> (<span class="tok-var">$branches</span> === <span class="tok-id">null</span> || <span class="tok-var">$this</span>-&gt;<span class="tok-id">conditionWrites</span>(<span class="tok-var">$statement</span>)) {</span>
-<span class="src-line" id="L124"><a class="ln" href="#L124">124</a>            <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">MetadataFlow</span>(<span class="tok-str">&#039;unknown&#039;</span>);</span>
+<span class="src-line" id="L124"><a class="ln" href="#L124">124</a>            <span class="tok-kw">return</span> <span class="tok-id">MetadataFlow</span>::<span class="tok-id">unknown</span>(<span class="tok-str">&#039;unsupported-control-flow&#039;</span>, <span class="tok-var">$statement</span>-&gt;<span class="tok-id">getStartLine</span>());</span>
 <span class="src-line" id="L125"><a class="ln" href="#L125">125</a>        }</span>
 <span class="src-line" id="L126"><a class="ln" href="#L126">126</a></span>
 <span class="src-line" id="L127"><a class="ln" href="#L127">127</a>        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-id">MetadataFlow</span>(<span class="tok-str">&#039;choice&#039;</span>, <span class="tok-id">array_map</span>(</span>

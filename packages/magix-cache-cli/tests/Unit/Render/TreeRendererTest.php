@@ -18,6 +18,7 @@ use Magix\Cache\Cli\Render\TreeRenderer;
 use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
@@ -42,6 +43,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
+#[Medium]
 final class TreeRendererTest extends TestCase
 {
     public function testRestrictedHighlightsLocalCapsAndKeepsUnrestrictedFields(): void

@@ -9,6 +9,7 @@ use function json_encode;
 
 use JsonException;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
+use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Graph\CacheGap;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\StrategyEffect;
@@ -54,15 +55,7 @@ final readonly class JsonRenderer
             'kind' => $boundary->isCacheBoundary ? 'boundary' : ($root ? 'entry-point' : 'uncached'),
             'file' => $boundary->file,
             'line' => $boundary->line,
-            'policy' => $policy === null ? null : [
-                'source' => $policy->source->name,
-                'ttl' => $policy->ttlLabel(),
-                'maxTtl' => $policy->maxTtl,
-                'tags' => $policy->tags,
-                'visibility' => $policy->visibility === null ? null : strtolower($policy->visibility->name),
-                'version' => $policy->version,
-                'runtime' => $policy->runtime,
-            ],
+            'policy' => $policy === null ? null : $this->policy($policy),
             'key' => !$boundary->isCacheBoundary ? null : array_map(
                 static fn ($parameter): array => [
                     'name' => $parameter->name,
@@ -91,6 +84,28 @@ final readonly class JsonRenderer
             'analysisWarnings' => $node->analysisWarnings,
             'analysisGaps' => array_map($this->gap(...), $node->gaps),
             'dependencies' => array_map(fn (CacheNode $child): array => $this->tree($child, false), $node->children),
+        ];
+    }
+
+    /**
+     * Returns one declared policy as plain data.
+     *
+     * A field the source declared but the reader could not resolve is null
+     * with its own flag, never the value the runtime would have defaulted to.
+     *
+     * @return array<string, mixed>
+     */
+    public function policy(PolicyDeclaration $policy): array
+    {
+        return [
+            'source' => $policy->source->name,
+            'ttl' => $policy->ttlLabel(),
+            'maxTtl' => $policy->maxTtl,
+            'maxTtlUnknown' => $policy->maxTtlUnknown,
+            'tags' => $policy->tags,
+            'visibility' => $policy->visibility === null ? null : strtolower($policy->visibility->name),
+            'version' => $policy->versionUnknown ? null : $policy->version,
+            'runtime' => $policy->runtimeUnknown ? null : $policy->runtime,
         ];
     }
 

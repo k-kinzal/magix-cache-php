@@ -116,4 +116,18 @@ final class ExpressionFlowReaderTest extends TestCase
         self::assertTrue($node->effect->tagsUnknown);
     }
 
+    public function testTypesResolveAReceiverAtThePositionTheCallIsWritten(): void
+    {
+        $node = AnalysisSource::node('$q = $this->inputs; $first = $q->a(); $q = $this->other; return $first;');
+
+        self::assertSame('20s', $node->effect->ttl->label());
+    }
+
+    public function testContentsReadsTheValueACachedIsBuiltAround(): void
+    {
+        $node = AnalysisSource::node('$box = Cached::of($this->inputs->a()); return $box->value();');
+
+        self::assertSame('20s', $node->effect->ttl->label());
+        self::assertSame(['a'], $node->effect->tags);
+    }
 }

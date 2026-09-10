@@ -10,12 +10,17 @@ namespace Magix\Cache\Cli\Declaration;
 final readonly class MetadataFlow
 {
     /**
-     * @param 'none'|'unknown'|'call'|'meet'|'choice'|'value'|'wrap'|'preserve' $kind
+     * @param 'none'|'unknown'|'call'|'meet'|'choice'|'value'|'wrap'|'preserve'|'collection' $kind
      * @param list<self> $inputs
      * @param string|null $target A fully qualified method identifier for a call.
+     * @param self|null $payload The value inside this Cached, when it is known.
      */
-    public function __construct(public string $kind, public array $inputs = [], public ?string $target = null)
-    {
+    public function __construct(
+        public string $kind,
+        public array $inputs = [],
+        public ?string $target = null,
+        public ?self $payload = null,
+    ) {
     }
 
     /**
@@ -27,7 +32,7 @@ final readonly class MetadataFlow
             return true;
         }
 
-        foreach ($this->inputs as $input) {
+        foreach ([...$this->inputs, ...($this->payload === null ? [] : [$this->payload])] as $input) {
             if ($input->hasUnknown()) {
                 return true;
             }
@@ -45,7 +50,7 @@ final readonly class MetadataFlow
             return true;
         }
 
-        foreach ($this->inputs as $input) {
+        foreach ([...$this->inputs, ...($this->payload === null ? [] : [$this->payload])] as $input) {
             if ($input->references($target)) {
                 return true;
             }

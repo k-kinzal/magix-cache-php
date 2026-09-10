@@ -240,6 +240,6 @@ final readonly class TreeRenderer
             $key .= ' (ignored: '.implode(', ', $ignored).')';
         }
 
-        return $key.'  version '.($boundary->policy->version ?? '1');
+        return $key.'  version '.($boundary->policy?->versionLabel() ?? '1');
     }
 }

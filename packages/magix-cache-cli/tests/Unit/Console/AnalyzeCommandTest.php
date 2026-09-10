@@ -11,6 +11,7 @@ use Magix\Cache\Cli\Console\CatalogLoader;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,7 @@ use Tests\Package\Cli\Fixture\Project\ViewerQuery;
 #[UsesClass(\Magix\Cache\Strategy\Contract\ConstructorArg::class)]
 #[UsesClass(\Magix\Cache\Strategy\Contract\Ttl::class)]
 #[UsesClass(\Magix\Cache\Strategy\Contract\TtlRange::class)]
+#[Medium]
 final class AnalyzeCommandTest extends TestCase
 {
     public function testAnalyzeShowsBubbledMetadataWithoutAutomaticTtlDeclarations(): void

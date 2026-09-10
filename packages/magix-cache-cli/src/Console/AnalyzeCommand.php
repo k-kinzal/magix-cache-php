@@ -48,8 +48,9 @@ final readonly class AnalyzeCommand
     /**
      * Renders the cache tree of the referenced boundary.
      *
-     * Uncached display modes and ignore patterns filter the complete tree
-     * after all effective constraints and propagation gaps are calculated.
+     * Analysis covers the whole reachable graph, bounded only by recursion.
+     * Display depth, uncached modes and ignore patterns filter the finished
+     * tree afterwards, so printing less never changes what was analyzed.
      *
      * @param array<array-key, mixed> $path
      * @param array<array-key, mixed> $ignore
@@ -64,7 +65,7 @@ final readonly class AnalyzeCommand
         array $path = [],
         #[Option(description: 'Output format: tree, json or mermaid')]
         string $format = 'tree',
-        #[Option(description: 'Maximum dependency depth to expand')]
+        #[Option(description: 'Maximum dependency depth to print; analysis always covers the whole graph')]
         int $depth = 8,
         #[Option(description: 'Hide matching class or Class::method subtrees (* and ? wildcards), repeatable')]
         array $ignore = [],
@@ -85,9 +86,10 @@ final readonly class AnalyzeCommand
         $filter = new TreeFilter(
             array_values(array_map(static fn (string $pattern): IgnorePattern => new IgnorePattern($pattern), array_filter($ignore, is_string(...)))),
             $uncached,
+            $depth,
         );
         $nodes = array_values(array_filter(array_map(
-            static fn (BoundaryDeclaration $found): ?CacheNode => $filter->apply($tree->build($found, $depth, includeUncached: true)),
+            static fn (BoundaryDeclaration $found): ?CacheNode => $filter->apply($tree->build($found, includeUncached: true)),
             $matches,
         ), static fn (?CacheNode $node): bool => $node !== null));
 

@@ -7,9 +7,11 @@ namespace Magix\Cache\Cli\Reader;
 use function array_map;
 use function count;
 use function in_array;
+use function is_bool;
 use function is_string;
 
 use Magix\Cache\Cli\Declaration\ExpirationContract;
+use Magix\Cache\Cli\Declaration\MetadataContract;
 use Magix\Cache\Cli\Declaration\StrategyArgument;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\StrategyInstantiation;
@@ -22,9 +24,11 @@ use Magix\Cache\Strategy\CompositeCacheStrategy;
 use Magix\Cache\Strategy\Contract\AssumeTtl;
 use Magix\Cache\Strategy\Contract\ExpiresAt;
 use Magix\Cache\Strategy\Contract\Ttl as TtlAttribute;
+use Magix\Cache\Strategy\Contract\WritesMetadata;
 use Magix\Cache\Strategy\StrategyDefinition;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
+use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
@@ -32,6 +36,7 @@ use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Return_;
 use PhpParser\Node\VariadicPlaceholder;
 use PhpParser\NodeFinder;
@@ -54,6 +59,7 @@ final readonly class StrategyReader
         private ContractReader $contracts = new ContractReader(),
         private AttributeReader $attributes = new AttributeReader(),
         private LiteralReader $literals = new LiteralReader(),
+        private ArgumentReader $arguments = new ArgumentReader(),
     ) {
     }
 
@@ -83,6 +89,7 @@ final readonly class StrategyReader
             hasCreate: $hasCreate,
             composed: $composed,
             ttl: $this->contract($node->getMethod('fetch')),
+            writes: $this->metadata($node->getMethod('fetch')),
             expirations: $this->expirations($node->getMethod('fetch')),
             assumptions: $hasCreate ? $this->assumptions($create) : [],
             notes: $notes,
@@ -132,6 +139,33 @@ final readonly class StrategyReader
         $attribute = $this->attributes->find($method->attrGroups, TtlAttribute::class);
 
         return $attribute === null ? null : $this->contracts->ttl($attribute);
+    }
+
+    /**
+     * Returns which non-expiration metadata fields the origin operation writes.
+     *
+     * An omitted attribute promises every field is preserved, the same promise
+     * an omitted lifetime contract makes about expiration.
+     */
+    public function metadata(?ClassMethod $method): MetadataContract
+    {
+        if ($method === null) {
+            return new MetadataContract();
+        }
+
+        $attribute = $this->attributes->find($method->attrGroups, WritesMetadata::class);
+
+        if ($attribute === null) {
+            return new MetadataContract();
+        }
+
+        $values = $this->arguments->values($attribute->args, ['visibility', 'tags', 'cacheable']);
+        $visibility = is_bool($values['visibility'] ?? null) ? $values['visibility'] : null;
+        $tags = is_bool($values['tags'] ?? null) ? $values['tags'] : null;
+        $cacheable = is_bool($values['cacheable'] ?? null) ? $values['cacheable'] : null;
+        $undescribed = $visibility === null && $tags === null && $cacheable === null;
+
+        return new MetadataContract($visibility ?? $undescribed, $tags ?? $undescribed, $cacheable ?? $undescribed);
     }
 
     /**
@@ -186,17 +220,26 @@ final readonly class StrategyReader
      *
      * Only a create() whose top level returns one compose() call or one
      * construction is followed; branches and helpers keep the composition
-     * statically unknown instead of guessing one path.
+     * statically unknown instead of guessing one path. A definition named in
+     * a local variable first is the same composition written differently.
      *
      * @return array{list<StrategyInstantiation>|null, list<string>}
      */
     public function composition(ClassMethod $create): array
     {
         $returns = [];
+        $bindings = [];
 
         foreach ($create->stmts ?? [] as $statement) {
             if ($statement instanceof Return_) {
                 $returns[] = $statement;
+
+                continue;
+            }
+
+            if ($statement instanceof Expression && $statement->expr instanceof Assign
+                && $statement->expr->var instanceof Variable && is_string($statement->expr->var->name)) {
+                $bindings[$statement->expr->var->name] = $statement->expr->expr;
             }
         }
 
@@ -204,12 +247,12 @@ final readonly class StrategyReader
             return [null, ['create() does not resolve to a single composition statically']];
         }
 
-        $expression = $returns[0]->expr;
+        $expression = $this->bound($returns[0]->expr, $bindings);
         $children = $this->compose($expression) ?? [$expression];
         $instantiations = [];
 
         foreach ($children as $child) {
-            $instantiation = $this->instantiation($child);
+            $instantiation = $this->instantiation($this->bound($child, $bindings));
 
             if ($instantiation === null) {
                 return [null, ['an argument of the composition cannot be read statically']];
@@ -219,6 +262,22 @@ final readonly class StrategyReader
         }
 
         return [$instantiations, []];
+    }
+
+    /**
+     * Returns the expression a local name stands for, following simple bindings.
+     *
+     * @param array<string, Expr> $bindings
+     */
+    public function bound(Expr $expression, array $bindings, int $budget = 8): Expr
+    {
+        if ($budget < 1 || !$expression instanceof Variable || !is_string($expression->name)) {
+            return $expression;
+        }
+
+        $value = $bindings[$expression->name] ?? null;
+
+        return $value === null ? $expression : $this->bound($value, $bindings, $budget - 1);
     }
 
     /**

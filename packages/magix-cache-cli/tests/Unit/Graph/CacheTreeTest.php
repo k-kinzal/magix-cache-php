@@ -54,18 +54,17 @@ final class CacheTreeTest extends TestCase
         ]));
 
         $baseline = $tree->build($root);
-        $expanded = $tree->expand($root, 8, [$root->id()], true);
-        $limited = $tree->build($root, 1, includeUncached: true);
+        $expanded = $tree->expand($root, [$root->id()], true);
+        $uncached = $tree->build($root, includeUncached: true);
 
         self::assertSame([], $baseline->children);
         self::assertEquals($baseline->effect, $expanded->effect);
-        self::assertEquals($baseline->effect, $limited->effect);
+        self::assertEquals($baseline->effect, $uncached->effect);
         self::assertSame(['recursive dependency, not expanded again'], $expanded->children[0]->children[0]->notes);
-        self::assertSame(['depth limit reached, dependencies not expanded; increase --depth to analyze further'], $limited->children[0]->notes);
-        self::assertSame(TtlEstimateState::Unknown, $limited->children[0]->effect->ttl->state);
+        self::assertSame(TtlEstimateState::Unknown, $expanded->children[0]->children[0]->effect->ttl->state);
     }
 
-    public function testBuildExplicitVisibilityOverridesTruncatedDependencies(): void
+    public function testBuildExplicitVisibilityOverridesRecursiveDependencies(): void
     {
         $inner = new BoundaryDeclaration('InnerQuery', 'execute', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 60), dependencies: [new DependencyCall('InnerQuery', 'execute', 2)]);
         $outer = new BoundaryDeclaration('OuterQuery', 'execute', 'b.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 20, visibility: \Magix\Cache\Metadata\Visibility::Private), dependencies: [new DependencyCall('InnerQuery', 'execute', 2)]);
@@ -73,16 +72,13 @@ final class CacheTreeTest extends TestCase
             new ClassDeclaration('InnerQuery', boundaries: [$inner]),
             new ClassDeclaration('OuterQuery', boundaries: [$outer]),
         ]));
-        $limited = $tree->build($outer, 1);
         $recursive = $tree->build($outer);
 
-        self::assertFalse($limited->effect->visibilityUnknown);
-        self::assertArrayHasKey('visibility', $limited->effect->localOverrides);
         self::assertFalse($recursive->effect->visibilityUnknown);
         self::assertArrayHasKey('visibility', $recursive->effect->localOverrides);
     }
 
-    public function testBuildKeepsUncachedRootDepthLimitsAndRecursionUnknown(): void
+    public function testBuildKeepsAnUncachedRootWithRecursionUnknown(): void
     {
         $query = new BoundaryDeclaration('App\ProductQuery', 'execute', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 20));
         $root = new BoundaryDeclaration(
@@ -102,10 +98,6 @@ final class CacheTreeTest extends TestCase
             new ClassDeclaration('App\Controller', entryPoints: [$root]),
         ]));
 
-        $limited = $tree->build($root, 0);
-        self::assertSame(TtlEstimateState::Unknown, $limited->effect->ttl->state);
-        self::assertSame([], $limited->effect->problems);
-        self::assertSame(['depth limit reached, dependencies not expanded; increase --depth to analyze further'], $limited->notes);
         $recursive = $tree->build($root);
         self::assertCount(2, $recursive->children);
         self::assertSame(TtlEstimateState::Unknown, $recursive->effect->ttl->state);
@@ -143,7 +135,7 @@ final class CacheTreeTest extends TestCase
         self::assertSame('App\ProductQuery::execute', $node->children[0]->boundary->id());
     }
 
-    public function testBuildStopsAtRecursiveAndTooDeepDependencies(): void
+    public function testBuildStopsAtARecursiveDependencyWithoutLosingTheLocalPolicy(): void
     {
         $boundary = new BoundaryDeclaration(
             class: 'App\LoopQuery',
@@ -157,14 +149,11 @@ final class CacheTreeTest extends TestCase
         $tree = new CacheTree($catalog);
 
         $recursive = $tree->build($boundary);
-        $limited = $tree->build($boundary, 0);
 
         self::assertSame(['recursive dependency, not expanded again'], $recursive->children[0]->notes);
         self::assertSame(TtlEstimateState::Unknown, $recursive->children[0]->effect->ttl->state);
-        self::assertSame([], $limited->children);
-        self::assertSame(['depth limit reached, dependencies not expanded; increase --depth to analyze further'], $limited->notes);
-        self::assertSame(TtlEstimateState::Known, $limited->effect->ttl->state);
-        self::assertSame(20, $limited->effect->ttl->seconds);
+        self::assertSame(TtlEstimateState::Known, $recursive->effect->ttl->state);
+        self::assertSame(20, $recursive->effect->ttl->seconds);
     }
 
     public function testBuildNotesWhenACallHasSeveralImplementations(): void

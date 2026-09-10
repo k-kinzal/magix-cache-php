@@ -113,9 +113,6 @@ final class CacheGapTest extends TestCase
             new ClassDeclaration('ParentQuery', boundaries: [$parent]),
         ]));
 
-        $limited = $tree->build($parent, 1, includeUncached: true);
-        self::assertSame([], $limited->gaps);
-        self::assertSame(['depth limit reached, dependencies not expanded; increase --depth to analyze further'], $limited->children[0]->notes);
         $complete = $tree->build($parent);
         self::assertCount(1, $complete->gaps);
         self::assertSame([$parent, $lookup, $child], $complete->gaps[0]->path);

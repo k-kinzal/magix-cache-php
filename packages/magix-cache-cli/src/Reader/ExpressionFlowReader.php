@@ -19,10 +19,25 @@ final readonly class ExpressionFlowReader
 {
     /**
      * @param array<string, string> $propertyTypes
-     * @param array<string, string> $variableTypes
+     * @param array<string, string> $parameterTypes
+     * @param array<string, list<array{int, string}>> $assignments Local bindings with the position that establishes them.
      */
-    public function __construct(private string $class, private array $propertyTypes, private array $variableTypes)
+    public function __construct(
+        private string $class,
+        private array $propertyTypes,
+        private array $parameterTypes,
+        private array $assignments = [],
+    ) {
+    }
+
+    /**
+     * Returns the receiver types in scope where one call is written.
+     *
+     * @return array<string, string>
+     */
+    public function types(Expr $call): array
     {
+        return (new DependencyReader())->bindings($this->parameterTypes, $this->assignments, $call->getStartFilePos());
     }
 
     /**
@@ -46,8 +61,12 @@ final readonly class ExpressionFlowReader
             $expression instanceof Expr\MethodCall => $this->method($expression, $variables),
             $expression instanceof Expr\StaticCall => $this->staticCall($expression, $variables),
             $expression instanceof Expr\ArrayDimFetch => $this->projection($expression, $variables),
+            $expression instanceof Expr\Array_ => new MetadataFlow('collection', array_map(
+                fn (\PhpParser\Node\ArrayItem $item): MetadataFlow => $this->read($item->value, $variables),
+                array_values(array_filter($expression->items, static fn (?\PhpParser\Node\ArrayItem $item): bool => $item !== null && !$item->unpack)),
+            )),
             $expression instanceof Scalar, $expression instanceof Expr\ConstFetch,
-            $expression instanceof Expr\Array_, $expression instanceof Expr\BinaryOp,
+            $expression instanceof Expr\BinaryOp,
             $expression instanceof Expr\Cast, $expression instanceof Expr\New_ => new MetadataFlow('none'),
             $expression instanceof Expr\Throw_ => new MetadataFlow('choice'),
             default => new MetadataFlow('unknown'),
@@ -69,7 +88,7 @@ final readonly class ExpressionFlowReader
             return $this->callback($this->argument($call, 0), $variables);
         }
 
-        $target = (new DependencyReader())->target($call, $this->class, $this->propertyTypes, $this->variableTypes);
+        $target = (new DependencyReader())->target($call, $this->class, $this->propertyTypes, $this->types($call));
 
         if ($target !== null && $target[0] !== Cached::class) {
             return new MetadataFlow('call', target: implode('::', $target));
@@ -91,20 +110,28 @@ final readonly class ExpressionFlowReader
     }
 
     /**
-     * A known nested of() exposes its value; other Cached receivers detach metadata.
+     * Taking a value out returns what was put in, however the Cached was built.
+     *
+     * The payload travels with the value, so naming it in a local variable is
+     * not a change in what the code computes.
      *
      * @param array<string, MetadataFlow> $variables
      */
     public function extraction(Expr $receiver, array $variables): MetadataFlow
     {
-        if ($receiver instanceof Expr\StaticCall && $receiver->class instanceof Name && $receiver->class->toString() === Cached::class
-            && $receiver->name instanceof Identifier && $receiver->name->toString() === 'of') {
-            $value = $this->argument($receiver, 0);
+        $flow = $this->read($receiver, $variables);
 
-            return $value === null ? new MetadataFlow('unknown') : $this->read($value, $variables);
-        }
+        return $flow->payload ?? new MetadataFlow('value', [$flow]);
+    }
 
-        return new MetadataFlow('value', [$this->read($receiver, $variables)]);
+    /**
+     * Reads the value a Cached is built around, when the expression is present.
+     *
+     * @param array<string, MetadataFlow> $variables
+     */
+    public function contents(?Expr $expression, array $variables): ?MetadataFlow
+    {
+        return $expression === null ? null : $this->read($expression, $variables);
     }
 
     /**
@@ -117,13 +144,13 @@ final readonly class ExpressionFlowReader
         }
 
         if ($call->class->toString() !== Cached::class) {
-            $target = (new DependencyReader())->target($call, $this->class, $this->propertyTypes, $this->variableTypes);
+            $target = (new DependencyReader())->target($call, $this->class, $this->propertyTypes, $this->types($call));
 
             return $target === null ? new MetadataFlow('unknown') : new MetadataFlow('call', target: implode('::', $target));
         }
 
         return match ($call->name->toString()) {
-            'of' => new MetadataFlow('wrap', [$this->metadata($this->argument($call, 1), $variables)]),
+            'of' => new MetadataFlow('wrap', [$this->metadata($this->argument($call, 1), $variables)], payload: $this->contents($this->argument($call, 0), $variables)),
             'sequence' => new MetadataFlow('wrap', [$this->collection($this->argument($call, 0), $variables)]),
             'traverse' => new MetadataFlow('wrap', [$this->traverse($call, $variables)]),
             default => new MetadataFlow('unknown'),
@@ -219,14 +246,7 @@ final readonly class ExpressionFlowReader
             return $this->callback($this->argument($expression, 0), $variables);
         }
 
-        if ($expression instanceof Expr\StaticCall && $expression->class instanceof Name && $expression->class->toString() === Cached::class
-            && $expression->name instanceof Identifier && $expression->name->toString() === 'of') {
-            $value = $this->argument($expression, 0);
-
-            return $value === null ? new MetadataFlow('unknown') : $this->read($value, $variables);
-        }
-
-        return new MetadataFlow('unknown');
+        return $this->read($expression, $variables)->payload ?? new MetadataFlow('unknown');
     }
 
     /**
@@ -250,8 +270,14 @@ final readonly class ExpressionFlowReader
      */
     public function collection(?Expr $expression, array $variables): MetadataFlow
     {
-        if (!$expression instanceof Expr\Array_) {
+        if ($expression === null) {
             return new MetadataFlow('unknown');
+        }
+
+        if (!$expression instanceof Expr\Array_) {
+            $flow = $this->read($expression, $variables);
+
+            return $flow->kind === 'collection' ? new MetadataFlow('meet', $flow->inputs) : new MetadataFlow('unknown');
         }
 
         $inputs = [];

@@ -177,7 +177,7 @@ final readonly class EffectCalculator
         $estimate = match (true) {
             $policy->ttl === null => TtlEstimate::unknown(condition: 'the declared ttl cannot be read statically'),
             is_int($policy->ttl) => $this->fixed($policy->ttl),
-            default => $this->derived($policy->ttl, $policy->maxTtl, $boundary, $upstream, $constraint->ttlSource ?? 'a dependency', $willOverride),
+            default => $this->derived($policy->ttl, $policy->maxTtl, $boundary, $upstream, $constraint->ttlSource ?? 'a dependency', $willOverride, $policy->maxTtlUnknown),
         };
 
         if ($estimate->state === TtlEstimateState::Invalid) {
@@ -224,15 +224,19 @@ final readonly class EffectCalculator
      *
      * Ttl::Auto and Ttl::FromUpstream require a finite upstream expiration.
      * A later expiration override can fulfill
-     * the requirement; otherwise a confirmed missing expiration is an error
+     * the requirement. A maxTtl that was declared but could not be read is a
+     * missing source, not a missing declaration, so it is never an error;
+     * otherwise a confirmed missing expiration is an error
      * unless the boundary itself supplies metadata or resolves a lifetime at
      * runtime, and an unknown one keeps the requirement as a runtime
      * condition.
      */
-    public function derived(Ttl $declared, ?int $maxTtl, BoundaryDeclaration $boundary, TtlEstimate $upstream, string $source, bool $willOverride = false): TtlEstimate
+    public function derived(Ttl $declared, ?int $maxTtl, BoundaryDeclaration $boundary, TtlEstimate $upstream, string $source, bool $willOverride = false, bool $maxTtlUnknown = false): TtlEstimate
     {
         if ($declared === Ttl::FromUpstream && $maxTtl === null) {
-            return TtlEstimate::invalid('Ttl::FromUpstream requires maxTtl, so the declaration cannot be constructed');
+            return $maxTtlUnknown
+                ? TtlEstimate::unknown(condition: 'the declared maxTtl cannot be read statically')
+                : TtlEstimate::invalid('Ttl::FromUpstream requires maxTtl, so the declaration cannot be constructed');
         }
 
         $cap = $declared === Ttl::FromUpstream ? $maxTtl : null;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Graph;
 
+use Magix\Cache\Cli\Declaration\MetadataContract;
+
 use function strrpos;
 use function substr;
 
@@ -19,14 +21,14 @@ final readonly class StrategyStep
      * @param TtlEstimate $ttl Candidate constraint this step contributes.
      * @param bool $assumed True when an explicit assumption replaced the contract.
      * @param list<ExpirationEstimate> $expirations Candidate daily expiration constraints.
-     * @param bool $metadataUnknown Whether non-expiration metadata can be overridden by custom code.
+     * @param MetadataContract $writes Non-expiration metadata fields this step replaces.
      */
     public function __construct(
         public string $strategy,
         public TtlEstimate $ttl,
         public bool $assumed = false,
         public array $expirations = [],
-        public bool $metadataUnknown = false,
+        public MetadataContract $writes = new MetadataContract(),
     ) {
     }
 

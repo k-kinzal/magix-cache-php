@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Graph;
 
+use Magix\Cache\Cli\Declaration\MetadataContract;
+
 /**
  * Holds the composed contract of the strategy a boundary declares.
  *
@@ -23,7 +25,7 @@ final readonly class StrategyEffect
      * @param bool|null $overridesExpiration Whether expiration is definitely replaced; null for an opaque final writer.
      * @param list<string> $problems Declarations that cannot work as written.
      * @param list<ExpirationEstimate> $expirations Candidate daily expiration constraints.
-     * @param bool $metadataUnknown Whether non-expiration metadata can be overridden by custom code.
+     * @param MetadataContract $writes Non-expiration metadata fields the composition replaces.
      */
     public function __construct(
         public string $label,
@@ -32,7 +34,7 @@ final readonly class StrategyEffect
         public ?bool $overridesExpiration = null,
         public array $problems = [],
         public array $expirations = [],
-        public bool $metadataUnknown = false,
+        public MetadataContract $writes = new MetadataContract(),
     ) {
     }
 }

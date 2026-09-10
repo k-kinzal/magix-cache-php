@@ -173,8 +173,8 @@ final readonly class ParameterEffects
      */
     public function visibility(BoundaryDeclaration $boundary, DependencyConstraint $constraint, CacheEffect $effect): array
     {
-        if ($effect->strategy?->metadataUnknown === true) {
-            return [Visibility::Shared, true, 'custom Strategy metadata overrides are not analyzed'];
+        if ($effect->strategy?->writes->visibility === true) {
+            return [Visibility::Shared, true, 'the declared strategy replaces visibility'];
         }
 
         $sources = $this->sources($boundary, 'visibility');
@@ -205,7 +205,7 @@ final readonly class ParameterEffects
     {
         $policy = $boundary->policy;
 
-        if ($effect->strategy?->metadataUnknown === true || $this->sources($boundary, 'tags') !== [] || ($policy->tagsUnknown ?? false)) {
+        if ($effect->strategy?->writes->tags === true || $this->sources($boundary, 'tags') !== [] || ($policy->tagsUnknown ?? false)) {
             return [[], true];
         }
 

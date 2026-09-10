@@ -46,7 +46,7 @@ final class NodePresentationTest extends TestCase
     {
         $boundary = new BoundaryDeclaration('Query', 'get', 'query.php', 1);
         $dynamic = new CacheEffect(TtlEstimate::unknown(lowerBound: 0, finite: true), visibilityUnknown: true);
-        $warnings = ['Lookup::get: depth limit reached; increase --depth'];
+        $warnings = ['Lookup::get: returned cache metadata is not analyzed'];
 
         yield 'runtime decision' => [new CacheNode($boundary, $dynamic), 'white', 'runtime-dependent'];
         yield 'proven storage' => [new CacheNode($boundary, new CacheEffect(TtlEstimate::known(30), storable: true)), 'white', 'yes'];
@@ -63,7 +63,7 @@ final class NodePresentationTest extends TestCase
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $arguments = [
-            'boundary' => 'InspectionQuery::execute',
+            'boundary' => 'UnverifiedPageQuery::execute',
             '--path' => ['packages/magix-cache-cli/tests/Fixture'],
             '--depth' => 1,
             '--uncached' => $mode,
@@ -71,17 +71,17 @@ final class NodePresentationTest extends TestCase
         ];
         $tester->execute($arguments, ['decorated' => true]);
         $tester->assertCommandIsSuccessful();
-        self::assertStringContainsString("\033[33;1mInspectionQuery::execute\033[39;22m", $tester->getDisplay());
-        self::assertStringContainsString('InventoryLookup::get: depth limit reached, dependencies not expanded; increase --depth', $tester->getDisplay());
-        self::assertSame(1, substr_count($tester->getDisplay(), 'InventoryLookup::get: depth limit reached'));
+        self::assertStringContainsString("\033[33;1mUnverifiedPageQuery::execute\033[39;22m", $tester->getDisplay());
+        self::assertStringContainsString('UnresolvedLookup::get: returned cache metadata is not analyzed', $tester->getDisplay());
+        self::assertSame(1, substr_count($tester->getDisplay(), 'UnresolvedLookup::get: returned cache metadata'));
         self::assertStringNotContainsString("\033[31m", $tester->getDisplay());
 
         $tester->execute([...$arguments, '--format' => 'mermaid']);
         self::assertStringContainsString('style n0 fill:#fff3cd', $tester->getDisplay());
-        self::assertStringContainsString('increase --depth', $tester->getDisplay());
+        self::assertStringContainsString('returned cache metadata is not analyzed', $tester->getDisplay());
         $tester->execute([...$arguments, '--format' => 'json']);
         self::assertStringContainsString('"analysisWarnings": [', $tester->getDisplay());
-        self::assertStringContainsString('increase --depth', $tester->getDisplay());
+        self::assertStringContainsString('returned cache metadata is not analyzed', $tester->getDisplay());
     }
 
     /**
@@ -95,15 +95,17 @@ final class NodePresentationTest extends TestCase
         }
     }
 
-    public function testCompletingDepthAnalysisRestoresWhiteRows(): void
+    public function testRowsAreYellowOnlyWhereAnalysisIsIncomplete(): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
-        $arguments = ['boundary' => 'BubblingPageQuery::explicit', '--path' => ['packages/magix-cache-cli/tests/Fixture']];
-        $tester->execute([...$arguments, '--depth' => 1], ['decorated' => true]);
-        self::assertStringContainsString("\033[33;1mBubblingPageQuery::explicit", $tester->getDisplay());
-        $tester->execute([...$arguments, '--depth' => 8], ['decorated' => true]);
+        $path = ['--path' => ['packages/magix-cache-cli/tests/Fixture']];
+
+        $tester->execute(['boundary' => 'UnverifiedPageQuery::execute', ...$path], ['decorated' => true]);
+        self::assertStringContainsString("\033[33;1mUnverifiedPageQuery::execute", $tester->getDisplay());
+
+        $tester->execute(['boundary' => 'BubblingPageQuery::explicit', ...$path, '--depth' => 1], ['decorated' => true]);
         self::assertStringContainsString("\033[37;1mBubblingPageQuery::explicit", $tester->getDisplay());
-        self::assertStringNotContainsString('increase --depth', $tester->getDisplay());
+        self::assertStringNotContainsString('is not analyzed', $tester->getDisplay());
     }
 
     public function testStorageShowsRuntimeDecisionsWithoutClaimingNonStorage(): void

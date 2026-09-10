@@ -7,12 +7,11 @@ namespace Magix\Cache\Cli\Graph;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\Catalog;
 use Magix\Cache\Cli\Declaration\ContractSource;
+use Magix\Cache\Cli\Declaration\MetadataContract;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\StrategyInstantiation;
 use Magix\Cache\Cli\Declaration\TtlAssumption;
 use Magix\Cache\Cli\Declaration\TtlContract;
-use Magix\Cache\Strategy\KeySpreadExpirationStrategy;
-use Magix\Cache\Strategy\StaleIfErrorCacheStrategy;
 
 use function strrpos;
 use function substr;
@@ -58,7 +57,7 @@ final readonly class StrategyResolver
             return new StrategyEffect(
                 label: $use->label(),
                 ttl: TtlEstimate::unknown(condition: $use->strategy.' was not found in the scanned sources'),
-                metadataUnknown: true,
+                writes: MetadataContract::undescribed(),
             );
         }
 
@@ -80,7 +79,7 @@ final readonly class StrategyResolver
         $composed = $this->composition($declaration, $environment);
         $ttl = $problems === [] ? $composed->ttl : TtlEstimate::invalid($problems[0]);
 
-        return new StrategyEffect($use->label(), $ttl, $composed->steps, $composed->overridesExpiration, [...$problems, ...$composed->problems], $composed->expirations, $composed->metadataUnknown);
+        return new StrategyEffect($use->label(), $ttl, $composed->steps, $composed->overridesExpiration, [...$problems, ...$composed->problems], $composed->expirations, $composed->writes);
     }
 
     /**
@@ -107,7 +106,7 @@ final readonly class StrategyResolver
         if ($declaration->composed === null) {
             $condition = $declaration->notes[0] ?? ('the composition of '.$declaration->shortName().' cannot be read statically');
 
-            return new StrategyEffect('', TtlEstimate::unknown(condition: $condition), metadataUnknown: true);
+            return new StrategyEffect('', TtlEstimate::unknown(condition: $condition), writes: MetadataContract::undescribed());
         }
 
         $ttl = TtlEstimate::unconstrained();
@@ -116,12 +115,12 @@ final readonly class StrategyResolver
         $problems = [];
         $adds = false;
         $open = false;
-        $metadataUnknown = false;
+        $writes = new MetadataContract();
 
         foreach (array_reverse($declaration->composed) as $instantiation) {
             [$step, $stepProblems, $stepAdds] = $this->step($declaration, $instantiation, $environment);
             $steps[] = $step;
-            $metadataUnknown = $metadataUnknown || $step->metadataUnknown;
+            $writes = $writes->merge($step->writes);
             $problems = [...$problems, ...$stepProblems];
             if ($stepAdds !== false) {
                 $ttl = $step->ttl;
@@ -131,7 +130,7 @@ final readonly class StrategyResolver
             }
         }
 
-        return new StrategyEffect('', $problems === [] ? $ttl : TtlEstimate::invalid($problems[0]), array_reverse($steps), $adds ? true : ($open ? null : false), $problems, $expirations, $metadataUnknown);
+        return new StrategyEffect('', $problems === [] ? $ttl : TtlEstimate::invalid($problems[0]), array_reverse($steps), $adds ? true : ($open ? null : false), $problems, $expirations, $writes);
     }
 
     /**
@@ -162,7 +161,7 @@ final readonly class StrategyResolver
 
             $condition = $this->shortName($instantiation->class).'::create() cannot be analyzed statically';
 
-            return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition), metadataUnknown: true), [], null];
+            return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition), writes: MetadataContract::undescribed()), [], null];
         }
 
         if ($child !== null && !$child->constructible) {
@@ -179,7 +178,7 @@ final readonly class StrategyResolver
             if ($child === null) {
                 $condition = $instantiation->class.' was not found in the scanned sources';
 
-                return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition), metadataUnknown: true), [], null];
+                return [new StrategyStep($instantiation->class, TtlEstimate::unknown(condition: $condition), writes: MetadataContract::undescribed()), [], null];
             }
         }
 
@@ -199,7 +198,7 @@ final readonly class StrategyResolver
         $composed = $this->composition($child, $childEnvironment);
         $ttl = $problems === [] ? $composed->ttl : TtlEstimate::invalid($problems[0]);
 
-        return [new StrategyStep($instantiation->class, $ttl, expirations: $composed->expirations, metadataUnknown: $composed->metadataUnknown), [...$problems, ...$composed->problems], $composed->overridesExpiration];
+        return [new StrategyStep($instantiation->class, $ttl, expirations: $composed->expirations, writes: $composed->writes), [...$problems, ...$composed->problems], $composed->overridesExpiration];
     }
 
     /**
@@ -229,7 +228,7 @@ final readonly class StrategyResolver
             return [new StrategyStep($child->name, TtlEstimate::invalid($problems[0])), $problems, true];
         }
 
-        return [new StrategyStep($child->name, $estimate, expirations: $expirations, metadataUnknown: !in_array($child->name, [KeySpreadExpirationStrategy::class, StaleIfErrorCacheStrategy::class], true)), [], !$contract->unconstrained || $expirations !== []];
+        return [new StrategyStep($child->name, $estimate, expirations: $expirations, writes: $child->writes), [], !$contract->unconstrained || $expirations !== []];
     }
 
     /**
@@ -247,7 +246,7 @@ final readonly class StrategyResolver
             return [new StrategyStep($class, TtlEstimate::invalid($problems[0]), assumed: true), $problems, true];
         }
 
-        return [new StrategyStep($class, $estimate, assumed: true, metadataUnknown: true), [], !$assumption->unconstrained];
+        return [new StrategyStep($class, $estimate, assumed: true, writes: MetadataContract::undescribed()), [], !$assumption->unconstrained];
     }
 
     /**

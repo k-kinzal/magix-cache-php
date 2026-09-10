@@ -14,16 +14,28 @@ use Magix\Cache\Metadata\Visibility;
 /**
  * Expands a boundary or an uncached entry point into its cache dependency tree.
  */
-final readonly class CacheTree
+final class CacheTree
 {
-    private StrategyResolver $strategies;
+    private readonly StrategyResolver $strategies;
+
+    /**
+     * Results reusable across paths, keyed by boundary and expansion mode.
+     *
+     * @var array<string, CacheNode>
+     */
+    private array $memo = [];
+
+    /**
+     * How many times expansion stopped at the recursion guard.
+     */
+    private int $recursions = 0;
 
     /**
      * Creates a tree builder for one catalog.
      */
     public function __construct(
-        private Catalog $catalog,
-        private EffectCalculator $effects = new EffectCalculator(),
+        private readonly Catalog $catalog,
+        private readonly EffectCalculator $effects = new EffectCalculator(),
         ?StrategyResolver $strategies = null,
     ) {
         $this->strategies = $strategies ?? new StrategyResolver($catalog);
@@ -32,29 +44,39 @@ final readonly class CacheTree
     /**
      * Returns a tree rooted at a boundary or an uncached method whose callees are composed.
      *
+     * Expansion is bounded only by the recursion guard, and every boundary is
+     * analyzed once. What a command prints is decided afterwards, so no
+     * display setting can change what was analyzed.
+     *
      * @param list<string> $visited Boundary identifiers already on the current path.
      * @param bool $includeUncached Include ordinary calls beyond the paths needed to report cache propagation gaps.
      */
-    public function build(BoundaryDeclaration $boundary, int $depth = 8, array $visited = [], bool $includeUncached = false): CacheNode
+    public function build(BoundaryDeclaration $boundary, array $visited = [], bool $includeUncached = false): CacheNode
     {
         $id = $boundary->id();
 
         if (in_array($id, $visited, true)) {
+            ++$this->recursions;
+
             $effect = new CacheEffect(TtlEstimate::unknown(condition: 'recursive dependency, not analyzed'), $boundary->scope() ?? Visibility::Shared, visibilityUnknown: $boundary->scope() !== Visibility::NoStore);
 
             return new CacheNode($boundary, $effect, [], ['recursive dependency, not expanded again']);
         }
 
-        if ($depth < 1) {
-            $constraint = $boundary->dependencies === []
-                ? new DependencyConstraint()
-                : new DependencyConstraint(TtlEstimate::unknown(condition: 'dependencies beyond the depth limit were not analyzed'), visibilityUnknown: true);
-            $notes = $boundary->dependencies === [] ? [] : ['depth limit reached, dependencies not expanded; increase --depth to analyze further'];
+        $key = $id.'#'.($includeUncached ? '1' : '0');
 
-            return new CacheNode($boundary, $this->effects->calculate($boundary, $constraint, $this->strategies->resolve($boundary)), [], $notes);
+        if (isset($this->memo[$key])) {
+            return $this->memo[$key];
         }
 
-        return $this->expand($boundary, $depth, [...$visited, $id], $includeUncached);
+        $before = $this->recursions;
+        $node = $this->expand($boundary, [...$visited, $id], $includeUncached);
+
+        if ($this->recursions === $before) {
+            $this->memo[$key] = $node;
+        }
+
+        return $node;
     }
 
     /**
@@ -62,7 +84,7 @@ final readonly class CacheTree
      *
      * @param list<string> $visited Identifiers on the current path, including this boundary.
      */
-    public function expand(BoundaryDeclaration $boundary, int $depth, array $visited, bool $includeUncached): CacheNode
+    public function expand(BoundaryDeclaration $boundary, array $visited, bool $includeUncached): CacheNode
     {
         $children = [];
         $constraints = [];
@@ -86,7 +108,7 @@ final readonly class CacheTree
                     continue;
                 }
 
-                $child = $this->build($candidate, $depth - 1, $visited, $includeUncached);
+                $child = $this->build($candidate, $visited, $includeUncached);
                 $seen[$candidate->id()] = $child;
                 $calls[$dependency->class.'::'.$dependency->method][] = $child;
                 $paths = $boundary->isCacheBoundary && !$candidate->isCacheBoundary ? CacheGap::through($child, [$boundary]) : [];

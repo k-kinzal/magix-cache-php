@@ -52,7 +52,8 @@ final readonly class DependencyReader
     public function read(ClassMethod $method, string $class, array $propertyTypes, array $parameters): array
     {
         $statements = $method->stmts ?? [];
-        $variableTypes = [...$this->parameterTypes($method), ...$this->variableTypes($statements, $propertyTypes)];
+        $parameterTypes = $this->parameterTypes($method);
+        $assignments = $this->variableTypes($statements, $propertyTypes);
         $calls = [];
 
         foreach ($statements === [] ? [] : $this->finder->find($statements, static fn (Node $node): bool => $node instanceof MethodCall || $node instanceof StaticCall) as $node) {
@@ -60,7 +61,7 @@ final readonly class DependencyReader
                 continue;
             }
 
-            $target = $this->target($node, $class, $propertyTypes, $variableTypes);
+            $target = $this->target($node, $class, $propertyTypes, $this->bindings($parameterTypes, $assignments, $node->getStartFilePos()));
 
             if ($target === null) {
                 continue;
@@ -99,39 +100,75 @@ final readonly class DependencyReader
     }
 
     /**
-     * Returns the class name of local variables that hold known objects.
+     * Returns where each local variable is bound to a known object type.
+     *
+     * Assignments keep their source position, because a variable reassigned
+     * later must not decide which method an earlier call reached.
      *
      * @param array<Node\Stmt> $statements
      * @param array<string, string> $propertyTypes
-     * @return array<string, string>
+     * @return array<string, list<array{int, string}>>
      */
     public function variableTypes(array $statements, array $propertyTypes): array
     {
-        $types = [];
+        $assignments = [];
 
         foreach ($statements === [] ? [] : $this->finder->findInstanceOf($statements, Assign::class) as $assign) {
             if (!$assign->var instanceof Variable || !is_string($assign->var->name)) {
                 continue;
             }
 
-            $expression = $assign->expr;
+            $type = $this->assigned($assign->expr, $propertyTypes);
 
-            if ($expression instanceof New_ && $expression->class instanceof Name) {
-                $types[$assign->var->name] = $expression->class->toString();
-
-                continue;
+            if ($type !== null) {
+                $assignments[$assign->var->name][] = [$assign->getStartFilePos(), $type];
             }
+        }
 
-            if (
-                $expression instanceof PropertyFetch
-                && $expression->var instanceof Variable
-                && $expression->var->name === 'this'
-                && $expression->name instanceof Identifier
-            ) {
-                $type = $propertyTypes[$expression->name->toString()] ?? null;
+        return $assignments;
+    }
 
-                if ($type !== null) {
-                    $types[$assign->var->name] = $type;
+    /**
+     * Returns the object type an assignment binds, when it is one this reader knows.
+     *
+     * @param array<string, string> $propertyTypes
+     */
+    public function assigned(Node\Expr $expression, array $propertyTypes): ?string
+    {
+        if ($expression instanceof New_ && $expression->class instanceof Name) {
+            return $expression->class->toString();
+        }
+
+        if (
+            $expression instanceof PropertyFetch
+            && $expression->var instanceof Variable
+            && $expression->var->name === 'this'
+            && $expression->name instanceof Identifier
+        ) {
+            return $propertyTypes[$expression->name->toString()] ?? null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the types in scope at one position in the method body.
+     *
+     * A parameter type holds until a local assignment replaces it, and only
+     * assignments that already ran can do so.
+     *
+     * @param array<string, string> $parameterTypes
+     * @param array<string, list<array{int, string}>> $assignments
+     * @return array<string, string>
+     */
+    public function bindings(array $parameterTypes, array $assignments, int $position): array
+    {
+        $types = $parameterTypes;
+
+        foreach ($assignments as $name => $bound) {
+            foreach ($bound as [$at, $type]) {
+                if ($at < $position) {
+                    $types[$name] = $type;
                 }
             }
         }

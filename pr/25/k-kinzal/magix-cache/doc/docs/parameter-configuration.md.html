@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parameter Configuration — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/pr/25/k-kinzal/magix-cache/doc/docs/parameter-configuration.md.html">
+<meta name="description" content="Parameter Configuration, a document of the k-kinzal/magix-cache package.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="Parameter Configuration — magix-cache-php">
+<meta property="og:description" content="Parameter Configuration, a document of the k-kinzal/magix-cache package.">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/pr/25/k-kinzal/magix-cache/doc/docs/parameter-configuration.md.html">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/pr/25/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}document.documentElement.dataset.diffMode=localStorage.getItem("docgen-diff-mode")||"inline"}catch(e){}</script>
+</head>
+<body data-root="../../../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../index.html">magix-cache-php</a></div><div class="sb-pkg"><a href="../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></div><nav class="sb-block"><div class="sb-title">Package</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/all-items.html">All items</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/index.html#documents">Documents</a></li></ul><div class="sb-kind" data-diff="modified">Layers</div><ul class="sb-list"><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Attribute.html">Attribute</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Cache.html">Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Clock.html">Clock</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/layer.Composition.html">Composition</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/layer.CoreApi.html">CoreApi</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Metadata.html">Metadata</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Runtime.html">Runtime</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Strategy.html">Strategy</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Namespaces</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/index.html" title="Magix\Cache">Magix\Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Attribute/index.html" title="Magix\Cache\Attribute">Magix\Cache\Attribute</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/index.html" title="Magix\Cache\Cache">Magix\Cache\Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/PSR16/index.html" title="Magix\Cache\Cache\PSR16">Magix\Cache\Cache\PSR16</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/PSR6/index.html" title="Magix\Cache\Cache\PSR6">Magix\Cache\Cache\PSR6</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Clock/index.html" title="Magix\Cache\Clock">Magix\Cache\Clock</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Composition/index.html" title="Magix\Cache\Composition">Magix\Cache\Composition</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Metadata/index.html" title="Magix\Cache\Metadata">Magix\Cache\Metadata</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/index.html" title="Magix\Cache\Runtime">Magix\Cache\Runtime</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Extension/index.html" title="Magix\Cache\Runtime\Extension">Magix\Cache\Runtime\Extension</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/KeyStrategy/index.html" title="Magix\Cache\Runtime\KeyStrategy">Magix\Cache\Runtime\KeyStrategy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Parameter/index.html" title="Magix\Cache\Runtime\Parameter">Magix\Cache\Runtime\Parameter</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Policy/index.html" title="Magix\Cache\Runtime\Policy">Magix\Cache\Runtime\Policy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Strategy/index.html" title="Magix\Cache\Strategy">Magix\Cache\Strategy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Strategy/Contract/index.html" title="Magix\Cache\Strategy\Contract">Magix\Cache\Strategy\Contract</a></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><a href="../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a><span class="crumb-sep">::</span><span class="crumb-current">docs/parameter-configuration.md</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<span class="diff-range" title="Comparing 3baf1908 to working tree">3baf1908 <span class="diff-arrow">→</span> working tree</span><div class="diff-modes" id="diff-modes" role="group" aria-label="Diff display mode"><button type="button" class="diff-mode" data-diff-mode="off" title="Documentation of the head revision, without diff marks">Off</button><button type="button" class="diff-mode" data-diff-mode="inline" title="Every page with additions and removals marked">Diff</button><button type="button" class="diff-mode" data-diff-mode="changes" title="Only what the head revision added, changed, or removed">Changes</button></div><a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<p class="diff-empty" id="diff-empty" data-changes="Nothing on this page changed between 3baf1908 and working tree." data-off="This page documents what 3baf1908 had and working tree no longer has. Switch to Diff to read it." hidden></p>
+<div class="symbol-head"><h1><span class="chip chip-kind k-document">document</span>Parameter Configuration</h1><div class="symbol-meta"><span class="src-link">docs/parameter-configuration.md</span></div></div>
+<section class="readme" data-diff="same"><div class="doc-block" data-diff="same"><h2>Parameter Configuration</h2>
+</div><div class="doc-block" data-diff="same"><p>A boundary can declare that its method parameters supply cache overrides or arguments to the active strategy factory. The parameter attribute identifies the source directly, so renaming that boundary parameter does not break the binding.</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\Cache</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheTags</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheTtl</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\CacheVisibility</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\StrategyArgument</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\UseStrategy</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cached</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\Visibility</span>;
+
+#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">60</span>, <span class="tok-id">tags</span>: [<span class="tok-str">&#039;catalog&#039;</span>])]
+#[<span class="tok-id">UseStrategy</span>(<span class="tok-id">ProductCacheStrategy</span>::<span class="tok-kw">class</span>)]
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">fetch</span>(
+    <span class="tok-id">int</span> <span class="tok-var">$productId</span>,
+    #[<span class="tok-id">CacheTtl</span>] <span class="tok-id">int</span> <span class="tok-var">$ttl</span> = <span class="tok-num">30</span>,
+    #[<span class="tok-id">CacheTags</span>] <span class="tok-kw">array</span> <span class="tok-var">$tags</span> = [],
+    #[<span class="tok-id">CacheVisibility</span>] <span class="tok-id">Visibility</span> <span class="tok-var">$visibility</span> = <span class="tok-id">Visibility</span>::<span class="tok-id">Shared</span>,
+    #[<span class="tok-id">StrategyArgument</span>(<span class="tok-str">&#039;min&#039;</span>)] <span class="tok-id">int</span> <span class="tok-var">$minimum</span> = <span class="tok-num">10</span>,
+): <span class="tok-id">Cached</span> {
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(
+        <span class="tok-kw">fn</span> (): <span class="tok-id">Cached</span> =&gt; <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">products</span>-&gt;<span class="tok-id">find</span>(<span class="tok-var">$productId</span>)),
+    );
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p><code>ProductCacheStrategy::create()</code> in <a href="../../../../k-kinzal/magix-cache/doc/docs/cache-strategies.md.html">Cache Strategies</a> accepts <code>min</code>. Here it receives the current invocation&#039;s <code>$minimum</code>, including the method&#039;s default when omitted. Positional and named calls behave the same. <code>cached()</code> still takes exactly one closure; the binding comes from attributes. The values are captured when the boundary enters <code>cached()</code>.</p>
+</div><div class="doc-block" data-diff="same"><h3>Cache overrides</h3>
+</div><div class="doc-block" data-diff="same"><div class="table-wrap"><table><thead><tr><th>Parameter attribute</th><th>Required value</th><th>Effect</th></tr></thead><tbody><tr><td><code>#[CacheTtl]</code></td><td>Non-negative <code>int</code> seconds</td><td>Replaces expiration at the origin base time</td></tr><tr><td><code>#[CacheTags]</code></td><td><code>list&lt;string&gt;</code> of valid tags</td><td>Replaces tags; <code>[]</code> clears them</td></tr><tr><td><code>#[CacheVisibility]</code></td><td>A <code>Metadata\Visibility</code> enum value</td><td>Replaces visibility, including Shared</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="same"><p>With <code>#[Cache(ttl: 60)]</code>, a parameter TTL of 90 replaces both that policy TTL and a dependency&#039;s remaining 20 seconds. A final zero TTL prevents storage. Parameters can supply an automatic boundary&#039;s finite expiration. A dynamic TTL runs next, then Strategies; each explicit writer can replace the earlier value. All relative lifetimes use one origin base time.</p>
+</div><div class="doc-block" data-diff="same"><p>Visibility and tags are bound before lookup. Shared can replace a private policy or scope. NoStore skips reads; final NoStore metadata prevents writes. CacheVisibility supplies invocation data, while CacheScope declares fixed parameter visibility. Unannotated fields inherit the policy and dependencies.</p>
+</div><div class="doc-block" data-diff="same"><p>When several parameters supply the same field, the last in method declaration order wins, regardless of named-call argument order. Every supplied value is validated. Each attribute appears at most once on a parameter. One parameter can supply a field and a compatible strategy argument:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>#[<span class="tok-id">CacheTtl</span>]
+#[<span class="tok-id">StrategyArgument</span>(<span class="tok-str">&#039;min&#039;</span>)]
+<span class="tok-id">int</span> <span class="tok-var">$ttl</span>,</code></pre>
+</div><div class="doc-block" data-diff="same"><p>Values are checked when bound, before lookup: TTLs must be non-negative integers, tags must be lists of valid string tokens, and visibility must be the enum. Invalid values raise <code>InvalidArgumentException</code> as caller errors; they are not covered by stale fallback or backend bypass.</p>
+</div><div class="doc-block" data-diff="same"><h3>Strategy arguments</h3>
+</div><div class="doc-block" data-diff="same"><p><code>#[StrategyArgument(&#039;min&#039;)]</code> names a destination on the active <code>UseStrategy</code> class&#039;s public static <code>create()</code> method. It supplies exactly that argument and retains the factory&#039;s native parameter type checking. Other factory arguments can still come from <code>UseStrategy</code> or from the factory&#039;s defaults. The effective <code>UseStrategy</code> is selected using the existing method-over-class precedence, before the parameter bindings are resolved.</p>
+</div><div class="doc-block" data-diff="same"><p>A destination must be a declared, non-variadic parameter passed by value. A destination has exactly one source. A parameter binding conflicts with either a named or positional value already supplied by <code>UseStrategy</code>, and two boundary parameters cannot supply the same destination. These are declaration errors. A binding without an enabled <code>UseStrategy</code> is also an error, including when a method disables a class-level strategy.</p>
+</div><div class="doc-block" data-diff="same"><p>When a strategy has parameter bindings, <code>create()</code> runs once per invocation, including fresh hits and nested calls. Only its static binding plan is memoized; the recipe containing invocation values is not retained. Without parameter bindings, the existing static recipe remains memoized. In both cases executable strategies and every nested child are freshly constructed for each invocation. The returned <code>StrategyDefinition</code> retains its existing immutable-configuration contract: configuration values, enum cases, arrays and nested definitions, without executable objects, closures or resources.</p>
+</div><div class="doc-block" data-diff="same"><h3>Cache keys and declarations</h3>
+</div><div class="doc-block" data-diff="same"><p>Configuration parameters cannot use <code>CacheIgnore</code>, and variadic boundary parameters cannot supply configuration. These restrictions are checked when the static declaration is resolved. Ordinary unannotated variadic parameters keep working as before.</p>
+</div><div class="doc-block" data-diff="same"><p>A <code>CacheKey</code> reducer may still reduce a configuration parameter. The key also includes its evaluated cache constraints and the resolved strategy construction definition under the reserved <code>@configuration</code> argument, so a reducer cannot merge entries with different effective settings. Custom key strategies must preserve this component along with the other identity fields.</p>
+</div><div class="doc-block" data-diff="same"><p>Changing a parameter&#039;s binding changes the declaration fingerprint. All bound values are invocation-local, and cache hits keep their stored absolute expiration; reading an entry never restarts its TTL.</p>
+</div><div class="doc-block" data-diff="same"><h3>Static analysis</h3>
+</div><div class="doc-block" data-diff="same"><p>The CLI reads the same parameter annotations without calling the method or its strategy factory. It displays each parameter&#039;s destinations and propagates strategy arguments through construction definitions and contract references. A supplied parameter is runtime-dependent even if the boundary or factory has a default; the analyzer never substitutes that default for every invocation.</p>
+</div><div class="doc-block" data-diff="same"><p>A parameter TTL proves finite expiration, but its value remains unknown even when a default exists. It replaces previous policy and dependency bounds. Dynamic TTL behaves the same way; a known Strategy override can replace either.</p>
+</div><div class="doc-block" data-diff="same"><p>Parameter visibility and tags replace earlier known fields with uncertainty. JSON exposes <code>visibilityUnknown</code> and <code>tagsUnknown</code>; an inheriting parent carries them forward, while an explicit parent field replaces that uncertainty.</p>
+</div><div class="doc-block" data-diff="same"><p><code>magix analyze</code> reports ignored or variadic sources, repeated attributes, incompatible constraint types, duplicate destinations, missing active strategies, and destinations that do not exist or conflict with the factory configuration in the affected node&#039;s problems. Actual runtime values still undergo the same boundary validation as any other library input.</p>
+</div></section>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../../../assets/search-index.js" defer></script>
+<script src="../../../../assets/app.js" defer></script>
+</body>
+</html>

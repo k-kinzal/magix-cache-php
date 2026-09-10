@@ -96,18 +96,20 @@ final readonly class BoundaryReader
             ) !== null,
             useStrategy: $this->useStrategy($method, $classUseStrategy),
             metadataFlow: (new MetadataFlowReader())->read($method, $class, $propertyTypes),
+            returnType: (new TypeReader())->label($method->returnType),
+            unresolvedCalls: $this->dependencies->unresolved($method, $class, $propertyTypes),
         );
     }
 
     /**
-     * Reads an uncached method as an analysis entry point without applying cache attributes.
+     * Retains declarations on methods without cached(), without applying their policies.
      *
      * Concrete leaves are retained for inspection; abstract declarations return null.
      * Call this only after read() has established that the method has no cached() call.
      *
      * @param array<string, string> $propertyTypes
      */
-    public function entryPoint(ClassMethod $method, string $class, string $file, array $propertyTypes): ?BoundaryDeclaration
+    public function entryPoint(ClassMethod $method, string $class, string $file, array $propertyTypes, ?PolicyDeclaration $classPolicy = null, bool $classDynamicTtl = false, ?UseStrategyDeclaration $classUseStrategy = null): ?BoundaryDeclaration
     {
         $parameters = $this->parameters->read($method);
         $dependencies = $this->dependencies->read($method, $class, $propertyTypes, $parameters);
@@ -122,8 +124,14 @@ final readonly class BoundaryReader
             file: $file,
             line: $method->getStartLine(),
             dependencies: $dependencies,
+            policy: $this->policy($method, $classPolicy),
+            parameters: $parameters,
+            hasDynamicTtl: $this->dynamicTtl($method, $classDynamicTtl),
+            useStrategy: $this->useStrategy($method, $classUseStrategy),
             isCacheBoundary: false,
             metadataFlow: (new MetadataFlowReader())->read($method, $class, $propertyTypes),
+            returnType: (new TypeReader())->label($method->returnType),
+            unresolvedCalls: $this->dependencies->unresolved($method, $class, $propertyTypes),
         );
     }
 

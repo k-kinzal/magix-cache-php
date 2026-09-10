@@ -10,6 +10,7 @@ use function json_encode;
 use JsonException;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
+use Magix\Cache\Cli\Graph\Analysis\DiagnosticCatalog;
 use Magix\Cache\Cli\Graph\CacheGap;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\StrategyEffect;
@@ -33,7 +34,7 @@ final readonly class JsonRenderer
         $trees = array_map($this->tree(...), $nodes);
 
         return json_encode(
-            count($trees) === 1 ? $trees[0] : $trees,
+            ['roots' => $trees, 'diagnostics' => array_values((new DiagnosticCatalog())->collect($nodes))],
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
         );
     }
@@ -53,6 +54,18 @@ final readonly class JsonRenderer
         return [
             'boundary' => $boundary->id(),
             'kind' => $boundary->isCacheBoundary ? 'boundary' : ($root ? 'entry-point' : 'uncached'),
+            'declared' => $boundary->policy !== null,
+            'execution' => $boundary->isCacheBoundary ? 'observed' : 'not-observed',
+            'returnType' => $boundary->returnType,
+            'parameters' => $boundary->parameters,
+            'hasDynamicTtl' => $boundary->hasDynamicTtl,
+            'useStrategy' => $boundary->useStrategy === null ? null : [
+                'strategy' => $boundary->useStrategy->strategy,
+                'line' => $boundary->useStrategy->line,
+                'arguments' => array_map((new ArgumentPresentation())->data(...), $boundary->useStrategy->arguments),
+            ],
+            'via' => $node->via,
+            'calls' => $node->calls,
             'file' => $boundary->file,
             'line' => $boundary->line,
             'policy' => $policy === null ? null : $this->policy($policy),
@@ -68,22 +81,38 @@ final readonly class JsonRenderer
                 $boundary->parameters,
             ),
             'strategy' => $effect->strategy === null ? null : $this->strategy($effect->strategy),
-            'effective' => [
-                'ttl' => $effect->ttl->jsonSerialize(),
-                ...($effect->expirationConstraints === [] ? [] : ['expirationConstraints' => $effect->expirationConstraints]),
-                'visibility' => strtolower($effect->visibility->name),
-                'visibilityReason' => $effect->visibilityReason,
-                'visibilityUnknown' => $effect->visibilityUnknown,
-                'tagsUnknown' => $effect->tagsUnknown,
-                'storable' => $effect->storable,
-                'tags' => $effect->tags,
-                'problems' => $effect->problems,
-            ],
+            'effective' => $this->effect($node),
             'notes' => $node->notes,
             ...($node->metadataVariants === null ? [] : ['metadataAlternatives' => array_map((new AlternativePresentation())->data(...), $node->metadataVariants)]),
-            'analysisWarnings' => $node->analysisWarnings,
+            'diagnostics' => array_keys($node->diagnostics),
             'analysisGaps' => array_map($this->gap(...), $node->gaps),
             'dependencies' => array_map(fn (CacheNode $child): array => $this->tree($child, false), $node->children),
+        ];
+    }
+
+    /**
+     * Serializes result certainty separately from source causes and storage proof.
+     *
+     * @return array<string, mixed>
+     */
+    public function effect(CacheNode $node): array
+    {
+        $effect = $node->effect;
+
+        return [
+            'ttl' => $effect->ttl->jsonSerialize(),
+            ...($effect->expirationConstraints === [] ? [] : ['expirationConstraints' => $effect->expirationConstraints]),
+            'visibility' => strtolower($effect->visibility->name),
+            'visibilityReason' => $effect->visibilityReason,
+            'visibilityUnknown' => $effect->visibilityUnknown,
+            'tagsUnknown' => $effect->tagsUnknown,
+            'storable' => $effect->storable,
+            'tags' => $effect->tags,
+            'problems' => $effect->problems,
+            'certainty' => $effect->certainty(),
+            'analysis' => $effect->analysis,
+            'storage' => $node->storage(),
+            'localOverrides' => $effect->localOverrides,
         ];
     }
 
@@ -100,6 +129,9 @@ final readonly class JsonRenderer
         return [
             'source' => $policy->source->name,
             'ttl' => $policy->ttlLabel(),
+            'ttlUnknown' => $policy->ttl === null,
+            'tagsUnknown' => $policy->tagsUnknown,
+            'visibilityUnknown' => $policy->visibilityUnknown,
             'maxTtl' => $policy->maxTtl,
             'maxTtlUnknown' => $policy->maxTtlUnknown,
             'tags' => $policy->tags,
@@ -144,6 +176,7 @@ final readonly class JsonRenderer
                 ],
                 $strategy->steps,
             ),
+            'writesMetadata' => $strategy->writes,
             'problems' => $strategy->problems,
         ];
     }

@@ -59,7 +59,7 @@ final readonly class Invariance
             'tags' => $effect->tagsLabel(),
             'storable' => $effect->storable,
             'problems' => $effect->problems,
-            'warnings' => $node->analysisWarnings,
+            'warnings' => $node->effect->analysis->causes(),
             'key' => self::key($node),
         ];
     }

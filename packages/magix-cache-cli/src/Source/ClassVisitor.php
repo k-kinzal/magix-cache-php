@@ -66,7 +66,7 @@ final class ClassVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            $entryPoint = $this->boundaries->entryPoint($method, $name, $this->file, $propertyTypes);
+            $entryPoint = $this->boundaries->entryPoint($method, $name, $this->file, $propertyTypes, $classPolicy, $classDynamicTtl, $classUseStrategy);
 
             if ($entryPoint !== null) {
                 $entryPoints[] = $entryPoint;

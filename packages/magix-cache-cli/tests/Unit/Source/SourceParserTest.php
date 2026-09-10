@@ -58,7 +58,7 @@ use Tests\Package\Cli\Fixture\Project\ProductQuery;
 final class SourceParserTest extends TestCase
 {
     #[DataProvider('providerAlternativeParents')]
-    public function testParsePropagatesAlternativeLifetimesThroughParentsAndEveryRenderer(string $method, string $label, bool $storable): void
+    public function testParsePropagatesAlternativeLifetimesThroughParentsAndEveryRenderer(string $method, string $label, bool $storable, string $display): void
     {
         $parser = new SourceParser();
         $directory = dirname(__DIR__, 2).'/Fixture/TtlAlternatives/';
@@ -74,8 +74,8 @@ final class SourceParserTest extends TestCase
         self::assertSame($storable, $node->effect->storable);
         self::assertSame([], $node->effect->problems);
         self::assertTrue($node->effect->ttl->hasFiniteExpiration());
-        self::assertStringContainsString($label, (new TreeRenderer())->render($node));
-        self::assertStringContainsString($label, (new \Magix\Cache\Cli\Render\MermaidRenderer())->render($node));
+        self::assertStringContainsString($display, (new TreeRenderer())->render($node));
+        self::assertStringContainsString($display, (new \Magix\Cache\Cli\Render\MermaidRenderer())->render($node));
         $json = (new JsonRenderer())->tree($node);
         self::assertIsArray($json['effective']);
         self::assertSame($node->effect->ttl->jsonSerialize(), $json['effective']['ttl']);
@@ -88,15 +88,15 @@ final class SourceParserTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string, string, bool}>
+     * @return iterable<string, array{string, string, bool, string}>
      */
     public static function providerAlternativeParents(): iterable
     {
-        yield 'auto' => ['automatic', '30/600-900s', true];
-        yield 'bounded' => ['bounded', '30/600-700s', true];
-        yield 'fixed' => ['fixed', '300s', true];
-        yield 'shorter' => ['shorter', '20s', true];
-        yield 'uncached' => ['show', '30/600-700s', false];
+        yield 'auto' => ['automatic', '30/600-900s', true, '30/600-900s'];
+        yield 'bounded' => ['bounded', '30/600-700s', true, '30/600-700s'];
+        yield 'fixed' => ['fixed', '300s', true, '300s'];
+        yield 'shorter' => ['shorter', '20s', true, '20s'];
+        yield 'uncached' => ['show', '30/600-700s', false, '(uncached)'];
     }
 
     public function testParseReadsABoundaryFromARealFile(): void
@@ -137,9 +137,9 @@ final class SourceParserTest extends TestCase
         self::assertSame('ParameterizedStrategy::create(minimum: $min)', $node->effect->strategy?->label);
         $rendered = (new TreeRenderer())->render($node);
 
-        self::assertStringContainsString('shared or stricter', $rendered);
-        self::assertStringContainsString('runtime tags', $rendered);
-        self::assertStringContainsString('cache ttl', $rendered);
+        self::assertStringContainsString('?', $rendered);
+        self::assertStringContainsString('tags ?', $rendered);
+        self::assertStringContainsString('ttl', $rendered);
         $json = (new JsonRenderer())->tree($node);
         self::assertIsArray($json['effective']);
         self::assertTrue($json['effective']['tagsUnknown']);

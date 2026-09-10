@@ -24,6 +24,8 @@ final readonly class BoundaryDeclaration
      * @param UseStrategyDeclaration|null $useStrategy The enabled #[UseStrategy] applying to the boundary.
      * @param MetadataFlow|null $metadataFlow Returned metadata operations; null when no method body was read.
      * @param bool $isCacheBoundary False for an uncached analysis entry point, whose dependencies alone supply constraints.
+     * @param string|null $returnType Native return type, independently of policy and execution.
+     * @param list<array{method: string, line: int}> $unresolvedCalls Calls whose receiver or name could not be resolved.
      */
     public function __construct(
         public string $class,
@@ -38,6 +40,8 @@ final readonly class BoundaryDeclaration
         public ?UseStrategyDeclaration $useStrategy = null,
         public bool $isCacheBoundary = true,
         public ?MetadataFlow $metadataFlow = null,
+        public ?string $returnType = null,
+        public array $unresolvedCalls = [],
     ) {
     }
 

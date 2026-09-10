@@ -15,9 +15,11 @@ use Magix\Cache\Cli\Render\NodePresentation;
 use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MermaidRenderer::class)]
+#[UsesNamespace('Magix\Cache')]
 #[UsesClass(NodePresentation::class)]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
@@ -40,9 +42,9 @@ final class MermaidRendererTest extends TestCase
 
         $chart = (new MermaidRenderer())->render($node);
 
-        self::assertStringContainsString('cache propagation unanalyzed: PageQuery::get → Lookup::get → ProductQuery::get', $chart);
+        self::assertStringNotContainsString('cache propagation unanalyzed', $chart);
         self::assertStringContainsString('expires by daily 12:00-12:15 Asia/Tokyo', $chart);
-        self::assertStringContainsString('style n0 fill:#fff3cd,stroke:#b58100,color:#664d03', $chart);
+        self::assertStringNotContainsString('fill:#fff3cd', $chart);
     }
 
     public function testRenderStartsAFlowchart(): void
@@ -86,5 +88,25 @@ final class MermaidRendererTest extends TestCase
         $statements = (new MermaidRenderer())->statements($node, 'n0');
 
         self::assertSame('    n0["RateQuery::execute<br/>≤30s - shared"]', $statements[0]);
+    }
+    public function testForestEmitsOneDiagramWithUniqueRootIdentifiers(): void
+    {
+        $node = \Tests\Package\Cli\Fixture\ReportSource::node('Controller::run');
+        $roots = (new \Magix\Cache\Cli\Render\TreeFilter(uncached: \Magix\Cache\Cli\Render\UncachedMode::None))->apply($node);
+        $chart = (new MermaidRenderer())->forest($roots);
+        self::assertSame(1, substr_count($chart, 'flowchart TD'));
+        self::assertStringContainsString('n0["Page::unrelated', $chart);
+        self::assertStringContainsString('n1["Migration::get', $chart);
+        self::assertStringNotContainsString('Controller', $chart);
+    }
+
+    public function testRenderShowsTheSameMetadataReferencesAsTheTree(): void
+    {
+        $node = \Tests\Package\Cli\Fixture\ReportSource::node('Page::automatic');
+        $node = (new \Magix\Cache\Cli\Render\TreeFilter(uncached: \Magix\Cache\Cli\Render\UncachedMode::None))->apply($node)[0];
+        $chart = (new MermaidRenderer())->render($node);
+        self::assertStringContainsString('Page::automatic<br/>10s? - shared? - tags leaf?', $chart);
+        self::assertStringContainsString('Leaf::get<br/>10s - shared - tags leaf', $chart);
+        self::assertStringNotContainsString('unanalyzed', $chart);
     }
 }

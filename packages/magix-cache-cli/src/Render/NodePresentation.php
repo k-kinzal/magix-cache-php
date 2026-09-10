@@ -15,19 +15,11 @@ use Magix\Cache\Metadata\Visibility;
 final readonly class NodePresentation
 {
     /**
-     * @return 'white'|'gray'|'yellow'|'red'
+     * @return 'white'|'gray'
      */
     public function color(CacheNode $node): string
     {
-        if ($this->invalid($node->effect)) {
-            return 'red';
-        }
-
-        if (!$node->boundary->isCacheBoundary || $this->disabled($node->effect)) {
-            return 'gray';
-        }
-
-        return $node->analysisWarnings === [] ? 'white' : 'yellow';
+        return $node->boundary->policy === null || ($node->boundary->isCacheBoundary && $this->disabled($node->effect)) ? 'gray' : 'white';
     }
 
     /**
@@ -35,15 +27,7 @@ final readonly class NodePresentation
      */
     public function storage(CacheNode $node): string
     {
-        if (!$node->boundary->isCacheBoundary || $this->invalid($node->effect) || $this->disabled($node->effect)) {
-            return 'no';
-        }
-
-        if ($node->effect->storable) {
-            return 'yes';
-        }
-
-        return $node->analysisWarnings === [] ? 'runtime-dependent' : 'unknown (analysis incomplete)';
+        return $node->storage();
     }
 
     /**
@@ -63,32 +47,14 @@ final readonly class NodePresentation
     }
 
     /**
-     * Emits each warning at its lowest visible ancestor, including when its source is hidden.
-     *
-     * @return list<string>
-     */
-    public function warnings(CacheNode $node): array
-    {
-        $below = array_merge(...array_map(static fn (CacheNode $child): array => $child->analysisWarnings, $node->children));
-
-        return array_values(array_diff($node->analysisWarnings, $below));
-    }
-
-    /**
-     * Keeps diagram colors aligned with terminal rows and field overrides.
+     * Keeps diagram row colors aligned with the terminal overview.
      */
     public function mermaid(CacheNode $node): string
     {
         $color = $this->color($node);
 
-        if ($color === 'white' && $node->effect->localOverrides !== []) {
-            $color = 'yellow';
-        }
-
         return match ($color) {
-            'red' => 'fill:#f8d7da,stroke:#b02a37,color:#842029',
             'gray' => 'fill:#e9ecef,stroke:#868e96,color:#495057',
-            'yellow' => 'fill:#fff3cd,stroke:#b58100,color:#664d03',
             'white' => 'fill:#ffffff,stroke:#495057,color:#212529',
         };
     }

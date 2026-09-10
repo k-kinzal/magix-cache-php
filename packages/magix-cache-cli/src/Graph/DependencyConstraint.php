@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Graph;
 
+use Magix\Cache\Cli\Graph\Analysis\MetadataAnalysis;
 use Magix\Cache\Metadata\Visibility;
 
 /**
@@ -34,6 +35,7 @@ final readonly class DependencyConstraint
         public bool $tagsUnknown = false,
         public bool $hasDependencies = false,
         public array $expirationConstraints = [],
+        public MetadataAnalysis $analysis = new MetadataAnalysis(),
     ) {
         $this->ttl = $ttl ?? TtlEstimate::unconstrained();
     }

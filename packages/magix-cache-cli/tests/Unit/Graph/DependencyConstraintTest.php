@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\Analysis\MetadataAnalysis::class)]
 final class DependencyConstraintTest extends TestCase
 {
     public function testConstraintNamesTheDependencyItComesFrom(): void

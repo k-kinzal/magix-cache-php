@@ -21,7 +21,7 @@ final readonly class MetadataFlowReader
     /**
      * Built-in return types that never carry cache metadata.
      */
-    private const array WITHOUT_METADATA = ['int', 'float', 'string', 'bool', 'array', 'void', 'null', 'false', 'true', 'never', 'iterable', 'object', 'callable'];
+    private const array WITHOUT_METADATA = ['int', 'float', 'string', 'bool', 'array', 'void', 'null', 'false', 'true', 'never', 'iterable', 'callable'];
 
     /**
      * Reports whether a declared return type rules out carrying cache metadata.

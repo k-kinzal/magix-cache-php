@@ -85,8 +85,10 @@ final class BoundaryReaderTest extends TestCase
 
         self::assertInstanceOf(BoundaryDeclaration::class, $entryPoint);
         self::assertFalse($entryPoint->isCacheBoundary);
-        self::assertNull($entryPoint->policy);
-        self::assertSame([], $entryPoint->parameters);
+        self::assertSame(90, $entryPoint->policy?->ttl);
+        self::assertCount(1, $entryPoint->parameters);
+        self::assertSame('viewerId', $entryPoint->parameters[0]->name);
+        self::assertSame(\Magix\Cache\Metadata\Visibility::Private, $entryPoint->parameters[0]->scope);
         self::assertSame('ProductController::show', $entryPoint->id());
         self::assertSame(['ProductQuery', 'ViewerQuery'], array_map(static fn (DependencyCall $call): string => $call->class, $entryPoint->dependencies));
         self::assertNull((new BoundaryReader())->entryPoint(new ClassMethod('abstract', ['stmts' => null]), 'ProductController', 'controller.php', []));

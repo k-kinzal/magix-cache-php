@@ -24,6 +24,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(JsonRenderer::class)]
+#[\PHPUnit\Framework\Attributes\UsesNamespace('Magix\Cache')]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
 #[UsesClass(CacheGap::class)]
@@ -99,7 +100,7 @@ final class JsonRendererTest extends TestCase
 
         self::assertSame('App\PageQuery::execute', $tree['boundary']);
         self::assertSame(
-            ['source' => 'MethodAttribute', 'ttl' => '120s', 'maxTtl' => null, 'maxTtlUnknown' => false, 'tags' => ['page'], 'visibility' => null, 'version' => '1', 'runtime' => 'default'],
+            ['source' => 'MethodAttribute', 'ttl' => '120s', 'ttlUnknown' => false, 'tagsUnknown' => false, 'visibilityUnknown' => false, 'maxTtl' => null, 'maxTtlUnknown' => false, 'tags' => ['page'], 'visibility' => null, 'version' => '1', 'runtime' => 'default'],
             $tree['policy'],
         );
         self::assertSame([['name' => 'viewerId', 'type' => 'int', 'ignored' => false, 'scope' => 'private', 'reducer' => null, 'configuration' => null]], $tree['key']);
@@ -168,5 +169,92 @@ final class JsonRendererTest extends TestCase
         self::assertFalse($renderer->policy($declared)['maxTtlUnknown']);
         self::assertNull($renderer->policy($unreadable)['version']);
         self::assertTrue($renderer->policy($unreadable)['maxTtlUnknown']);
+    }
+
+    public function testEffectRetainsDeterminedTtlWhileOtherFieldsRemainPartial(): void
+    {
+        $node = \Tests\Package\Cli\Fixture\ReportSource::node('Page::fixed');
+        $data = (new JsonRenderer())->effect($node);
+        self::assertSame(TtlEstimate::known(60, $node->effect->ttl->reason)->jsonSerialize(), $data['ttl']);
+        self::assertSame(['ttl' => 'known', 'visibility' => 'partial', 'tags' => 'partial'], $data['certainty']);
+        self::assertSame('unknown', $data['storage']);
+        self::assertSame($node->effect->analysis, $data['analysis']);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testRenderResolvesEveryHiddenCauseWithoutRestoringHiddenRows(): void
+    {
+        $node = \Tests\Package\Cli\Fixture\ReportSource::node('Page::multiple');
+        $nodes = (new \Magix\Cache\Cli\Render\TreeFilter(uncached: \Magix\Cache\Cli\Render\UncachedMode::None))->apply($node);
+        $report = json_decode((new JsonRenderer())->render($nodes), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($report);
+        self::assertIsArray($report['diagnostics']);
+        self::assertCount(1, $report['diagnostics']);
+        self::assertIsArray($report['diagnostics'][0]);
+        self::assertSame('Bridge::get', $report['diagnostics'][0]['method']);
+        self::assertSame(array_keys($node->effect->analysis->tags)[0], $report['diagnostics'][0]['id']);
+        self::assertStringNotContainsString('"boundary": "Bridge::get"', (new JsonRenderer())->render($nodes));
+    }
+
+    public function testTreeRetainsMigrationDeclarationsSeparatelyFromReturnedMetadata(): void
+    {
+        $node = \Tests\Package\Cli\Fixture\ReportSource::node('Migration::get');
+        $data = (new JsonRenderer())->tree($node);
+        self::assertTrue($data['declared']);
+        self::assertSame('not-observed', $data['execution']);
+        self::assertSame('Magix\\Cache\\Cached', $data['returnType']);
+        self::assertIsArray($data['policy']);
+        self::assertSame('60s', $data['policy']['ttl']);
+        self::assertSame($node->boundary->parameters, $data['parameters']);
+        self::assertNull($data['key']);
+        self::assertSame(10, $node->effect->ttl->seconds);
+        self::assertFalse($node->effect->storable);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testRenderPreservesUnreadableArgumentsWithoutLosingMigrationResults(): void
+    {
+        $node = \Tests\Package\Cli\Fixture\ReportSource::node('Migration::get');
+        $report = \Tests\Package\Cli\Fixture\JsonReport::root((new JsonRenderer())->render([$node]));
+        self::assertIsArray($report['useStrategy']);
+        self::assertSame(['limit' => ['state' => 'unknown']], $report['useStrategy']['arguments']);
+        self::assertIsArray($report['parameters']);
+        self::assertIsArray($report['parameters'][0]);
+        self::assertSame('ttl', $report['parameters'][0]['name']);
+        self::assertIsArray($report['parameters'][0]['configuration']);
+        self::assertTrue($report['parameters'][0]['configuration']['ttl']);
+        self::assertIsArray($report['effective']);
+        self::assertIsArray($report['effective']['ttl']);
+        self::assertSame(10, $report['effective']['ttl']['seconds']);
+        self::assertSame('not-observed', $report['execution']);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testRenderKeepsMetadataReferencesSeparateFromEffectiveConstraints(): void
+    {
+        $node = \Tests\Package\Cli\Fixture\AnalysisSource::node('return opaque($this->inputs->b());', '#[Cache(ttl: 120)]');
+        $nodes = (new \Magix\Cache\Cli\Render\TreeFilter(uncached: \Magix\Cache\Cli\Render\UncachedMode::None))->apply($node);
+        $report = \Tests\Package\Cli\Fixture\JsonReport::root((new JsonRenderer())->render($nodes));
+        self::assertIsArray($report['effective']);
+        $effect = $report['effective'];
+        self::assertSame('shared', $effect['visibility']);
+        self::assertTrue($effect['visibilityUnknown']);
+        self::assertSame([], $effect['tags']);
+        self::assertTrue($effect['tagsUnknown']);
+        self::assertFalse($effect['storable']);
+        self::assertSame('unknown', $effect['storage']);
+        self::assertIsArray($effect['analysis']);
+        self::assertIsArray($effect['analysis']['visibilityReference']);
+        self::assertSame('private', $effect['analysis']['visibilityReference']['value']);
+        self::assertSame(['Inputs::b'], $effect['analysis']['visibilityReference']['sources']);
+        self::assertIsArray($effect['analysis']['tagsReference']);
+        self::assertSame(['b'], $effect['analysis']['tagsReference']['value']);
+        self::assertSame(['ttl' => 'known', 'visibility' => 'partial', 'tags' => 'partial'], $effect['certainty']);
     }
 }

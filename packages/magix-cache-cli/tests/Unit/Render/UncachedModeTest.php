@@ -28,7 +28,7 @@ final class UncachedModeTest extends TestCase
     #[DataProvider('providerRows')]
     public function testKeepsOnlyRowsSelectedByTheDisplayMode(CacheNode $node, bool $cachedAncestor, array $expected): void
     {
-        self::assertSame($expected, array_values(array_filter(UncachedMode::cases(), static fn (UncachedMode $mode): bool => $mode->keeps($node, $cachedAncestor))));
+        self::assertSame($expected, array_values(array_filter(UncachedMode::cases(), static fn (UncachedMode $mode): bool => $mode->keeps($node->boundary->policy !== null, $cachedAncestor, $node->children !== []))));
     }
 
     /**
@@ -37,7 +37,7 @@ final class UncachedModeTest extends TestCase
     public static function providerRows(): iterable
     {
         $effect = new CacheEffect(TtlEstimate::unknown(), Visibility::Shared);
-        $cached = new CacheNode(new BoundaryDeclaration('CachedQuery', 'get', 'cached.php', 1), $effect);
+        $cached = new CacheNode(new BoundaryDeclaration('CachedQuery', 'get', 'cached.php', 1, policy: new \Magix\Cache\Cli\Declaration\PolicyDeclaration(\Magix\Cache\Cli\Declaration\PolicySource::MethodAttribute)), $effect);
         $leaf = new CacheNode(new BoundaryDeclaration('Leaf', 'get', 'leaf.php', 1, isCacheBoundary: false), $effect);
         $bridge = new CacheNode($leaf->boundary, $effect, [$cached]);
 

@@ -16,6 +16,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\Analysis\AnalysisCause::class)]
+#[UsesClass(\Magix\Cache\Cli\Graph\Analysis\MetadataAnalysis::class)]
 final class CacheEffectTest extends TestCase
 {
     public function testEffectKeepsTheReasonsBehindEveryValue(): void
@@ -60,5 +62,11 @@ final class CacheEffectTest extends TestCase
         self::assertSame('fixed + runtime tags', (new CacheEffect(tags: ['fixed'], tagsUnknown: true))->tagsLabel());
         self::assertSame('runtime tags', (new CacheEffect(tagsUnknown: true))->tagsLabel());
         self::assertSame('-', (new CacheEffect())->tagsLabel());
+    }
+    public function testCertaintyDistinguishesRuntimeChoicesFromAnalysisLimits(): void
+    {
+        $cause = \Magix\Cache\Cli\Graph\Analysis\AnalysisCause::at(null, 'test', 'unreadable return');
+        $effect = new CacheEffect(TtlEstimate::known(60), visibilityUnknown: true, tagsUnknown: true, analysis: (new \Magix\Cache\Cli\Graph\Analysis\MetadataAnalysis())->withCause($cause, ['tags']));
+        self::assertSame(['ttl' => 'known', 'visibility' => 'runtime', 'tags' => 'partial'], $effect->certainty());
     }
 }

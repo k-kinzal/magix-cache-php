@@ -25,4 +25,11 @@ final class MetadataFlowTest extends TestCase
         self::assertTrue((new MetadataFlow('meet', [new MetadataFlow('choice', [new MetadataFlow('unknown')])]))->hasUnknown());
         self::assertFalse((new MetadataFlow('value', [new MetadataFlow('call', target: 'A::get')]))->hasUnknown());
     }
+    public function testUnknownRetainsItsInputReferencesAndLocation(): void
+    {
+        $flow = MetadataFlow::unknown('opaque-call', 7, [new MetadataFlow('call', target: 'A::get')]);
+        self::assertTrue($flow->references('A::get'));
+        self::assertSame(7, $flow->line);
+        self::assertSame('opaque-call', $flow->reason);
+    }
 }

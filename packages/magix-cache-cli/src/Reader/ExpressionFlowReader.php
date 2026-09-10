@@ -46,7 +46,7 @@ final readonly class ExpressionFlowReader
     public function read(Expr $expression, array $variables): MetadataFlow
     {
         return match (true) {
-            $expression instanceof Expr\Variable && is_string($expression->name) => $variables[$expression->name] ?? new MetadataFlow('unknown'),
+            $expression instanceof Expr\Variable && is_string($expression->name) => $variables[$expression->name] ?? MetadataFlow::unknown('unresolved-binding', $expression->getStartLine()),
             $expression instanceof Expr\Assign => $this->read($expression->expr, $variables),
             $expression instanceof Expr\Ternary => new MetadataFlow('choice', [
                 $this->read($expression->if ?? $expression->cond, $variables), $this->read($expression->else, $variables),
@@ -60,6 +60,7 @@ final readonly class ExpressionFlowReader
             ]),
             $expression instanceof Expr\MethodCall => $this->method($expression, $variables),
             $expression instanceof Expr\StaticCall => $this->staticCall($expression, $variables),
+            $expression instanceof Expr\FuncCall => MetadataFlow::unknown('opaque-call', $expression->getStartLine(), $this->arguments($expression, $variables)),
             $expression instanceof Expr\ArrayDimFetch => $this->projection($expression, $variables),
             $expression instanceof Expr\Array_ => new MetadataFlow('collection', array_map(
                 fn (\PhpParser\Node\ArrayItem $item): MetadataFlow => $this->read($item->value, $variables),
@@ -69,7 +70,7 @@ final readonly class ExpressionFlowReader
             $expression instanceof Expr\BinaryOp,
             $expression instanceof Expr\Cast, $expression instanceof Expr\New_ => new MetadataFlow('none'),
             $expression instanceof Expr\Throw_ => new MetadataFlow('choice'),
-            default => new MetadataFlow('unknown'),
+            default => MetadataFlow::unknown('unsupported-expression', $expression->getStartLine()),
         };
     }
 
@@ -79,7 +80,7 @@ final readonly class ExpressionFlowReader
     public function method(Expr\MethodCall $call, array $variables): MetadataFlow
     {
         if (!$call->name instanceof Identifier || $call->isFirstClassCallable()) {
-            return new MetadataFlow('unknown');
+            return MetadataFlow::unknown('dynamic-call', $call->getStartLine());
         }
 
         $name = $call->name->toString();
@@ -91,7 +92,7 @@ final readonly class ExpressionFlowReader
         $target = (new DependencyReader())->target($call, $this->class, $this->propertyTypes, $this->types($call));
 
         if ($target !== null && $target[0] !== Cached::class) {
-            return new MetadataFlow('call', target: implode('::', $target));
+            return new MetadataFlow('call', target: implode('::', $target), line: $call->getStartLine());
         }
 
         $receiver = $this->read($call->var, $variables);
@@ -105,7 +106,7 @@ final readonly class ExpressionFlowReader
             $name === 'flatMap' => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), $this->callback($this->argument($call, 0), $variables)]),
             $name === 'flatten' => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), $this->nested($call->var, $variables)]),
             $name === 'zip', in_array($name, ['combine2', 'combine3', 'combine4', 'combine5'], true) => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), ...$this->arguments($call, $variables)]),
-            default => new MetadataFlow('unknown'),
+            default => MetadataFlow::unknown('opaque-method', $call->getStartLine(), [$receiver, ...$this->arguments($call, $variables)]),
         };
     }
 
@@ -293,7 +294,7 @@ final readonly class ExpressionFlowReader
      * @param array<string, MetadataFlow> $variables
      * @return list<MetadataFlow>
      */
-    public function arguments(Expr\MethodCall $call, array $variables): array
+    public function arguments(Expr\MethodCall|Expr\StaticCall|Expr\FuncCall $call, array $variables): array
     {
         $inputs = [];
 

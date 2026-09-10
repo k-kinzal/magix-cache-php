@@ -100,6 +100,28 @@ final readonly class DependencyReader
     }
 
     /**
+     * Retains unresolved call sites without inventing dependencies or metadata effects.
+     *
+     * @param array<string, string> $propertyTypes
+     * @return list<array{method: string, line: int}>
+     */
+    public function unresolved(ClassMethod $method, string $class, array $propertyTypes): array
+    {
+        $statements = $method->stmts ?? [];
+        $parameters = $this->parameterTypes($method);
+        $assignments = $this->variableTypes($statements, $propertyTypes);
+        $unresolved = [];
+
+        foreach ($this->finder->find($statements, static fn (Node $node): bool => $node instanceof MethodCall || $node instanceof StaticCall) as $call) {
+            if (($call instanceof MethodCall || $call instanceof StaticCall) && $this->target($call, $class, $propertyTypes, $this->bindings($parameters, $assignments, $call->getStartFilePos())) === null) {
+                $unresolved[] = ['method' => $call->name instanceof Identifier ? $call->name->toString() : '(dynamic)', 'line' => $call->getStartLine()];
+            }
+        }
+
+        return $unresolved;
+    }
+
+    /**
      * Returns where each local variable is bound to a known object type.
      *
      * Assignments keep their source position, because a variable reassigned

@@ -38,4 +38,15 @@ final class AlternativeEffectsTest extends TestCase
         self::assertFalse($ttl->hasFiniteExpiration());
         self::assertNull($ttl->upperBound);
     }
+
+    public function testSummarizeIncludesKnownBranchesWhenCheckingReferenceAgreement(): void
+    {
+        $effect = \Tests\Package\Cli\Fixture\AnalysisSource::node('return $flag ? opaque($this->inputs->a()) : $this->inputs->b();')->effect;
+        self::assertNotNull($effect->analysis->visibilityReference);
+        self::assertNull($effect->analysis->visibilityReference->value());
+        self::assertNotNull($effect->analysis->tagsReference);
+        self::assertNull($effect->analysis->tagsReference->value());
+        self::assertSame([], $effect->tags);
+        self::assertTrue($effect->visibilityUnknown);
+    }
 }

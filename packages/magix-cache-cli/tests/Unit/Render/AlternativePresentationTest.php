@@ -25,8 +25,9 @@ final class AlternativePresentationTest extends TestCase
         $node = AnalysisSource::node('return $flag ? $this->inputs->a() : $this->inputs->b();');
         $label = (new AlternativePresentation())->label($node);
         self::assertSame('Inputs::a [ttl 20s, shared, tags a] or Inputs::b [ttl 60s, private, tags b]', $label);
-        self::assertStringContainsString('alternatives: '.$label, (new TreeRenderer())->render($node));
-        self::assertStringContainsString('alternatives: '.$label, (new MermaidRenderer())->render($node));
+        self::assertStringContainsString('ttl 20/60s', (new TreeRenderer())->render($node));
+        self::assertStringNotContainsString('alternatives:', (new TreeRenderer())->render($node));
+        self::assertStringContainsString('20/60s', (new MermaidRenderer())->render($node));
     }
 
     public function testDataPreservesCorrelatedMetadataWhenDisplayHidesChildren(): void
@@ -34,9 +35,9 @@ final class AlternativePresentationTest extends TestCase
         $node = AnalysisSource::node('return $flag ? $this->inputs->a() : $this->inputs->b();');
         $before = (new JsonRenderer())->tree($node);
         $filtered = (new TreeFilter([new IgnorePattern('Inputs::*')], UncachedMode::None))->apply($node);
-        self::assertNotNull($filtered);
-        self::assertSame($before['metadataAlternatives'], (new JsonRenderer())->tree($filtered)['metadataAlternatives']);
-        self::assertSame($node->effect, $filtered->effect);
+        self::assertCount(1, $filtered);
+        self::assertSame($before['metadataAlternatives'], (new JsonRenderer())->tree($filtered[0])['metadataAlternatives']);
+        self::assertSame($node->effect, $filtered[0]->effect);
     }
     public function testVariantNamesAnUnconstrainedReturnWithoutInventingADependency(): void
     {

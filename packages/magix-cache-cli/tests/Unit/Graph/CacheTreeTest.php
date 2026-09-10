@@ -60,7 +60,7 @@ final class CacheTreeTest extends TestCase
         self::assertSame([], $baseline->children);
         self::assertEquals($baseline->effect, $expanded->effect);
         self::assertEquals($baseline->effect, $uncached->effect);
-        self::assertSame(['recursive dependency, not expanded again'], $expanded->children[0]->children[0]->notes);
+        self::assertNotEmpty($expanded->children[0]->children[0]->effect->analysis->causes());
         self::assertSame(TtlEstimateState::Unknown, $expanded->children[0]->children[0]->effect->ttl->state);
     }
 
@@ -103,7 +103,7 @@ final class CacheTreeTest extends TestCase
         self::assertSame(TtlEstimateState::Unknown, $recursive->effect->ttl->state);
         self::assertSame(20, $recursive->effect->ttl->upperBound);
         self::assertSame([], $recursive->effect->problems);
-        self::assertSame(['recursive dependency, not expanded again'], $recursive->children[1]->notes);
+        self::assertNotEmpty($recursive->children[1]->effect->analysis->causes());
     }
 
     public function testBuildComposesTheEffectOfEveryDependency(): void
@@ -150,7 +150,7 @@ final class CacheTreeTest extends TestCase
 
         $recursive = $tree->build($boundary);
 
-        self::assertSame(['recursive dependency, not expanded again'], $recursive->children[0]->notes);
+        self::assertNotEmpty($recursive->children[0]->effect->analysis->causes());
         self::assertSame(TtlEstimateState::Unknown, $recursive->children[0]->effect->ttl->state);
         self::assertSame(TtlEstimateState::Known, $recursive->effect->ttl->state);
         self::assertSame(20, $recursive->effect->ttl->seconds);

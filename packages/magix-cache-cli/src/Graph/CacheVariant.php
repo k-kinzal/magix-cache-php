@@ -34,7 +34,8 @@ final readonly class CacheVariant
             && $a->storable === $b->storable && $a->visibilityReason === $b->visibilityReason
             && $a->problems === $b->problems && $a->strategy === $b->strategy
             && $a->visibilityUnknown === $b->visibilityUnknown && $a->tagsUnknown === $b->tagsUnknown
-            && $a->localOverrides === $b->localOverrides && $a->expirationConstraints === $b->expirationConstraints;
+            && $a->localOverrides === $b->localOverrides && $a->expirationConstraints === $b->expirationConstraints
+            && $a->analysis->equals($b->analysis);
     }
 
     /**
@@ -84,6 +85,7 @@ final readonly class CacheVariant
             $this->effect->tagsUnknown,
             $this->sources !== [],
             $this->effect->expirationConstraints,
+            $this->effect->analysis,
         );
     }
 }

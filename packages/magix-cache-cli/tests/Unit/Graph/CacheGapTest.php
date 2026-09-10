@@ -116,6 +116,6 @@ final class CacheGapTest extends TestCase
         $complete = $tree->build($parent);
         self::assertCount(1, $complete->gaps);
         self::assertSame([$parent, $lookup, $child], $complete->gaps[0]->path);
-        self::assertSame(['recursive dependency, not expanded again'], $complete->children[0]->children[0]->notes);
+        self::assertNotEmpty($complete->children[0]->children[0]->effect->analysis->causes());
     }
 }

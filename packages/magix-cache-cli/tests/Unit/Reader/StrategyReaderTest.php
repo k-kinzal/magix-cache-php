@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Reader;
 
+use Magix\Cache\Cli\Declaration\ConstantCatalog;
 use Magix\Cache\Cli\Declaration\ContractReference;
 use Magix\Cache\Cli\Declaration\ContractSource;
 use Magix\Cache\Cli\Declaration\StrategyArgument;
@@ -35,6 +36,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(StrategyReader::class)]
 #[UsesClass(AttributeReader::class)]
+#[UsesClass(ConstantCatalog::class)]
 #[UsesClass(ContractReader::class)]
 #[UsesClass(ContractReference::class)]
 #[UsesClass(LiteralReader::class)]

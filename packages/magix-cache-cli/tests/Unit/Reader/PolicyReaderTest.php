@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Reader;
 
+use Magix\Cache\Cli\Declaration\ConstantCatalog;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Reader\ArgumentReader;
@@ -26,6 +27,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PolicyReader::class)]
 #[UsesClass(ArgumentReader::class)]
+#[UsesClass(ConstantCatalog::class)]
 #[UsesClass(LiteralReader::class)]
 #[UsesClass(PolicyDeclaration::class)]
 final class PolicyReaderTest extends TestCase

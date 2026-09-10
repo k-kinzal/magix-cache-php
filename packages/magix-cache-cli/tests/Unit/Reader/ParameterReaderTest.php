@@ -6,6 +6,7 @@ namespace Tests\Package\Cli\Unit\Reader;
 
 use Magix\Cache\Attribute\CacheKey;
 use Magix\Cache\Attribute\CacheScope;
+use Magix\Cache\Cli\Declaration\ConstantCatalog;
 use Magix\Cache\Cli\Declaration\KeyParameter;
 use Magix\Cache\Cli\Reader\AttributeReader;
 use Magix\Cache\Cli\Reader\LiteralReader;
@@ -31,6 +32,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ParameterReader::class)]
 #[UsesClass(AttributeReader::class)]
+#[UsesClass(ConstantCatalog::class)]
 #[UsesClass(KeyParameter::class)]
 #[UsesClass(LiteralReader::class)]
 #[UsesClass(TypeReader::class)]

@@ -7,6 +7,7 @@ namespace Tests\Package\Cli\Unit\Render;
 use JsonException;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\KeyParameter;
+use Magix\Cache\Cli\Declaration\MetadataContract;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Graph\CacheEffect;
@@ -28,6 +29,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CacheGap::class)]
 #[UsesClass(CacheNode::class)]
 #[UsesClass(KeyParameter::class)]
+#[UsesClass(MetadataContract::class)]
 #[UsesClass(PolicyDeclaration::class)]
 #[UsesClass(StrategyEffect::class)]
 #[UsesClass(StrategyStep::class)]

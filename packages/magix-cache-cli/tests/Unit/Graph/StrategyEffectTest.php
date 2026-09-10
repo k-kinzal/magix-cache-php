@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Graph;
 
+use Magix\Cache\Cli\Declaration\MetadataContract;
 use Magix\Cache\Cli\Graph\StrategyEffect;
 use Magix\Cache\Cli\Graph\StrategyStep;
 use Magix\Cache\Cli\Graph\TtlEstimate;
@@ -12,6 +13,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(StrategyEffect::class)]
+#[UsesClass(MetadataContract::class)]
 #[UsesClass(StrategyStep::class)]
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]

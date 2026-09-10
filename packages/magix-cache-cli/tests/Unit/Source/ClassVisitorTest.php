@@ -6,6 +6,7 @@ namespace Tests\Package\Cli\Unit\Source;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\ClassDeclaration;
+use Magix\Cache\Cli\Declaration\ConstantCatalog;
 use Magix\Cache\Cli\Declaration\DependencyCall;
 use Magix\Cache\Cli\Declaration\KeyParameter;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
@@ -34,6 +35,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(BoundaryReader::class)]
 #[UsesClass(ClassDeclaration::class)]
+#[UsesClass(ConstantCatalog::class)]
 #[UsesClass(DependencyCall::class)]
 #[UsesClass(DependencyReader::class)]
 #[UsesClass(KeyParameter::class)]

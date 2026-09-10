@@ -6,6 +6,7 @@ namespace Tests\Package\Cli\Unit\Graph;
 
 use Magix\Cache\Cli\Declaration\ContractReference;
 use Magix\Cache\Cli\Declaration\ContractSource;
+use Magix\Cache\Cli\Declaration\MetadataContract;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\StrategyParameter;
 use Magix\Cache\Cli\Declaration\TtlContract;
@@ -25,6 +26,7 @@ use Tests\Fixture\ProductCacheStrategy;
 #[UsesClass(Arg::class)]
 #[UsesClass(ConstructorArg::class)]
 #[UsesClass(ContractReference::class)]
+#[UsesClass(MetadataContract::class)]
 #[UsesClass(StrategyDeclaration::class)]
 #[UsesClass(StrategyParameter::class)]
 #[UsesClass(Ttl::class)]

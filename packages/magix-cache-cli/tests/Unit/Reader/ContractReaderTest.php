@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Reader;
 
+use Magix\Cache\Cli\Declaration\ConstantCatalog;
 use Magix\Cache\Cli\Declaration\ContractReference;
 use Magix\Cache\Cli\Declaration\ContractSource;
 use Magix\Cache\Cli\Declaration\TtlAssumption;
@@ -30,6 +31,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ContractReader::class)]
+#[UsesClass(ConstantCatalog::class)]
 #[UsesClass(ContractReference::class)]
 #[UsesClass(LiteralReader::class)]
 #[UsesClass(TtlAssumption::class)]

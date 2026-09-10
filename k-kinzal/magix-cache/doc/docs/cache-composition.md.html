@@ -83,8 +83,8 @@ $page = $productQuery-&gt;execute($productId)-&gt;map(
             <span class="tok-kw">new</span> <span class="tok-id">ProductPage</span>(<span class="tok-var">$product</span>, <span class="tok-var">$inventory</span>),
     );</code></pre>
 <p>The mapping closure receives the unwrapped values. Its return value is wrapped in a new <code>Cached</code> carrying the met metadata of every input.</p>
-<h3>Combine Three to Five Values</h3>
-<p>The same API is available for three, four, or five dependencies:</p>
+<h3>Combine Three to Ten Values</h3>
+<p>The same API is available for three through ten dependencies:</p>
 <pre class="code-block"><code><span class="tok-var">$viewModel</span> = <span class="tok-var">$product</span>
     -&gt;<span class="tok-id">combine3</span>(<span class="tok-var">$inventory</span>, <span class="tok-var">$pricing</span>)
     -&gt;<span class="tok-id">map</span>(
@@ -98,8 +98,8 @@ $page = $productQuery-&gt;execute($productId)-&gt;map(
             <span class="tok-var">$pricing</span>,
         ),
     );</code></pre>
-<p>Use <code>combine4()</code> and <code>combine5()</code> for four and five values respectively. Each method returns a typed capability whose <code>map()</code> closure receives the values in the same order.</p>
-<p>For more than five inputs of different types, compose intermediate domain values and combine those results in another step. For a variable number of results, use <code>sequence()</code> or <code>traverse()</code> below.</p>
+<p><code>combine4()</code> through <code>combine10()</code> follow the same shape for four to ten values. Each method returns a typed capability whose <code>map()</code> closure receives the values in the same order, so the arity and the type of every input are checked statically.</p>
+<p>For more than ten inputs of different types, compose intermediate domain values and combine those results in another step. For a variable number of results, use <code>sequence()</code> or <code>traverse()</code> below.</p>
 <h3>Flatten a Nested Cached Value</h3>
 <p><code>flatten()</code> changes <code>Cached&lt;Cached&lt;T&gt;&gt;</code> into <code>Cached&lt;T&gt;</code>, meeting the outer and inner metadata:</p>
 <pre class="code-block"><code><span class="tok-var">$nested</span> = <span class="tok-var">$productQuery</span>-&gt;<span class="tok-id">execute</span>(<span class="tok-var">$productId</span>)-&gt;<span class="tok-id">map</span>(

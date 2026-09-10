@@ -26,267 +26,282 @@ A reference without a method matches every boundary of the class. `analyze` also
 
 ## magix analyze
 
-Expands a cache boundary or an uncached entry point into its cache dependency tree.
+Analyzes the selected method without executing application code. Partial analysis
+is a result: known calls, declarations and metadata remain available even when
+another part cannot be followed. Uncertainty belongs to the affected field;
+an unrelated ordinary call does not change a cache parent's certainty.
 
 ```bash
-vendor/bin/magix analyze ProductPageQuery::execute
+vendor/bin/magix analyze ProductPageQuery::execute --uncached=none
 ```
 
 ```text
-App\Query\ProductPageQuery::execute
-  src/Query/ProductPageQuery.php:34
-
-  ttl          20s (declared 120s, capped by ProductQuery::execute)
-  visibility   private (restricted by ViewerQuery::execute)
-  storable     yes
-  tags         inventory, page, product, viewer
-  key          $productId, $viewerId (ignored: $trace)  version 1
-  policy       #[Cache(ttl: 120s, tags: [page])]
-
-ProductPageQuery::execute  ttl 20s (declared 120s)  private  tags inventory,page,product,viewer
+ProductPageQuery::execute  ttl 120s  private  tags page
 |-- ProductQuery::execute  ttl 20s  shared  tags product
 |-- InventoryQuery::execute  ttl 60s  shared  tags inventory
 `-- ViewerQuery::execute  ttl 30s  private  tags viewer
 ```
 
-The header block describes the boundary itself:
+The parent declares TTL 120 and tags `page`, so those fields replace the children's
+metadata. Omitted visibility inherits Private. The child's TTL does not cap an
+explicit parent TTL.
 
-| Field | Meaning |
+Tree output uses one line per method. It has no separate detail header, repeated
+warning paragraphs, or expanded alternative lists. JSON carries those details
+for further analysis. Mermaid uses the same compact values in a single diagram,
+including when filtering produces several roots.
+
+### Reading partial results
+
+| Label | Meaning |
 |---|---|
-| `ttl` | Expiration after composition, followed by the reason it differs from the declaration. A number appears only when it is statically determined; a proven range keeps its bounds — `30-60s`, `30-?s` (the `?` is undetermined, not unlimited), `≤60s` — and otherwise the estimate is `unconstrained` (provably no expiration), `unknown` with the runtime condition, or `invalid` when the declaration throws at runtime |
-| `strategy` | The `#[UseStrategy]` construction, one line per composed strategy with its contracted candidate range, and `(assumed)` where an explicit `#[AssumeTtl]` replaced the contract. Only shown when a strategy is declared |
-| `strategy ttl` | The winning Strategy expiration override on the normal origin path; disjoint alternatives stay distinct, such as `30/600-900s` |
-| `visibility` | `shared`, `private`, or `nostore` after composition, followed by what restricted it |
-| `storable` | `yes` when storage is proven, `no` for a non-cache method, a disabled cache, or an invalid declaration, `runtime-dependent` for a normal runtime decision, and `unknown (analysis incomplete)` when storage is unproven and call analysis is unfinished |
-| `tags` | Bubbled dependency tags, replaced when the boundary explicitly sets tags |
-| `key` | The parameters that form the key, the ignored ones, and the policy version |
-| `policy` | The declaration as it is written in the source |
+| `ttl 10s` | A determined effective lifetime |
+| `ttl ?` | No usable numeric lifetime is known |
+| `ttl 10s?` | A 10-second reference was found in known inputs or a declaration, but its survival into the result is unverified |
+| `ttl dynamic` | A finite expiration is established, with its duration decided at runtime |
+| `ttl ≤60s`, `30-?s`, `30-60s` | Proven bounds; `?` means undetermined, never unlimited |
+| `ttl 30/600-900s` | Disjoint lifetime alternatives, without filling the gap |
+| `ttl unconstrained` | Proven absence of an expiration constraint |
+| `ttl invalid` | A confirmed invalid expiration declaration |
+| `?` in visibility | No usable visibility reference is known |
+| `shared?`, `private?`, `nostore?` | Visibility observed before an opaque operation, whose survival is unverified |
+| `≥private` | A proven Private floor, with the remaining choice unresolved |
+| `tags product?` | A reference to `product`, whose propagation is unverified |
+| `tags product,?` | Guaranteed tag `product` and an undetermined remainder |
+| `tags page,product?` | Guaranteed tag `page` and tentative tag `product` |
+| `tags []?` | An empty tag set observed before an opaque operation; its preservation is unverified |
+| `ttl 60s [declared]` | A Cache attribute was read, but this method's cache execution was not observed |
+| `[declaration problem]` | A confirmed problem whose explanation is retained in JSON |
 
-Lines below the header show each boundary of the tree, with `!` for a declaration problem and `~` for incomplete analysis or a note about how the tree was resolved. An analysis gap does not assert that the boundary fails at runtime.
+A numeric reference such as `10s?` is not a bound or a probability. It appears only
+when the understood numeric inputs agree on one value; conflicting references
+become `?`. The analyzer never uses references in TTL composition, storage proof,
+or an automatic parent's finite-expiration check. A proven bound takes precedence
+over a reference in the display. Full reference sources and their basis remain
+in JSON, separate from `effective.ttl`.
 
-Terminal colors describe **Magix Cache behavior**, independently of whether static
-analysis proves that a particular invocation will store an entry:
+Visibility and tag references follow the same rule as TTL references. They are
+observations for the overview, never effective constraints or storage proof.
+For example, `private?` does not establish a Private floor, and `product?` does
+not enter the guaranteed tag set. Known facts take display precedence: a proven
+Private floor renders as `≥private`, and a guaranteed tag is never suffixed `?`.
 
-| Color | Meaning |
-|---|---|
-| White row | A normal cache boundary, including dynamic TTL, parameter configuration, daily expiration and custom Strategies |
-| Gray row | An ordinary method, an uncached entry point, or a boundary whose effective result has `NoStore` or TTL 0 |
-| Yellow row / `~` diagnostic | Incomplete call analysis: recursion, ambiguous implementations, syntax the reader cannot follow, or unverified propagation through ordinary methods |
-| Yellow field | An explicit local override of bubbled TTL, visibility or tags on an enabled, valid boundary |
-| Red row / `!` diagnostic | A definite declaration error, such as a missing policy, invalid lifetime or invalid Strategy binding |
+Conflicting visibility candidates or tag sets produce `?`; their candidates and
+sources remain in JSON. Tag order and duplicates do not create a conflict.
+Plain arguments and values detached with `value()` do not supply metadata
+references. Explicit field replacements, including runtime parameter overrides
+and readable Strategy writers, discard the old reference for that field.
+Opaque Strategy replacements can retain metadata observed before that stage.
 
-White means normal cache participation, not guaranteed storage. Runtime TTL and
-visibility can decide whether a particular call is stored; custom Strategy
-metadata stays unknown in the analysis without turning normal behavior into a
-warning. `shared` and `private` both use white. TTL 0 is a valid non-storage
-setting, so it uses gray like `NoStore`, not error red.
+Only affected fields become uncertain. A fixed TTL can remain `60s` while tags
+and visibility retain their own unknown or tentative labels. Explicit parent fields remove their inherited
+uncertainty. Runtime parameter settings and readable strategy contracts remain
+distinct from syntax or call resolution the analyzer could not follow.
 
-Ordinary descendants display `(uncached)` without TTL or visibility fields;
-NoStore boundaries retain their metadata and show `nostore`. An explicitly
-selected uncached root remains visible as `(uncached entry point)` with its
-summary of called caches. Errors take precedence over gray and yellow. Disabled
-caches and ordinary methods retain gray rows even when they carry yellow warnings.
+Tags show at most three names, with `+N` for omitted guaranteed names and `+N?`
+for omitted tentative names. Full tag lists, key parameters,
+strategy candidates, alternative returns, source locations and diagnostic
+explanations are available with `--format=json`.
 
-Yellow analysis warnings name the affected method or call path. Each one is
-reported on the method it belongs to and never repeated on the callers above it,
-so a warning names the one place to look. Warnings remain
-visible when their source rows are hidden by `--uncached` or `--ignore`. Affected
-cache ancestors stay yellow because filtering does not complete the analysis.
-Each warning appears at its lowest visible ancestor to avoid repeating it at
-every level. Informational labels and ordinary TTL values follow the row color.
+Normal declared rows are white; ordinary methods and effective NoStore or TTL 0
+are gray. Explicit local field overrides use yellow. Invalid TTL and the compact
+declaration-problem marker use red. An unrelated descendant's diagnostic never
+colors the whole parent. White does not prove storage. JSON separately reports
+`effective.storage` as `yes`, `no`, `runtime-dependent`, or `unknown`.
+`--ansi` and `--no-ansi` change color only.
 
-Yellow fields mark **local overrides** when a boundary has dependencies.
-Explicit settings are shown even when numerically equal to inherited values:
-they still own that field. This includes runtime-dependent overrides and
-Strategies. Ordinary leaf declarations have no dependency bubbling to override.
-FromUpstream is highlighted when its maximum changes a proven lifetime. Invalid
-and disabled boundaries retain their red or gray fields.
-
-Use `--ansi` to force terminal colors or `--no-ansi` to disable them. Plain text
-keeps the same labels and diagnostics. Mermaid uses the same row meanings,
-coloring the whole node yellow when a white node contains override fields; errors
-remain red and disabled nodes remain gray. JSON preserves conservative
-`effective.storable` proof (`false` still includes runtime decisions), and adds
-`analysisWarnings` independently of declaration `problems` and `analysisGaps`.
-Neither color nor the terminal storage label changes the computed metadata.
-
-Disjoint lifetime contracts such as `#[Ttl(30, new TtlRange(min: 600, max: 900))]` render as `30/600-900s` in the tree and Mermaid output. A fixed 300-second parent yields `300s`, while an automatic parent preserves `30/600-900s`. FromUpstream caps each alternative separately. The analyzer does not infer the conditions selecting the alternatives or correlations between separate strategies.
-
-JSON retains the existing `state`, `seconds`, `lowerBound`, `upperBound`, and `reason` fields. When alternatives remain disjoint it also includes a normalized `ranges` list, for example `[{"min": 30, "max": 30}, {"min": 600, "max": 900}]`. The enclosing bounds alone do not describe the gaps. An unknown estimate with a proven finite expiration also includes `"finite": true`; an unknown numeric lifetime is not the same as an expiration that might be absent. Single intervals and determined values do not need a `ranges` field.
-
-An action that gathers several cached results for a view does not need `#[Cache]` or `cached()` to be analyzed:
-
-```php
-public function show(int $productId, int $viewerId): View
-{
-    $product = $this->products->execute($productId);
-    $stock = $this->inventory->execute($productId);
-    $viewer = $this->viewer->execute($viewerId);
-
-    return view('product', [
-        'product' => $product->value(),
-        'stock' => $stock->value(),
-        'viewer' => $viewer->value(),
-    ]);
-}
-```
-
-```bash
-vendor/bin/magix analyze ProductController::show
-```
-
-The root is labelled `uncached entry point`. Its effective metadata describes what the method returns. In the example above, `value()` extracts plain values, so the root has `unconstrained` TTL, `shared` visibility, and no tags. The child queries remain visible with their own cache policies. An ordinary method returning a `Cached` intact preserves that result's metadata. Query objects can be resolved through typed properties, typed action parameters, local constructor assignments, and static calls.
-
-The root's `key` and `policy` are `none (uncached entry point)` and `storable` is `no`, because the action itself does not write a cache entry. The report does not attach metadata to values extracted with `value()` or configure HTTP caching for the view. Methods that actually call `cached()` still require a cache policy. Uncached entry points cannot be selected by `key`.
+### Options and row selection
 
 | Option | Default | Purpose |
 |---|---|---|
 | `--path` | Composer autoload roots | Directory or file to scan, repeatable |
 | `--format` | `tree` | `tree`, `json`, or `mermaid` |
-| `--depth` | `8` | Maximum dependency depth to print; analysis always covers the whole graph |
-| `--uncached` | `between` | Ordinary method rows: `between` cache boundaries, `all`, or `none` |
-| `--ignore` | none | Hide matching class or `Class::method` subtrees; repeatable and independent of `--uncached` |
+| `--depth` | `8` | Maximum original call depth to print; analysis covers the reachable graph |
+| `--uncached` | `between` | Select rows according to Cache attributes |
+| `--ignore` | none | Hide matching class or `Class::method` subtrees, repeatable |
 
-### Inspecting ordinary calls and hiding subtrees
+For this filter, a cache declaration means an effective **`#[Cache]` attribute**:
+a method attribute, or the applicable concrete class attribute when the method
+has none. A `Cached` return type or a `cached()` call alone does not qualify.
 
-Choose how many ordinary method rows to display:
+| Mode | Selected rows |
+|---|---|
+| `all` | Every analyzed method, including wholly unattributed branches |
+| `between` | Attributed methods and unattributed methods with both an attributed ancestor and an attributed descendant |
+| `none` | Only attributed methods; promote their visible descendants across omitted methods |
 
-| Mode | `CachedA → Helper → CachedB` | `CachedA → Helper → Leaf` (both ordinary) |
-|---|---|---|
-| `--uncached=between` (default) | Keep `Helper` between the cache boundaries | Omit the wholly uncached branch |
-| `--uncached=all` | Keep `Helper` | Show the entire branch, including leaves |
-| `--uncached=none` | Omit `Helper` and display `CachedB` under `CachedA` | Omit the wholly uncached branch |
-
-The explicitly selected root remains visible in every mode, including an uncached entry point. In `between` and `none`, ordinary methods before the first cache boundary are also omitted: `Controller → Helper → CachedB` displays `Controller → CachedB`. The displayed connections can therefore span omitted calls; they do not prove direct calls or metadata propagation.
-
-Use `--uncached=all` to inspect methods that have not been made into cache boundaries:
+Errors and diagnostics never make a row exempt from these rules.
+**The selected root follows the same rule.** For example,
+`Controller → Helper → CachedB` becomes just `CachedB` under `between` or `none`.
+Several attributed descendants can therefore become separate displayed roots.
+Use `all` to retain an unattributed entry point.
 
 ```bash
-vendor/bin/magix analyze PageQuery::execute --uncached=all \
-  --ignore 'Inventory*' --ignore '*Manager'
+vendor/bin/magix analyze ProductController::show --uncached=all
+vendor/bin/magix analyze PageQuery::execute --uncached=none --ignore 'Inventory*'
 ```
 
-Ordinary callees are labelled `uncached`; their lack of a boundary is not an error. They are followed recursively within the scanned sources, including concrete methods with no further calls. This uses the same call resolution as the cache analysis: it does not infer database access, execute application code, or discover dynamically named calls and unscanned implementations. A method that calls `cached()` remains a cache boundary and still reports a missing `#[Cache]` policy as a problem.
+`--ignore` removes a matched node and its entire subtree before promotion.
+Descendants of an ignored node never reappear. `between` tests the unignored
+original hierarchy, independently of display depth; depth counts original calls,
+including omitted methods.
 
-The default `between` mode keeps only ordinary methods with both a cached ancestor and a cached descendant on the analyzed path. Ordinary side branches are omitted even when they hang off a visible intermediate method. These cache-to-cache paths are reported as analysis gaps. Every mode preserves the computed TTL, visibility, tags, storability, problems, and gaps of existing nodes. Following an ordinary helper is not proof that its result carries cache metadata: a helper can extract a plain value with `value()`.
+Filtering is shared by tree, JSON and Mermaid and happens after analysis.
+It changes rows and connections, never the original effective metadata,
+alternatives or field certainty. A hidden dependency can still affect a displayed
+result. Its cause remains referenced in JSON, but its diagnostic prose is not
+reprinted on an ancestor in the tree.
 
-`--ignore` applies to cached and uncached nodes alike in every mode, before ordinary rows are omitted. A match hides that node and its entire subtree; descendants of an ignored node are never promoted to the parent, even with `--uncached=none`. Other paths to the same method remain visible unless they also match. Multiple patterns are combined with OR. The selected root is subject to the same filter: if all roots are ignored, the command succeeds with `[]` in JSON and an explanatory message in the text formats.
+A successful selection with no visible rows produces
+`{"roots": [], "diagnostics": []}` in JSON and an explanatory text message.
+Missing targets or unreadable required inputs are execution errors. Incomplete
+analysis and confirmed declaration problems remain report data and do not make
+an otherwise produced report fail.
 
-Filtering happens after analysis and is shared by tree, JSON, and Mermaid output. An ignored dependency still constrains its ancestors' TTL and visibility, contributes tags, and can cause an ancestor to be invalid. Analysis gaps and uncertainty also remain on the affected parent when their paths are hidden, including with `--uncached=none`. Diagnostics may consequently name a hidden ordinary method. Neither display option changes cache composition or the runtime. `--depth` also only selects what is printed: every boundary is analyzed once, bounded only by recursion, so no display setting can change a reported TTL, visibility or tag.
+Ignore patterns match complete, case-sensitive names. Without `::`, they select
+all methods of a class; with it, class and method patterns match separately.
+A class containing `\` uses its fully qualified name (an optional leading
+separator is accepted); otherwise it uses the short name. `*` matches zero or
+more characters, including namespace separators, and `?` matches one character.
+Patterns apply to resolved concrete candidate names. There are no regular
+expressions, negation, or comma-separated lists; repeat `--ignore` for OR.
+Quote shell patterns such as `'App\Query\*'` and `'*::get*'`.
 
-| Pattern | Matches |
-|---|---|
-| `Inventory*` | All methods on short class names beginning with `Inventory` |
-| `*Manager` | All methods on short class names ending with `Manager` |
-| `InventoryQuery::get` | One exact short class and method name |
-| `Inventory*::get*` | Both the class and method patterns |
-| `*::get*` | Methods beginning with `get` on any class |
-| `App\Query\*` | Fully qualified class names under this namespace, including nested namespaces |
-| `App\Query\InventoryQuery::get?` | A fully qualified class and a method ending in exactly one character after `get` |
+### Declaration and execution during migration
 
-Patterns match complete names and are case-sensitive. Without `::`, the pattern selects a class's methods. With `::`, class and method patterns are matched separately. A class pattern containing `\` is matched against the fully qualified name; otherwise it is matched against the short class name. An optional leading `\` is accepted for fully qualified names. Patterns apply to the resolved concrete declaration names, including each candidate of an interface call.
+Attributes, return types and observed execution are independent facts. A method
+with `#[Cache(ttl: 60)]` that returns another method's 10-second `Cached` without
+calling `cached()` remains visible under `none` as `ttl 60s [declared]`.
+JSON records `declared: true`, `execution: "not-observed"`, the policy and
+parameters, and the actual returned effective TTL of 10 seconds. It does not
+claim that the declared 60 seconds has been applied or that this method stores.
 
-Only `*` (zero or more characters) and `?` (one character) are special. `*` also crosses namespace separators; `\` is a literal namespace separator, not a pattern escape. Regexes, character classes, negation and comma-separated lists are not supported; use another `--ignore` for another pattern. Quote patterns as shown above so the shell does not expand them.
-
-The same filtering and labels apply to tree, JSON and Mermaid output.
+A method with a `Cached` type but no Cache attribute follows the unattributed
+filter rules. A `cached()` call without a policy can have a declaration problem
+while still being omitted by `none`. Use `all` and JSON for the complete analyzed
+inventory, including such problems.
 
 ### Conditional cache results
 
-The analyzer follows returns and local assignments through `if`/`elseif`/`else`,
-ternaries, `switch` (including fallthrough and an absent default), and `match`.
-It does not execute conditions or choose a runtime branch. For example:
+Returns and local assignments through `if`/`elseif`/`else`, ternaries, `switch`
+(including fallthrough and an absent default), and `match` retain exclusive
+alternatives. The analyzer does not execute predicates or choose a branch.
 
-```php
-public function choose(bool $flag): Cached
-{
-    return $flag ? $this->a->execute() : $this->b->execute();
-}
-```
+If a return chooses A with TTL 20 and tag `a`, or B with TTL 60 and tag `b`,
+the TTL summary is `20/60s`. JSON's `metadataAlternatives` retains each
+candidate's sources, TTL, visibility and tags. The summary includes only facts
+common to every candidate. Tree and Mermaid keep the compact summary.
 
-If A returns 20 seconds with shared visibility and tag `a`, while B returns
-60 seconds with private visibility and tag `b`, the report retains both:
+Composition takes each possible combination: `(A or B)->zip(C)` yields
+`(A + C) or (B + C)`. Reusing one selected value, such as `$v->zip($v)`, does
+not invent a combination of different alternatives. Separate conditions are
+independent unless they reuse that value. Each boundary's settings apply to
+every candidate separately. An unbounded branch cannot borrow another branch's
+finite expiration to satisfy an automatic policy.
 
-```text
-alternatives: A::execute [ttl 20s, shared, tags a] or B::execute [ttl 60s, private, tags b]
-```
-
-The TTL summary is `20/60s`, not `20s`. Only facts common to every branch appear
-in the summary's tags and visibility; each candidate retains its exact fields.
-This also works inside a `cached()` origin. An ordinary method still displays
-`(uncached)` and never stores its own result.
-
-Composition uses each possible combination: `(A or B)->zip(C)` yields
-`(A + C) or (B + C)`. Reusing the same selected value, such as `$v->zip($v)`,
-does not invent a combination of different alternatives. Separate conditions
-are independent unless they reuse that same value; the analyzer does not prove
-relationships between arbitrary predicates. Boundary settings are applied to
-every candidate separately. Even when settings make their metadata equal,
-distinct dependency selections remain visible. A branch without a finite
-expiration cannot borrow one from another branch to satisfy an automatic TTL.
-
-`map()` preserves its receiver's metadata. `flatMap()`, `zip()`, `combineN()`,
-literal `sequence()` inputs, and readable `flatten()`/`unzip()` expressions
-preserve their composition semantics. A literal empty `sequence()` or `traverse()`
-has no constraint. A runtime iterable remains unknown, including whether it is
-empty. Opaque callbacks, unsupported statements, mutated bindings that cannot be
-followed, and excessive path expansion remain unanalyzed. Statement branching is
-bounded to eight levels and metadata expansion to 128 candidates per operation.
+`map()` preserves receiver metadata. `flatMap()`, `zip()`, `combineN()`,
+literal `sequence()` inputs, and readable `flatten()`/`unzip()` preserve their
+composition semantics. Empty literal `sequence()` or `traverse()` has no
+constraint. Runtime iterables remain unknown, including whether they are empty.
+Statement branching is bounded to eight levels and metadata expansion to
+128 candidates per operation; reaching these limits creates a local cause.
 
 ### Cache propagation gaps
 
-An ordinary method between two cache boundaries does not by itself cause a gap.
-Returning `Cached` intact propagates its metadata. Extracting `value()`, including
-through local aliases, returns a plain value without that metadata. For example,
-`return $this->query->execute()->value()` is uncached; its query remains visible
-under `--uncached=between`, and no propagation diagnostic is emitted. Rewrapping
-with `Cached::of($value)` adds no metadata; explicitly supplying a child's
-`metadata` preserves that child's constraints.
+Call structure and metadata propagation are separate results. A known call
+remains a dependency even if an opaque transformation prevents the analyzer
+from proving which metadata is returned. Simply crossing an ordinary method
+does not cause a gap: returning `Cached` preserves metadata and extracting
+`value()` detaches it. `Cached::of($value)` adds no metadata; explicitly supplying
+a child's metadata preserves its constraints.
 
-A gap remains when the returned metadata cannot be followed, such as
-`return opaqueTransform($this->query->execute())`. The report then includes:
+For an automatic parent returning
+`opaqueTransform($this->query->execute())` through an ordinary helper, a compact
+report can show:
 
 ```text
-PageQuery::execute  ttl 60s  shared or stricter  tags runtime tags
-    ~ cache propagation unanalyzed: PageQuery::execute -> ProductLookup::get -> ProductQuery::execute
-`-- ProductLookup::get (uncached)
-    `-- ProductQuery::execute  ttl 20s  shared  tags product
+PageQuery::execute  ttl 20s?  shared?  tags product?
+`-- ProductQuery::execute  ttl 20s  shared  tags product
 ```
 
-The child's metadata is not assumed to propagate through an opaque transformation.
-Unknown TTL, visibility, and tags remain subject to the parent's explicit settings.
-The warning describes incomplete analysis, not an invalid declaration. A known
-extraction is analyzed even though it deliberately drops the child's metadata.
+The TTL, visibility and tag references do not assert propagation. An explicit parent TTL
+would replace that field while other affected fields remain uncertain.
 
-Detection is limited to resolved calls in scanned sources.
-Recursion retains uncertainty without inventing unseen children.
-Use `--uncached=all` to inspect ordinary paths. No gap is not proof that every
-runtime dependency has been found. Filtering never removes the original metadata
-alternatives or diagnostics, including when their source nodes are hidden.
+JSON retains source causes, affected-field references, original call resolution,
+and `analysisGaps` with full method paths. Sources shared by many callers are
+indexed once in report-level `diagnostics`. Hidden unrelated causes do not
+reappear merely because they are descendants. Hidden causes actually affecting
+a displayed field remain available by ID.
 
-JSON includes an `analysisGaps` list on every node. Each gap has
-`kind: "unverified-cache-propagation"`, a `path` of fully qualified method IDs,
-and a readable `message`, separate from invalid `effective.problems`.
-Mermaid includes the diagnostic path and styles an affected cache parent yellow.
-`analyze` continues to succeed when it produces a report with analysis gaps.
+Calls are limited to statically resolved methods in scanned sources. Unresolved
+call sites remain in `calls`; recursion retains uncertainty without inventing
+unseen children. Absence of a gap is not proof that every runtime dependency was
+found.
 
 ### Structured output
 
-`--format=json` prints the whole tree, including every policy, parameter, effective value, and reason, which suits editors and other tools:
-
-Each node has a `kind` of `boundary`, `entry-point` (an uncached root), or `uncached` (an ordinary callee). Both uncached kinds have `policy: null`, `key: null`, and `effective.storable: false`. Their `effective` result describes returned metadata; known extraction yields no constraints. `metadataAlternatives` retains each possible result with its sources, TTL, visibility, tags, storage proof, and analysis status. The top-level `effective` result summarizes only facts shared by those alternatives. After filtering, the remaining nodes keep their original `effective` results while `dependencies` contains only visible children.
-
 ```bash
-vendor/bin/magix analyze ProductPageQuery::execute --format=json
+vendor/bin/magix analyze ProductPageQuery::execute --format=json --uncached=all
 ```
 
-`--format=mermaid` prints a flowchart that can be embedded in documentation:
+JSON always has the same envelope, with zero, one or several roots:
 
-```text
-flowchart TD
-    n0["ProductPageQuery::execute<br/>20s - private"]
-    n0_0["ProductQuery::execute<br/>20s - shared"]
-    n0 --> n0_0
+```json
+{
+  "roots": [],
+  "diagnostics": []
+}
 ```
+
+Each root and dependency contains:
+
+| Field | Content |
+|---|---|
+| `boundary`, `file`, `line` | Method identity and source location |
+| `declared`, `policy` | Attribute presence and the read declaration, including unknown-field flags |
+| `execution`, `returnType`, `parameters`, `hasDynamicTtl`, `useStrategy` | Execution observation and independent source declarations |
+| `kind` | `boundary` for observed execution, otherwise `entry-point` at a displayed root or `uncached` below one |
+| `calls` | Original targets, unresolved method names, candidate methods, source lines and resolution state, independently of displayed children |
+| `via` | Original callers omitted from the displayed connection |
+| `key`, `strategy` | Applied key parameters and analyzed strategy construction/steps |
+| `effective` | Original TTL, visibility, tags, storage proof, local overrides and confirmed problems |
+| `effective.certainty` | Per-field `known`, `unconstrained`, `invalid`, `runtime`, or `partial` as applicable |
+| `effective.analysis` | Per-field cause IDs and separate `ttlReference`, `visibilityReference` and `tagsReference` records |
+| `metadataAlternatives` | Distinct returned candidates, sources and per-candidate effective analysis |
+| `diagnostics` | IDs of local analysis causes, including observations superseded by explicit field overrides |
+| `analysisGaps`, `notes` | Detailed propagation paths and traversal observations |
+| `dependencies` | Visible child nodes after selection |
+
+Report-level `diagnostics` defines each referenced cause once with `id`, `kind`,
+`method`, `file`, `line`, and `message`. Consumers can index the field references
+to count causes separately from affected methods. Ordinary call resolution
+remains independent of metadata certainty.
+
+`visibilityReference` and `tagsReference` include `value`, `candidates`, `sources`
+and `basis`. A visibility value uses its lower-case name; a tag value is an
+array of names. When candidates disagree, `value` is `null` and the conflicting
+`candidates` remain available. These records stay separate from
+`effective.visibility`, `effective.tags`, their unknown flags and storage proof.
+An explicit replacement removes only the corresponding reference.
+
+`useStrategy.arguments` retains tagged declaration values: `unknown`, `runtime`
+parameter references, or `known` literals, arrays and enum cases. Unreadable
+arguments never turn the whole report into a JSON encoding failure.
+
+The TTL domain keeps `state`, `seconds`, `lowerBound`, `upperBound`, and `reason`.
+Disjoint estimates also include normalized `ranges`; enclosing bounds alone do
+not describe their gaps. Unknown numeric durations with proven finite expiration
+include `finite: true`. A reference does not populate `seconds`, bounds or
+finite-expiration proof.
+
+This envelope replaces the previous single-node/multiple-node JSON shape;
+consumers should read `roots` and resolve diagnostic IDs against `diagnostics`.
+The JSON projection retains full details of selected nodes, including causes
+from hidden methods that their results still depend on. `--uncached=all` and a
+sufficient `--depth` expose all analyzed rows.
+
+`--format=mermaid` emits one flowchart for the forest. Dotted connections span
+omitted methods; an edge describes a call path, not proof of metadata propagation.
 
 ## magix key
 
@@ -325,10 +340,10 @@ The namespace is a runtime setting, separate from the runtime reference named in
 `analyze` reads `#[ExpiresAt('12:00', until: '12:15', timezone: 'Asia/Tokyo')]`
 on a strategy's `fetch()` and displays `daily 12:00-12:15 Asia/Tokyo` separately
 from TTL seconds. Omit `until` for a single time; overnight ranges retain a
-`(+1 day)` marker. The `strategy at` row describes the local candidate, while
-`expires by` propagates its upper constraint through dependencies. Other
-constraints can expire the result earlier. A parent with a 60-second TTL shows
-`≤60s` and keeps the wall-clock window.
+`(+1 day)` marker. JSON retains each strategy step's local candidate, while
+`expires by` shows the surviving daily constraint in the overview. Other
+constraints can expire the result earlier. A parent with an explicit 60-second TTL replaces inherited clock constraints
+and shows `60s`; lower-priority candidates remain in JSON.
 
 Repeat `#[ExpiresAt]` on the same `fetch()` for multiple times or windows, for
 example `#[ExpiresAt('09:00')]` followed by `#[ExpiresAt('18:00', until: '18:15')]`.
@@ -351,4 +366,4 @@ for constructor references, invocation-dependent values, composition, timezone
 semantics, and the responsibility of the strategy implementation.
 
 
-The CLI's TTL/ExpiresAt contracts describe expiration only. For custom Strategies, tags and visibility remain unknown because arbitrary metadata overrides are not proven by those contracts. The bundled KeySpreadExpirationStrategy and StaleIfErrorCacheStrategy preserve those fields on normal origin success. A later parent can explicitly replace unknown fields; AssumeTtl only resolves expiration, never other metadata.
+TTL/ExpiresAt contracts describe expiration only. Readable strategies preserve other fields unless `#[WritesMetadata]` declares their replacement; those replacement values remain runtime-dependent. Unreadable strategies retain analysis uncertainty. `#[AssumeTtl]` covers expiration alone, and later parent settings can explicitly replace affected fields.

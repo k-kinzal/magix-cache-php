@@ -41,6 +41,7 @@ final class MetadataFlowReaderTest extends TestCase
                 public function cached(): \Magix\Cache\Cached { return \Magix\Cache\Cached::of(1); }
                 public function nullable(): ?\Magix\Cache\Cached { return null; }
                 public function untyped() { return 1; }
+                public function object(): object { return \Magix\Cache\Cached::of(1); }
             }
             SOURCE;
         $statements = (new NodeTraverser(new NameResolver()))->traverse(
@@ -54,16 +55,19 @@ final class MetadataFlowReaderTest extends TestCase
         $cached = $class->getMethod('cached');
         $nullable = $class->getMethod('nullable');
         $untyped = $class->getMethod('untyped');
+        $object = $class->getMethod('object');
         self::assertInstanceOf(ClassMethod::class, $scalar);
         self::assertInstanceOf(ClassMethod::class, $other);
         self::assertInstanceOf(ClassMethod::class, $cached);
         self::assertInstanceOf(ClassMethod::class, $nullable);
         self::assertInstanceOf(ClassMethod::class, $untyped);
+        self::assertInstanceOf(ClassMethod::class, $object);
 
         self::assertTrue($reader->returnsNoMetadata($scalar));
         self::assertTrue($reader->returnsNoMetadata($other));
         self::assertFalse($reader->returnsNoMetadata($cached));
         self::assertFalse($reader->returnsNoMetadata($nullable));
         self::assertFalse($reader->returnsNoMetadata($untyped));
+        self::assertFalse($reader->returnsNoMetadata($object));
     }
 }

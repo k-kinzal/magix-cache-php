@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Graph;
 
+use Magix\Cache\Cli\Graph\Analysis\MetadataReference;
+
 /**
  * Summarizes alternatives using only facts shared by every possible result.
  */
@@ -23,9 +25,11 @@ final readonly class AlternativeEffects
         $tagsUnknown = $first->tagsUnknown;
         $problems = $first->problems;
         $expirations = $first->expirationConstraints;
+        $analysis = $first->analysis;
 
         foreach (array_slice($variants, 1) as $variant) {
             $effect = $variant->effect;
+            $analysis = $analysis->merge($effect->analysis);
             $ttl = $this->ttl($ttl, $effect->ttl);
             $visibilityUnknown = $visibilityUnknown || $effect->visibilityUnknown || $visibility !== $effect->visibility;
             $visibility = $visibility->meet($effect->visibility) === $visibility ? $effect->visibility : $visibility;
@@ -47,6 +51,10 @@ final readonly class AlternativeEffects
             tagsUnknown: $tagsUnknown,
             localOverrides: $first->localOverrides,
             expirationConstraints: $expirations,
+            analysis: $analysis->withMetadataReferences(
+                $analysis->visibilityReference === null ? null : MetadataReference::fromVisibility($variants),
+                $analysis->tagsReference === null ? null : MetadataReference::fromTags($variants),
+            ),
         );
     }
 

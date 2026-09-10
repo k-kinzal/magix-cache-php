@@ -166,4 +166,17 @@ final class DependencyReaderTest extends TestCase
 
         self::assertSame([0 => 'viewerId'], $forwarded);
     }
+
+    public function testUnresolvedRetainsReceiverAndDynamicNameFailuresWithLocations(): void
+    {
+        $method = new ClassMethod('get', ['stmts' => [
+            new Expression(new MethodCall(new Variable('this'), 'known', attributes: ['startLine' => 4])),
+            new Expression(new MethodCall(new Variable('external'), 'fetch', attributes: ['startLine' => 5])),
+            new Expression(new MethodCall(new Variable('this'), new Variable('method'), attributes: ['startLine' => 6])),
+        ]]);
+        self::assertSame([
+            ['method' => 'fetch', 'line' => 5],
+            ['method' => '(dynamic)', 'line' => 6],
+        ], (new DependencyReader())->unresolved($method, 'Query', []));
+    }
 }

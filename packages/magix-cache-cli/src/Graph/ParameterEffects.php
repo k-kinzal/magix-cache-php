@@ -6,6 +6,7 @@ namespace Magix\Cache\Cli\Graph;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\KeyParameter;
+use Magix\Cache\Cli\Graph\Analysis\AnalysisOverrides;
 use Magix\Cache\Metadata\Visibility;
 
 /**
@@ -153,7 +154,7 @@ final readonly class ParameterEffects
         $problems = [...$effect->problems, ...$this->problems($boundary)];
 
         return new CacheEffect(
-            ttl: $problems === [] ? $effect->ttl : TtlEstimate::invalid($problems[0]),
+            ttl: $effect->ttl,
             visibility: $visibility,
             storable: $effect->storable && !$visibilityUnknown && $problems === [],
             tags: $tags,
@@ -164,6 +165,7 @@ final readonly class ParameterEffects
             visibilityUnknown: $visibilityUnknown,
             tagsUnknown: $tagsUnknown,
             localOverrides: $problems === [] ? (new LocalOverrides())->describe($boundary, $constraint, $effect) : [],
+            analysis: (new AnalysisOverrides())->apply($boundary, $constraint, $effect),
         );
     }
     /**

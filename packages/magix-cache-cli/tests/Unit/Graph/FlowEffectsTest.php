@@ -12,11 +12,13 @@ use Magix\Cache\Cli\Graph\TtlEstimateState;
 use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 use Tests\Package\Cli\Fixture\AnalysisSource;
 
 #[CoversClass(FlowEffects::class)]
+#[Medium]
 #[UsesNamespace('Magix\Cache')]
 final class FlowEffectsTest extends TestCase
 {
@@ -25,7 +27,7 @@ final class FlowEffectsTest extends TestCase
     {
         $node = AnalysisSource::node($body, direct: $direct);
         self::assertSame([], $node->gaps);
-        self::assertSame([], $node->analysisWarnings);
+        self::assertSame([], $node->effect->analysis->causes());
         self::assertSame([], $node->effect->problems);
         self::assertSame('20/60/90s', $node->effect->ttl->label());
         self::assertSame(TtlEstimateState::Unknown, $node->effect->ttl->state);
@@ -128,7 +130,7 @@ final class FlowEffectsTest extends TestCase
     {
         $arms = implode(', ', array_map(static fn (int $index): string => $index.' => $this->inputs->a()', range(0, 128)));
         $node = AnalysisSource::node('return match ($flag) { '.$arms.' };');
-        self::assertNotEmpty($node->analysisWarnings);
+        self::assertNotEmpty($node->effect->analysis->causes());
         self::assertNull($node->effect->ttl->seconds);
         self::assertTrue($node->effect->tagsUnknown);
     }
@@ -144,7 +146,7 @@ final class FlowEffectsTest extends TestCase
     public function testEvaluateKeepsARecursiveAlternativeUnknown(): void
     {
         $node = AnalysisSource::node('return $flag ? $this->inputs->a() : $this->pick($flag);');
-        self::assertNotEmpty($node->analysisWarnings);
+        self::assertNotEmpty($node->effect->analysis->causes());
         self::assertFalse($node->effect->ttl->hasFiniteExpiration());
         self::assertNull($node->effect->ttl->seconds);
     }
@@ -168,5 +170,33 @@ final class FlowEffectsTest extends TestCase
 
         self::assertSame(TtlEstimateState::Unconstrained, $detached[0]->effect->ttl->state);
         self::assertFalse($effects->detached([new CacheVariant(new CacheEffect(TtlEstimate::known(20)))])[0]->analyzed);
+    }
+
+    public function testUnknownRetainsReferencesThroughNestedOpaqueCallsWithoutConvertingThemToConstraints(): void
+    {
+        $node = AnalysisSource::node('return opaque(opaque($this->inputs->b()));', '#[Cache(ttl: 120)]');
+        $effect = $node->effect;
+        self::assertSame(Visibility::Private, $effect->analysis->visibilityReference?->value());
+        self::assertSame(['b'], $effect->analysis->tagsReference?->value());
+        self::assertSame(Visibility::Shared, $effect->visibility);
+        self::assertSame([], $effect->tags);
+        self::assertTrue($effect->visibilityUnknown);
+        self::assertTrue($effect->tagsUnknown);
+        self::assertFalse($effect->storable);
+        self::assertSame(120, $effect->ttl->seconds);
+        self::assertSame([], $effect->analysis->ttl);
+    }
+
+    public function testUnknownDoesNotReviveConflictingMetadataReferencesOrReferencesDetachedByValue(): void
+    {
+        $conflicting = AnalysisSource::node('return opaque(opaque($this->inputs->a(), $this->inputs->b()), $this->inputs->a());')->effect;
+        self::assertNotNull($conflicting->analysis->visibilityReference);
+        self::assertNull($conflicting->analysis->visibilityReference->value());
+        self::assertNotNull($conflicting->analysis->tagsReference);
+        self::assertNull($conflicting->analysis->tagsReference->value());
+
+        $detached = AnalysisSource::node('return opaque($this->inputs->b()->value());')->effect;
+        self::assertNull($detached->analysis->visibilityReference);
+        self::assertNull($detached->analysis->tagsReference);
     }
 }

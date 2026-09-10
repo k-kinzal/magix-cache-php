@@ -13,6 +13,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CacheNode::class)]
+#[\PHPUnit\Framework\Attributes\UsesNamespace('Magix\Cache')]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(CacheEffect::class)]
 #[UsesClass(TtlEstimate::class)]
@@ -37,8 +38,27 @@ final class CacheNodeTest extends TestCase
         self::assertSame('App\PageQuery::execute', $node->boundary->id());
         self::assertSame([$child], $node->children);
         self::assertSame(['recursive dependency'], $node->notes);
-        self::assertSame(['PageQuery::execute: recursive dependency'], $node->analysisWarnings);
+        self::assertCount(1, $node->diagnostics);
         $ancestor = new CacheNode($node->boundary, $node->effect, [$node]);
-        self::assertSame($node->analysisWarnings, $ancestor->analysisWarnings);
+        self::assertSame([], $ancestor->diagnostics);
+    }
+    public function testStorageDoesNotDependOnUnrelatedDescendants(): void
+    {
+        self::assertSame('yes', \Tests\Package\Cli\Fixture\ReportSource::node('Page::unrelated')->storage());
+        self::assertSame('unknown', \Tests\Package\Cli\Fixture\ReportSource::node('Page::fixed')->storage());
+        self::assertSame('no', \Tests\Package\Cli\Fixture\ReportSource::node('Migration::get')->storage());
+    }
+
+    public function testWithChildrenRetainsFactsWhenProjectionOmitsTheOrigin(): void
+    {
+        $original = \Tests\Package\Cli\Fixture\ReportSource::node('Page::automatic');
+        $visible = $original->withChildren([], ['Controller::run']);
+        self::assertSame([], $visible->children);
+        self::assertSame(['Controller::run'], $visible->via);
+        self::assertSame($original->effect, $visible->effect);
+        self::assertSame($original->diagnostics, $visible->diagnostics);
+        self::assertSame($original->metadataVariants, $visible->metadataVariants);
+        self::assertSame($original->calls, $visible->calls);
+        self::assertNotEmpty($original->children);
     }
 }

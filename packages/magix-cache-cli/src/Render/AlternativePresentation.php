@@ -45,6 +45,8 @@ final readonly class AlternativePresentation
         return [
             'sources' => $variant->sources,
             'analyzed' => $variant->analyzed,
+            'certainty' => $effect->certainty(),
+            'analysis' => $effect->analysis,
             'ttl' => $effect->ttl->jsonSerialize(),
             'visibility' => strtolower($effect->visibility->name),
             'visibilityUnknown' => $effect->visibilityUnknown,

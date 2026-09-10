@@ -43,7 +43,7 @@ final readonly class StatementFlowReader
     public function read(array $statements, array $variables = [], int $budget = 24): MetadataFlow
     {
         if ($budget < 1) {
-            return new MetadataFlow('unknown');
+            return MetadataFlow::unknown('control-flow-limit', ($statements[0] ?? null)?->getStartLine() ?? 0);
         }
 
         foreach ($statements as $position => $statement) {
@@ -52,7 +52,7 @@ final readonly class StatementFlowReader
             }
 
             if ($this->variables->aliases($statement)) {
-                return new MetadataFlow('unknown');
+                return MetadataFlow::unknown('aliased-binding', $statement->getStartLine());
             }
 
             if ($statement instanceof Stmt\Expression) {
@@ -121,7 +121,7 @@ final readonly class StatementFlowReader
         $branches = $this->branches($statement);
 
         if ($branches === null || $this->conditionWrites($statement)) {
-            return new MetadataFlow('unknown');
+            return MetadataFlow::unknown('unsupported-control-flow', $statement->getStartLine());
         }
 
         return new MetadataFlow('choice', array_map(

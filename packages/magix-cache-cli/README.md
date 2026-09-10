@@ -9,12 +9,12 @@ The result answers the questions that are otherwise only observable in productio
 
 ## Features
 
-- Cache trees for one boundary, with the effective TTL, visibility, tags, and key of every node
-- Ordinary method display with `--uncached=between|all|none` (default: `between` cache boundaries), and independent subtree filters with repeatable `--ignore` patterns
-- Explicit analysis gaps when a cache boundary reaches another cache through ordinary methods, with unverified metadata kept unknown
+- Compact cache trees with effective TTL, visibility and tags; detailed declarations, keys and provenance in JSON
+- Row selection by `#[Cache]` with `--uncached=between|all|none`, including the selected root, plus repeatable `--ignore` subtree filters
+- Partial results during migration: declarations remain visible, known fields stay known, and affected fields show `?` or grounded references such as `10s?`, `shared?` and `tags product?`
 - The reason behind each effective value, including inherited metadata and explicit local overrides
 - White rows for normal cache boundaries, including runtime-dependent TTL and custom Strategies; gray for ordinary methods, NoStore and TTL 0
-- Yellow fields for explicit bubbling overrides, yellow warnings for incomplete analysis, and red for definite declaration errors
+- Yellow fields for explicit bubbling overrides; compact markers for confirmed declaration problems, with explanations in JSON
 - Composed strategy contracts, bound to the same `create()` the runtime calls, with candidate ranges such as `30-60s` kept apart from the effective TTL
 - The default hash strategy's cache key for a call in the configured runtime namespace
 - Tree, JSON, and Mermaid output for terminals, editors, and documentation
@@ -38,16 +38,6 @@ vendor/bin/magix analyze ProductPageQuery::execute
 ```
 
 ```text
-App\Query\ProductPageQuery::execute
-  src/Query/ProductPageQuery.php:34
-
-  ttl          120s
-  visibility   private (inherited from ViewerQuery::execute)
-  storable     yes
-  tags         page
-  key          $productId, $viewerId (ignored: $trace)  version 1
-  policy       #[Cache(ttl: 120s, tags: [page])]
-
 ProductPageQuery::execute  ttl 120s  private  tags page
 |-- ProductQuery::execute  ttl 20s  shared  tags product
 |-- InventoryQuery::execute  ttl 60s  shared  tags inventory
@@ -56,9 +46,25 @@ ProductPageQuery::execute  ttl 120s  private  tags page
 
 The boundary explicitly chooses 120 seconds and replaces tags with `page`. Its omitted visibility inherits Private from `ViewerQuery`. The child's 20-second TTL does not cap the parent's explicit override. Nothing needs to be executed to see this.
 
-In a color terminal, normal cache boundaries appear white, including dynamic TTL, parameter configuration and custom Strategies. Ordinary methods, effective `NoStore` and TTL 0 use gray; missing policies and invalid declarations use red. Incomplete call analysis uses yellow with a diagnostic naming the one method it belongs to. Explicit overrides of bubbled fields also use yellow. `shared` and `private` retain their text labels without separate colors. White describes normal behavior rather than guaranteed storage: the header distinguishes `runtime-dependent` from `no`. Mermaid uses the same meanings. Use `--ansi` to force terminal colors or `--no-ansi` for plain text.
+Tree output uses one line per method, with no warning paragraphs or separate
+detail header. Unknown fields show `?`; `10s?` is a reference whose propagation
+is unverified, never a value used in parent TTL calculations. Visibility and tags
+likewise retain references such as `shared?` and `product?` separately from proven
+fields. `tags product,?` guarantees `product`; `tags product?` does not. A proven
+Private floor is `≥private`, distinct from the reference `private?`. Proven bounds
+remain bounds, and analyzed runtime durations show `dynamic`. Normal declared
+rows are white, ordinary methods and disabled results are gray, explicit field
+overrides are yellow, and confirmed problems have a compact red marker.
+Use `--ansi` or `--no-ansi` to control color.
 
-For a parent that only bubbles up child constraints, declare `#[Cache]` without a TTL. The tree shows the effective values directly, without a `(declared Ttl::Auto)` annotation, and the policy row uses `#[Cache]` (or includes any additional options). Explicit `ttl: Ttl::Auto` renders the same way. Fixed TTL declarations, upstream caps, and unknown or invalid lifetime diagnostics remain visible; JSON retains the normalized TTL mode in `policy.ttl`.
+`--format=json` exports detailed facts in a consistent `roots`/`diagnostics`
+envelope. Causes are indexed once and referenced by the fields they affect.
+Shared causes and unrelated hidden calls do not fill the overview with warnings.
+
+For an automatic parent, declare `#[Cache]` without a TTL. For a migration that
+has added the attribute before connecting `cached()`, the row shows
+`[declared]`. JSON keeps the declared policy separate from the actual returned
+metadata and records that cache execution has not been observed.
 
 ## Commands
 
@@ -81,7 +87,10 @@ See [Commands](docs/commands.md) for every option. `magix list` lists the availa
 
 The composition rules are the ones the runtime applies: the earliest expiration wins, cacheability is combined with logical AND, the strictest visibility wins, and tags are unioned. These are bubbling rules. Explicit parent fields override afterward: fixed TTL replaces expiration, tags replace the tag list, and visibility replaces scope. Strategies override after policy and invocation settings.
 
-Because the analysis is static, the effective TTL is an honest estimate rather than a guess. A lifetime is reported as a number only when it is statically determined; a boundary that is provably without expiration is `unconstrained`; anything that depends on runtime values, such as a `#[DynamicTtl]` resolver or an upstream the analyzer cannot see, is `unknown`, together with the tightest provable upper bound such as `unknown (≤30s)`; and a declaration that throws at runtime is `invalid`. A call that resolves to several implementations expands into all of them.
+The analyzer retains determined values, proven bounds, unconstrained results,
+runtime choices, analysis limitations and confirmed invalid declarations
+separately. Renderers summarize these facts without changing them. A call that
+resolves to several implementations expands into alternatives.
 
 The analyzer follows returned metadata through ordinary methods and cached origin
 closures. Returning `Cached` preserves it; `value()` extraction and plain return
@@ -91,15 +100,19 @@ values detach it. `map()` preserves its receiver, and `flatMap()`, `zip()`,
 Branches (`if`/`elseif`, ternaries, `switch`, and `match`) remain alternatives:
 `A or B`, with TTL, visibility, and tags kept together for each result.
 Composing a choice with C produces `(A + C) or (B + C)`. Tree and Mermaid show
-these candidates; JSON includes `metadataAlternatives`. No candidate is selected
+a compact summary; JSON includes full `metadataAlternatives`. No candidate is selected
 by running the application.
 
-Opaque transformations or unsupported control flow can still produce
-`cache propagation unanalyzed`; merely crossing an ordinary method does not.
-The default `--uncached=between` shows intermediate methods; `all` also shows
-wholly uncached branches, and `none` omits ordinary rows. These display choices
-preserve alternatives, effects, and diagnostics. See [analysis gaps](docs/commands.md#cache-propagation-gaps)
-and [conditional cache results](docs/commands.md#conditional-cache-results).
+Opaque transformations and unsupported control flow retain local causes and
+affected-field uncertainty. Returning through an ordinary method alone does
+not cause a gap. The default `--uncached=between` retains unattributed methods
+only between attributed ancestors and descendants; `all` shows every analyzed
+row, and `none` shows only methods with an effective `#[Cache]` attribute.
+Return types, observed execution and diagnostics never override selection.
+An unattributed selected root can disappear, leaving a forest of declarations.
+All formats preserve the effective results of displayed nodes.
+See [analysis gaps](docs/commands.md#cache-propagation-gaps) and
+[conditional cache results](docs/commands.md#conditional-cache-results).
 
 ## Documentation
 
@@ -120,8 +133,8 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 `magix analyze` understands `CacheTtl`, `CacheTags`,
 `CacheVisibility`, and `StrategyArgument` on boundary parameters. Configuration
-values remain runtime-dependent even when defaults are declared. TTL caps are
-preserved, strategy labels show their source parameters, and dynamic visibility
+values remain runtime-dependent even when defaults are declared. Parameter TTL overrides replace earlier bounds; JSON strategy labels retain
+their source parameters, and dynamic visibility
 and tags remain explicit throughout the dependency tree. JSON includes
 `visibilityUnknown` and `tagsUnknown` alongside the proven metadata bounds.
 

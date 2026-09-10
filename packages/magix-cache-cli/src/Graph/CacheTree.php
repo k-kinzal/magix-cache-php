@@ -9,6 +9,9 @@ use function in_array;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\Catalog;
+use Magix\Cache\Cli\Graph\Analysis\AnalysisCause;
+use Magix\Cache\Cli\Graph\Analysis\CallAnalysis;
+use Magix\Cache\Cli\Graph\Analysis\MetadataAnalysis;
 use Magix\Cache\Metadata\Visibility;
 
 /**
@@ -58,9 +61,10 @@ final class CacheTree
         if (in_array($id, $visited, true)) {
             ++$this->recursions;
 
-            $effect = new CacheEffect(TtlEstimate::unknown(condition: 'recursive dependency, not analyzed'), $boundary->scope() ?? Visibility::Shared, visibilityUnknown: $boundary->scope() !== Visibility::NoStore);
+            $cause = AnalysisCause::at($boundary, 'recursive-call', 'Recursive dependency was not expanded again');
+            $effect = new CacheEffect(TtlEstimate::unknown(condition: 'recursive dependency, not analyzed'), $boundary->scope() ?? Visibility::Shared, visibilityUnknown: $boundary->scope() !== Visibility::NoStore, tagsUnknown: true, analysis: (new MetadataAnalysis())->withCause($cause));
 
-            return new CacheNode($boundary, $effect, [], ['recursive dependency, not expanded again']);
+            return new CacheNode($boundary, $effect);
         }
 
         $key = $id.'#'.($includeUncached ? '1' : '0');
@@ -136,18 +140,13 @@ final class CacheTree
      */
     public function finish(BoundaryDeclaration $boundary, array $children, array $constraints, array $notes, array $gaps, array $calls): CacheNode
     {
-        $strategy = $this->strategies->resolve($boundary);
-        $variants = $boundary->metadataFlow === null ? null : $this->effects->applyAlternatives(
+        $strategy = $boundary->isCacheBoundary ? $this->strategies->resolve($boundary) : null;
+        $returned = $boundary->metadataFlow === null ? null : (new FlowEffects($boundary))->evaluate($boundary->metadataFlow, $calls);
+        $variants = $returned === null ? null : $this->effects->applyAlternatives(
             $boundary,
-            (new FlowEffects())->evaluate($boundary->metadataFlow, $calls),
+            $returned,
             $strategy,
         );
-        foreach ($variants ?? [] as $variant) {
-            if (!$variant->analyzed) {
-                $notes[] = 'returned cache metadata is not analyzed';
-                break;
-            }
-        }
 
         $effect = $variants !== null && $variants !== []
             ? (count($variants) === 1 ? $variants[0]->effect : (new AlternativeEffects())->summarize($variants))
@@ -157,13 +156,22 @@ final class CacheTree
             $effect = new CacheEffect(TtlEstimate::unknown(condition: 'method has no normal return'));
         }
 
+        $local = new CacheNode($boundary, $effect, notes: $notes);
+        $diagnostics = $local->diagnostics;
+
+        foreach ($returned ?? [] as $variant) {
+            $diagnostics = [...$diagnostics, ...array_filter($variant->effect->analysis->causes(), static fn (AnalysisCause $cause): bool => $cause->method === $boundary->id())];
+        }
+
         return new CacheNode(
             $boundary,
             $effect,
             $children,
             $notes,
             $gaps,
+            diagnostics: $diagnostics,
             metadataVariants: $variants,
+            calls: CallAnalysis::fromCalls($boundary, $calls),
         );
     }
 
@@ -176,7 +184,7 @@ final class CacheTree
             return true;
         }
 
-        if (!$boundary->metadataFlow->hasUnknown() && !$boundary->metadataFlow->references($target)) {
+        if (!$boundary->metadataFlow->references($target)) {
             return false;
         }
 

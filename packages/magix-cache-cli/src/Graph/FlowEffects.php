@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Graph;
 
+use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\MetadataFlow;
+use Magix\Cache\Cli\Graph\Analysis\AnalysisCause;
+use Magix\Cache\Cli\Graph\Analysis\MetadataAnalysis;
+use Magix\Cache\Cli\Graph\Analysis\MetadataReference;
+use Magix\Cache\Cli\Graph\Analysis\TtlReference;
 
 /**
  * Evaluates return paths: choices union candidates, composition meets their products.
@@ -12,21 +17,34 @@ use Magix\Cache\Cli\Declaration\MetadataFlow;
 final readonly class FlowEffects
 {
     /**
+     * Attributes limitations to the method whose returned expression is evaluated.
+     */
+    public function __construct(private ?BoundaryDeclaration $owner = null)
+    {
+    }
+
+    /**
      * @param array<string, list<CacheNode>> $calls
      * @return list<CacheVariant>
      */
     public function evaluate(MetadataFlow $flow, array $calls): array
     {
         if ($flow->kind === 'call') {
+            if (($calls[$flow->target ?? ''] ?? []) === []) {
+                return [$this->unknown($flow, 'unresolved-return-call')];
+            }
+
             return array_map(
                 static fn (CacheVariant $variant, int $index): CacheVariant => $variant->select('call:'.spl_object_id($flow), $index, replace: true),
-                $variants = $this->call($calls[$flow->target ?? ''] ?? []),
+                $variants = $this->call($calls[$flow->target ?? '']),
                 array_keys($variants),
             );
         }
 
         if ($flow->kind === 'unknown') {
-            return [$this->unknown()];
+            $inputs = array_merge(...array_map(fn (MetadataFlow $input): array => $this->evaluate($input, $calls), $flow->inputs));
+
+            return [$this->unknown($flow, $flow->reason ?? 'opaque-return', $inputs)];
         }
 
         if ($flow->kind === 'collection') {
@@ -50,7 +68,7 @@ final readonly class FlowEffects
                 : $this->product($variants, $next);
 
             if (count($variants) > 128) {
-                return [$this->unknown()];
+                return [$this->unknown($flow, 'alternative-limit', $variants)];
             }
         }
 
@@ -142,7 +160,7 @@ final readonly class FlowEffects
                 }
 
                 if (count($variants) >= 128) {
-                    return [$this->unknown()];
+                    return [$this->unknown(kind: 'alternative-limit', inputs: [...$first, ...$second])];
                 }
 
                 $a = $left->effect;
@@ -156,6 +174,7 @@ final readonly class FlowEffects
                         visibilityUnknown: $a->visibilityUnknown || $b->visibilityUnknown,
                         tagsUnknown: $a->tagsUnknown || $b->tagsUnknown,
                         expirationConstraints: [...$a->expirationConstraints, ...$b->expirationConstraints],
+                        analysis: $a->analysis->merge($b->analysis),
                     ),
                     array_values(array_unique([...$left->sources, ...$right->sources])),
                     $left->analyzed && $right->analyzed,
@@ -193,13 +212,27 @@ final readonly class FlowEffects
 
     /**
      * Unknown paths keep every metadata field open rather than borrowing a child's value.
+     *
+     * @param list<CacheVariant> $inputs Understood operands, used only for display references.
      */
-    public function unknown(): CacheVariant
+    public function unknown(?MetadataFlow $flow = null, string $kind = 'opaque-return', array $inputs = []): CacheVariant
     {
+        $message = match ($kind) {
+            'unresolved-return-call' => 'The returned call could not be resolved: '.($flow->target ?? 'unknown target'),
+            'alternative-limit' => 'Return alternatives exceeded the analysis budget',
+            default => 'Returned metadata could not be followed through '.$kind,
+        };
+        $cause = AnalysisCause::at($this->owner, $kind, $message, $flow->line ?? 0);
+
         return new CacheVariant(new CacheEffect(
             TtlEstimate::unknown(condition: 'returned cache metadata is not analyzed'),
             visibilityUnknown: true,
             tagsUnknown: true,
+            analysis: (new MetadataAnalysis(
+                ttlReference: TtlReference::fromVariants($inputs),
+                visibilityReference: MetadataReference::fromVisibility($inputs),
+                tagsReference: MetadataReference::fromTags($inputs),
+            ))->withCause($cause),
         ), analyzed: false);
     }
 }

@@ -54,7 +54,7 @@ final readonly class AnalyzeCommand
      *
      * @param array<array-key, mixed> $path
      * @param array<array-key, mixed> $ignore
-     * @param UncachedMode $uncached Show all ordinary calls, only those between cache boundaries (default), or none; the selected root and diagnostics remain visible.
+     * @param UncachedMode $uncached Select rows by Cache attributes, independently of execution, types and diagnostics; the selected root follows the same rule.
      * @throws JsonException when the tree cannot be encoded as JSON
      */
     public function __invoke(
@@ -69,7 +69,7 @@ final readonly class AnalyzeCommand
         int $depth = 8,
         #[Option(description: 'Hide matching class or Class::method subtrees (* and ? wildcards), repeatable')]
         array $ignore = [],
-        #[Option(description: 'Ordinary method rows: between (cache boundaries), all, or none; retains the selected root and diagnostics')]
+        #[Option(description: 'Rows without #[Cache]: between declarations (default), all, or none; applies to the selected root too')]
         UncachedMode $uncached = UncachedMode::Between,
     ): int {
         $catalog = $this->catalog->load($path);
@@ -88,10 +88,10 @@ final readonly class AnalyzeCommand
             $uncached,
             $depth,
         );
-        $nodes = array_values(array_filter(array_map(
-            static fn (BoundaryDeclaration $found): ?CacheNode => $filter->apply($tree->build($found, includeUncached: true)),
+        $nodes = array_merge(...array_map(
+            static fn (BoundaryDeclaration $found): array => $filter->apply($tree->build($found, includeUncached: true)),
             $matches,
-        ), static fn (?CacheNode $node): bool => $node !== null));
+        ));
 
         return $this->render($io, $nodes, $format);
     }
@@ -110,14 +110,20 @@ final readonly class AnalyzeCommand
             return Command::SUCCESS;
         }
 
-        $renderer = $format === 'mermaid' ? new MermaidRenderer() : new TreeRenderer();
+        if ($format === 'mermaid' && $nodes !== []) {
+            $io->writeln((new MermaidRenderer())->forest($nodes));
+
+            return Command::SUCCESS;
+        }
+
+        $renderer = new TreeRenderer();
 
         if ($nodes === []) {
-            $io->writeln('All matching roots were excluded by --ignore.');
+            $io->writeln('No methods match the display filters.');
         }
 
         foreach ($nodes as $node) {
-            $io->writeln($renderer->render($node));
+            $io->write($renderer->render($node));
         }
 
         return Command::SUCCESS;

@@ -50,7 +50,7 @@ final class ExpressionFlowReaderTest extends TestCase
         $node = AnalysisSource::node('$v = $this->inputs->c(); return $this->inputs->a()->flatMap(fn ($v) => $v);', '#[Cache(ttl: 120)]');
         self::assertTrue($node->effect->visibilityUnknown);
         self::assertSame(['a'], $node->effect->tags);
-        self::assertNotEmpty($node->analysisWarnings);
+        self::assertNotEmpty($node->effect->analysis->causes());
     }
 
     public function testMetadataPreservesAnExplicitlyRewrappedChild(): void
@@ -83,7 +83,7 @@ final class ExpressionFlowReaderTest extends TestCase
     public function testProjectionOfAnExtractedValueKeepsItDetachedWithoutAReturnType(): void
     {
         $node = AnalysisSource::node('return $this->inputs->a()->value()["id"];', '#[Cache(ttl: 120)]', origin: 'return Cached::of($this->bridge->pick($flag));');
-        self::assertSame([], $node->analysisWarnings);
+        self::assertSame([], $node->effect->analysis->causes());
         self::assertSame([], $node->children[0]->effect->tags);
         self::assertSame('unconstrained', $node->children[0]->effect->ttl->label());
     }
@@ -111,7 +111,7 @@ final class ExpressionFlowReaderTest extends TestCase
     public function testMethodDoesNotApplyCachedSemanticsToAnUnrelatedMapMethod(): void
     {
         $node = AnalysisSource::node('return (new Collection())->map(fn () => $this->inputs->a());', '#[Cache(ttl: 120)]');
-        self::assertNotEmpty($node->analysisWarnings);
+        self::assertNotEmpty($node->effect->analysis->causes());
         self::assertTrue($node->effect->visibilityUnknown);
         self::assertTrue($node->effect->tagsUnknown);
     }

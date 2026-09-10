@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Render;
 
-use Magix\Cache\Cli\Graph\CacheNode;
-
 /**
  * Selects which ordinary method rows remain visible after cache analysis.
  */
@@ -21,13 +19,13 @@ enum UncachedMode: string
     case None = 'none';
 
     /**
-     * Returns whether a descendant row is visible after its own children are filtered.
+     * Returns whether a row is visible based solely on declarations in the hierarchy.
      *
      * @param bool $cachedAncestor Whether a cache boundary precedes this row on the original path.
      */
-    public function keeps(CacheNode $node, bool $cachedAncestor): bool
+    public function keeps(bool $declared, bool $cachedAncestor, bool $declaredDescendant): bool
     {
-        return $node->boundary->isCacheBoundary || $this === self::All
-            || ($this === self::Between && $cachedAncestor && $node->children !== []);
+        return $declared || $this === self::All
+            || ($this === self::Between && $cachedAncestor && $declaredDescendant);
     }
 }

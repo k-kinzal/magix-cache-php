@@ -20,7 +20,19 @@ final readonly class MetadataFlow
         public array $inputs = [],
         public ?string $target = null,
         public ?self $payload = null,
+        public ?string $reason = null,
+        public int $line = 0,
     ) {
+    }
+
+    /**
+     * Retains the operation and understood inputs behind a local limitation.
+     *
+     * @param list<self> $inputs
+     */
+    public static function unknown(string $reason, int $line = 0, array $inputs = []): self
+    {
+        return new self('unknown', $inputs, reason: $reason, line: $line);
     }
 
     /**

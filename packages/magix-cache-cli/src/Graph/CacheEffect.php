@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Graph;
 
+use Magix\Cache\Cli\Graph\Analysis\MetadataAnalysis;
 use Magix\Cache\Metadata\Visibility;
 
 /**
@@ -38,8 +39,23 @@ final readonly class CacheEffect
         public bool $tagsUnknown = false,
         public array $localOverrides = [],
         public array $expirationConstraints = [],
+        public MetadataAnalysis $analysis = new MetadataAnalysis(),
     ) {
         $this->ttl = $ttl ?? TtlEstimate::unknown();
+    }
+
+    /**
+     * Distinguishes analysis limits from understood runtime choices on each field.
+     *
+     * @return array{ttl: string, visibility: string, tags: string}
+     */
+    public function certainty(): array
+    {
+        return [
+            'ttl' => $this->ttl->state === TtlEstimateState::Unknown ? ($this->analysis->ttl === [] ? 'runtime' : 'partial') : $this->ttl->state->value,
+            'visibility' => $this->visibilityUnknown ? ($this->analysis->visibility === [] ? 'runtime' : 'partial') : 'known',
+            'tags' => $this->tagsUnknown ? ($this->analysis->tags === [] ? 'runtime' : 'partial') : 'known',
+        ];
     }
 
     /**

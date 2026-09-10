@@ -11,6 +11,7 @@ use function is_int;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
+use Magix\Cache\Cli\Graph\Analysis\MetadataAnalysis;
 use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 
@@ -48,9 +49,11 @@ final readonly class EffectCalculator
         $expirations = [];
         $visibilityUnknown = $hasGaps;
         $tagsUnknown = $hasGaps;
+        $analysis = new MetadataAnalysis();
 
         foreach ($children as $child) {
             $effect = $child->effect;
+            $analysis = $analysis->merge($effect->analysis);
             $expirations = [...$expirations, ...$effect->expirationConstraints];
             $visibilityUnknown = $visibilityUnknown || $effect->visibilityUnknown;
             $tagsUnknown = $tagsUnknown || $effect->tagsUnknown;
@@ -69,7 +72,7 @@ final readonly class EffectCalculator
             }
         }
 
-        return new DependencyConstraint($ttl, $ttlSource, $visibility, $visibilitySource, $this->tags($tags), $visibilityUnknown, $tagsUnknown, $children !== [], $expirations);
+        return new DependencyConstraint($ttl, $ttlSource, $visibility, $visibilitySource, $this->tags($tags), $visibilityUnknown, $tagsUnknown, $children !== [], $expirations, $analysis);
     }
 
     /**
@@ -155,6 +158,7 @@ final readonly class EffectCalculator
             visibilityUnknown: $constraint->visibilityUnknown,
             tagsUnknown: $constraint->tagsUnknown,
             expirationConstraints: $constraint->expirationConstraints,
+            analysis: $constraint->analysis,
         );
     }
 
@@ -198,7 +202,7 @@ final readonly class EffectCalculator
      */
     public function fixed(int $declared): TtlEstimate
     {
-        return TtlEstimate::known($declared);
+        return $declared < 0 ? TtlEstimate::invalid('A declared TTL must be zero or greater') : TtlEstimate::known($declared);
     }
 
     /**
@@ -237,6 +241,10 @@ final readonly class EffectCalculator
             return $maxTtlUnknown
                 ? TtlEstimate::unknown(condition: 'the declared maxTtl cannot be read statically')
                 : TtlEstimate::invalid('Ttl::FromUpstream requires maxTtl, so the declaration cannot be constructed');
+        }
+
+        if ($maxTtl !== null && $maxTtl < 0) {
+            return TtlEstimate::invalid('A declared maxTtl must be zero or greater');
         }
 
         $cap = $declared === Ttl::FromUpstream ? $maxTtl : null;
@@ -329,6 +337,7 @@ final readonly class EffectCalculator
             problems: $this->problems([$problem], $strategy),
             strategy: $strategy,
             expirationConstraints: [...$constraint->expirationConstraints, ...($strategy->expirations ?? [])],
+            analysis: $constraint->analysis,
         );
     }
 }

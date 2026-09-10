@@ -46,12 +46,12 @@ final class StatementFlowReaderTest extends TestCase
     {
         $node = AnalysisSource::node('$v = $this->inputs->a(); if (($v = $this->inputs->b())->value()) {} return $v;');
         self::assertSame(TtlEstimateState::Unknown, $node->effect->ttl->state);
-        self::assertNotEmpty($node->analysisWarnings);
+        self::assertNotEmpty($node->effect->analysis->causes());
     }
     public function testWritesDropsUnsupportedReferenceAssignments(): void
     {
         $node = AnalysisSource::node('$v = $this->inputs->a(); $alias =& $v; $alias = $this->inputs->b(); return $v;');
-        self::assertNotEmpty($node->analysisWarnings);
+        self::assertNotEmpty($node->effect->analysis->causes());
         self::assertNull($node->effect->ttl->seconds);
     }
 
@@ -60,7 +60,7 @@ final class StatementFlowReaderTest extends TestCase
         $node = AnalysisSource::node('if ($flag === 1) { $unused = 1; } foreach ([1, 2] as $i) { $seen = $i; } return $this->inputs->a();');
 
         self::assertSame('20s', $node->effect->ttl->label());
-        self::assertSame([], $node->analysisWarnings);
+        self::assertSame([], $node->effect->analysis->causes());
     }
 
     public function testExpressionBindsASimpleAssignmentAndDropsAnythingElse(): void

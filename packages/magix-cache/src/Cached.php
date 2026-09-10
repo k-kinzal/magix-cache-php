@@ -12,10 +12,15 @@ use function count;
 use function is_array;
 
 use LogicException;
+use Magix\Cache\Composition\Capability10;
 use Magix\Cache\Composition\Capability2;
 use Magix\Cache\Composition\Capability3;
 use Magix\Cache\Composition\Capability4;
 use Magix\Cache\Composition\Capability5;
+use Magix\Cache\Composition\Capability6;
+use Magix\Cache\Composition\Capability7;
+use Magix\Cache\Composition\Capability8;
+use Magix\Cache\Composition\Capability9;
 use Magix\Cache\Metadata\CacheMetadata;
 
 /**
@@ -259,5 +264,125 @@ final readonly class Cached
     public function combine5(self $second, self $third, self $fourth, self $fifth): Capability5
     {
         return new Capability5($this, $second, $third, $fourth, $fifth);
+    }
+
+    /**
+     * Combines this value with five dependencies.
+     *
+     * @template T2
+     * @template T3
+     * @template T4
+     * @template T5
+     * @template T6
+     * @param self<T2> $second
+     * @param self<T3> $third
+     * @param self<T4> $fourth
+     * @param self<T5> $fifth
+     * @param self<T6> $sixth
+     * @return Capability6<T, T2, T3, T4, T5, T6>
+     */
+    public function combine6(self $second, self $third, self $fourth, self $fifth, self $sixth): Capability6
+    {
+        return new Capability6($this, $second, $third, $fourth, $fifth, $sixth);
+    }
+
+    /**
+     * Combines this value with six dependencies.
+     *
+     * @template T2
+     * @template T3
+     * @template T4
+     * @template T5
+     * @template T6
+     * @template T7
+     * @param self<T2> $second
+     * @param self<T3> $third
+     * @param self<T4> $fourth
+     * @param self<T5> $fifth
+     * @param self<T6> $sixth
+     * @param self<T7> $seventh
+     * @return Capability7<T, T2, T3, T4, T5, T6, T7>
+     */
+    public function combine7(self $second, self $third, self $fourth, self $fifth, self $sixth, self $seventh): Capability7
+    {
+        return new Capability7($this, $second, $third, $fourth, $fifth, $sixth, $seventh);
+    }
+
+    /**
+     * Combines this value with seven dependencies.
+     *
+     * @template T2
+     * @template T3
+     * @template T4
+     * @template T5
+     * @template T6
+     * @template T7
+     * @template T8
+     * @param self<T2> $second
+     * @param self<T3> $third
+     * @param self<T4> $fourth
+     * @param self<T5> $fifth
+     * @param self<T6> $sixth
+     * @param self<T7> $seventh
+     * @param self<T8> $eighth
+     * @return Capability8<T, T2, T3, T4, T5, T6, T7, T8>
+     */
+    public function combine8(self $second, self $third, self $fourth, self $fifth, self $sixth, self $seventh, self $eighth): Capability8
+    {
+        return new Capability8($this, $second, $third, $fourth, $fifth, $sixth, $seventh, $eighth);
+    }
+
+    /**
+     * Combines this value with eight dependencies.
+     *
+     * @template T2
+     * @template T3
+     * @template T4
+     * @template T5
+     * @template T6
+     * @template T7
+     * @template T8
+     * @template T9
+     * @param self<T2> $second
+     * @param self<T3> $third
+     * @param self<T4> $fourth
+     * @param self<T5> $fifth
+     * @param self<T6> $sixth
+     * @param self<T7> $seventh
+     * @param self<T8> $eighth
+     * @param self<T9> $ninth
+     * @return Capability9<T, T2, T3, T4, T5, T6, T7, T8, T9>
+     */
+    public function combine9(self $second, self $third, self $fourth, self $fifth, self $sixth, self $seventh, self $eighth, self $ninth): Capability9
+    {
+        return new Capability9($this, $second, $third, $fourth, $fifth, $sixth, $seventh, $eighth, $ninth);
+    }
+
+    /**
+     * Combines this value with nine dependencies.
+     *
+     * @template T2
+     * @template T3
+     * @template T4
+     * @template T5
+     * @template T6
+     * @template T7
+     * @template T8
+     * @template T9
+     * @template T10
+     * @param self<T2> $second
+     * @param self<T3> $third
+     * @param self<T4> $fourth
+     * @param self<T5> $fifth
+     * @param self<T6> $sixth
+     * @param self<T7> $seventh
+     * @param self<T8> $eighth
+     * @param self<T9> $ninth
+     * @param self<T10> $tenth
+     * @return Capability10<T, T2, T3, T4, T5, T6, T7, T8, T9, T10>
+     */
+    public function combine10(self $second, self $third, self $fourth, self $fifth, self $sixth, self $seventh, self $eighth, self $ninth, self $tenth): Capability10
+    {
+        return new Capability10($this, $second, $third, $fourth, $fifth, $sixth, $seventh, $eighth, $ninth, $tenth);
     }
 }

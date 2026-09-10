@@ -70,7 +70,7 @@ When a parent only composes cached children, `#[Cache]` with no arguments is eno
 
 Every method argument is included in the cache key by default. On a hit, the stored value and metadata are returned as `Cached` without running the compute closure.
 
-Use `map()`, `flatMap()`, and `combine2()` through `combine5()` to compose values. `flatten()` removes one nested `Cached` layer, `zip()` and `unzip()` combine and split typed pairs, and `Cached::sequence()` / `Cached::traverse()` collect a variable number of results. Access the original PHP value explicitly with `value()`; `Cached` does not forward magic access. Their metadata can only become stricter: expiration moves earlier, cacheability uses logical AND, visibility becomes more restrictive, and tags and diagnostic reasons are combined. Explicit boundary settings are applied afterward: a parent TTL of 60s overrides a bubbled 20s lifetime. Unspecified fields inherit; explicit tags and visibility replace their inherited fields.
+Use `map()`, `flatMap()`, and `combine2()` through `combine10()` to compose values. `flatten()` removes one nested `Cached` layer, `zip()` and `unzip()` combine and split typed pairs, and `Cached::sequence()` / `Cached::traverse()` collect a variable number of results. Access the original PHP value explicitly with `value()`; `Cached` does not forward magic access. Their metadata can only become stricter: expiration moves earlier, cacheability uses logical AND, visibility becomes more restrictive, and tags and diagnostic reasons are combined. Explicit boundary settings are applied afterward: a parent TTL of 60s overrides a bubbled 20s lifetime. Unspecified fields inherit; explicit tags and visibility replace their inherited fields.
 
 ## Documentation
 

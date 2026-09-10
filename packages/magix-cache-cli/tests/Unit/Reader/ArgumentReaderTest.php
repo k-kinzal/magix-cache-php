@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Reader;
 
+use Magix\Cache\Cli\Declaration\ConstantCatalog;
 use Magix\Cache\Cli\Reader\ArgumentReader;
 use Magix\Cache\Cli\Reader\LiteralReader;
 use PhpParser\Node\Arg;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ArgumentReader::class)]
+#[UsesClass(ConstantCatalog::class)]
 #[UsesClass(LiteralReader::class)]
 final class ArgumentReaderTest extends TestCase
 {

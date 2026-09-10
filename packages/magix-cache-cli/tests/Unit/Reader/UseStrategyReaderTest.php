@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Reader;
 
+use Magix\Cache\Cli\Declaration\ConstantCatalog;
 use Magix\Cache\Cli\Declaration\UseStrategyDeclaration;
 use Magix\Cache\Cli\Reader\LiteralReader;
 use Magix\Cache\Cli\Reader\UseStrategyReader;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(UseStrategyReader::class)]
+#[UsesClass(ConstantCatalog::class)]
 #[UsesClass(LiteralReader::class)]
 #[UsesClass(UseStrategyDeclaration::class)]
 final class UseStrategyReaderTest extends TestCase

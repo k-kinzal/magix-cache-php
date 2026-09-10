@@ -94,7 +94,7 @@ final class TreeFilterTest extends TestCase
     public function testApplyPreservesWarningsEvenWhenOrdinaryRowsAreHidden(): void
     {
         $effect = new CacheEffect(TtlEstimate::unknown(), Visibility::Shared);
-        $stopped = new CacheNode(new BoundaryDeclaration('Lookup', 'get', 'lookup.php', 1, isCacheBoundary: false), $effect, notes: ['depth limit reached, dependencies not expanded']);
+        $stopped = new CacheNode(new BoundaryDeclaration('Lookup', 'get', 'lookup.php', 1, isCacheBoundary: false), $effect, notes: ['returned cache metadata is not analyzed']);
         $root = new CacheNode(new BoundaryDeclaration('CachedQuery', 'get', 'cached.php', 1), $effect, [$stopped]);
 
         self::assertEquals(new CacheNode($root->boundary, $effect, analysisWarnings: $root->analysisWarnings), (new TreeFilter())->apply($root));

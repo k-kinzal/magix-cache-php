@@ -71,7 +71,7 @@ analysis proves that a particular invocation will store an entry:
 |---|---|
 | White row | A normal cache boundary, including dynamic TTL, parameter configuration, daily expiration and custom Strategies |
 | Gray row | An ordinary method, an uncached entry point, or a boundary whose effective result has `NoStore` or TTL 0 |
-| Yellow row / `~` diagnostic | Incomplete call analysis: depth limits, recursion, ambiguous implementations or unverified propagation through ordinary methods |
+| Yellow row / `~` diagnostic | Incomplete call analysis: recursion, ambiguous implementations, syntax the reader cannot follow, or unverified propagation through ordinary methods |
 | Yellow field | An explicit local override of bubbled TTL, visibility or tags on an enabled, valid boundary |
 | Red row / `!` diagnostic | A definite declaration error, such as a missing policy, invalid lifetime or invalid Strategy binding |
 
@@ -87,9 +87,9 @@ selected uncached root remains visible as `(uncached entry point)` with its
 summary of called caches. Errors take precedence over gray and yellow. Disabled
 caches and ordinary methods retain gray rows even when they carry yellow warnings.
 
-Yellow analysis warnings name the affected method or call path. For a depth limit,
-raise `--depth`; recursion and unverified metadata propagation require inspecting
-the reported path and cannot be solved just by increasing depth. Warnings remain
+Yellow analysis warnings name the affected method or call path. Each one is
+reported on the method it belongs to and never repeated on the callers above it,
+so a warning names the one place to look. Warnings remain
 visible when their source rows are hidden by `--uncached` or `--ignore`. Affected
 cache ancestors stay yellow because filtering does not complete the analysis.
 Each warning appears at its lowest visible ancestor to avoid repeating it at
@@ -143,7 +143,7 @@ The root's `key` and `policy` are `none (uncached entry point)` and `storable` i
 |---|---|---|
 | `--path` | Composer autoload roots | Directory or file to scan, repeatable |
 | `--format` | `tree` | `tree`, `json`, or `mermaid` |
-| `--depth` | `8` | Maximum dependency depth to expand |
+| `--depth` | `8` | Maximum dependency depth to print; analysis always covers the whole graph |
 | `--uncached` | `between` | Ordinary method rows: `between` cache boundaries, `all`, or `none` |
 | `--ignore` | none | Hide matching class or `Class::method` subtrees; repeatable and independent of `--uncached` |
 
@@ -166,13 +166,13 @@ vendor/bin/magix analyze PageQuery::execute --uncached=all \
   --ignore 'Inventory*' --ignore '*Manager'
 ```
 
-Ordinary callees are labelled `uncached`; their lack of a boundary is not an error. They are followed recursively within the scanned sources and the existing `--depth` limit, including concrete methods with no further calls. This uses the same call resolution as the cache analysis: it does not infer database access, execute application code, or discover dynamically named calls and unscanned implementations. A method that calls `cached()` remains a cache boundary and still reports a missing `#[Cache]` policy as a problem.
+Ordinary callees are labelled `uncached`; their lack of a boundary is not an error. They are followed recursively within the scanned sources, including concrete methods with no further calls. This uses the same call resolution as the cache analysis: it does not infer database access, execute application code, or discover dynamically named calls and unscanned implementations. A method that calls `cached()` remains a cache boundary and still reports a missing `#[Cache]` policy as a problem.
 
 The default `between` mode keeps only ordinary methods with both a cached ancestor and a cached descendant on the analyzed path. Ordinary side branches are omitted even when they hang off a visible intermediate method. These cache-to-cache paths are reported as analysis gaps. Every mode preserves the computed TTL, visibility, tags, storability, problems, and gaps of existing nodes. Following an ordinary helper is not proof that its result carries cache metadata: a helper can extract a plain value with `value()`.
 
 `--ignore` applies to cached and uncached nodes alike in every mode, before ordinary rows are omitted. A match hides that node and its entire subtree; descendants of an ignored node are never promoted to the parent, even with `--uncached=none`. Other paths to the same method remain visible unless they also match. Multiple patterns are combined with OR. The selected root is subject to the same filter: if all roots are ignored, the command succeeds with `[]` in JSON and an explanatory message in the text formats.
 
-Filtering happens after analysis and is shared by tree, JSON, and Mermaid output. An ignored dependency still constrains its ancestors' TTL and visibility, contributes tags, and can cause an ancestor to be invalid. Analysis gaps and uncertainty also remain on the affected parent when their paths are hidden, including with `--uncached=none`. Diagnostics may consequently name a hidden ordinary method. Neither display option changes cache composition or the runtime. The depth limit counts actual method calls before filtering; hidden branches do not free depth for other calls.
+Filtering happens after analysis and is shared by tree, JSON, and Mermaid output. An ignored dependency still constrains its ancestors' TTL and visibility, contributes tags, and can cause an ancestor to be invalid. Analysis gaps and uncertainty also remain on the affected parent when their paths are hidden, including with `--uncached=none`. Diagnostics may consequently name a hidden ordinary method. Neither display option changes cache composition or the runtime. `--depth` also only selects what is printed: every boundary is analyzed once, bounded only by recursion, so no display setting can change a reported TTL, visibility or tag.
 
 | Pattern | Matches |
 |---|---|
@@ -257,8 +257,8 @@ Unknown TTL, visibility, and tags remain subject to the parent's explicit settin
 The warning describes incomplete analysis, not an invalid declaration. A known
 extraction is analyzed even though it deliberately drops the child's metadata.
 
-Detection is limited to resolved calls in scanned sources within `--depth`.
-Recursion and depth cutoffs retain uncertainty without inventing unseen children.
+Detection is limited to resolved calls in scanned sources.
+Recursion retains uncertainty without inventing unseen children.
 Use `--uncached=all` to inspect ordinary paths. No gap is not proof that every
 runtime dependency has been found. Filtering never removes the original metadata
 alternatives or diagnostics, including when their source nodes are hidden.

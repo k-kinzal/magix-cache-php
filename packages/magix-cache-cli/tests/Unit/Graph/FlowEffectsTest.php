@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Graph;
 
+use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheVariant;
 use Magix\Cache\Cli\Graph\FlowEffects;
+use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Graph\TtlEstimateState;
 use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -147,4 +149,24 @@ final class FlowEffectsTest extends TestCase
         self::assertNull($node->effect->ttl->seconds);
     }
 
+    public function testCarriedMarksAValueAsHoldingMetadata(): void
+    {
+        $effects = new FlowEffects();
+        $bare = new CacheVariant(new CacheEffect(TtlEstimate::known(20)));
+
+        self::assertTrue($effects->carried([$bare], false)[0]->cached);
+        self::assertFalse($effects->carried([$bare], true)[0]->analyzed);
+        self::assertTrue($effects->carried([$effects->carried([$bare], false)[0]], true)[0]->cached);
+    }
+
+    public function testDetachedLeavesTheConstraintsOfItsCarrierBehind(): void
+    {
+        $effects = new FlowEffects();
+        $carrier = $effects->carried([new CacheVariant(new CacheEffect(TtlEstimate::known(20)))], false)[0];
+
+        $detached = $effects->detached([$carrier]);
+
+        self::assertSame(TtlEstimateState::Unconstrained, $detached[0]->effect->ttl->state);
+        self::assertFalse($effects->detached([new CacheVariant(new CacheEffect(TtlEstimate::known(20)))])[0]->analyzed);
+    }
 }

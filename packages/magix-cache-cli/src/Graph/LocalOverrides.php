@@ -31,17 +31,15 @@ final readonly class LocalOverrides
             $overrides['ttl'] = $ttl;
         }
 
-        if ($effect->strategy?->metadataUnknown === true) {
-            return $overrides;
-        }
-
         $parameters = new ParameterEffects();
+        $writes = $effect->strategy?->writes;
 
-        if ($boundary->policy?->visibility !== null || $boundary->scope() !== null || $parameters->sources($boundary, 'visibility') !== []) {
+        if ($writes?->visibility !== true
+            && ($boundary->policy?->visibility !== null || $boundary->scope() !== null || $parameters->sources($boundary, 'visibility') !== [])) {
             $overrides['visibility'] = ($effect->visibilityReason ?? 'local visibility').'; composed '.strtolower($constraint->visibility->name);
         }
 
-        if ($boundary->policy?->tags !== null || $parameters->sources($boundary, 'tags') !== []) {
+        if ($writes?->tags !== true && ($boundary->policy?->tags !== null || $parameters->sources($boundary, 'tags') !== [])) {
             $overrides['tags'] = 'local tags replace inherited tags';
         }
 

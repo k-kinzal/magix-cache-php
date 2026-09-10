@@ -103,9 +103,36 @@ final class DependencyReaderTest extends TestCase
             new Expression(new Assign(new Variable('other'), new Variable('unknown'))),
         ];
 
-        $types = (new DependencyReader())->variableTypes($statements, ['products' => 'App\ProductQuery']);
+        $reader = new DependencyReader();
+        $assignments = $reader->variableTypes($statements, ['products' => 'App\ProductQuery']);
 
-        self::assertSame(['query' => 'App\ProductQuery', 'fresh' => 'App\FeedQuery'], $types);
+        self::assertSame(['query', 'fresh'], array_keys($assignments));
+        self::assertSame(
+            ['query' => 'App\ProductQuery', 'fresh' => 'App\FeedQuery'],
+            $reader->bindings([], $assignments, PHP_INT_MAX),
+        );
+    }
+
+    public function testBindingsIgnoreAnAssignmentThatHasNotRunYet(): void
+    {
+        $reader = new DependencyReader();
+        $assignments = ['query' => [[10, 'App\ProductQuery'], [40, 'App\FeedQuery']]];
+
+        self::assertSame([], $reader->bindings([], $assignments, 5));
+        self::assertSame(['query' => 'App\ProductQuery'], $reader->bindings([], $assignments, 20));
+        self::assertSame(['query' => 'App\FeedQuery'], $reader->bindings([], $assignments, 50));
+    }
+
+    public function testAssignedReadsOnlyTheBindingsItCanIdentify(): void
+    {
+        $reader = new DependencyReader();
+
+        self::assertSame('App\FeedQuery', $reader->assigned(new New_(new Name('App\FeedQuery')), []));
+        self::assertSame(
+            'App\ProductQuery',
+            $reader->assigned(new PropertyFetch(new Variable('this'), 'products'), ['products' => 'App\ProductQuery']),
+        );
+        self::assertNull($reader->assigned(new Variable('unknown'), []));
     }
 
     public function testTargetResolvesReceiversItCanIdentify(): void

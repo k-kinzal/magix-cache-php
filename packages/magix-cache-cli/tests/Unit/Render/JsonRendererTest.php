@@ -7,6 +7,7 @@ namespace Tests\Package\Cli\Unit\Render;
 use JsonException;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\KeyParameter;
+use Magix\Cache\Cli\Declaration\MetadataContract;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Graph\CacheEffect;
@@ -17,6 +18,7 @@ use Magix\Cache\Cli\Graph\StrategyStep;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\JsonRenderer;
 use Magix\Cache\Metadata\Visibility;
+use Magix\Cache\Runtime\Policy\Ttl;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -27,6 +29,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CacheGap::class)]
 #[UsesClass(CacheNode::class)]
 #[UsesClass(KeyParameter::class)]
+#[UsesClass(MetadataContract::class)]
 #[UsesClass(PolicyDeclaration::class)]
 #[UsesClass(StrategyEffect::class)]
 #[UsesClass(StrategyStep::class)]
@@ -96,7 +99,7 @@ final class JsonRendererTest extends TestCase
 
         self::assertSame('App\PageQuery::execute', $tree['boundary']);
         self::assertSame(
-            ['source' => 'MethodAttribute', 'ttl' => '120s', 'maxTtl' => null, 'tags' => ['page'], 'visibility' => null, 'version' => '1', 'runtime' => 'default'],
+            ['source' => 'MethodAttribute', 'ttl' => '120s', 'maxTtl' => null, 'maxTtlUnknown' => false, 'tags' => ['page'], 'visibility' => null, 'version' => '1', 'runtime' => 'default'],
             $tree['policy'],
         );
         self::assertSame([['name' => 'viewerId', 'type' => 'int', 'ignored' => false, 'scope' => 'private', 'reducer' => null, 'configuration' => null]], $tree['key']);
@@ -147,5 +150,23 @@ final class JsonRendererTest extends TestCase
             [['strategy' => 'App\\Spread', 'ttl' => TtlEstimate::unknown(60, null, 30)->jsonSerialize(), 'assumed' => true]],
             $encoded['steps'],
         );
+    }
+
+    public function testPolicyReportsAnUnreadableFieldInsteadOfItsDefault(): void
+    {
+        $declared = new PolicyDeclaration(PolicySource::MethodAttribute, ttl: 120, version: 'v7');
+        $unreadable = new PolicyDeclaration(
+            PolicySource::MethodAttribute,
+            ttl: Ttl::FromUpstream,
+            maxTtlUnknown: true,
+            versionUnknown: true,
+        );
+
+        $renderer = new JsonRenderer();
+
+        self::assertSame('v7', $renderer->policy($declared)['version']);
+        self::assertFalse($renderer->policy($declared)['maxTtlUnknown']);
+        self::assertNull($renderer->policy($unreadable)['version']);
+        self::assertTrue($renderer->policy($unreadable)['maxTtlUnknown']);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Reader;
 
+use Magix\Cache\Cli\Declaration\ConstantCatalog;
 use Magix\Cache\Cli\Declaration\ContractReference;
 use Magix\Cache\Cli\Declaration\ContractSource;
 use Magix\Cache\Cli\Declaration\StrategyArgument;
@@ -22,6 +23,7 @@ use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeFinder;
@@ -34,6 +36,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(StrategyReader::class)]
 #[UsesClass(AttributeReader::class)]
+#[UsesClass(ConstantCatalog::class)]
 #[UsesClass(ContractReader::class)]
 #[UsesClass(ContractReference::class)]
 #[UsesClass(LiteralReader::class)]
@@ -45,6 +48,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TtlContract::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\ExpirationReader::class)]
 #[UsesClass(\Magix\Cache\Cli\Declaration\ExpirationContract::class)]
+#[UsesClass(\Magix\Cache\Cli\Declaration\MetadataContract::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ArgumentReader::class)]
 final class StrategyReaderTest extends TestCase
 {
     public function testReadReadsACompositeStrategyWithItsCompositionInOrder(): void
@@ -543,5 +548,36 @@ final class StrategyReaderTest extends TestCase
         self::assertSame([], $contracts[0]->problems);
         self::assertSame(['invalid or duplicate expiration argument at'], $contracts[1]->problems);
         self::assertSame(['an expiration contract requires at'], $contracts[2]->problems);
+    }
+
+    public function testMetadataReadsWhichFieldsFetchReplaces(): void
+    {
+        $code = <<<'SOURCE'
+            <?php
+            final class Silent { public function fetch(): void {} }
+            final class Undescribed { #[\Magix\Cache\Strategy\Contract\WritesMetadata] public function fetch(): void {} }
+            final class Named { #[\Magix\Cache\Strategy\Contract\WritesMetadata(visibility: true)] public function fetch(): void {} }
+            SOURCE;
+        $statements = (new NodeTraverser(new NameResolver()))->traverse(
+            (new ParserFactory())->createForNewestSupportedVersion()->parse($code) ?? [],
+        );
+        $classes = (new NodeFinder())->findInstanceOf($statements, Class_::class);
+        $reader = new StrategyReader();
+
+        self::assertTrue($reader->metadata($classes[0]->getMethod('fetch'))->preservesEverything());
+        self::assertTrue($reader->metadata($classes[1]->getMethod('fetch'))->tags);
+        self::assertTrue($reader->metadata($classes[2]->getMethod('fetch'))->visibility);
+        self::assertFalse($reader->metadata($classes[2]->getMethod('fetch'))->tags);
+        self::assertTrue($reader->metadata(null)->preservesEverything());
+    }
+
+    public function testBoundFollowsALocalNameToTheDefinitionItStandsFor(): void
+    {
+        $definition = new StaticCall(new Name('Def'), 'of');
+        $reader = new StrategyReader();
+
+        self::assertSame($definition, $reader->bound(new Variable('composed'), ['composed' => $definition]));
+        self::assertSame($definition, $reader->bound($definition, []));
+        self::assertInstanceOf(Variable::class, $reader->bound(new Variable('missing'), []));
     }
 }

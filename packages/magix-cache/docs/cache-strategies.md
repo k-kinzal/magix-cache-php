@@ -269,4 +269,14 @@ The assumption replaces exactly the one analysis item it names, is marked `(assu
 The analyzer derives results from contracts and construction code; it does not prove an arbitrary implementation correct, and it does not restrict how a strategy is implemented to make itself smarter. The implementer of a strategy is responsible for honoring the published contract. A declaration that cannot work as written — a reference to a constructor parameter that does not exist, a missing `create()`, an executable factory result, or a definition containing mutable objects — is reported as `invalid` by `magix analyze`, never silently corrected.
 
 
-The CLI's TTL/ExpiresAt contracts describe expiration only. For custom Strategies, tags and visibility remain unknown because arbitrary metadata overrides are not proven by those contracts. The bundled KeySpreadExpirationStrategy and StaleIfErrorCacheStrategy preserve those fields on normal origin success. A later parent can explicitly replace unknown fields; AssumeTtl only resolves expiration, never other metadata.
+`Contract\Ttl` and `Contract\ExpiresAt` describe expiration only. `OriginResult::withMetadata()` can also replace visibility, tags and cacheability, and `Contract\WritesMetadata` is how a strategy declares that:
+
+```php
+#[Ttl(min: new ConstructorArg('minimum'), max: new ConstructorArg('maximum'))]
+#[WritesMetadata(visibility: true)]
+public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
+```
+
+Omitting the attribute declares that every one of those fields is preserved, the same promise an omitted `#[Ttl]` makes about expiration. Supplying it with no arguments declares that all three are replaced with values the declaration cannot describe, so the analyzer reports them as unknown. Naming fields declares exactly those, and the fields left out stay as precise as the dependencies made them.
+
+This is a contract, not an inference: a `fetch()` that writes a field it did not name breaks its own contract, exactly as one that overrides expiration without declaring `#[Ttl]` does. The bundled `KeySpreadExpirationStrategy` and `StaleIfErrorCacheStrategy` declare nothing here because they preserve those fields. A later parent can explicitly replace unknown fields; `AssumeTtl` only resolves expiration, never other metadata.

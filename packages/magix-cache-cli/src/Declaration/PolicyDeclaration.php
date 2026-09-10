@@ -22,6 +22,9 @@ final readonly class PolicyDeclaration
      * @param int|Ttl|null $ttl Null when the declared expression cannot be read statically.
      * @param list<string>|null $tags Null inherits; an empty list clears.
      * @param string $runtime Name of the runtime the declaration references.
+     * @param bool $maxTtlUnknown Whether maxTtl was declared with an expression that could not be read.
+     * @param bool $versionUnknown Whether version was declared with an expression that could not be read.
+     * @param bool $runtimeUnknown Whether runtime was declared with an expression that could not be read.
      */
     public function __construct(
         public PolicySource $source,
@@ -33,6 +36,9 @@ final readonly class PolicyDeclaration
         public string $runtime = CacheRuntimeRegistry::DEFAULT_NAME,
         public bool $tagsUnknown = false,
         public bool $visibilityUnknown = false,
+        public bool $maxTtlUnknown = false,
+        public bool $versionUnknown = false,
+        public bool $runtimeUnknown = false,
     ) {
     }
 
@@ -43,8 +49,8 @@ final readonly class PolicyDeclaration
     {
         $options = $this->ttl === Ttl::Auto ? [] : ['ttl: '.$this->ttlLabel()];
 
-        if ($this->maxTtl !== null) {
-            $options[] = 'maxTtl: '.$this->maxTtl;
+        if ($this->maxTtl !== null || $this->maxTtlUnknown) {
+            $options[] = 'maxTtl: '.($this->maxTtlUnknown ? 'unresolved' : $this->maxTtl);
         }
 
         if ($this->tags !== null) {
@@ -55,15 +61,26 @@ final readonly class PolicyDeclaration
             $options[] = 'visibility: '.$this->visibility->name;
         }
 
-        if ($this->version !== '1') {
-            $options[] = 'version: '.$this->version;
+        if ($this->versionUnknown || $this->version !== '1') {
+            $options[] = 'version: '.$this->versionLabel();
         }
 
-        if ($this->runtime !== CacheRuntimeRegistry::DEFAULT_NAME) {
-            $options[] = 'runtime: '.$this->runtime;
+        if ($this->runtimeUnknown || $this->runtime !== CacheRuntimeRegistry::DEFAULT_NAME) {
+            $options[] = 'runtime: '.($this->runtimeUnknown ? 'unresolved' : $this->runtime);
         }
 
         return $options === [] ? '#[Cache]' : '#[Cache('.implode(', ', $options).')]';
+    }
+
+    /**
+     * Returns the declared key version, or that it could not be read.
+     *
+     * A version that cannot be read must never be shown as the default: it
+     * takes part in the cache key, so a substituted value is a wrong key.
+     */
+    public function versionLabel(): string
+    {
+        return $this->versionUnknown ? 'unresolved' : $this->version;
     }
 
     /**

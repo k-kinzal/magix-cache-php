@@ -9,6 +9,7 @@ use function array_values;
 use function is_string;
 
 use Magix\Cache\Cli\Declaration\Catalog;
+use Magix\Cache\Cli\Declaration\ConstantCatalog;
 use Magix\Cache\Cli\Source\SourceParser;
 use Magix\Cache\Cli\Source\SourcePaths;
 
@@ -18,6 +19,9 @@ use function substr;
 
 /**
  * Builds the boundary catalog that every command works on.
+ *
+ * Constants are collected from every scanned file first, so a policy that
+ * references a constant declared elsewhere reads exactly like a literal one.
  */
 final readonly class CatalogLoader
 {
@@ -39,14 +43,20 @@ final readonly class CatalogLoader
     {
         $requested = array_values(array_filter($paths, is_string(...)));
         $sources = new SourcePaths($this->workingDirectory);
-        $classes = [];
+        $files = $sources->files($sources->resolve($requested));
+        $constants = new ConstantCatalog();
+
+        foreach ($files as $file) {
+            $constants = $constants->merge($this->parser->constants($file));
+        }
 
         $prefix = $this->workingDirectory.'/';
+        $classes = [];
 
-        foreach ($sources->files($sources->resolve($requested)) as $file) {
+        foreach ($files as $file) {
             $display = str_starts_with($file, $prefix) ? substr($file, strlen($prefix)) : $file;
 
-            foreach ($this->parser->parse($file, $display) as $class) {
+            foreach ($this->parser->parse($file, $display, $constants) as $class) {
                 $classes[] = $class;
             }
         }

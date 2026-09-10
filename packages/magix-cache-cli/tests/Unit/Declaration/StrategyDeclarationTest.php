@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Unit\Declaration;
 
+use Magix\Cache\Cli\Declaration\MetadataContract;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\TtlAssumption;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -11,6 +12,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(StrategyDeclaration::class)]
+#[UsesClass(MetadataContract::class)]
 #[UsesClass(TtlAssumption::class)]
 final class StrategyDeclarationTest extends TestCase
 {

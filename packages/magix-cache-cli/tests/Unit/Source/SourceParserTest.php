@@ -19,11 +19,14 @@ use Magix\Cache\Cli\Reader\DependencyReader;
 use Magix\Cache\Cli\Reader\LiteralReader;
 use Magix\Cache\Cli\Reader\ParameterReader;
 use Magix\Cache\Cli\Reader\PolicyReader;
+use Magix\Cache\Cli\Reader\StrategyReader;
 use Magix\Cache\Cli\Reader\TypeReader;
 use Magix\Cache\Cli\Render\JsonRenderer;
 use Magix\Cache\Cli\Render\TreeRenderer;
 use Magix\Cache\Cli\Source\ClassVisitor;
 use Magix\Cache\Cli\Source\SourceParser;
+use PhpParser\Node\Scalar\Int_;
+use PhpParser\Node\Stmt\Namespace_;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -50,7 +53,7 @@ use Tests\Package\Cli\Fixture\Project\ProductQuery;
 #[UsesClass(PolicyReader::class)]
 #[UsesClass(TypeReader::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\ContractReader::class)]
-#[UsesClass(\Magix\Cache\Cli\Reader\StrategyReader::class)]
+#[UsesClass(StrategyReader::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\UseStrategyReader::class)]
 final class SourceParserTest extends TestCase
 {
@@ -79,9 +82,9 @@ final class SourceParserTest extends TestCase
 
         $child = $tree->build($catalog->candidates(\Tests\Package\Cli\Fixture\TtlAlternatives\TimedQuery::class, 'execute')[0]);
         self::assertSame('30/600-900s', $child->effect->strategy?->ttl->label());
-        self::assertFalse($child->effect->storable);
-        self::assertTrue($child->effect->visibilityUnknown);
-        self::assertTrue($child->effect->tagsUnknown);
+        self::assertTrue($child->effect->storable, 'a strategy that only adjusts expiration keeps the result storable');
+        self::assertFalse($child->effect->visibilityUnknown, 'an undeclared visibility write preserves the composed visibility');
+        self::assertFalse($child->effect->tagsUnknown, 'an undeclared tags write preserves the composed tags');
     }
 
     /**
@@ -89,10 +92,10 @@ final class SourceParserTest extends TestCase
      */
     public static function providerAlternativeParents(): iterable
     {
-        yield 'auto' => ['automatic', '30/600-900s', false];
-        yield 'bounded' => ['bounded', '30/600-700s', false];
-        yield 'fixed' => ['fixed', '300s', false];
-        yield 'shorter' => ['shorter', '20s', false];
+        yield 'auto' => ['automatic', '30/600-900s', true];
+        yield 'bounded' => ['bounded', '30/600-700s', true];
+        yield 'fixed' => ['fixed', '300s', true];
+        yield 'shorter' => ['shorter', '20s', true];
         yield 'uncached' => ['show', '30/600-700s', false];
     }
 
@@ -142,5 +145,26 @@ final class SourceParserTest extends TestCase
         self::assertTrue($json['effective']['tagsUnknown']);
         self::assertSame([], $node->effect->problems);
         self::assertSame($before, ParameterizedStrategy::$calls, 'static analysis never executes create()');
+    }
+
+    public function testConstantsCollectsWhatAnAttributeMayReference(): void
+    {
+        $source = '<?php namespace App; class Config { public const int TTL = 300; }';
+        $catalog = (new SourceParser())->constants('data:text/plain;base64,'.base64_encode($source));
+
+        $ttl = $catalog->classConstant('App\\Config', 'TTL');
+
+        self::assertInstanceOf(Int_::class, $ttl);
+        self::assertSame(300, $ttl->value);
+    }
+
+    public function testStatementsReturnsNameResolvedTopLevelStatements(): void
+    {
+        $source = '<?php namespace App; class Config {}';
+
+        $statements = (new SourceParser())->statements('data:text/plain;base64,'.base64_encode($source));
+
+        self::assertCount(1, $statements);
+        self::assertInstanceOf(Namespace_::class, $statements[0]);
     }
 }

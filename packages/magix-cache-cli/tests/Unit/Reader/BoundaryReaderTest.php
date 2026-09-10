@@ -6,6 +6,7 @@ namespace Tests\Package\Cli\Unit\Reader;
 
 use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
+use Magix\Cache\Cli\Declaration\ConstantCatalog;
 use Magix\Cache\Cli\Declaration\DependencyCall;
 use Magix\Cache\Cli\Declaration\KeyParameter;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
@@ -40,6 +41,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ArgumentReader::class)]
 #[UsesClass(AttributeReader::class)]
 #[UsesClass(BoundaryDeclaration::class)]
+#[UsesClass(ConstantCatalog::class)]
 #[UsesClass(DependencyCall::class)]
 #[UsesClass(DependencyReader::class)]
 #[UsesClass(KeyParameter::class)]

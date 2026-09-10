@@ -7,6 +7,7 @@ namespace Tests\Package\Cli\Unit\Declaration;
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\Catalog;
 use Magix\Cache\Cli\Declaration\ClassDeclaration;
+use Magix\Cache\Cli\Declaration\MetadataContract;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Catalog::class)]
 #[UsesClass(BoundaryDeclaration::class)]
 #[UsesClass(ClassDeclaration::class)]
+#[UsesClass(MetadataContract::class)]
 #[UsesClass(StrategyDeclaration::class)]
 final class CatalogTest extends TestCase
 {

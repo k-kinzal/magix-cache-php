@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Magix\Cache\Cli\Reader;
 
 use function array_filter;
+use function array_key_exists;
 use function array_values;
 use function is_array;
 use function is_int;
@@ -42,13 +43,17 @@ final readonly class PolicyReader
      */
     public function read(array $arguments, PolicySource $source): PolicyDeclaration
     {
-        $values = $this->arguments->values($arguments, self::OPTIONS);
-        $ttl = $values['ttl'] ?? Ttl::Auto;
-        $maxTtl = $values['maxTtl'] ?? null;
-        $tags = $values['tags'] ?? null;
-        $visibility = $values['visibility'] ?? null;
-        $version = $values['version'] ?? '1';
-        $runtime = $values['runtime'] ?? CacheRuntimeRegistry::DEFAULT_NAME;
+        $written = $this->arguments->values($arguments, self::OPTIONS);
+        $unreadable = static fn (string $option): bool => array_key_exists($option, $written)
+            && $written[$option] === LiteralReader::UNRESOLVED;
+        $read = static fn (string $option): mixed => $unreadable($option) ? null : ($written[$option] ?? null);
+
+        $ttl = $unreadable('ttl') ? null : ($read('ttl') ?? Ttl::Auto);
+        $maxTtl = $read('maxTtl');
+        $tags = $read('tags');
+        $visibility = $read('visibility');
+        $version = $read('version');
+        $runtime = $read('runtime');
 
         return new PolicyDeclaration(
             source: $source,
@@ -56,10 +61,13 @@ final readonly class PolicyReader
             maxTtl: is_int($maxTtl) ? $maxTtl : null,
             tags: is_array($tags) ? array_values(array_filter($tags, is_string(...))) : null,
             visibility: $visibility instanceof Visibility ? $visibility : null,
-            version: is_string($version) && $version !== LiteralReader::UNRESOLVED ? $version : '1',
-            runtime: is_string($runtime) && $runtime !== LiteralReader::UNRESOLVED ? $runtime : CacheRuntimeRegistry::DEFAULT_NAME,
-            tagsUnknown: $tags !== null && !is_array($tags),
-            visibilityUnknown: $visibility !== null && !$visibility instanceof Visibility,
+            version: is_string($version) ? $version : '1',
+            runtime: is_string($runtime) ? $runtime : CacheRuntimeRegistry::DEFAULT_NAME,
+            tagsUnknown: $unreadable('tags'),
+            visibilityUnknown: $unreadable('visibility'),
+            maxTtlUnknown: $unreadable('maxTtl'),
+            versionUnknown: $unreadable('version'),
+            runtimeUnknown: $unreadable('runtime'),
         );
     }
 }

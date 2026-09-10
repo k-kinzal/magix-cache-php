@@ -6,6 +6,7 @@ namespace Tests\Package\Cli\Unit\Graph;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\KeyParameter;
+use Magix\Cache\Cli\Declaration\MetadataContract;
 use Magix\Cache\Cli\Declaration\ParameterConfiguration;
 use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\DependencyConstraint;
@@ -97,19 +98,19 @@ final class ParameterEffectsTest extends TestCase
         self::assertTrue($effect->tagsUnknown);
         self::assertFalse($effect->storable);
     }
-    public function testVisibilityCustomStrategyErasesEarlierVisibilityBounds(): void
+    public function testVisibilityIsErasedOnlyByAStrategyThatDeclaresItWritesVisibility(): void
     {
         $boundary = new BoundaryDeclaration('Query', 'get', 'a.php', 1);
         $effect = new CacheEffect(
             TtlEstimate::known(60),
             visibility: Visibility::Private,
-            strategy: new \Magix\Cache\Cli\Graph\StrategyEffect('Custom', TtlEstimate::known(60), metadataUnknown: true)
+            strategy: new \Magix\Cache\Cli\Graph\StrategyEffect('Custom', TtlEstimate::known(60), writes: MetadataContract::undescribed())
         );
         [$visibility, $unknown, $reason] = (new ParameterEffects())->visibility($boundary, new DependencyConstraint(), $effect);
 
         self::assertSame(Visibility::Shared, $visibility);
         self::assertTrue($unknown);
-        self::assertSame('custom Strategy metadata overrides are not analyzed', $reason);
+        self::assertSame('the declared strategy replaces visibility', $reason);
     }
 
     public function testTagsCustomStrategyReplacesKnownTagsWithUncertainty(): void
@@ -118,7 +119,7 @@ final class ParameterEffectsTest extends TestCase
         $effect = new CacheEffect(
             TtlEstimate::known(60),
             tags: ['fixed'],
-            strategy: new \Magix\Cache\Cli\Graph\StrategyEffect('Custom', TtlEstimate::known(60), metadataUnknown: true)
+            strategy: new \Magix\Cache\Cli\Graph\StrategyEffect('Custom', TtlEstimate::known(60), writes: MetadataContract::undescribed())
         );
         [$tags, $unknown] = (new ParameterEffects())->tags($boundary, new DependencyConstraint(), $effect);
 

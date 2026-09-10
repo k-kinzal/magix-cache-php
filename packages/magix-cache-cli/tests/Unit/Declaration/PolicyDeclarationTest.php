@@ -61,4 +61,13 @@ final class PolicyDeclarationTest extends TestCase
         self::assertSame('#[Cache(ttl: Ttl::FromUpstream, maxTtl: 30)]', $capped->label());
         self::assertSame('#[Cache(ttl: unresolved)]', $unresolved->label());
     }
+
+    public function testVersionLabelNeverSubstitutesTheDefaultForAnUnreadableVersion(): void
+    {
+        self::assertSame('v7', (new PolicyDeclaration(PolicySource::MethodAttribute, version: 'v7'))->versionLabel());
+        self::assertSame(
+            'unresolved',
+            (new PolicyDeclaration(PolicySource::MethodAttribute, versionUnknown: true))->versionLabel(),
+        );
+    }
 }

@@ -93,7 +93,7 @@ final readonly class KeyCommand
         }
 
         $io->writeln($found->id());
-        $io->writeln('  version    '.$found->policy->version);
+        $io->writeln('  version    '.$found->policy->versionLabel());
         $io->writeln('  namespace  '.$namespace);
         $io->writeln('  arguments  '.$this->describeArguments($bound));
         $io->writeln('  key        '.$key);

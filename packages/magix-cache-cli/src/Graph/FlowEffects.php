@@ -29,23 +29,16 @@ final readonly class FlowEffects
             return [$this->unknown()];
         }
 
+        if ($flow->kind === 'collection') {
+            return [new CacheVariant(new CacheEffect(TtlEstimate::unconstrained()))];
+        }
+
         if ($flow->kind === 'wrap' || $flow->kind === 'preserve') {
-            return array_map(fn (CacheVariant $variant): CacheVariant => $flow->kind === 'preserve' && !$variant->cached ? $this->unknown() : new CacheVariant(
-                $variant->effect,
-                $variant->sources,
-                $variant->analyzed,
-                $variant->ttlSource,
-                $variant->visibilitySource,
-                $variant->selections,
-                cached: true,
-            ), $this->evaluate($flow->inputs[0], $calls));
+            return $this->carried($this->evaluate($flow->inputs[0], $calls), $flow->kind === 'preserve');
         }
 
         if ($flow->kind === 'value') {
-            $receivers = $this->evaluate($flow->inputs[0], $calls);
-
-            return $this->unique(array_map(fn (CacheVariant $receiver): CacheVariant => !$receiver->cached
-                ? $this->unknown() : new CacheVariant(new CacheEffect(TtlEstimate::unconstrained()), selections: $receiver->selections), $receivers));
+            return $this->detached($this->evaluate($flow->inputs[0], $calls));
         }
 
         $variants = $flow->kind === 'choice' ? [] : [new CacheVariant(new CacheEffect(TtlEstimate::unconstrained()))];
@@ -65,7 +58,44 @@ final readonly class FlowEffects
     }
 
     /**
+     * Marks a value as carrying metadata, keeping every other field as it was.
+     *
+     * @param list<CacheVariant> $variants
+     * @param bool $requiresCarrier Whether the operation only works on a value that already carries metadata.
+     * @return list<CacheVariant>
+     */
+    public function carried(array $variants, bool $requiresCarrier): array
+    {
+        return array_map(fn (CacheVariant $variant): CacheVariant => $requiresCarrier && !$variant->cached ? $this->unknown() : new CacheVariant(
+            $variant->effect,
+            $variant->sources,
+            $variant->analyzed,
+            $variant->ttlSource,
+            $variant->visibilitySource,
+            $variant->selections,
+            cached: true,
+        ), $variants);
+    }
+
+    /**
+     * Takes a value out of its carrier, which leaves its constraints behind.
+     *
+     * @param list<CacheVariant> $receivers
+     * @return list<CacheVariant>
+     */
+    public function detached(array $receivers): array
+    {
+        return $this->unique(array_map(fn (CacheVariant $receiver): CacheVariant => !$receiver->cached
+            ? $this->unknown()
+            : new CacheVariant(new CacheEffect(TtlEstimate::unconstrained()), selections: $receiver->selections), $receivers));
+    }
+
+    /**
      * Multiple implementations are alternatives, never simultaneous dependencies.
+     *
+     * Following a resolved call is itself an analyzed step: the callee's own
+     * limits travel in the metadata it hands back, and the note describing
+     * them belongs to the callee, not to every caller above it.
      *
      * @param list<CacheNode> $nodes
      * @return list<CacheVariant>
@@ -79,13 +109,13 @@ final readonly class FlowEffects
         $variants = [];
 
         foreach ($nodes as $node) {
-            $returns = $node->metadataVariants ?? [new CacheVariant($node->effect, analyzed: $node->boundary->isCacheBoundary && $node->notes === [])];
+            $returns = $node->metadataVariants ?? [new CacheVariant($node->effect)];
 
             foreach ($returns as $variant) {
                 $variants[] = new CacheVariant(
                     $variant->effect,
                     $node->boundary->isCacheBoundary ? [$node->boundary->shortId(), ...(count($returns) > 1 ? $variant->sources : [])] : $variant->sources,
-                    $variant->analyzed,
+                    true,
                     $node->boundary->shortId(),
                     $node->boundary->shortId(),
                     cached: $node->boundary->isCacheBoundary || $variant->cached,

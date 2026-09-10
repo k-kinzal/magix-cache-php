@@ -52,4 +52,14 @@ final readonly class AnalysisSource
 
         return (new CacheTree($catalog))->build($catalog->search('Root::run')[0]);
     }
+
+    /**
+     * Returns one parsed statement, with the source positions it was written at.
+     */
+    public static function statement(string $code): \PhpParser\Node\Stmt
+    {
+        $statements = (new \PhpParser\ParserFactory())->createForNewestSupportedVersion()->parse('<?php '.$code) ?? [];
+
+        return $statements[0];
+    }
 }

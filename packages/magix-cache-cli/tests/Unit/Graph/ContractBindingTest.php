@@ -6,6 +6,7 @@ namespace Tests\Package\Cli\Unit\Graph;
 
 use Magix\Cache\Cli\Declaration\ContractReference;
 use Magix\Cache\Cli\Declaration\ContractSource;
+use Magix\Cache\Cli\Declaration\MetadataContract;
 use Magix\Cache\Cli\Declaration\StrategyArgument;
 use Magix\Cache\Cli\Declaration\StrategyDeclaration;
 use Magix\Cache\Cli\Declaration\StrategyParameter;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ContractBinding::class)]
 #[UsesClass(ContractReference::class)]
+#[UsesClass(MetadataContract::class)]
 #[UsesClass(StrategyArgument::class)]
 #[UsesClass(StrategyDeclaration::class)]
 #[UsesClass(StrategyParameter::class)]

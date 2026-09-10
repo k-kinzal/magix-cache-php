@@ -26,6 +26,7 @@ final readonly class StrategyDeclaration
      * @param bool $hasCreate Whether the class declares a static create().
      * @param list<StrategyInstantiation>|null $composed Children in composition order, or null when unreadable.
      * @param TtlContract|null $ttl Lifetime contract declared on the fetch operation.
+     * @param MetadataContract $writes Non-expiration metadata fields the fetch operation replaces.
      * @param list<TtlAssumption> $assumptions Explicit assumptions declared on create().
      * @param list<string> $notes Why parts of the declaration could not be read.
      * @param bool $constructible Whether this class can be a constructed CacheStrategy leaf.
@@ -41,6 +42,7 @@ final readonly class StrategyDeclaration
         public bool $hasCreate = false,
         public ?array $composed = null,
         public ?TtlContract $ttl = null,
+        public MetadataContract $writes = new MetadataContract(),
         public array $assumptions = [],
         public array $notes = [],
         public bool $constructible = true,

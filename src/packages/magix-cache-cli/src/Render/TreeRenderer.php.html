@@ -276,7 +276,7 @@
 <span class="src-line" id="L240"><a class="ln" href="#L240">240</a>            <span class="tok-var">$key</span> .= <span class="tok-str">&#039; (ignored: &#039;</span>.<span class="tok-id">implode</span>(<span class="tok-str">&#039;, &#039;</span>, <span class="tok-var">$ignored</span>).<span class="tok-str">&#039;)&#039;</span>;</span>
 <span class="src-line" id="L241"><a class="ln" href="#L241">241</a>        }</span>
 <span class="src-line" id="L242"><a class="ln" href="#L242">242</a></span>
-<span class="src-line" id="L243"><a class="ln" href="#L243">243</a>        <span class="tok-kw">return</span> <span class="tok-var">$key</span>.<span class="tok-str">&#039;  version &#039;</span>.(<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">policy</span>-&gt;<span class="tok-id">version</span> ?? <span class="tok-str">&#039;1&#039;</span>);</span>
+<span class="src-line" id="L243"><a class="ln" href="#L243">243</a>        <span class="tok-kw">return</span> <span class="tok-var">$key</span>.<span class="tok-str">&#039;  version &#039;</span>.(<span class="tok-var">$boundary</span>-&gt;<span class="tok-id">policy</span>?-&gt;<span class="tok-id">versionLabel</span>() ?? <span class="tok-str">&#039;1&#039;</span>);</span>
 <span class="src-line" id="L244"><a class="ln" href="#L244">244</a>    }</span>
 <span class="src-line" id="L245"><a class="ln" href="#L245">245</a>}</span>
 <span class="src-line" id="L246"><a class="ln" href="#L246">246</a></span>

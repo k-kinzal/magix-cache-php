@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storage Adapters — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/pr/28/k-kinzal/magix-cache/doc/docs/storage-adapters.md.html">
+<meta name="description" content="Storage Adapters, a document of the k-kinzal/magix-cache package.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="Storage Adapters — magix-cache-php">
+<meta property="og:description" content="Storage Adapters, a document of the k-kinzal/magix-cache package.">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/pr/28/k-kinzal/magix-cache/doc/docs/storage-adapters.md.html">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/pr/28/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}document.documentElement.dataset.diffMode=localStorage.getItem("docgen-diff-mode")||"inline"}catch(e){}</script>
+</head>
+<body data-root="../../../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../index.html">magix-cache-php</a></div><div class="sb-pkg"><a href="../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></div><nav class="sb-block"><div class="sb-title">Package</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/all-items.html">All items</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/index.html#documents">Documents</a></li></ul><div class="sb-kind" data-diff="modified">Layers</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/layer.Attribute.html">Attribute</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Cache.html">Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Clock.html">Clock</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Composition.html">Composition</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/layer.CoreApi.html">CoreApi</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Metadata.html">Metadata</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/layer.Runtime.html">Runtime</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/layer.Strategy.html">Strategy</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Namespaces</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/index.html" title="Magix\Cache">Magix\Cache</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Attribute/index.html" title="Magix\Cache\Attribute">Magix\Cache\Attribute</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/index.html" title="Magix\Cache\Cache">Magix\Cache\Cache</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/PSR16/index.html" title="Magix\Cache\Cache\PSR16">Magix\Cache\Cache\PSR16</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Cache/PSR6/index.html" title="Magix\Cache\Cache\PSR6">Magix\Cache\Cache\PSR6</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Clock/index.html" title="Magix\Cache\Clock">Magix\Cache\Clock</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Composition/index.html" title="Magix\Cache\Composition">Magix\Cache\Composition</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Metadata/index.html" title="Magix\Cache\Metadata">Magix\Cache\Metadata</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/index.html" title="Magix\Cache\Runtime">Magix\Cache\Runtime</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Extension/index.html" title="Magix\Cache\Runtime\Extension">Magix\Cache\Runtime\Extension</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/KeyStrategy/index.html" title="Magix\Cache\Runtime\KeyStrategy">Magix\Cache\Runtime\KeyStrategy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Parameter/index.html" title="Magix\Cache\Runtime\Parameter">Magix\Cache\Runtime\Parameter</a></li><li data-diff="modified"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Runtime/Policy/index.html" title="Magix\Cache\Runtime\Policy">Magix\Cache\Runtime\Policy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Strategy/index.html" title="Magix\Cache\Strategy">Magix\Cache\Strategy</a></li><li data-diff="same"><a href="../../../../k-kinzal/magix-cache/Magix/Cache/Strategy/Contract/index.html" title="Magix\Cache\Strategy\Contract">Magix\Cache\Strategy\Contract</a></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><a href="../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a><span class="crumb-sep">::</span><span class="crumb-current">docs/storage-adapters.md</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<span class="diff-range" title="Comparing 6bc7a0a2 to working tree">6bc7a0a2 <span class="diff-arrow">→</span> working tree</span><div class="diff-modes" id="diff-modes" role="group" aria-label="Diff display mode"><button type="button" class="diff-mode" data-diff-mode="off" title="Documentation of the head revision, without diff marks">Off</button><button type="button" class="diff-mode" data-diff-mode="inline" title="Every page with additions and removals marked">Diff</button><button type="button" class="diff-mode" data-diff-mode="changes" title="Only what the head revision added, changed, or removed">Changes</button></div><a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<p class="diff-empty" id="diff-empty" data-changes="Nothing on this page changed between 6bc7a0a2 and working tree." data-off="This page documents what 6bc7a0a2 had and working tree no longer has. Switch to Diff to read it." hidden></p>
+<div class="symbol-head"><h1><span class="chip chip-kind k-document">document</span>Storage Adapters</h1><div class="symbol-meta"><span class="src-link">docs/storage-adapters.md</span></div></div>
+<section class="readme" data-diff="same"><div class="doc-block" data-diff="same"><h2>Storage Adapters</h2>
+</div><div class="doc-block" data-diff="same"><p>This guide explains how to connect MagixCache to PSR-6, PSR-16, framework caches, or a custom storage topology.</p>
+</div><div class="doc-block" data-diff="same"><h3>Storage Boundary</h3>
+</div><div class="doc-block" data-diff="same"><p>The runtime depends on <code>Magix\Cache\Cache\Cache</code>, a small port that reads and writes complete <code>CacheEntry</code> objects:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">interface</span> <span class="tok-id">Cache</span>
+{
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">get</span>(<span class="tok-id">string</span> <span class="tok-var">$key</span>, <span class="tok-id">Closure</span> <span class="tok-var">$typeWitness</span>): ?<span class="tok-id">CacheEntry</span>;
+
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">set</span>(<span class="tok-id">string</span> <span class="tok-var">$key</span>, <span class="tok-id">CacheEntry</span> <span class="tok-var">$entry</span>): <span class="tok-id">void</span>;
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>Application code works with public <code>Cached&lt;T&gt;</code> values. Only the runtime and storage boundary work with internal <code>CacheEntry&lt;T&gt;</code> values; do not expose <code>CacheEntry</code> from queries.</p>
+</div><div class="doc-block" data-diff="same"><h3>PSR-16</h3>
+</div><div class="doc-block" data-diff="same"><p>Wrap any PSR-16 implementation with <code>SimpleCache</code> and register the runtime under the <code>default</code> name:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>&lt;?<span class="tok-id">php</span>
+
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cache\PSR16\SimpleCache</span> <span class="tok-kw">as</span> <span class="tok-id">MagixSimpleCache</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\CacheRuntime</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\CacheRuntimeRegistry</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Psr\SimpleCache\CacheInterface</span>;
+
+<span class="tok-com">/** @var CacheInterface $cache */</span>
+<span class="tok-var">$cache</span> = <span class="tok-var">$container</span>-&gt;<span class="tok-id">get</span>(<span class="tok-id">CacheInterface</span>::<span class="tok-kw">class</span>);
+
+<span class="tok-id">CacheRuntimeRegistry</span>::<span class="tok-id">register</span>(
+    <span class="tok-str">&#039;default&#039;</span>,
+    <span class="tok-kw">new</span> <span class="tok-id">CacheRuntime</span>(<span class="tok-kw">new</span> <span class="tok-id">MagixSimpleCache</span>(<span class="tok-var">$cache</span>)),
+);</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The adapter stores the complete <code>CacheEntry</code> and passes a TTL based on its physical retention deadline to the PSR-16 backend.</p>
+</div><div class="doc-block" data-diff="same"><h3>PSR-6</h3>
+</div><div class="doc-block" data-diff="same"><p>Wrap any PSR-6 pool with <code>CacheItemPool</code>:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>&lt;?<span class="tok-id">php</span>
+
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cache\PSR6\CacheItemPool</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\CacheRuntime</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\CacheRuntimeRegistry</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Psr\Cache\CacheItemPoolInterface</span>;
+
+<span class="tok-com">/** @var CacheItemPoolInterface $pool */</span>
+<span class="tok-var">$pool</span> = <span class="tok-var">$container</span>-&gt;<span class="tok-id">get</span>(<span class="tok-id">CacheItemPoolInterface</span>::<span class="tok-kw">class</span>);
+
+<span class="tok-id">CacheRuntimeRegistry</span>::<span class="tok-id">register</span>(
+    <span class="tok-str">&#039;default&#039;</span>,
+    <span class="tok-kw">new</span> <span class="tok-id">CacheRuntime</span>(<span class="tok-kw">new</span> <span class="tok-id">CacheItemPool</span>(<span class="tok-var">$pool</span>)),
+);</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The adapter sets the PSR-6 item&#039;s absolute expiration to the entry&#039;s physical retention deadline.</p>
+</div><div class="doc-block" data-diff="same"><p>Both adapters treat a backend hit containing something other than a Magix <code>CacheEntry</code> as a cache miss, and an entry written under a different storage format version is diagnosed as a miss rather than served. Use a dedicated namespace or pool when other application features could write the same key.</p>
+</div><div class="doc-block" data-diff="same"><h3>Framework Integrations</h3>
+</div><div class="doc-block" data-diff="same"><p>The dedicated adapters connect the framework&#039;s default cache service and register the <code>default</code> runtime reference:</p>
+</div><div class="doc-block" data-diff="same"><div class="table-wrap"><table><thead><tr><th>Framework</th><th>Package</th><th>Backend</th></tr></thead><tbody><tr><td>Laravel 12 / 13</td><td><span class="md-target" title="../../magix-cache-laravel/README.md"><code>k-kinzal/magix-cache-laravel</code></span></td><td>Default <code>cache.store</code> through PSR-16</td></tr><tr><td>Symfony 7.4 / 8</td><td><span class="md-target" title="../../magix-cache-symfony/README.md"><code>k-kinzal/magix-cache-symfony</code></span></td><td><code>cache.app</code> through PSR-6</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="same"><p>Laravel package discovery performs setup automatically. Symfony applications enable <code>MagixCacheBundle</code> in <code>config/bundles.php</code>. Both register a container-backed provider closure, so the registry never holds a runtime instance across requests.</p>
+</div><div class="doc-block" data-diff="same"><h3>Logical Expiration and Physical Retention</h3>
+</div><div class="doc-block" data-diff="same"><p>Each stored entry has two deadlines:</p>
+</div><div class="doc-block" data-diff="same"><div class="table-wrap"><table><thead><tr><th>Field</th><th>Purpose</th></tr></thead><tbody><tr><td><code>expiresAt</code></td><td>Logical freshness deadline; normal reads stop returning the entry after this time</td></tr><tr><td><code>retainedUntil</code></td><td>Physical storage deadline; the backend may retain the entry until this time</td></tr></tbody></table></div>
+</div><div class="doc-block" data-diff="same"><p>They are equal by default. <code>#[StaleIfError(maxAge: ...)]</code> extends <code>retainedUntil</code> to <code>expiresAt + maxAge</code> without changing <code>expiresAt</code>, allowing an expired entry to remain available only as a stale fallback. Extending retention never changes the expiration itself.</p>
+</div><div class="doc-block" data-diff="same"><p>The PSR adapters use <code>retainedUntil</code> for backend expiration. The runtime still checks both deadlines, so a physically present but logically expired entry is never returned as a fresh hit, and a fresh hit never re-bases the stored expiration.</p>
+</div><div class="doc-block" data-diff="same"><h3>Stored Metadata</h3>
+</div><div class="doc-block" data-diff="same"><p>A <code>CacheEntry</code> preserves:</p>
+</div><div class="doc-block" data-diff="same"><ul><li>The result value</li><li>Absolute logical expiration</li><li>Absolute physical retention</li><li>Tags</li><li>Visibility</li><li>Diagnostic reasons</li><li>The storage format version</li></ul>
+</div><div class="doc-block" data-diff="same"><p>Only results with all of the following properties are written, and the judgement is repeated immediately before the write:</p>
+</div><div class="doc-block" data-diff="same"><ul><li><code>cacheable</code> is <code>true</code></li><li>Visibility is not <code>NoStore</code></li><li>Expiration is finite and in the future</li></ul>
+</div><div class="doc-block" data-diff="same"><p>The backend must be able to store the value and <code>CacheEntry</code> object. For cross-process caches, choose a serializer that supports the result types used by the application.</p>
+</div><div class="doc-block" data-diff="same"><p>Tags are persisted as metadata, but the included PSR adapters do not invoke backend-specific tag APIs. Add a custom implementation or decorator when tag indexes and invalidation are required.</p>
+</div><div class="doc-block" data-diff="same"><h3>Custom Storage</h3>
+</div><div class="doc-block" data-diff="same"><p>Implement <code>Cache</code> when storage is not exposed through PSR-6 or PSR-16:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code>&lt;?<span class="tok-id">php</span>
+
+<span class="tok-kw">use</span> <span class="tok-id">Closure</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cache\Cache</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cache\CacheEntry</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Override</span>;
+
+<span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">ApplicationCache</span> <span class="tok-kw">implements</span> <span class="tok-id">Cache</span>
+{
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(<span class="tok-kw">private</span> <span class="tok-id">CacheBackend</span> <span class="tok-var">$backend</span>)
+    {
+    }
+
+    #[<span class="tok-id">Override</span>]
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">get</span>(<span class="tok-id">string</span> <span class="tok-var">$key</span>, <span class="tok-id">Closure</span> <span class="tok-var">$typeWitness</span>): ?<span class="tok-id">CacheEntry</span>
+    {
+        <span class="tok-kw">unset</span>(<span class="tok-var">$typeWitness</span>);
+        <span class="tok-var">$value</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">backend</span>-&gt;<span class="tok-id">get</span>(<span class="tok-var">$key</span>);
+
+        <span class="tok-kw">return</span> <span class="tok-var">$value</span> <span class="tok-kw">instanceof</span> <span class="tok-id">CacheEntry</span> ? <span class="tok-var">$value</span> : <span class="tok-id">null</span>;
+    }
+
+    #[<span class="tok-id">Override</span>]
+    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">set</span>(<span class="tok-id">string</span> <span class="tok-var">$key</span>, <span class="tok-id">CacheEntry</span> <span class="tok-var">$entry</span>): <span class="tok-id">void</span>
+    {
+        <span class="tok-var">$this</span>-&gt;<span class="tok-id">backend</span>-&gt;<span class="tok-id">putUntil</span>(<span class="tok-var">$key</span>, <span class="tok-var">$entry</span>, <span class="tok-var">$entry</span>-&gt;<span class="tok-id">retainedUntil</span>);
+    }
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>The <code>typeWitness</code> closure communicates the expected generic value type to static analysis and specialized implementations. A normal storage adapter does not invoke it.</p>
+</div><div class="doc-block" data-diff="same"><p>Custom implementations must preserve the complete entry, retain it no later than <code>retainedUntil</code>, and return <code>null</code> for misses or incompatible values. When the backend itself fails, raise <code>CacheBackendFailure</code> with the original failure as <code>previous</code>: that is the failure <code>Cache</code> declares, and the default <code>#[BypassCacheErrors]</code> classifier accepts it without any configuration. An implementation that reports failures its own way still works, but a caller who wants them bypassed has to say so with a registered classifier.</p>
+</div><div class="doc-block" data-diff="same"><p>Use a <code>Cache</code> decorator for storage topology such as namespacing, metrics, encryption, or multiple tiers. Use <code>CacheKeyStrategy</code> when only the generated key format needs to change.</p>
+</div><div class="doc-block" data-diff="same"><h3>Backend Failures</h3>
+</div><div class="doc-block" data-diff="same"><p>The bundled PSR-6 and PSR-16 adapters translate <code>Psr\Cache\CacheException</code> and <code>Psr\SimpleCache\CacheException</code> into <code>CacheBackendFailure</code>, and the runtime propagates it by default. To treat classified read failures as misses and write failures as skipped writes, declare <code>#[BypassCacheErrors]</code> on that cache boundary:</p>
+</div><div class="doc-block" data-diff="same"><pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\BypassCacheErrors</span>;
+<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Attribute\Cache</span>;
+
+#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>)]
+#[<span class="tok-id">BypassCacheErrors</span>]
+<span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(): <span class="tok-id">Cached</span>
+{
+    <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-kw">fn</span> (): <span class="tok-id">Cached</span> =&gt; <span class="tok-id">Cached</span>::<span class="tok-id">of</span>(<span class="tok-var">$this</span>-&gt;<span class="tok-id">origin</span>-&gt;<span class="tok-id">fetch</span>()));
+}</code></pre>
+</div><div class="doc-block" data-diff="same"><p>Origin failures always propagate; only cache reads and writes are inside the bypass range. See <a href="../../../../k-kinzal/magix-cache/doc/docs/cache-behaviors.md.html#bypass-cache-backend-errors">Cache Behaviors</a> for classification details and custom classifiers.</p>
+</div></section>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../../../assets/search-index.js" defer></script>
+<script src="../../../../assets/app.js" defer></script>
+</body>
+</html>

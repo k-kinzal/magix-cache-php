@@ -137,7 +137,7 @@ The context exposes:
 
 The resolver must return a lifetime of zero or more seconds; a negative return value is a configuration error. The resolved lifetime replaces the policy, parameter and inherited expiration at the origin base time. A subsequent Strategy override has higher priority. The resolver runs only after a successful origin call — not on a fresh hit and not for a stale fallback.
 
-The default `Ttl::Auto` pairs naturally with a dynamic TTL because it inherits the expiration the resolver supplied. A dynamic TTL overrides a fixed policy TTL; a later Strategy override wins over the resolver.
+The default `Ttl::Auto` pairs naturally with a dynamic TTL because it declares no lifetime of its own, so the resolver's expiration is the only one. A dynamic TTL overrides a fixed policy TTL; a later Strategy override wins over the resolver.
 
 One boundary declares at most one resolver. Referencing a resolver that is not registered with the boundary's runtime is a definition error (`LogicException`), not a silent fallback.
 

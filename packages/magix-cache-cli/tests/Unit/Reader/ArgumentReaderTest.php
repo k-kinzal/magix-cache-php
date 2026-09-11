@@ -24,7 +24,7 @@ final class ArgumentReaderTest extends TestCase
     {
         $values = (new ArgumentReader())->values(
             [new Arg(new Int_(20)), new Arg(new String_('v2'), name: new Identifier('version'))],
-            ['ttl', 'maxTtl'],
+            ['ttl', 'tags'],
         );
 
         self::assertSame(['ttl' => 20, 'version' => 'v2'], $values);

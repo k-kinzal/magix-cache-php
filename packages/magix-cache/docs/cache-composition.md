@@ -250,7 +250,7 @@ public function execute(int $productId): Cached
 }
 ```
 
-Omitting TTL retains the composed expiration. Bare `#[Cache]` inherits all metadata; the example explicitly replaces tags with the page tag. A fixed parent TTL overrides the inherited deadline: child 20s plus parent `ttl: 60` produces a parent lifetime of 60s. `Ttl::FromUpstream` is the explicit choice to inherit with a maximum.
+Omitting TTL retains the composed expiration. Bare `#[Cache]` inherits all metadata; the example explicitly replaces tags with the page tag. A fixed parent TTL overrides the inherited deadline: child 20s plus parent `ttl: 60` produces a parent lifetime of 60s.
 
 ## Create Source Metadata
 

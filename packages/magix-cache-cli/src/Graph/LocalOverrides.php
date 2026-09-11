@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Magix\Cache\Cli\Graph;
 
 use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
-use Magix\Cache\Runtime\Policy\Ttl;
 
 /**
  * Identifies explicit local fields that replace bubbled metadata.
  *
- * Equal values still have a local owner. FromUpstream is the explicit cap
- * operation and is highlighted only when it changes a proven lifetime.
+ * Equal values still have a local owner, so a field is reported by who wrote
+ * it rather than by whether the value changed.
  */
 final readonly class LocalOverrides
 {
@@ -71,28 +70,6 @@ final readonly class LocalOverrides
             return 'local ttl '.$policy->ttl.'s; composed '.$constraint->ttl->label();
         }
 
-        if ($policy?->ttl === Ttl::FromUpstream && $policy->maxTtl !== null && $this->shortens($constraint->ttl, $policy->maxTtl)) {
-            return 'local maxTtl '.$policy->maxTtl.'s; composed '.$constraint->ttl->label();
-        }
-
         return null;
-    }
-
-    /**
-     * Reports whether a local cap restricts any of the proven composed lifetimes.
-     *
-     * This numeric comparison is independent of the policy declaration and
-     * never treats an unknown upper bound as an unlimited lifetime.
-     */
-    public function shortens(TtlEstimate $composed, int $cap): bool
-    {
-        if ($composed->state === TtlEstimateState::Invalid
-            || ($composed->state === TtlEstimateState::Unknown && (!$composed->hasFiniteExpiration() || $composed->reason !== null))) {
-            return false;
-        }
-
-        $ceiling = $composed->seconds ?? $composed->upperBound ?? $composed->lowerBound;
-
-        return $composed->state === TtlEstimateState::Unconstrained || ($ceiling !== null && $ceiling > $cap);
     }
 }

@@ -7,7 +7,6 @@ namespace Tests\Package\Cli\Fixture\TtlAlternatives;
 use Magix\Cache\Attribute\Cache;
 use Magix\Cache\Cacheable;
 use Magix\Cache\Cached;
-use Magix\Cache\Runtime\Policy\Ttl;
 
 /**
  * Applies parent policies to a time-dependent cache boundary.
@@ -35,15 +34,6 @@ final class TimedPage
     /**
      * @return Cached<string>
      */
-    #[Cache(ttl: Ttl::FromUpstream, maxTtl: 700)]
-    public function bounded(): Cached
-    {
-        return $this->cached(fn (): Cached => $this->query->execute());
-    }
-
-    /**
-     * @return Cached<string>
-     */
     #[Cache(ttl: 300)]
     public function fixed(): Cached
     {
@@ -64,6 +54,6 @@ final class TimedPage
      */
     public function show(): Cached
     {
-        return $this->bounded();
+        return $this->automatic();
     }
 }

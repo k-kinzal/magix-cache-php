@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Magix\Cache\Runtime;
 
 use InvalidArgumentException;
-use LogicException;
 use Magix\Cache\Cached;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\Metadata\CacheMetadata;
@@ -36,7 +35,6 @@ final readonly class OriginOverrides
      * @param Cached<mixed> $result
      * @param int<0, max>|null $parameterTtl Validated parameter override at the same base time.
      * @throws InvalidArgumentException when the resolver returns a negative lifetime
-     * @throws LogicException when FromUpstream has no maximum lifetime
      */
     public function apply(
         CachePolicy $policy,

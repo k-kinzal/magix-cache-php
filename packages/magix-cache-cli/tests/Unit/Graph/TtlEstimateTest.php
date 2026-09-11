@@ -115,10 +115,10 @@ final class TtlEstimateTest extends TestCase
 
     public function testInvalidCarriesItsProblem(): void
     {
-        $estimate = TtlEstimate::invalid('Ttl::Auto has nothing to inherit');
+        $estimate = TtlEstimate::invalid('A declared TTL must be zero or greater');
 
         self::assertSame(TtlEstimateState::Invalid, $estimate->state);
-        self::assertSame('Ttl::Auto has nothing to inherit', $estimate->reason);
+        self::assertSame('A declared TTL must be zero or greater', $estimate->reason);
     }
 
     public function testMeetKeepsTheEarlierOfTwoKnownLifetimes(): void

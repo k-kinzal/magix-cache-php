@@ -19,7 +19,6 @@ final class PolicyDeclarationTest extends TestCase
         $policy = new PolicyDeclaration(
             source: PolicySource::MethodAttribute,
             ttl: 30,
-            maxTtl: 60,
             tags: ['product'],
             visibility: Visibility::Private,
             version: '2',
@@ -27,7 +26,7 @@ final class PolicyDeclarationTest extends TestCase
         );
 
         self::assertSame(
-            '#[Cache(ttl: 30s, maxTtl: 60, tags: [product], visibility: Private, version: 2, runtime: edge)]',
+            '#[Cache(ttl: 30s, tags: [product], visibility: Private, version: 2, runtime: edge)]',
             $policy->label(),
         );
     }
@@ -53,12 +52,10 @@ final class PolicyDeclarationTest extends TestCase
     {
         $plain = new PolicyDeclaration(source: PolicySource::MethodAttribute);
         $tagged = new PolicyDeclaration(source: PolicySource::ClassAttribute, ttl: Ttl::Auto, tags: ['page']);
-        $capped = new PolicyDeclaration(source: PolicySource::MethodAttribute, ttl: Ttl::FromUpstream, maxTtl: 30);
         $unresolved = new PolicyDeclaration(source: PolicySource::MethodAttribute, ttl: null);
 
         self::assertSame('#[Cache]', $plain->label());
         self::assertSame('#[Cache(tags: [page])]', $tagged->label());
-        self::assertSame('#[Cache(ttl: Ttl::FromUpstream, maxTtl: 30)]', $capped->label());
         self::assertSame('#[Cache(ttl: unresolved)]', $unresolved->label());
     }
 

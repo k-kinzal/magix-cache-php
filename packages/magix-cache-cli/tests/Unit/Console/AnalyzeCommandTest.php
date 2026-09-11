@@ -606,8 +606,7 @@ final class AnalyzeCommandTest extends TestCase
     public static function providerExpirationPolicies(): iterable
     {
         yield 'auto' => ['automatic', null];
-        yield 'bounded' => ['bounded', 30];
-        yield 'uncached entry' => ['show', 30];
+        yield 'uncached entry' => ['show', null];
     }
 
     /**

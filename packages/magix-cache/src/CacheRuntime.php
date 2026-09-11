@@ -16,7 +16,6 @@ use Magix\Cache\Runtime\Extension\CacheObserver;
 use Magix\Cache\Runtime\Extension\RegisteredExtensions;
 use Magix\Cache\Runtime\GuardedCache;
 use Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy;
-use Magix\Cache\Runtime\Policy\PolicySemantics;
 use Magix\Cache\Runtime\StrategyChain;
 use Magix\Cache\Runtime\UnixClock;
 use Magix\Cache\Strategy\CacheAnswer;
@@ -39,7 +38,7 @@ use RuntimeException;
  * to reorder them. Policy, parameter TTL, dynamic TTL and strategies override
  * in that order, using the single base time taken right after origin success.
  * The outer strategy runs last on the return path and wins for fields it replaces.
- * Automatic expiration is validated after the overrides. Only the origin
+ * Only the origin
  * call is captured as OriginFailure; strategies decide whether to answer it,
  * and unhandled failures propagate with their original identity.
  * Every invocation constructs fresh strategy
@@ -76,7 +75,7 @@ final readonly class CacheRuntime
      * @param CacheInvocation<T> $invocation
      * @return Cached<T>
      * @throws RuntimeException when an origin failure remains unanswered or a delegated stage fails
-     * @throws LogicException when a referenced extension is not registered or a derived lifetime cannot be derived
+     * @throws LogicException when a referenced extension is not registered
      */
     public function execute(CacheInvocation $invocation): Cached
     {
@@ -121,7 +120,6 @@ final readonly class CacheRuntime
         }
 
         $result = $fetched->cached;
-        (new PolicySemantics())->validate($invocation->policy, $result->metadata);
         $chain->set($operation, new CacheWrite($result));
 
         return $result;

@@ -100,9 +100,10 @@ final class FlowEffectsTest extends TestCase
     {
         $node = AnalysisSource::node('return $flag ? $this->inputs->a() : Cached::of(1);');
         self::assertNotNull($node->metadataVariants);
-        self::assertSame(TtlEstimateState::Invalid, $node->metadataVariants[1]->effect->ttl->state);
-        self::assertNotEmpty($node->effect->problems);
+        self::assertSame(TtlEstimateState::Unconstrained, $node->metadataVariants[1]->effect->ttl->state);
+        self::assertSame([], $node->effect->problems);
         self::assertFalse($node->effect->ttl->hasFiniteExpiration());
+        self::assertFalse($node->effect->storable);
     }
     public function testCallKeepsRepeatedUsesOfOneInvocationCorrelated(): void
     {

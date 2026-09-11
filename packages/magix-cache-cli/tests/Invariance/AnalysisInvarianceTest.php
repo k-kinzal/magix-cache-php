@@ -30,7 +30,7 @@ final class AnalysisInvarianceTest extends TestCase
      * The dependency and helpers every case composes.
      */
     private const string COMMON = <<<'PHP'
-        class Consts { public const int TTL = 300; public const string VERSION = 'v7'; public const int MAX = 60; }
+        class Consts { public const int TTL = 300; public const string VERSION = 'v7'; }
         class Child { use Cacheable;
             #[Cache(ttl: 20, tags: ['product'])]
             public function execute(): Cached { return $this->cached(fn () => Cached::of(1)); }
@@ -246,33 +246,6 @@ final class AnalysisInvarianceTest extends TestCase
 
         $this->assertRewriteKeeps(
             '300s',
-            Invariance::summarize(Invariance::source(self::COMMON.$literal), 'RootA::run'),
-            Invariance::summarize(Invariance::source(self::COMMON.$constant), 'RootB::run'),
-        );
-    }
-
-    /**
-     * A maxTtl behind a constant is declared, so it is never a missing maxTtl.
-     */
-    public function testAConstantMaxTtlReadsTheSameAsALiteralMaxTtl(): void
-    {
-        $literal = <<<'PHP'
-            class RootA { use Cacheable;
-                public function __construct(private Child $c) {}
-                #[Cache(ttl: Ttl::FromUpstream, maxTtl: 60)]
-                public function run(): Cached { return $this->cached(fn () => $this->c->execute()); }
-            }
-            PHP;
-        $constant = <<<'PHP'
-            class RootB { use Cacheable;
-                public function __construct(private Child $c) {}
-                #[Cache(ttl: Ttl::FromUpstream, maxTtl: Consts::MAX)]
-                public function run(): Cached { return $this->cached(fn () => $this->c->execute()); }
-            }
-            PHP;
-
-        $this->assertRewriteKeeps(
-            '20s',
             Invariance::summarize(Invariance::source(self::COMMON.$literal), 'RootA::run'),
             Invariance::summarize(Invariance::source(self::COMMON.$constant), 'RootB::run'),
         );

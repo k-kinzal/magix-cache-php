@@ -284,61 +284,43 @@ final class EffectCalculatorTest extends TestCase
         self::assertSame(0, $tighter->seconds);
     }
 
-    public function testDerivedInheritsAndCapsAKnownUpstream(): void
+    public function testInheritedNamesWhereAProvenLifetimeCameFrom(): void
     {
-        $calculator = new EffectCalculator();
-        $boundary = new BoundaryDeclaration('App\PageQuery', 'execute', 'a.php', 1);
-
-        $inherited = $calculator->derived(Ttl::Auto, null, $boundary, TtlEstimate::known(45), 'FeedQuery::execute');
-        $capped = $calculator->derived(Ttl::FromUpstream, 10, $boundary, TtlEstimate::known(45), 'FeedQuery::execute');
+        $inherited = (new EffectCalculator())->inherited(TtlEstimate::known(45), 'FeedQuery::execute');
 
         self::assertSame(45, $inherited->seconds);
         self::assertSame('inherited from FeedQuery::execute', $inherited->reason);
-        self::assertSame(10, $capped->seconds);
-        self::assertSame('upstream expiration capped at 10s', $capped->reason);
     }
 
-    public function testDerivedKeepsAnUnknownUpstreamConditionalInsteadOfAssumingTheCap(): void
+    public function testInheritedKeepsAnUnknownUpstreamExactlyAsItWasBubbled(): void
+    {
+        $upstream = TtlEstimate::unknown(10);
+
+        $inherited = (new EffectCalculator())->inherited($upstream, 'RateQuery::execute');
+
+        self::assertSame($upstream, $inherited);
+        self::assertSame(TtlEstimateState::Unknown, $inherited->state);
+        self::assertSame(10, $inherited->upperBound);
+    }
+
+    public function testInheritedLeavesAnUnconstrainedUpstreamUnconstrainedInsteadOfRejectingIt(): void
     {
         $calculator = new EffectCalculator();
         $boundary = new BoundaryDeclaration('App\PageQuery', 'execute', 'a.php', 1);
 
-        $fromUpstream = $calculator->derived(Ttl::FromUpstream, 30, $boundary, TtlEstimate::unknown(), 'RateQuery::execute');
-        $automatic = $calculator->derived(Ttl::Auto, null, $boundary, TtlEstimate::unknown(10), 'RateQuery::execute');
+        $inherited = $calculator->inherited(TtlEstimate::unconstrained(), 'a dependency');
+        $effective = $calculator->lifetime($boundary, new PolicyDeclaration(PolicySource::MethodAttribute, Ttl::Auto), new DependencyConstraint());
 
-        self::assertSame(TtlEstimateState::Unknown, $fromUpstream->state);
-        self::assertNull($fromUpstream->seconds);
-        self::assertSame(30, $fromUpstream->upperBound);
-        self::assertSame('requires a finite upstream expiration at runtime', $fromUpstream->reason);
-        self::assertSame(TtlEstimateState::Unknown, $automatic->state);
-        self::assertSame(10, $automatic->upperBound);
+        self::assertSame(TtlEstimateState::Unconstrained, $inherited->state);
+        self::assertSame(TtlEstimateState::Unconstrained, $effective->state);
     }
 
-    public function testDerivedRejectsAConfirmedUnconstrainedUpstream(): void
+    public function testADynamicResolverStillSuppliesTheLifetimeAnAutomaticPolicyDeclaresNothingAbout(): void
     {
-        $calculator = new EffectCalculator();
-        $boundary = new BoundaryDeclaration('App\PageQuery', 'execute', 'a.php', 1);
-
-        $automatic = $calculator->derived(Ttl::Auto, null, $boundary, TtlEstimate::unconstrained(), 'a dependency');
-        $fromUpstream = $calculator->derived(Ttl::FromUpstream, 30, $boundary, TtlEstimate::unconstrained(), 'a dependency');
-        $unbounded = $calculator->derived(Ttl::FromUpstream, null, $boundary, TtlEstimate::known(10), 'a dependency');
-
-        self::assertSame(TtlEstimateState::Invalid, $automatic->state);
-        self::assertSame(TtlEstimateState::Invalid, $fromUpstream->state);
-        self::assertSame(TtlEstimateState::Invalid, $unbounded->state);
-    }
-
-    public function testDerivedAcceptsABoundaryThatSuppliesItsOwnExpiration(): void
-    {
-        $calculator = new EffectCalculator();
-        $supplying = new BoundaryDeclaration('App\UpstreamQuery', 'execute', 'a.php', 1, suppliesMetadata: true);
         $resolving = new BoundaryDeclaration('App\RateQuery', 'execute', 'b.php', 1, hasDynamicTtl: true);
 
-        $supplied = $calculator->derived(Ttl::Auto, null, $supplying, TtlEstimate::unconstrained(), 'a dependency');
-        $resolved = $calculator->lifetime($resolving, new PolicyDeclaration(PolicySource::MethodAttribute, Ttl::FromUpstream, maxTtl: 30), new DependencyConstraint());
+        $resolved = (new EffectCalculator())->lifetime($resolving, new PolicyDeclaration(PolicySource::MethodAttribute, Ttl::Auto), new DependencyConstraint());
 
-        self::assertSame(TtlEstimateState::Unknown, $supplied->state);
-        self::assertNull($supplied->upperBound);
         self::assertSame(TtlEstimateState::Unknown, $resolved->state);
         self::assertNull($resolved->upperBound);
         self::assertTrue($resolved->hasFiniteExpiration());
@@ -519,7 +501,7 @@ final class EffectCalculatorTest extends TestCase
         self::assertSame([], $node->effect->problems);
     }
 
-    public function testCalculateReportsThatAnEmptySequenceCannotSupplyAnAutomaticTtl(): void
+    public function testCalculateReportsThatAnEmptySequenceComposesNoLifetimeWithoutCallingItADefect(): void
     {
         $catalog = (new CatalogLoader(dirname(__DIR__, 5)))
             ->load(['packages/magix-cache-cli/tests/Fixture/FunctionalComposition']);
@@ -529,10 +511,9 @@ final class EffectCalculatorTest extends TestCase
         $node = (new CacheTree($catalog))->build($boundaries[0]);
 
         self::assertSame([], $node->children);
-        self::assertSame(TtlEstimateState::Invalid, $node->effect->ttl->state);
-        self::assertSame([
-            'Ttl::Auto has no dependency with a finite expiration, so applying the policy throws a LogicException',
-        ], $node->effect->problems);
+        self::assertSame(TtlEstimateState::Unconstrained, $node->effect->ttl->state);
+        self::assertSame([], $node->effect->problems);
+        self::assertFalse($node->effect->storable);
     }
 
     public function testMissingPolicyKeepsDailyDependencyConstraintsWithTheError(): void

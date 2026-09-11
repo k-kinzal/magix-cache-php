@@ -81,11 +81,11 @@ final class MetadataGraph
     }
 
     /**
-     * Caps a collection that also contains the left branch's second leaf.
+     * Inherits from a collection that also contains the left branch's second leaf.
      *
      * @return Cached<string>
      */
-    #[Cache(ttl: Ttl::FromUpstream, maxTtl: 30, tags: ['right', 'common'])]
+    #[Cache(tags: ['right', 'common'])]
     public function right(): Cached
     {
         return $this->cached(function (): Cached {

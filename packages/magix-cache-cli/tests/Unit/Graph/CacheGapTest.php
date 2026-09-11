@@ -28,12 +28,12 @@ use PHPUnit\Framework\TestCase;
 final class CacheGapTest extends TestCase
 {
     #[DataProvider('providerPolicies')]
-    public function testLabelIdentifiesIndirectCachesWhilePropagationKeepsProvenBounds(int|Ttl $ttl, ?int $cap, ?int $upper): void
+    public function testLabelIdentifiesIndirectCachesWhilePropagationKeepsProvenBounds(int|Ttl $ttl, ?int $upper): void
     {
         $child = new BoundaryDeclaration('App\Child', 'get', 'child.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, 5, tags: ['child'], visibility: Visibility::NoStore));
         $lookup = new BoundaryDeclaration('App\Lookup', 'get', 'lookup.php', 2, dependencies: [new DependencyCall('App\Child', 'get', 3)], isCacheBoundary: false);
         $bridge = new BoundaryDeclaration('App\Bridge', 'get', 'bridge.php', 4, dependencies: [new DependencyCall('App\Lookup', 'get', 5)], isCacheBoundary: false);
-        $parent = new BoundaryDeclaration('App\ParentQuery', 'get', 'parent.php', 6, new PolicyDeclaration(PolicySource::MethodAttribute, $ttl, maxTtl: $cap, tags: ['parent']), dependencies: [new DependencyCall('App\Bridge', 'get', 7)]);
+        $parent = new BoundaryDeclaration('App\ParentQuery', 'get', 'parent.php', 6, new PolicyDeclaration(PolicySource::MethodAttribute, $ttl, tags: ['parent']), dependencies: [new DependencyCall('App\Bridge', 'get', 7)]);
         $outer = new BoundaryDeclaration('App\Outer', 'get', 'outer.php', 8, new PolicyDeclaration(PolicySource::MethodAttribute, 120), dependencies: [new DependencyCall('App\ParentQuery', 'get', 9)]);
         $tree = new CacheTree(new Catalog([
             new ClassDeclaration('App\Child', boundaries: [$child]),
@@ -69,13 +69,12 @@ final class CacheGapTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{int|Ttl, int|null, int|null}>
+     * @return iterable<string, array{int|Ttl, int|null}>
      */
     public static function providerPolicies(): iterable
     {
-        yield 'fixed' => [60, null, 60];
-        yield 'automatic' => [Ttl::Auto, null, null];
-        yield 'upstream cap' => [Ttl::FromUpstream, 30, 30];
+        yield 'fixed' => [60, 60];
+        yield 'automatic' => [Ttl::Auto, null];
     }
 
     public function testThroughKeepsInterfacePathsDistinctAndStopsAtTheFirstCachedChild(): void

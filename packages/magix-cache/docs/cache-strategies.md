@@ -144,11 +144,10 @@ Alternatives are carried through dependencies and parent policies without fillin
 | --- | --- |
 | `Ttl::Auto` | `30/600-900s` |
 | Fixed `700` | `700s` |
-| `Ttl::FromUpstream` with `maxTtl: 700` | `30/600-700s` |
 | Fixed `300` | `300s` |
 | Fixed `20` | `20s` |
 
-Dependency bubbling takes the minimum for every pair of alternatives; it does not intersect the sets. For example, composing `30/600-900s` with `60/700-800s` produces `30/60/600-800s`. Duplicate and overlapping intervals are normalized. An unknown dependency that could expire at any earlier time can fill the gaps, producing `≤900s`; this uncertainty is preserved. The proof of a finite expiration also propagates, so an automatic parent does not report a missing-upstream notice merely because the exact TTL is runtime-dependent.
+Dependency bubbling takes the minimum for every pair of alternatives; it does not intersect the sets. For example, composing `30/600-900s` with `60/700-800s` produces `30/60/600-800s`. Duplicate and overlapping intervals are normalized. An unknown dependency that could expire at any earlier time can fill the gaps, producing `≤900s`; this uncertainty is preserved. The proof of a finite expiration also propagates, so an automatic parent stays provably storable even when the exact TTL is runtime-dependent.
 
 The contracts describe possible outcomes, not the predicates selecting them. The analyzer does not prove time-window conditions or correlations between strategies. Conditions are not inferred. Dependency bubbling combines alternatives by pairwise minimum; ordered Strategy overrides select the winning writer's alternatives.
 

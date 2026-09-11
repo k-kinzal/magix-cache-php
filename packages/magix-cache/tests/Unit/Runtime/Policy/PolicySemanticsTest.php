@@ -39,15 +39,13 @@ final class PolicySemanticsTest extends TestCase
         self::assertSame([], $result->tags);
         self::assertSame(Visibility::Shared, $result->visibility);
         self::assertSame(105.0, $result->expiresAt);
-        $semantics->validate(new CachePolicy(), $result);
     }
 
-    public function testApplyFromUpstreamExplicitlyCapsWithoutExtending(): void
+    public function testApplyAutoDeclaresNoLifetimeSoAnAbsentExpirationStaysAbsent(): void
     {
-        $semantics = new PolicySemantics();
-        $policy = new CachePolicy(ttl: Ttl::FromUpstream, maxTtl: 10);
-        self::assertSame(110.0, $semantics->apply($policy, new CacheMetadata(expiresAt: 120.0), 100.0)->expiresAt);
-        self::assertSame(105.0, $semantics->apply($policy, new CacheMetadata(expiresAt: 105.0), 100.0)->expiresAt);
+        $result = (new PolicySemantics())->apply(new CachePolicy(ttl: Ttl::Auto), CacheMetadata::top(), 100.0);
+
+        self::assertNull($result->expiresAt);
     }
 
     public function testApplyFixedLifetimeCanExplicitlyRefreshAnExpiredDependency(): void
@@ -55,11 +53,5 @@ final class PolicySemanticsTest extends TestCase
         $result = (new PolicySemantics())->apply(new CachePolicy(ttl: 60), new CacheMetadata(expiresAt: 90.0), 100.0);
 
         self::assertSame(160.0, $result->expiresAt);
-    }
-    public function testValidateAcceptsAnExpirationSuppliedByALaterOverride(): void
-    {
-        $metadata = CacheMetadata::top()->withExpiration(160.0);
-        (new PolicySemantics())->validate(new CachePolicy(), $metadata);
-        self::assertSame(160.0, $metadata->expiresAt);
     }
 }

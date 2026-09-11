@@ -27,7 +27,7 @@ final readonly class PolicyReader
     /**
      * Parameter order of the #[Cache] attribute.
      */
-    private const array OPTIONS = ['ttl', 'maxTtl', 'tags', 'visibility', 'version', 'runtime'];
+    private const array OPTIONS = ['ttl', 'tags', 'visibility', 'version', 'runtime'];
 
     /**
      * Creates a policy reader.
@@ -49,7 +49,6 @@ final readonly class PolicyReader
         $read = static fn (string $option): mixed => $unreadable($option) ? null : ($written[$option] ?? null);
 
         $ttl = $unreadable('ttl') ? null : ($read('ttl') ?? Ttl::Auto);
-        $maxTtl = $read('maxTtl');
         $tags = $read('tags');
         $visibility = $read('visibility');
         $version = $read('version');
@@ -58,14 +57,12 @@ final readonly class PolicyReader
         return new PolicyDeclaration(
             source: $source,
             ttl: is_int($ttl) || $ttl instanceof Ttl ? $ttl : null,
-            maxTtl: is_int($maxTtl) ? $maxTtl : null,
             tags: is_array($tags) ? array_values(array_filter($tags, is_string(...))) : null,
             visibility: $visibility instanceof Visibility ? $visibility : null,
             version: is_string($version) ? $version : '1',
             runtime: is_string($runtime) ? $runtime : CacheRuntimeRegistry::DEFAULT_NAME,
             tagsUnknown: $unreadable('tags'),
             visibilityUnknown: $unreadable('visibility'),
-            maxTtlUnknown: $unreadable('maxTtl'),
             versionUnknown: $unreadable('version'),
             runtimeUnknown: $unreadable('runtime'),
         );

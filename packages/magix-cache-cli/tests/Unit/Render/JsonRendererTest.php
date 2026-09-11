@@ -18,7 +18,6 @@ use Magix\Cache\Cli\Graph\StrategyStep;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\JsonRenderer;
 use Magix\Cache\Metadata\Visibility;
-use Magix\Cache\Runtime\Policy\Ttl;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -102,7 +101,7 @@ final class JsonRendererTest extends TestCase
 
         self::assertSame('App\PageQuery::execute', $tree['boundary']);
         self::assertSame(
-            ['source' => 'MethodAttribute', 'ttl' => '120s', 'ttlUnknown' => false, 'tagsUnknown' => false, 'visibilityUnknown' => false, 'maxTtl' => null, 'maxTtlUnknown' => false, 'tags' => ['page'], 'visibility' => null, 'version' => '1', 'runtime' => 'default'],
+            ['source' => 'MethodAttribute', 'ttl' => '120s', 'ttlUnknown' => false, 'tagsUnknown' => false, 'visibilityUnknown' => false, 'tags' => ['page'], 'visibility' => null, 'version' => '1', 'runtime' => 'default'],
             $tree['policy'],
         );
         self::assertSame([['name' => 'viewerId', 'type' => 'int', 'ignored' => false, 'scope' => 'private', 'reducer' => null, 'configuration' => null]], $tree['key']);
@@ -160,17 +159,16 @@ final class JsonRendererTest extends TestCase
         $declared = new PolicyDeclaration(PolicySource::MethodAttribute, ttl: 120, version: 'v7');
         $unreadable = new PolicyDeclaration(
             PolicySource::MethodAttribute,
-            ttl: Ttl::FromUpstream,
-            maxTtlUnknown: true,
+            ttl: null,
             versionUnknown: true,
         );
 
         $renderer = new JsonRenderer();
 
         self::assertSame('v7', $renderer->policy($declared)['version']);
-        self::assertFalse($renderer->policy($declared)['maxTtlUnknown']);
+        self::assertFalse($renderer->policy($declared)['ttlUnknown']);
         self::assertNull($renderer->policy($unreadable)['version']);
-        self::assertTrue($renderer->policy($unreadable)['maxTtlUnknown']);
+        self::assertTrue($renderer->policy($unreadable)['ttlUnknown']);
     }
 
     public function testEffectRetainsDeterminedTtlWhileOtherFieldsRemainPartial(): void

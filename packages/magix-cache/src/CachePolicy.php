@@ -16,35 +16,25 @@ use Magix\Cache\Runtime\Policy\Ttl;
  * Declares explicit overrides for a cache boundary.
  *
  * Omitted fields inherit bubbled metadata. A fixed TTL replaces expiration;
- * Auto inherits it and FromUpstream explicitly caps the inherited deadline.
+ * Ttl::Auto declares no lifetime and keeps the composed one.
  */
 final readonly class CachePolicy
 {
     /**
      * Creates an explicit cache policy.
      *
-     * @param int|Ttl $ttl Fixed lifetime in seconds, or a lifetime derived from upstream.
-     * @param int|null $maxTtl Upper bound applied to a derived lifetime.
+     * @param int|Ttl $ttl Fixed lifetime in seconds, or Ttl::Auto to keep the composed one.
      * @param list<string>|null $tags Replacement tags; null inherits, [] clears.
-     * @throws InvalidArgumentException when a lifetime is negative, a derived lifetime has no upper bound, the version is empty, or a tag is unusable
+     * @throws InvalidArgumentException when a lifetime is negative, the version is empty, or a tag is unusable
      */
     public function __construct(
         public int|Ttl $ttl = Ttl::Auto,
-        public ?int $maxTtl = null,
         public ?array $tags = null,
         public ?Visibility $visibility = null,
         public string $version = '1',
     ) {
         if (is_int($ttl) && $ttl < 0) {
             throw new InvalidArgumentException('Cache TTL must be zero or greater.');
-        }
-
-        if ($maxTtl !== null && $maxTtl < 0) {
-            throw new InvalidArgumentException('Maximum cache TTL must be zero or greater.');
-        }
-
-        if ($ttl === Ttl::FromUpstream && $maxTtl === null) {
-            throw new InvalidArgumentException('Ttl::FromUpstream requires maxTtl.');
         }
 
         if ($version === '') {
@@ -67,7 +57,6 @@ final readonly class CachePolicy
 
         return new self(
             ttl: $this->ttl,
-            maxTtl: $this->maxTtl,
             tags: $this->tags,
             visibility: $visibility,
             version: $this->version,

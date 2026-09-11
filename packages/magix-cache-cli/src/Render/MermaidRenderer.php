@@ -61,6 +61,14 @@ final readonly class MermaidRenderer
             $label .= ' (uncached)';
         }
 
+        if ($node->composed !== null) {
+            $label .= '<br/>composes '.$escape($values->lifetime($node->composed)).' - '.$escape($values->visibility($node->composed));
+
+            if ($node->composed->tags !== [] || $node->composed->tagsUnknown) {
+                $label .= ' - tags '.$escape($values->tags($node->composed));
+            }
+        }
+
         if ($node->effect->problems !== []) {
             $label .= '<br/>[declaration problem]';
         }

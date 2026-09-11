@@ -54,7 +54,7 @@ final readonly class AnalyzeCommand
      *
      * @param array<array-key, mixed> $path
      * @param array<array-key, mixed> $ignore
-     * @param UncachedMode $uncached Select rows by Cache attributes, independently of execution, types and diagnostics; the selected root follows the same rule.
+     * @param UncachedMode $uncached Select rows by Cache attributes, independently of execution, types and diagnostics; the analyzed method itself always stays.
      * @throws JsonException when the tree cannot be encoded as JSON
      */
     public function __invoke(
@@ -65,11 +65,11 @@ final readonly class AnalyzeCommand
         array $path = [],
         #[Option(description: 'Output format: tree, json or mermaid')]
         string $format = 'tree',
-        #[Option(description: 'Maximum dependency depth to print; analysis always covers the whole graph')]
+        #[Option(description: 'Maximum depth of printed rows; row selection and analysis always cover the whole graph')]
         int $depth = 8,
         #[Option(description: 'Hide matching class or Class::method subtrees (* and ? wildcards), repeatable')]
         array $ignore = [],
-        #[Option(description: 'Rows without #[Cache]: between declarations (default), all, or none; applies to the selected root too')]
+        #[Option(description: 'Rows without #[Cache]: between declarations (default), all, or none; the analyzed method itself is always shown')]
         UncachedMode $uncached = UncachedMode::Between,
     ): int {
         $catalog = $this->catalog->load($path);

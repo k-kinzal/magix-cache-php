@@ -29,6 +29,7 @@ final readonly class CacheNode
      * @param list<CacheVariant>|null $metadataVariants Possible returned metadata, kept separate across exclusive paths.
      * @param list<string> $via Original callers omitted from this displayed connection.
      * @param list<CallAnalysis> $calls Original call sites, independently of row filtering.
+     * @param CacheEffect|null $composed What the cache boundaries a non-storing method reaches compose to, null for a boundary and for a method that reaches none.
      */
     public function __construct(
         public BoundaryDeclaration $boundary,
@@ -40,6 +41,7 @@ final readonly class CacheNode
         public ?array $metadataVariants = null,
         public array $via = [],
         public array $calls = [],
+        public ?CacheEffect $composed = null,
     ) {
         $local = [];
 
@@ -49,6 +51,22 @@ final readonly class CacheNode
         }
 
         $this->diagnostics = $diagnostics ?? [...$local, ...array_filter($effect->analysis->causes(), static fn (AnalysisCause $cause): bool => $cause->method === $boundary->id())];
+    }
+
+    /**
+     * Returns the constraint this row imposes on everything built from its result.
+     *
+     * A cache boundary answers with its own stored result: what it decided to
+     * store bounds every consumer of that subtree. An ordinary method answers
+     * with what the boundaries below it compose to, independently of whether it
+     * propagates their metadata to its caller. Extracting a value detaches
+     * metadata for the caller, but the data in a page built from it still
+     * cannot outlive the caches it came from. A method that reaches no boundary
+     * imposes nothing.
+     */
+    public function composition(): CacheEffect
+    {
+        return $this->composed ?? ($this->boundary->isCacheBoundary ? $this->effect : new CacheEffect(TtlEstimate::unconstrained()));
     }
 
     /**
@@ -76,6 +94,6 @@ final readonly class CacheNode
      */
     public function withChildren(array $children, ?array $via = null): self
     {
-        return new self($this->boundary, $this->effect, $children, $this->notes, $this->gaps, $this->diagnostics, $this->metadataVariants, $via ?? $this->via, $this->calls);
+        return new self($this->boundary, $this->effect, $children, $this->notes, $this->gaps, $this->diagnostics, $this->metadataVariants, $via ?? $this->via, $this->calls, $this->composed);
     }
 }

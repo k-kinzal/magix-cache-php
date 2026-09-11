@@ -45,8 +45,19 @@ final class TreeRendererTest extends TestCase
     {
         $node = ReportSource::node('Migration::get');
         $summary = (new OutputFormatter())->format((new TreeRenderer())->summary($node));
-        self::assertSame('Migration::get  ttl 60s [declared]', $summary);
+        self::assertSame('Migration::get  ttl 60s [declared]  composes ttl 10s  shared  tags leaf', $summary);
         self::assertSame(10, $node->effect->ttl->seconds);
+    }
+
+    public function testComposesReportsWhatANonStoringRowBoundsItsResultByAndNothingForABoundary(): void
+    {
+        $renderer = new TreeRenderer();
+        $node = ReportSource::node('Controller::run');
+        self::assertSame(['composes ttl 10s', 'shared', 'tags leaf'], $renderer->composes($node));
+        self::assertNotNull($node->composed);
+        self::assertNull(ReportSource::node('Page::clean')->composed);
+        self::assertSame([], $renderer->composes(ReportSource::node('Page::clean')));
+        self::assertSame([], $renderer->composes(ReportSource::node('Utility::get')));
     }
 
     public function testFieldHighlightsOnlyExplicitOverridesAndEscapesSourceText(): void

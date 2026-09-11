@@ -20,6 +20,7 @@ use Magix\Cache\Cli\Render\JsonRenderer;
 use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
@@ -37,6 +38,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
+#[Medium]
 final class JsonRendererTest extends TestCase
 {
     public function testGapKeepsQualifiedEndpointsAndIntermediateMethods(): void
@@ -179,6 +181,19 @@ final class JsonRendererTest extends TestCase
         self::assertSame(['ttl' => 'known', 'visibility' => 'partial', 'tags' => 'partial'], $data['certainty']);
         self::assertSame('unknown', $data['storage']);
         self::assertSame($node->effect->analysis, $data['analysis']);
+    }
+
+    public function testComposedReportsThePageLevelBoundWithoutClaimingStorage(): void
+    {
+        $renderer = new JsonRenderer();
+        $data = $renderer->composed(\Tests\Package\Cli\Fixture\ReportSource::node('Controller::run'));
+        self::assertIsArray($data);
+        self::assertSame(TtlEstimate::known(10)->jsonSerialize(), $data['ttl']);
+        self::assertSame('shared', $data['visibility']);
+        self::assertSame(['leaf'], $data['tags']);
+        self::assertArrayNotHasKey('storable', $data);
+        self::assertArrayNotHasKey('storage', $data);
+        self::assertNull($renderer->composed(\Tests\Package\Cli\Fixture\ReportSource::node('Page::unrelated')));
     }
 
     /**

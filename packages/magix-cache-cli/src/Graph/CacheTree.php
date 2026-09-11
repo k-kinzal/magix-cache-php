@@ -132,6 +132,13 @@ final class CacheTree
     }
 
     /**
+     * Records what a method returns and, when it stores nothing, what it composes.
+     *
+     * The two answer different questions and never replace each other: the
+     * effective result is what a caller observes, while the composed estimate
+     * bounds a page built from this method even where an extraction detached
+     * that metadata or its propagation was not analyzed.
+     *
      * @param list<CacheNode> $children
      * @param list<CacheNode> $constraints
      * @param list<string> $notes
@@ -156,6 +163,9 @@ final class CacheTree
             $effect = new CacheEffect(TtlEstimate::unknown(condition: 'method has no normal return'));
         }
 
+        $composed = $boundary->isCacheBoundary || $constraints === []
+            ? null
+            : $this->effects->compose($this->effects->constrain($constraints, composition: true));
         $local = new CacheNode($boundary, $effect, notes: $notes);
         $diagnostics = $local->diagnostics;
 
@@ -172,6 +182,7 @@ final class CacheTree
             diagnostics: $diagnostics,
             metadataVariants: $variants,
             calls: CallAnalysis::fromCalls($boundary, $calls),
+            composed: $composed,
         );
     }
 

@@ -26,6 +26,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
@@ -52,6 +53,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Reader\ExpressionFlowReader::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\MetadataFlowReader::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\StatementFlowReader::class)]
+#[Medium]
 final class ClassVisitorTest extends TestCase
 {
     public function testEnterNodeCollectsBoundariesWithTheClassPolicy(): void

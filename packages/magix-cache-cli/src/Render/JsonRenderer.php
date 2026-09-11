@@ -82,6 +82,7 @@ final readonly class JsonRenderer
             ),
             'strategy' => $effect->strategy === null ? null : $this->strategy($effect->strategy),
             'effective' => $this->effect($node),
+            'composed' => $this->composed($node),
             'notes' => $node->notes,
             ...($node->metadataVariants === null ? [] : ['metadataAlternatives' => array_map((new AlternativePresentation())->data(...), $node->metadataVariants)]),
             'diagnostics' => array_keys($node->diagnostics),
@@ -113,6 +114,35 @@ final readonly class JsonRenderer
             'analysis' => $effect->analysis,
             'storage' => $node->storage(),
             'localOverrides' => $effect->localOverrides,
+        ];
+    }
+
+    /**
+     * Serializes the page-level estimate of a method that stores nothing itself.
+     *
+     * The composed constraint answers what a result built from this method is
+     * bounded by, so it carries no storable flag or storage label: reaching a
+     * cache is not proof that this method stores one.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function composed(CacheNode $node): ?array
+    {
+        $effect = $node->composed;
+
+        if ($effect === null) {
+            return null;
+        }
+
+        return [
+            'ttl' => $effect->ttl->jsonSerialize(),
+            ...($effect->expirationConstraints === [] ? [] : ['expirationConstraints' => $effect->expirationConstraints]),
+            'visibility' => strtolower($effect->visibility->name),
+            'visibilityReason' => $effect->visibilityReason,
+            'visibilityUnknown' => $effect->visibilityUnknown,
+            'tagsUnknown' => $effect->tagsUnknown,
+            'tags' => $effect->tags,
+            'certainty' => $effect->certainty(),
         ];
     }
 

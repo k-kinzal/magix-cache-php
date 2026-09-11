@@ -38,8 +38,9 @@ final readonly class EffectCalculator
      *
      * @param list<CacheNode> $children
      * @param bool $hasGaps An ordinary path reaches a cache child, but its metadata propagation has not been analyzed.
+     * @param bool $composition Read what each child composes instead of what it returns, for the page-level estimate of a method that stores nothing.
      */
-    public function constrain(array $children, bool $hasGaps = false): DependencyConstraint
+    public function constrain(array $children, bool $hasGaps = false, bool $composition = false): DependencyConstraint
     {
         $ttl = $hasGaps ? TtlEstimate::unknown(condition: 'cache propagation through uncached methods is unanalyzed') : TtlEstimate::unconstrained();
         $ttlSource = null;
@@ -52,7 +53,7 @@ final readonly class EffectCalculator
         $analysis = new MetadataAnalysis();
 
         foreach ($children as $child) {
-            $effect = $child->effect;
+            $effect = $composition ? $child->composition() : $child->effect;
             $analysis = $analysis->merge($effect->analysis);
             $expirations = [...$expirations, ...$effect->expirationConstraints];
             $visibilityUnknown = $visibilityUnknown || $effect->visibilityUnknown;

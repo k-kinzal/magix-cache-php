@@ -11,8 +11,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Ttl::class)]
 final class TtlTest extends TestCase
 {
-    public function testModesAreDistinct(): void
+    public function testAutoIsTheOnlyModeBecauseItOnlyMeansNoDeclaredLifetime(): void
     {
-        self::assertNotSame(Ttl::Auto, Ttl::FromUpstream);
+        self::assertSame([Ttl::Auto], Ttl::cases());
     }
 }

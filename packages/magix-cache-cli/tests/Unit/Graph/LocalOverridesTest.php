@@ -29,46 +29,32 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Visibility::class)]
 final class LocalOverridesTest extends TestCase
 {
-    public function testShortensUsesProvenBoundsWithoutInventingAnUnlimitedLifetime(): void
-    {
-        $restrictions = new LocalOverrides();
-
-        self::assertTrue($restrictions->shortens(TtlEstimate::unknown(lowerBound: 30, finite: true), 20));
-        self::assertFalse($restrictions->shortens(TtlEstimate::unknown(lowerBound: 30, finite: true), 60));
-        self::assertFalse($restrictions->shortens(TtlEstimate::unknown(finite: true), 20));
-        self::assertFalse($restrictions->shortens(TtlEstimate::known(20), 20));
-        self::assertTrue($restrictions->shortens(TtlEstimate::oneOf(new TtlInterval(30, 30), new TtlInterval(600, 900)), 300));
-    }
-
     /**
-     * @return iterable<string, array{int|Ttl, int|null, TtlEstimate, string|null}>
+     * @return iterable<string, array{int|Ttl, TtlEstimate, string|null}>
      */
     public static function providerTtlCases(): iterable
     {
-        yield 'shorter parent' => [20, null, TtlEstimate::known(60), 'local ttl 20s; composed 60s'];
-        yield 'equal parent' => [60, null, TtlEstimate::known(60), 'local ttl 60s; composed 60s'];
-        yield 'longer parent' => [120, null, TtlEstimate::known(60), 'local ttl 120s; composed 60s'];
-        yield 'automatic' => [Ttl::Auto, null, TtlEstimate::known(60), null];
-        yield 'active maximum' => [Ttl::FromUpstream, 20, TtlEstimate::known(60), 'local maxTtl 20s; composed 60s'];
-        yield 'inactive maximum' => [Ttl::FromUpstream, 120, TtlEstimate::known(60), null];
-        yield 'zero TTL' => [0, null, TtlEstimate::known(60), 'local ttl 0s; composed 60s'];
-        yield 'unknown dependency' => [20, null, TtlEstimate::unknown(), 'local ttl 20s; composed unknown'];
-        yield 'unknown with upper bound' => [20, null, TtlEstimate::unknown(60), 'local ttl 20s; composed ≤60s'];
-        yield 'invalid dependency' => [20, null, TtlEstimate::invalid('broken declaration'), null];
-        yield 'unconstrained dependency' => [20, null, TtlEstimate::unconstrained(), 'local ttl 20s; composed unconstrained'];
-        yield 'partial alternatives' => [300, null, TtlEstimate::oneOf(new TtlInterval(30, 30), new TtlInterval(600, 900)), 'local ttl 300s; composed 30/600-900s'];
-        yield 'all alternatives' => [20, null, TtlEstimate::oneOf(new TtlInterval(30, 30), new TtlInterval(600, 900)), 'local ttl 20s; composed 30/600-900s'];
-        yield 'uncertain runtime condition' => [20, null, TtlEstimate::unknown(60, 'runtime condition', 30, true), 'local ttl 20s; composed 30-60s'];
+        yield 'shorter parent' => [20, TtlEstimate::known(60), 'local ttl 20s; composed 60s'];
+        yield 'equal parent' => [60, TtlEstimate::known(60), 'local ttl 60s; composed 60s'];
+        yield 'longer parent' => [120, TtlEstimate::known(60), 'local ttl 120s; composed 60s'];
+        yield 'automatic' => [Ttl::Auto, TtlEstimate::known(60), null];
+        yield 'zero TTL' => [0, TtlEstimate::known(60), 'local ttl 0s; composed 60s'];
+        yield 'unknown dependency' => [20, TtlEstimate::unknown(), 'local ttl 20s; composed unknown'];
+        yield 'unknown with upper bound' => [20, TtlEstimate::unknown(60), 'local ttl 20s; composed ≤60s'];
+        yield 'invalid dependency' => [20, TtlEstimate::invalid('broken declaration'), null];
+        yield 'unconstrained dependency' => [20, TtlEstimate::unconstrained(), 'local ttl 20s; composed unconstrained'];
+        yield 'partial alternatives' => [300, TtlEstimate::oneOf(new TtlInterval(30, 30), new TtlInterval(600, 900)), 'local ttl 300s; composed 30/600-900s'];
+        yield 'all alternatives' => [20, TtlEstimate::oneOf(new TtlInterval(30, 30), new TtlInterval(600, 900)), 'local ttl 20s; composed 30/600-900s'];
+        yield 'uncertain runtime condition' => [20, TtlEstimate::unknown(60, 'runtime condition', 30, true), 'local ttl 20s; composed 30-60s'];
     }
 
     #[DataProvider('providerTtlCases')]
-    public function testTtlReportsExplicitOverridesAndActiveUpstreamCaps(int|Ttl $ttl, ?int $maxTtl, TtlEstimate $upstream, ?string $reason): void
+    public function testTtlIsAttributedToTheDeclarationThatWroteIt(int|Ttl $ttl, TtlEstimate $upstream, ?string $reason): void
     {
-        $boundary = new BoundaryDeclaration('Page', 'execute', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, $ttl, $maxTtl));
+        $boundary = new BoundaryDeclaration('Page', 'execute', 'a.php', 1, new PolicyDeclaration(PolicySource::MethodAttribute, $ttl));
         $effect = (new EffectCalculator())->calculate($boundary, new DependencyConstraint($upstream, hasDependencies: true));
 
         self::assertSame($reason, $effect->localOverrides['ttl'] ?? null);
-
     }
 
     public function testLeafDeclarationsHaveNoBubblingToOverride(): void

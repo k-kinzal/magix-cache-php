@@ -132,7 +132,6 @@ final class BoundaryReaderTest extends TestCase
         self::assertSame(['product'], $boundary->policy->tags);
         self::assertSame('edge', $boundary->policy->runtime);
         self::assertTrue($boundary->hasDynamicTtl);
-        self::assertFalse($boundary->suppliesMetadata);
     }
 
     public function testReadSkipsMethodsThatDoNotCache(): void

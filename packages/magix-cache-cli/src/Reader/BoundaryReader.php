@@ -11,13 +11,11 @@ use Magix\Cache\Cli\Declaration\BoundaryDeclaration;
 use Magix\Cache\Cli\Declaration\PolicyDeclaration;
 use Magix\Cache\Cli\Declaration\PolicySource;
 use Magix\Cache\Cli\Declaration\UseStrategyDeclaration;
-use Magix\Cache\Metadata\CacheMetadata;
 use PhpParser\Node;
 use PhpParser\Node\Attribute;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
-use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeFinder;
@@ -90,10 +88,6 @@ final readonly class BoundaryReader
             parameters: $parameters,
             dependencies: $this->dependencies->read($method, $class, $propertyTypes, $parameters),
             hasDynamicTtl: $this->dynamicTtl($method, $classDynamicTtl),
-            suppliesMetadata: $this->finder->findFirst(
-                $statements,
-                static fn (Node $node): bool => $node instanceof Name && $node->toString() === CacheMetadata::class,
-            ) !== null,
             useStrategy: $this->useStrategy($method, $classUseStrategy),
             metadataFlow: (new MetadataFlowReader())->read($method, $class, $propertyTypes),
             returnType: (new TypeReader())->label($method->returnType),

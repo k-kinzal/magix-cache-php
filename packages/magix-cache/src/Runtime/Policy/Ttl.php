@@ -5,17 +5,12 @@ declare(strict_types=1);
 namespace Magix\Cache\Runtime\Policy;
 
 /**
- * Selects how a cached method obtains its expiration time.
+ * Marks a cached method as declaring no lifetime of its own.
  */
 enum Ttl
 {
     /**
-     * Inherit the earliest expiration from the method's dependencies.
+     * Keep the composed expiration exactly as the dependencies bubbled it.
      */
     case Auto;
-
-    /**
-     * Inherit an upstream expiration bounded by CachePolicy::$maxTtl.
-     */
-    case FromUpstream;
 }

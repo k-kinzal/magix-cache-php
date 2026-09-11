@@ -69,7 +69,6 @@ final readonly class DeclarationFingerprint
 
         $encoded = json_encode([
             'ttl' => is_int($policy->ttl) ? $policy->ttl : 'Ttl::'.$policy->ttl->name,
-            'maxTtl' => $policy->maxTtl,
             'tags' => $policy->tags === null ? null : (new CacheTokenSet())->tags($policy->tags),
             'visibility' => $policy->visibility?->name,
             'version' => $policy->version,

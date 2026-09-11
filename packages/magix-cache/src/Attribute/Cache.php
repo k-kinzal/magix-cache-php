@@ -23,15 +23,13 @@ final readonly class Cache
     /**
      * Creates an attribute-backed cache policy.
      *
-     * @param int|Ttl $ttl Fixed lifetime in seconds, or a lifetime derived from upstream.
-     * @param int|null $maxTtl Upper bound applied to a derived lifetime.
+     * @param int|Ttl $ttl Fixed lifetime in seconds, or Ttl::Auto to keep the composed one.
      * @param list<string>|null $tags Replacement tags; null inherits, [] clears.
      * @param string $runtime Name of a runtime registered at bootstrap.
-     * @throws InvalidArgumentException when a lifetime is negative, a derived lifetime has no upper bound, the version is empty, a tag is unusable, or the runtime reference is empty
+     * @throws InvalidArgumentException when a lifetime is negative, the version is empty, a tag is unusable, or the runtime reference is empty
      */
     public function __construct(
         public int|Ttl $ttl = Ttl::Auto,
-        public ?int $maxTtl = null,
         public ?array $tags = null,
         public ?Visibility $visibility = null,
         public string $version = '1',
@@ -51,7 +49,6 @@ final readonly class Cache
     {
         return new CachePolicy(
             ttl: $this->ttl,
-            maxTtl: $this->maxTtl,
             tags: $this->tags,
             visibility: $this->visibility,
             version: $this->version,

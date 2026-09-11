@@ -162,8 +162,6 @@ final readonly class JsonRenderer
             'ttlUnknown' => $policy->ttl === null,
             'tagsUnknown' => $policy->tagsUnknown,
             'visibilityUnknown' => $policy->visibilityUnknown,
-            'maxTtl' => $policy->maxTtl,
-            'maxTtlUnknown' => $policy->maxTtlUnknown,
             'tags' => $policy->tags,
             'visibility' => $policy->visibility === null ? null : strtolower($policy->visibility->name),
             'version' => $policy->versionUnknown ? null : $policy->version,

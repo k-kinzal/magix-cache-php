@@ -36,7 +36,6 @@ final class PolicyReaderTest extends TestCase
     {
         $policy = (new PolicyReader())->read([
             new Arg(new Int_(30)),
-            new Arg(new Int_(60)),
             new Arg(new Array_([new ArrayItem(new String_('page'))])),
             new Arg(new ClassConstFetch(new Name(Visibility::class), 'Private')),
             new Arg(new String_('v2')),
@@ -44,7 +43,6 @@ final class PolicyReaderTest extends TestCase
         ], PolicySource::MethodAttribute);
 
         self::assertSame(30, $policy->ttl);
-        self::assertSame(60, $policy->maxTtl);
         self::assertSame(['page'], $policy->tags);
         self::assertSame(Visibility::Private, $policy->visibility);
         self::assertSame('v2', $policy->version);
@@ -57,7 +55,6 @@ final class PolicyReaderTest extends TestCase
         $policy = (new PolicyReader())->read([], PolicySource::ClassAttribute);
 
         self::assertSame(Ttl::Auto, $policy->ttl);
-        self::assertNull($policy->maxTtl);
         self::assertNull($policy->tags);
         self::assertNull($policy->visibility);
         self::assertSame('1', $policy->version);

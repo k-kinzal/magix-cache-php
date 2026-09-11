@@ -28,7 +28,7 @@ final readonly class AnalysisOverrides
             $analysis = $analysis->without('ttl');
         }
 
-        foreach (['ttl' => $policy?->ttl === null || $policy->maxTtlUnknown, 'visibility' => $policy->visibilityUnknown ?? false, 'tags' => $policy->tagsUnknown ?? false] as $field => $unknown) {
+        foreach (['ttl' => $policy?->ttl === null, 'visibility' => $policy->visibilityUnknown ?? false, 'tags' => $policy->tagsUnknown ?? false] as $field => $unknown) {
             if ($unknown) {
                 $analysis = $analysis->without($field)->withCause(AnalysisCause::at($boundary, 'unreadable-policy', 'The declared '.$field.' could not be read'), [$field]);
             }

@@ -36,8 +36,7 @@ A method-level `#[Cache]` wins over the class-level one as a whole; the two are 
 
 | Option | Type | Default | Purpose |
 |---|---|---|---|
-| `ttl` | `int\|Ttl` | `Ttl::Auto` | Selects the boundary expiration |
-| `maxTtl` | `?int` | `null` | Upper bound for `Ttl::FromUpstream` (required in that mode) |
+| `ttl` | `int\|Ttl` | `Ttl::Auto` | Fixed lifetime, or `Ttl::Auto` to declare none |
 | `tags` | `?list<string>` | `null` | Inherits when omitted; an explicit list replaces tags, including `[]` |
 | `visibility` | `?Visibility` | `null` | Inherits when omitted; an explicit enum replaces visibility |
 | `version` | `string` | `'1'` | Changes the generated cache key |
@@ -55,7 +54,7 @@ An integer TTL is relative to the base time taken right after the origin result 
 #[Cache(ttl: 60)]
 ```
 
-A fixed TTL replaces the inherited expiration. If a dependency has 20 seconds left, `#[Cache(ttl: 60)]` makes the parent expire 60 seconds after its origin succeeds. This is an intentional parent cache policy. Use `Ttl::FromUpstream` to retain a dependency cap instead.
+A fixed TTL replaces the inherited expiration. If a dependency has 20 seconds left, `#[Cache(ttl: 60)]` makes the parent expire 60 seconds after its origin succeeds. This is an intentional parent cache policy. Omit `ttl` to keep the dependency's deadline instead.
 
 A final TTL of `0` expires immediately and prevents storage. A higher-priority parameter, dynamic TTL or Strategy may explicitly replace a policy TTL of zero.
 
@@ -83,19 +82,14 @@ public function execute(int $productId): Cached
 
 The composed expiration, cacheability, visibility, tags, and diagnostic reasons are preserved. The omitted TTL defaults to `Ttl::Auto`, so writing `#[Cache(ttl: Ttl::Auto)]` explicitly has the same effect. Other options can be supplied independently, such as `#[Cache(tags: ['product-pages'])]`.
 
-The automatic policy requires a finite final expiration from the returned `Cached` value or an override. Returning `Cached::of($value)` with no finite constraint is a definition error and the runtime throws a `LogicException`.
+`Ttl::Auto` adds no constraint of its own, so it never validates anything: the result is whatever the composition produced. A boundary that composes no finite expiration simply stores nothing, exactly like an origin that returns `Cached::of($value)` with no metadata. This is not a definition error.
 
-A parameter, `#[DynamicTtl]` resolver or Strategy can supply that expiration; validation runs after all overrides. See [Cache Behaviors](cache-behaviors.md#dynamic-ttl).
-
-## Upstream TTL
-
-`Ttl::FromUpstream` inherits an absolute expiration supplied in the returned metadata and caps it with `maxTtl`:
+An expiration can equally come from the returned metadata itself, which is how an upstream deadline enters composition:
 
 ```php
 use Magix\Cache\Metadata\CacheMetadata;
-use Magix\Cache\Runtime\Policy\Ttl;
 
-#[Cache(ttl: Ttl::FromUpstream, maxTtl: 300)]
+#[Cache]
 public function execute(): Cached
 {
     return $this->cached(function (): Cached {
@@ -109,7 +103,7 @@ public function execute(): Cached
 }
 ```
 
-At policy application, the expiration becomes the earlier of the inherited expiration and `baseTime + maxTtl`. `maxTtl` is required. A later parameter, dynamic TTL or Strategy override takes precedence over this cap. Like `Ttl::Auto`, the final result must have a finite expiration.
+To bound such a deadline, declare the bound as the policy: `#[Cache(ttl: 300)]` replaces it outright. A parameter, `#[DynamicTtl]` resolver or Strategy can also supply or replace the expiration. See [Cache Behaviors](cache-behaviors.md#dynamic-ttl).
 
 ## Tags
 

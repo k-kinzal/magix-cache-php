@@ -34,7 +34,6 @@ final readonly class ParameterConfiguration
     {
         return new CachePolicy(
             ttl: $policy->ttl,
-            maxTtl: $policy->maxTtl,
             tags: $this->tags ?? $policy->tags,
             visibility: $this->visibility ?? $policy->visibility,
             version: $policy->version,

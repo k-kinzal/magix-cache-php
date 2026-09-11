@@ -93,10 +93,9 @@ final class SourceParserTest extends TestCase
     public static function providerAlternativeParents(): iterable
     {
         yield 'auto' => ['automatic', '30/600-900s', true, '30/600-900s'];
-        yield 'bounded' => ['bounded', '30/600-700s', true, '30/600-700s'];
         yield 'fixed' => ['fixed', '300s', true, '300s'];
         yield 'shorter' => ['shorter', '20s', true, '20s'];
-        yield 'uncached' => ['show', '30/600-700s', false, '(uncached)'];
+        yield 'uncached' => ['show', '30/600-900s', false, '(uncached)'];
     }
 
     public function testParseReadsABoundaryFromARealFile(): void

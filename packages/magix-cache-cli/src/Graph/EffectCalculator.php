@@ -15,7 +15,6 @@ use Magix\Cache\Cli\Graph\Analysis\MetadataAnalysis;
 use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\Policy\Ttl;
 
-use function min;
 use function sort;
 
 /**
@@ -178,11 +177,10 @@ final readonly class EffectCalculator
         }
 
         $parameterTtl = (new ParameterEffects())->ttl($boundary);
-        $willOverride = $parameterTtl !== null || $boundary->hasDynamicTtl || ($strategy !== null && $strategy->overridesExpiration !== false);
         $estimate = match (true) {
             $policy->ttl === null => TtlEstimate::unknown(condition: 'the declared ttl cannot be read statically'),
             is_int($policy->ttl) => $this->fixed($policy->ttl),
-            default => $this->derived($policy->ttl, $policy->maxTtl, $boundary, $upstream, $constraint->ttlSource ?? 'a dependency', $willOverride, $policy->maxTtlUnknown),
+            default => $this->inherited($upstream, $constraint->ttlSource ?? 'a dependency'),
         };
 
         if ($estimate->state === TtlEstimateState::Invalid) {
@@ -225,61 +223,16 @@ final readonly class EffectCalculator
     }
 
     /**
-     * Returns the estimate of a lifetime derived from the upstream expiration.
+     * Returns the composed lifetime kept by a boundary that declares none.
      *
-     * Ttl::Auto and Ttl::FromUpstream require a finite upstream expiration.
-     * A later expiration override can fulfill
-     * the requirement. A maxTtl that was declared but could not be read is a
-     * missing source, not a missing declaration, so it is never an error;
-     * otherwise a confirmed missing expiration is an error
-     * unless the boundary itself supplies metadata or resolves a lifetime at
-     * runtime, and an unknown one keeps the requirement as a runtime
-     * condition.
+     * Ttl::Auto contributes no constraint of its own, so the estimate is
+     * exactly what the dependencies bubbled up, including the certainty that
+     * they supplied nothing. Only the derivation of a proven lifetime is
+     * named, so a report can say where the number came from.
      */
-    public function derived(Ttl $declared, ?int $maxTtl, BoundaryDeclaration $boundary, TtlEstimate $upstream, string $source, bool $willOverride = false, bool $maxTtlUnknown = false): TtlEstimate
+    public function inherited(TtlEstimate $upstream, string $source): TtlEstimate
     {
-        if ($declared === Ttl::FromUpstream && $maxTtl === null) {
-            return $maxTtlUnknown
-                ? TtlEstimate::unknown(condition: 'the declared maxTtl cannot be read statically')
-                : TtlEstimate::invalid('Ttl::FromUpstream requires maxTtl, so the declaration cannot be constructed');
-        }
-
-        if ($maxTtl !== null && $maxTtl < 0) {
-            return TtlEstimate::invalid('A declared maxTtl must be zero or greater');
-        }
-
-        $cap = $declared === Ttl::FromUpstream ? $maxTtl : null;
-
-        if ($upstream->seconds !== null) {
-            return $cap === null
-                ? TtlEstimate::known($upstream->seconds, 'inherited from '.$source)
-                : TtlEstimate::known(min($upstream->seconds, $cap), 'upstream expiration capped at '.$cap.'s');
-        }
-
-        if ($upstream->state === TtlEstimateState::Unknown) {
-            $capped = $cap === null ? $upstream : $upstream->meet(TtlEstimate::known($cap));
-
-            if ($willOverride || $upstream->hasFiniteExpiration()) {
-                return $capped;
-            }
-
-            return $capped->withCondition('requires a finite upstream expiration at runtime');
-        }
-
-        if ($willOverride) {
-            return TtlEstimate::unconstrained();
-        }
-
-        if ($boundary->suppliesMetadata) {
-            return TtlEstimate::unknown(
-                upperBound: $cap,
-                condition: 'requires the boundary to supply a finite expiration at runtime',
-            );
-        }
-
-        return TtlEstimate::invalid(
-            'Ttl::'.$declared->name.' has no dependency with a finite expiration, so applying the policy throws a LogicException',
-        );
+        return $upstream->seconds === null ? $upstream : TtlEstimate::known($upstream->seconds, 'inherited from '.$source);
     }
 
     /**

@@ -198,56 +198,54 @@
 <span class="src-line" id="L162"><a class="ln" href="#L162">162</a>            <span class="tok-str">&#039;ttlUnknown&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">ttl</span> === <span class="tok-id">null</span>,</span>
 <span class="src-line" id="L163"><a class="ln" href="#L163">163</a>            <span class="tok-str">&#039;tagsUnknown&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">tagsUnknown</span>,</span>
 <span class="src-line" id="L164"><a class="ln" href="#L164">164</a>            <span class="tok-str">&#039;visibilityUnknown&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">visibilityUnknown</span>,</span>
-<span class="src-line" id="L165"><a class="ln" href="#L165">165</a>            <span class="tok-str">&#039;maxTtl&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">maxTtl</span>,</span>
-<span class="src-line" id="L166"><a class="ln" href="#L166">166</a>            <span class="tok-str">&#039;maxTtlUnknown&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">maxTtlUnknown</span>,</span>
-<span class="src-line" id="L167"><a class="ln" href="#L167">167</a>            <span class="tok-str">&#039;tags&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">tags</span>,</span>
-<span class="src-line" id="L168"><a class="ln" href="#L168">168</a>            <span class="tok-str">&#039;visibility&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">visibility</span> === <span class="tok-id">null</span> ? <span class="tok-id">null</span> : <span class="tok-id">strtolower</span>(<span class="tok-var">$policy</span>-&gt;<span class="tok-id">visibility</span>-&gt;<span class="tok-id">name</span>),</span>
-<span class="src-line" id="L169"><a class="ln" href="#L169">169</a>            <span class="tok-str">&#039;version&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">versionUnknown</span> ? <span class="tok-id">null</span> : <span class="tok-var">$policy</span>-&gt;<span class="tok-id">version</span>,</span>
-<span class="src-line" id="L170"><a class="ln" href="#L170">170</a>            <span class="tok-str">&#039;runtime&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">runtimeUnknown</span> ? <span class="tok-id">null</span> : <span class="tok-var">$policy</span>-&gt;<span class="tok-id">runtime</span>,</span>
-<span class="src-line" id="L171"><a class="ln" href="#L171">171</a>        ];</span>
-<span class="src-line" id="L172"><a class="ln" href="#L172">172</a>    }</span>
-<span class="src-line" id="L173"><a class="ln" href="#L173">173</a></span>
-<span class="src-line" id="L174"><a class="ln" href="#L174">174</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L175"><a class="ln" href="#L175">175</a><span class="tok-com">     * Returns an analysis gap with a stable kind and fully qualified call path.</span></span>
-<span class="src-line" id="L176"><a class="ln" href="#L176">176</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L177"><a class="ln" href="#L177">177</a><span class="tok-com">     * @return array{kind: string, path: list&lt;string&gt;, message: string}</span></span>
-<span class="src-line" id="L178"><a class="ln" href="#L178">178</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L179"><a class="ln" href="#L179">179</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">gap</span>(<span class="tok-id">CacheGap</span> <span class="tok-var">$gap</span>): <span class="tok-kw">array</span></span>
-<span class="src-line" id="L180"><a class="ln" href="#L180">180</a>    {</span>
-<span class="src-line" id="L181"><a class="ln" href="#L181">181</a>        <span class="tok-kw">return</span> [</span>
-<span class="src-line" id="L182"><a class="ln" href="#L182">182</a>            <span class="tok-str">&#039;kind&#039;</span> =&gt; <span class="tok-str">&#039;unverified-cache-propagation&#039;</span>,</span>
-<span class="src-line" id="L183"><a class="ln" href="#L183">183</a>            <span class="tok-str">&#039;path&#039;</span> =&gt; <span class="tok-id">array_map</span>(<span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">BoundaryDeclaration</span> <span class="tok-var">$boundary</span>): <span class="tok-id">string</span> =&gt; <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">id</span>(), <span class="tok-var">$gap</span>-&gt;<span class="tok-id">path</span>),</span>
-<span class="src-line" id="L184"><a class="ln" href="#L184">184</a>            <span class="tok-str">&#039;message&#039;</span> =&gt; <span class="tok-var">$gap</span>-&gt;<span class="tok-id">label</span>(),</span>
-<span class="src-line" id="L185"><a class="ln" href="#L185">185</a>        ];</span>
-<span class="src-line" id="L186"><a class="ln" href="#L186">186</a>    }</span>
-<span class="src-line" id="L187"><a class="ln" href="#L187">187</a></span>
-<span class="src-line" id="L188"><a class="ln" href="#L188">188</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L189"><a class="ln" href="#L189">189</a><span class="tok-com">     * Returns one analyzed strategy composition as plain data.</span></span>
-<span class="src-line" id="L190"><a class="ln" href="#L190">190</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L191"><a class="ln" href="#L191">191</a><span class="tok-com">     * @return array&lt;string, mixed&gt;</span></span>
-<span class="src-line" id="L192"><a class="ln" href="#L192">192</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L193"><a class="ln" href="#L193">193</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">strategy</span>(<span class="tok-id">StrategyEffect</span> <span class="tok-var">$strategy</span>): <span class="tok-kw">array</span></span>
-<span class="src-line" id="L194"><a class="ln" href="#L194">194</a>    {</span>
-<span class="src-line" id="L195"><a class="ln" href="#L195">195</a>        <span class="tok-kw">return</span> [</span>
-<span class="src-line" id="L196"><a class="ln" href="#L196">196</a>            <span class="tok-str">&#039;declared&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">label</span>,</span>
-<span class="src-line" id="L197"><a class="ln" href="#L197">197</a>            <span class="tok-str">&#039;ttl&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">ttl</span>-&gt;<span class="tok-id">jsonSerialize</span>(),</span>
-<span class="src-line" id="L198"><a class="ln" href="#L198">198</a>            <span class="tok-str">&#039;overridesExpiration&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">overridesExpiration</span>,</span>
-<span class="src-line" id="L199"><a class="ln" href="#L199">199</a>            ...(<span class="tok-var">$strategy</span>-&gt;<span class="tok-id">expirations</span> === [] ? [] : [<span class="tok-str">&#039;expirations&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">expirations</span>]),</span>
-<span class="src-line" id="L200"><a class="ln" href="#L200">200</a>            <span class="tok-str">&#039;steps&#039;</span> =&gt; <span class="tok-id">array_map</span>(</span>
-<span class="src-line" id="L201"><a class="ln" href="#L201">201</a>                <span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">StrategyStep</span> <span class="tok-var">$step</span>): <span class="tok-kw">array</span> =&gt; [</span>
-<span class="src-line" id="L202"><a class="ln" href="#L202">202</a>                    <span class="tok-str">&#039;strategy&#039;</span> =&gt; <span class="tok-var">$step</span>-&gt;<span class="tok-id">strategy</span>,</span>
-<span class="src-line" id="L203"><a class="ln" href="#L203">203</a>                    <span class="tok-str">&#039;ttl&#039;</span> =&gt; <span class="tok-var">$step</span>-&gt;<span class="tok-id">ttl</span>-&gt;<span class="tok-id">jsonSerialize</span>(),</span>
-<span class="src-line" id="L204"><a class="ln" href="#L204">204</a>                    <span class="tok-str">&#039;assumed&#039;</span> =&gt; <span class="tok-var">$step</span>-&gt;<span class="tok-id">assumed</span>,</span>
-<span class="src-line" id="L205"><a class="ln" href="#L205">205</a>                    ...(<span class="tok-var">$step</span>-&gt;<span class="tok-id">expirations</span> === [] ? [] : [<span class="tok-str">&#039;expirations&#039;</span> =&gt; <span class="tok-var">$step</span>-&gt;<span class="tok-id">expirations</span>]),</span>
-<span class="src-line" id="L206"><a class="ln" href="#L206">206</a>                ],</span>
-<span class="src-line" id="L207"><a class="ln" href="#L207">207</a>                <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">steps</span>,</span>
-<span class="src-line" id="L208"><a class="ln" href="#L208">208</a>            ),</span>
-<span class="src-line" id="L209"><a class="ln" href="#L209">209</a>            <span class="tok-str">&#039;writesMetadata&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">writes</span>,</span>
-<span class="src-line" id="L210"><a class="ln" href="#L210">210</a>            <span class="tok-str">&#039;problems&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">problems</span>,</span>
-<span class="src-line" id="L211"><a class="ln" href="#L211">211</a>        ];</span>
-<span class="src-line" id="L212"><a class="ln" href="#L212">212</a>    }</span>
-<span class="src-line" id="L213"><a class="ln" href="#L213">213</a>}</span>
-<span class="src-line" id="L214"><a class="ln" href="#L214">214</a></span>
+<span class="src-line" id="L165"><a class="ln" href="#L165">165</a>            <span class="tok-str">&#039;tags&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">tags</span>,</span>
+<span class="src-line" id="L166"><a class="ln" href="#L166">166</a>            <span class="tok-str">&#039;visibility&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">visibility</span> === <span class="tok-id">null</span> ? <span class="tok-id">null</span> : <span class="tok-id">strtolower</span>(<span class="tok-var">$policy</span>-&gt;<span class="tok-id">visibility</span>-&gt;<span class="tok-id">name</span>),</span>
+<span class="src-line" id="L167"><a class="ln" href="#L167">167</a>            <span class="tok-str">&#039;version&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">versionUnknown</span> ? <span class="tok-id">null</span> : <span class="tok-var">$policy</span>-&gt;<span class="tok-id">version</span>,</span>
+<span class="src-line" id="L168"><a class="ln" href="#L168">168</a>            <span class="tok-str">&#039;runtime&#039;</span> =&gt; <span class="tok-var">$policy</span>-&gt;<span class="tok-id">runtimeUnknown</span> ? <span class="tok-id">null</span> : <span class="tok-var">$policy</span>-&gt;<span class="tok-id">runtime</span>,</span>
+<span class="src-line" id="L169"><a class="ln" href="#L169">169</a>        ];</span>
+<span class="src-line" id="L170"><a class="ln" href="#L170">170</a>    }</span>
+<span class="src-line" id="L171"><a class="ln" href="#L171">171</a></span>
+<span class="src-line" id="L172"><a class="ln" href="#L172">172</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L173"><a class="ln" href="#L173">173</a><span class="tok-com">     * Returns an analysis gap with a stable kind and fully qualified call path.</span></span>
+<span class="src-line" id="L174"><a class="ln" href="#L174">174</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L175"><a class="ln" href="#L175">175</a><span class="tok-com">     * @return array{kind: string, path: list&lt;string&gt;, message: string}</span></span>
+<span class="src-line" id="L176"><a class="ln" href="#L176">176</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L177"><a class="ln" href="#L177">177</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">gap</span>(<span class="tok-id">CacheGap</span> <span class="tok-var">$gap</span>): <span class="tok-kw">array</span></span>
+<span class="src-line" id="L178"><a class="ln" href="#L178">178</a>    {</span>
+<span class="src-line" id="L179"><a class="ln" href="#L179">179</a>        <span class="tok-kw">return</span> [</span>
+<span class="src-line" id="L180"><a class="ln" href="#L180">180</a>            <span class="tok-str">&#039;kind&#039;</span> =&gt; <span class="tok-str">&#039;unverified-cache-propagation&#039;</span>,</span>
+<span class="src-line" id="L181"><a class="ln" href="#L181">181</a>            <span class="tok-str">&#039;path&#039;</span> =&gt; <span class="tok-id">array_map</span>(<span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">BoundaryDeclaration</span> <span class="tok-var">$boundary</span>): <span class="tok-id">string</span> =&gt; <span class="tok-var">$boundary</span>-&gt;<span class="tok-id">id</span>(), <span class="tok-var">$gap</span>-&gt;<span class="tok-id">path</span>),</span>
+<span class="src-line" id="L182"><a class="ln" href="#L182">182</a>            <span class="tok-str">&#039;message&#039;</span> =&gt; <span class="tok-var">$gap</span>-&gt;<span class="tok-id">label</span>(),</span>
+<span class="src-line" id="L183"><a class="ln" href="#L183">183</a>        ];</span>
+<span class="src-line" id="L184"><a class="ln" href="#L184">184</a>    }</span>
+<span class="src-line" id="L185"><a class="ln" href="#L185">185</a></span>
+<span class="src-line" id="L186"><a class="ln" href="#L186">186</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L187"><a class="ln" href="#L187">187</a><span class="tok-com">     * Returns one analyzed strategy composition as plain data.</span></span>
+<span class="src-line" id="L188"><a class="ln" href="#L188">188</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L189"><a class="ln" href="#L189">189</a><span class="tok-com">     * @return array&lt;string, mixed&gt;</span></span>
+<span class="src-line" id="L190"><a class="ln" href="#L190">190</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L191"><a class="ln" href="#L191">191</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">strategy</span>(<span class="tok-id">StrategyEffect</span> <span class="tok-var">$strategy</span>): <span class="tok-kw">array</span></span>
+<span class="src-line" id="L192"><a class="ln" href="#L192">192</a>    {</span>
+<span class="src-line" id="L193"><a class="ln" href="#L193">193</a>        <span class="tok-kw">return</span> [</span>
+<span class="src-line" id="L194"><a class="ln" href="#L194">194</a>            <span class="tok-str">&#039;declared&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">label</span>,</span>
+<span class="src-line" id="L195"><a class="ln" href="#L195">195</a>            <span class="tok-str">&#039;ttl&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">ttl</span>-&gt;<span class="tok-id">jsonSerialize</span>(),</span>
+<span class="src-line" id="L196"><a class="ln" href="#L196">196</a>            <span class="tok-str">&#039;overridesExpiration&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">overridesExpiration</span>,</span>
+<span class="src-line" id="L197"><a class="ln" href="#L197">197</a>            ...(<span class="tok-var">$strategy</span>-&gt;<span class="tok-id">expirations</span> === [] ? [] : [<span class="tok-str">&#039;expirations&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">expirations</span>]),</span>
+<span class="src-line" id="L198"><a class="ln" href="#L198">198</a>            <span class="tok-str">&#039;steps&#039;</span> =&gt; <span class="tok-id">array_map</span>(</span>
+<span class="src-line" id="L199"><a class="ln" href="#L199">199</a>                <span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">StrategyStep</span> <span class="tok-var">$step</span>): <span class="tok-kw">array</span> =&gt; [</span>
+<span class="src-line" id="L200"><a class="ln" href="#L200">200</a>                    <span class="tok-str">&#039;strategy&#039;</span> =&gt; <span class="tok-var">$step</span>-&gt;<span class="tok-id">strategy</span>,</span>
+<span class="src-line" id="L201"><a class="ln" href="#L201">201</a>                    <span class="tok-str">&#039;ttl&#039;</span> =&gt; <span class="tok-var">$step</span>-&gt;<span class="tok-id">ttl</span>-&gt;<span class="tok-id">jsonSerialize</span>(),</span>
+<span class="src-line" id="L202"><a class="ln" href="#L202">202</a>                    <span class="tok-str">&#039;assumed&#039;</span> =&gt; <span class="tok-var">$step</span>-&gt;<span class="tok-id">assumed</span>,</span>
+<span class="src-line" id="L203"><a class="ln" href="#L203">203</a>                    ...(<span class="tok-var">$step</span>-&gt;<span class="tok-id">expirations</span> === [] ? [] : [<span class="tok-str">&#039;expirations&#039;</span> =&gt; <span class="tok-var">$step</span>-&gt;<span class="tok-id">expirations</span>]),</span>
+<span class="src-line" id="L204"><a class="ln" href="#L204">204</a>                ],</span>
+<span class="src-line" id="L205"><a class="ln" href="#L205">205</a>                <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">steps</span>,</span>
+<span class="src-line" id="L206"><a class="ln" href="#L206">206</a>            ),</span>
+<span class="src-line" id="L207"><a class="ln" href="#L207">207</a>            <span class="tok-str">&#039;writesMetadata&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">writes</span>,</span>
+<span class="src-line" id="L208"><a class="ln" href="#L208">208</a>            <span class="tok-str">&#039;problems&#039;</span> =&gt; <span class="tok-var">$strategy</span>-&gt;<span class="tok-id">problems</span>,</span>
+<span class="src-line" id="L209"><a class="ln" href="#L209">209</a>        ];</span>
+<span class="src-line" id="L210"><a class="ln" href="#L210">210</a>    }</span>
+<span class="src-line" id="L211"><a class="ln" href="#L211">211</a>}</span>
+<span class="src-line" id="L212"><a class="ln" href="#L212">212</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

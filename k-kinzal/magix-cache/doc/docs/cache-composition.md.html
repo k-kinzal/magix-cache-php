@@ -179,7 +179,7 @@ restore(store(value, M_boundary)).metadata = M_boundary</code></pre>
             );
     });
 }</code></pre>
-<p>Omitting TTL retains the composed expiration. Bare <code>#[Cache]</code> inherits all metadata; the example explicitly replaces tags with the page tag. A fixed parent TTL overrides the inherited deadline: child 20s plus parent <code>ttl: 60</code> produces a parent lifetime of 60s. <code>Ttl::FromUpstream</code> is the explicit choice to inherit with a maximum.</p>
+<p>Omitting TTL retains the composed expiration. Bare <code>#[Cache]</code> inherits all metadata; the example explicitly replaces tags with the page tag. A fixed parent TTL overrides the inherited deadline: child 20s plus parent <code>ttl: 60</code> produces a parent lifetime of 60s.</p>
 <h3>Create Source Metadata</h3>
 <p>Most dependencies receive metadata when their own cache boundary applies a policy. A source can also attach constraints directly:</p>
 <pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\CacheMetadata</span>;

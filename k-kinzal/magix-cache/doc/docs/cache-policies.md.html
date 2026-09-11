@@ -57,13 +57,13 @@
 }</code></pre>
 <p>A method-level <code>#[Cache]</code> wins over the class-level one as a whole; the two are never mixed per option. Attributes on a parent class are never inherited implicitly, and declarations are static — there is no per-call override path. If neither the method nor its concrete class declares <code>#[Cache]</code>, <code>cached()</code> throws a <code>LogicException</code>.</p>
 <p><code>#[Cache]</code> accepts these options:</p>
-<div class="table-wrap"><table><thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>ttl</code></td><td><code>int|Ttl</code></td><td><code>Ttl::Auto</code></td><td>Selects the boundary expiration</td></tr><tr><td><code>maxTtl</code></td><td><code>?int</code></td><td><code>null</code></td><td>Upper bound for <code>Ttl::FromUpstream</code> (required in that mode)</td></tr><tr><td><code>tags</code></td><td><code>?list&lt;string&gt;</code></td><td><code>null</code></td><td>Inherits when omitted; an explicit list replaces tags, including <code>[]</code></td></tr><tr><td><code>visibility</code></td><td><code>?Visibility</code></td><td><code>null</code></td><td>Inherits when omitted; an explicit enum replaces visibility</td></tr><tr><td><code>version</code></td><td><code>string</code></td><td><code>&#039;1&#039;</code></td><td>Changes the generated cache key</td></tr><tr><td><code>runtime</code></td><td><code>string</code></td><td><code>&#039;default&#039;</code></td><td>Name of a runtime registered at bootstrap</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>ttl</code></td><td><code>int|Ttl</code></td><td><code>Ttl::Auto</code></td><td>Fixed lifetime, or <code>Ttl::Auto</code> to declare none</td></tr><tr><td><code>tags</code></td><td><code>?list&lt;string&gt;</code></td><td><code>null</code></td><td>Inherits when omitted; an explicit list replaces tags, including <code>[]</code></td></tr><tr><td><code>visibility</code></td><td><code>?Visibility</code></td><td><code>null</code></td><td>Inherits when omitted; an explicit enum replaces visibility</td></tr><tr><td><code>version</code></td><td><code>string</code></td><td><code>&#039;1&#039;</code></td><td>Changes the generated cache key</td></tr><tr><td><code>runtime</code></td><td><code>string</code></td><td><code>&#039;default&#039;</code></td><td>Name of a runtime registered at bootstrap</td></tr></tbody></table></div>
 <p>The shared <code>CachePolicy</code> value type has the same options. Bubbling and overrides are separate: composition gathers dependency metadata, then explicitly configured boundary fields replace the inherited fields.</p>
 <p>Priority is <code>dependency metadata → policy → parameter settings → dynamic TTL → Strategy</code>, with the later writer winning for each field. Unspecified fields inherit. Cacheability and reasons remain unchanged unless a Strategy explicitly replaces them.</p>
 <h3>Fixed TTL</h3>
 <p>An integer TTL is relative to the base time taken right after the origin result is produced:</p>
 <pre class="code-block"><code>#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">60</span>)]</code></pre>
-<p>A fixed TTL replaces the inherited expiration. If a dependency has 20 seconds left, <code>#[Cache(ttl: 60)]</code> makes the parent expire 60 seconds after its origin succeeds. This is an intentional parent cache policy. Use <code>Ttl::FromUpstream</code> to retain a dependency cap instead.</p>
+<p>A fixed TTL replaces the inherited expiration. If a dependency has 20 seconds left, <code>#[Cache(ttl: 60)]</code> makes the parent expire 60 seconds after its origin succeeds. This is an intentional parent cache policy. Omit <code>ttl</code> to keep the dependency&#039;s deadline instead.</p>
 <p>A final TTL of <code>0</code> expires immediately and prevents storage. A higher-priority parameter, dynamic TTL or Strategy may explicitly replace a policy TTL of zero.</p>
 <h3>Automatic TTL</h3>
 <p>Use <code>#[Cache]</code> without arguments when a parent only needs to bubble up its children&#039;s cache constraints:</p>
@@ -83,14 +83,11 @@
     });
 }</code></pre>
 <p>The composed expiration, cacheability, visibility, tags, and diagnostic reasons are preserved. The omitted TTL defaults to <code>Ttl::Auto</code>, so writing <code>#[Cache(ttl: Ttl::Auto)]</code> explicitly has the same effect. Other options can be supplied independently, such as <code>#[Cache(tags: [&#039;product-pages&#039;])]</code>.</p>
-<p>The automatic policy requires a finite final expiration from the returned <code>Cached</code> value or an override. Returning <code>Cached::of($value)</code> with no finite constraint is a definition error and the runtime throws a <code>LogicException</code>.</p>
-<p>A parameter, <code>#[DynamicTtl]</code> resolver or Strategy can supply that expiration; validation runs after all overrides. See <a href="../../../../k-kinzal/magix-cache/doc/docs/cache-behaviors.md.html#dynamic-ttl">Cache Behaviors</a>.</p>
-<h3>Upstream TTL</h3>
-<p><code>Ttl::FromUpstream</code> inherits an absolute expiration supplied in the returned metadata and caps it with <code>maxTtl</code>:</p>
+<p><code>Ttl::Auto</code> adds no constraint of its own, so it never validates anything: the result is whatever the composition produced. A boundary that composes no finite expiration simply stores nothing, exactly like an origin that returns <code>Cached::of($value)</code> with no metadata. This is not a definition error.</p>
+<p>An expiration can equally come from the returned metadata itself, which is how an upstream deadline enters composition:</p>
 <pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Metadata\CacheMetadata</span>;
-<span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Policy\Ttl</span>;
 
-#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-id">Ttl</span>::<span class="tok-id">FromUpstream</span>, <span class="tok-id">maxTtl</span>: <span class="tok-num">300</span>)]
+#[<span class="tok-id">Cache</span>]
 <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">execute</span>(): <span class="tok-id">Cached</span>
 {
     <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">cached</span>(<span class="tok-kw">function</span> (): <span class="tok-id">Cached</span> {
@@ -102,7 +99,7 @@
         );
     });
 }</code></pre>
-<p>At policy application, the expiration becomes the earlier of the inherited expiration and <code>baseTime + maxTtl</code>. <code>maxTtl</code> is required. A later parameter, dynamic TTL or Strategy override takes precedence over this cap. Like <code>Ttl::Auto</code>, the final result must have a finite expiration.</p>
+<p>To bound such a deadline, declare the bound as the policy: <code>#[Cache(ttl: 300)]</code> replaces it outright. A parameter, <code>#[DynamicTtl]</code> resolver or Strategy can also supply or replace the expiration. See <a href="../../../../k-kinzal/magix-cache/doc/docs/cache-behaviors.md.html#dynamic-ttl">Cache Behaviors</a>.</p>
 <h3>Tags</h3>
 <p>Policy tags replace the inherited tag list. Omit tags to inherit; use <code>tags: []</code> to clear them:</p>
 <pre class="code-block"><code>#[<span class="tok-id">Cache</span>(<span class="tok-id">ttl</span>: <span class="tok-num">30</span>, <span class="tok-id">tags</span>: [<span class="tok-str">&#039;products&#039;</span>, <span class="tok-str">&#039;product:42&#039;</span>])]</code></pre>

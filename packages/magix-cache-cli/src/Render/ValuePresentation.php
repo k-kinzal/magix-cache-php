@@ -23,7 +23,14 @@ final readonly class ValuePresentation
             return $node->boundary->policy->ttlLabel().' [declared]';
         }
 
-        $effect = $node->effect;
+        return $this->lifetime($node->effect);
+    }
+
+    /**
+     * Renders one lifetime estimate without the declaration labels of a row.
+     */
+    public function lifetime(CacheEffect $effect): string
+    {
         $ttl = $effect->ttl;
 
         if ($ttl->state !== TtlEstimateState::Unknown) {

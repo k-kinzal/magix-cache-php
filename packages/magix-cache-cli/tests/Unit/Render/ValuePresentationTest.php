@@ -10,12 +10,14 @@ use Magix\Cache\Cli\Graph\TtlEstimate;
 use Magix\Cache\Cli\Render\ValuePresentation;
 use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 use Tests\Package\Cli\Fixture\ReportSource;
 
 #[CoversClass(ValuePresentation::class)]
 #[UsesNamespace('Magix\Cache')]
+#[Medium]
 final class ValuePresentationTest extends TestCase
 {
     public function testTtlSeparatesReferencesBoundsAndRuntimeChoices(): void
@@ -28,6 +30,16 @@ final class ValuePresentationTest extends TestCase
         self::assertSame('≤30s', $values->ttl(new CacheNode($partial->boundary, new CacheEffect(TtlEstimate::unknown(30), analysis: $partial->effect->analysis))));
         self::assertSame('dynamic', $values->ttl(new CacheNode($partial->boundary, new CacheEffect(TtlEstimate::unknown(lowerBound: 0, finite: true)))));
         self::assertSame('60s [declared]', $values->ttl(ReportSource::node('Migration::get')));
+    }
+
+    public function testLifetimeLabelsAnEstimateWithoutTheDeclarationLabelOfARow(): void
+    {
+        $values = new ValuePresentation();
+        $migration = ReportSource::node('Migration::get');
+        self::assertSame('60s [declared]', $values->ttl($migration));
+        self::assertSame('10s', $values->lifetime($migration->effect));
+        self::assertSame('?', $values->lifetime(new CacheEffect()));
+        self::assertSame('≤30s', $values->lifetime(new CacheEffect(TtlEstimate::unknown(30))));
     }
 
     public function testVisibilityKeepsAProvenFloorWithoutInventingCertainty(): void

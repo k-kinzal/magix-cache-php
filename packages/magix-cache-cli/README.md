@@ -10,7 +10,8 @@ The result answers the questions that are otherwise only observable in productio
 ## Features
 
 - Compact cache trees with effective TTL, visibility and tags; detailed declarations, keys and provenance in JSON
-- Row selection by `#[Cache]` with `--uncached=between|all|none`, including the selected root, plus repeatable `--ignore` subtree filters
+- Page-level estimates on methods that store nothing: what a controller action composes from the caches it reaches
+- Row selection by `#[Cache]` with `--uncached=between|all|none`, always keeping the analyzed method, plus repeatable `--ignore` subtree filters
 - Partial results during migration: declarations remain visible, known fields stay known, and affected fields show `?` or grounded references such as `10s?`, `shared?` and `tags product?`
 - The reason behind each effective value, including inherited metadata and explicit local overrides
 - White rows for normal cache boundaries, including runtime-dependent TTL and custom Strategies; gray for ordinary methods, NoStore and TTL 0
@@ -109,7 +110,11 @@ not cause a gap. The default `--uncached=between` retains unattributed methods
 only between attributed ancestors and descendants; `all` shows every analyzed
 row, and `none` shows only methods with an effective `#[Cache]` attribute.
 Return types, observed execution and diagnostics never override selection.
-An unattributed selected root can disappear, leaving a forest of declarations.
+The analyzed method itself always stays, even when it declares no cache because
+it converts its result; such a row reports what it `composes` from the caches it
+reaches, which is the page-level bound its returned metadata cannot carry.
+`--depth` counts printed rows, so omitted methods never spend the budget the
+displayed ones need.
 All formats preserve the effective results of displayed nodes.
 See [analysis gaps](docs/commands.md#cache-propagation-gaps) and
 [conditional cache results](docs/commands.md#conditional-cache-results).

@@ -6,11 +6,13 @@ namespace Tests\Package\Cli\Unit\Console;
 
 use Magix\Cache\Cli\Console\CatalogLoader;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CatalogLoader::class)]
 #[UsesNamespace('Magix\Cache\Cli')]
+#[Medium]
 final class CatalogLoaderTest extends TestCase
 {
     public function testLoadCollectsEveryBoundaryBelowThePath(): void

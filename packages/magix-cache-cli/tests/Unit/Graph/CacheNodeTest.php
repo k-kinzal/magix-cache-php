@@ -9,6 +9,7 @@ use Magix\Cache\Cli\Graph\CacheEffect;
 use Magix\Cache\Cli\Graph\CacheNode;
 use Magix\Cache\Cli\Graph\TtlEstimate;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
@@ -19,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
+#[Medium]
 final class CacheNodeTest extends TestCase
 {
     public function testNodeCarriesItsBoundaryEffectAndChildren(): void
@@ -49,6 +51,20 @@ final class CacheNodeTest extends TestCase
         self::assertSame('no', \Tests\Package\Cli\Fixture\ReportSource::node('Migration::get')->storage());
     }
 
+    public function testCompositionAnswersWithTheStoredResultOrWhatTheReachedBoundariesBound(): void
+    {
+        $page = \Tests\Package\Cli\Fixture\ReportSource::node('Page::unrelated');
+        self::assertSame($page->effect, $page->composition());
+
+        $controller = \Tests\Package\Cli\Fixture\ReportSource::node('Controller::run');
+        self::assertSame(10, $controller->composition()->ttl->seconds);
+        self::assertSame(['leaf'], $controller->composition()->tags);
+        self::assertNull($controller->effect->ttl->seconds);
+
+        $inspection = \Tests\Package\Cli\Fixture\ReportSource::node('Utility::get');
+        self::assertSame('unconstrained', $inspection->composition()->ttl->state->value);
+    }
+
     public function testWithChildrenRetainsFactsWhenProjectionOmitsTheOrigin(): void
     {
         $original = \Tests\Package\Cli\Fixture\ReportSource::node('Page::automatic');
@@ -56,6 +72,7 @@ final class CacheNodeTest extends TestCase
         self::assertSame([], $visible->children);
         self::assertSame(['Controller::run'], $visible->via);
         self::assertSame($original->effect, $visible->effect);
+        self::assertSame($original->composed, $visible->composed);
         self::assertSame($original->diagnostics, $visible->diagnostics);
         self::assertSame($original->metadataVariants, $visible->metadataVariants);
         self::assertSame($original->calls, $visible->calls);

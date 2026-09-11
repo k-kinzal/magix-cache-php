@@ -51,6 +51,41 @@ warning paragraphs, or expanded alternative lists. JSON carries those details
 for further analysis. Mermaid uses the same compact values in a single diagram,
 including when filtering produces several roots.
 
+### Page-level estimates
+
+A controller action converts its result to a response, so it declares no cache
+of its own and its *returned* metadata is empty: extracting a value with
+`value()` detaches it for the caller. That says nothing about how long the page
+may be cached, which is the question a CDN or `Cache-Control` header asks. So a
+row that stores nothing also reports what it **composes**: the caches it reaches,
+met the way dependencies bubble.
+
+```bash
+vendor/bin/magix analyze ProductController::show
+```
+
+```text
+ProductController::show (uncached)  composes ttl 20s  private  tags inventory,product,viewer
+|-- ProductQuery::execute  ttl 20s  shared  tags product
+|-- InventoryQuery::execute  ttl 60s  shared  tags inventory
+`-- ViewerQuery::execute  ttl 30s  private  tags viewer
+```
+
+The page cannot outlive the shortest dependency, is Private because one
+dependency is, and carries the union of their tags. JSON reports the same values
+under `composed`, with `visibilityReason` naming what restricted the result.
+
+The estimate folds through ordinary callers, so an action that delegates to a
+helper reports the same bound. A cache boundary answers for its whole subtree
+with its own stored result, because that is what it decided to store. It comes
+from the complete analysis, so `--uncached`, `--ignore` and `--depth` never
+change it.
+
+It is an estimate about data, not storage proof: `composes` never means the
+method caches anything, `effective.storage` stays `no`, and the row stays gray.
+Because it bounds every reachable path, it stays conservative where exclusive
+branches disagree; the individual candidates remain in `metadataAlternatives`.
+
 ### Reading partial results
 
 | Label | Meaning |
@@ -116,7 +151,7 @@ colors the whole parent. White does not prove storage. JSON separately reports
 |---|---|---|
 | `--path` | Composer autoload roots | Directory or file to scan, repeatable |
 | `--format` | `tree` | `tree`, `json`, or `mermaid` |
-| `--depth` | `8` | Maximum original call depth to print; analysis covers the reachable graph |
+| `--depth` | `8` | Maximum depth of printed rows; selection and analysis cover the reachable graph |
 | `--uncached` | `between` | Select rows according to Cache attributes |
 | `--ignore` | none | Hide matching class or `Class::method` subtrees, repeatable |
 
@@ -131,10 +166,12 @@ has none. A `Cached` return type or a `cached()` call alone does not qualify.
 | `none` | Only attributed methods; promote their visible descendants across omitted methods |
 
 Errors and diagnostics never make a row exempt from these rules.
-**The selected root follows the same rule.** For example,
-`Controller → Helper → CachedB` becomes just `CachedB` under `between` or `none`.
-Several attributed descendants can therefore become separate displayed roots.
-Use `all` to retain an unattributed entry point.
+**The analyzed method itself is exempt from them**: it names what the report
+answers, so it stays visible in every mode. An entry point that converts its
+result, such as a controller action that renders a response, declares no cache
+of its own and would otherwise disappear from its own report. For example,
+`Controller → Helper → CachedB` keeps `Controller` with `CachedB` promoted under
+it in `between` and `none`. Only `--ignore` removes it.
 
 ```bash
 vendor/bin/magix analyze ProductController::show --uncached=all
@@ -143,8 +180,9 @@ vendor/bin/magix analyze PageQuery::execute --uncached=none --ignore 'Inventory*
 
 `--ignore` removes a matched node and its entire subtree before promotion.
 Descendants of an ignored node never reappear. `between` tests the unignored
-original hierarchy, independently of display depth; depth counts original calls,
-including omitted methods.
+original hierarchy, independently of display depth. Depth counts printed rows,
+so an omitted method never spends the budget a displayed one needs, and a
+compact mode never reaches less far than `all`.
 
 Filtering is shared by tree, JSON and Mermaid and happens after analysis.
 It changes rows and connections, never the original effective metadata,
@@ -265,6 +303,7 @@ Each root and dependency contains:
 | `via` | Original callers omitted from the displayed connection |
 | `key`, `strategy` | Applied key parameters and analyzed strategy construction/steps |
 | `effective` | Original TTL, visibility, tags, storage proof, local overrides and confirmed problems |
+| `composed` | Page-level estimate of a method that stores nothing, or `null` for a cache boundary and for a method that reaches none |
 | `effective.certainty` | Per-field `known`, `unconstrained`, `invalid`, `runtime`, or `partial` as applicable |
 | `effective.analysis` | Per-field cause IDs and separate `ttlReference`, `visibilityReference` and `tagsReference` records |
 | `metadataAlternatives` | Distinct returned candidates, sources and per-candidate effective analysis |

@@ -49,7 +49,7 @@ final readonly class TreeRenderer
         $name = $this->highlight(OutputFormatter::escape($node->boundary->shortId()), $node, true);
 
         if ($node->boundary->policy === null && !$node->boundary->isCacheBoundary) {
-            return $this->highlight($name.' (uncached)', $node);
+            return $this->highlight(implode('  ', [$name.' (uncached)', ...$this->composes($node)]), $node);
         }
 
         $values = new ValuePresentation();
@@ -68,11 +68,44 @@ final readonly class TreeRenderer
             }
         }
 
+        $parts = [...$parts, ...$this->composes($node)];
+
         if ($effect->problems !== []) {
             $parts[] = '<fg=red>[declaration problem]</>';
         }
 
         return $this->highlight(implode('  ', $parts), $node);
+    }
+
+    /**
+     * Reports what a method that stores nothing still bounds its result by.
+     *
+     * This is the page-level estimate: the caches the method reaches, met the
+     * way dependencies bubble. It is not storage proof and not the metadata the
+     * method hands to its caller, which an extraction detaches.
+     *
+     * @return list<string>
+     */
+    public function composes(CacheNode $node): array
+    {
+        $effect = $node->composed;
+
+        if ($effect === null) {
+            return [];
+        }
+
+        $values = new ValuePresentation();
+        $parts = ['composes ttl '.OutputFormatter::escape($values->lifetime($effect)), OutputFormatter::escape($values->visibility($effect))];
+
+        if ($effect->tags !== [] || $effect->tagsUnknown) {
+            $parts[] = 'tags '.OutputFormatter::escape($values->tags($effect));
+        }
+
+        if ($effect->expirationConstraints !== []) {
+            $parts[] = 'expires by '.OutputFormatter::escape(ExpirationEstimate::describe($effect->expirationConstraints));
+        }
+
+        return $parts;
     }
 
     /**

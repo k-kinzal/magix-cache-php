@@ -102,20 +102,25 @@ final class AnalyzeCommandTest extends TestCase
         $tester->execute([...$arguments, '--format' => 'json']);
         $data = JsonReport::root($tester->getDisplay());
 
+        self::assertSame('entry-point', $data['kind']);
         self::assertIsArray($data['effective']);
         self::assertArrayHasKey('localOverrides', $data['effective']);
         self::assertIsArray($data['dependencies']);
         self::assertIsArray($data['dependencies'][0]);
         self::assertIsArray($data['dependencies'][0]['effective']);
         self::assertArrayHasKey('localOverrides', $data['dependencies'][0]['effective']);
+        self::assertIsArray($data['dependencies'][0]['dependencies']);
+        self::assertIsArray($data['dependencies'][0]['dependencies'][0]);
+        self::assertIsArray($data['dependencies'][0]['dependencies'][0]['effective']);
 
         $tester->execute([...$arguments, '--format' => 'mermaid']);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringContainsString('n0["RestrictedPageQuery::execute<br/>10s - private - tags inventory"]', $tester->getDisplay());
+        self::assertStringContainsString('n0["RestrictedPageQuery::show (uncached)<br/>composes 10s - private - tags inventory"]', $tester->getDisplay());
+        self::assertStringContainsString('n0_0["RestrictedPageQuery::execute<br/>10s - private - tags inventory"]', $tester->getDisplay());
         self::assertStringNotContainsString('local restriction:', $tester->getDisplay());
-        self::assertStringContainsString('style n0 fill:#ffffff', $tester->getDisplay());
         self::assertStringContainsString('style n0_0 fill:#ffffff', $tester->getDisplay());
+        self::assertStringContainsString('style n0_0_0 fill:#ffffff', $tester->getDisplay());
     }
 
     public function testAnalyzeShowsDetachedQueriesInjectedIntoActionParameters(): void
@@ -128,7 +133,8 @@ final class AnalyzeCommandTest extends TestCase
         ]);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringNotContainsString('ProductController::', $tester->getDisplay());
+        self::assertStringContainsString('ProductController::injected (uncached)', $tester->getDisplay());
+        self::assertStringContainsString('ProductQuery::execute', $tester->getDisplay());
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
     }
 
@@ -143,6 +149,50 @@ final class AnalyzeCommandTest extends TestCase
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
         self::assertStringContainsString('ViewerQuery::execute', $tester->getDisplay());
         self::assertStringNotContainsString('LogicException', $tester->getDisplay());
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testAnalyzeEstimatesThePageAnUncachedActionComposesFromTheCachesItReaches(): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $arguments = ['boundary' => 'ProductController::show', '--path' => ['packages/magix-cache-cli/tests/Fixture/Project']];
+        $tester->execute($arguments);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('ProductController::show (uncached)  composes ttl 20s  private  tags inventory,product,viewer', $tester->getDisplay());
+
+        $tester->execute([...$arguments, '--format' => 'json']);
+        $data = JsonReport::root($tester->getDisplay());
+        self::assertIsArray($data['composed']);
+        self::assertIsArray($data['composed']['ttl']);
+        self::assertSame(20, $data['composed']['ttl']['seconds']);
+        self::assertSame('private', $data['composed']['visibility']);
+        self::assertSame(['inventory', 'product', 'viewer'], $data['composed']['tags']);
+        self::assertIsArray($data['effective']);
+        self::assertIsArray($data['effective']['ttl']);
+        self::assertSame('unconstrained', $data['effective']['ttl']['state']);
+        self::assertSame('no', $data['effective']['storage']);
+        self::assertIsArray($data['dependencies']);
+        self::assertIsArray($data['dependencies'][0]);
+        self::assertNull($data['dependencies'][0]['composed']);
+    }
+
+    #[DataProvider('providerFormatsAndUncachedModes')]
+    public function testAnalyzeReportsTheSelectedRootItselfInEveryMode(string $format, string $uncached): void
+    {
+        $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
+        $tester->execute([
+            'boundary' => 'ProductController::show',
+            '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'],
+            '--format' => $format,
+            '--uncached' => $uncached,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString($format === 'json' ? '"kind": "entry-point"' : 'ProductController::show (uncached)', $tester->getDisplay());
+        self::assertStringContainsString('ProductQuery::execute', $tester->getDisplay());
     }
 
     /**
@@ -189,8 +239,8 @@ final class AnalyzeCommandTest extends TestCase
         ]);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringNotContainsString('ProductController::', $tester->getDisplay());
-        self::assertStringNotContainsString('ProductController::show (uncached)', $tester->getDisplay());
+        self::assertStringContainsString('ProductController::index (uncached)', $tester->getDisplay());
+        self::assertStringNotContainsString('ProductController::show', $tester->getDisplay());
         self::assertStringContainsString('InventoryQuery::execute', $tester->getDisplay());
     }
 
@@ -618,18 +668,20 @@ final class AnalyzeCommandTest extends TestCase
     }
 
     #[DataProvider('providerUncachedFormats')]
-    public function testNonePromotesAnExplicitUncachedRootAndHonorsTheOriginalDepth(string $format): void
+    public function testNoneKeepsTheAnalyzedRootAndSpendsDepthOnPrintedRows(string $format): void
     {
         $tester = new CommandTester((new Application(dirname(__DIR__, 5)))->console()->find('analyze'));
         $arguments = ['boundary' => 'ProductController::index', '--path' => ['packages/magix-cache-cli/tests/Fixture/Project'], '--format' => $format, '--uncached' => 'none'];
         $tester->execute($arguments);
 
         $tester->assertCommandIsSuccessful();
-        self::assertStringNotContainsString($format === 'json' ? '"boundary": "Tests\\\\Package\\\\Cli\\\\Fixture\\\\Project\\\\ProductController::index"' : 'ProductController::index', $tester->getDisplay());
-        self::assertStringNotContainsString($format === 'json' ? '"kind": "uncached"' : '(uncached)', $tester->getDisplay());
+        self::assertStringContainsString($format === 'json' ? '"kind": "entry-point"' : 'ProductController::index', $tester->getDisplay());
+        self::assertStringNotContainsString($format === 'json' ? '"boundary": "Tests\\\\Package\\\\Cli\\\\Fixture\\\\Project\\\\ProductController::show"' : 'ProductController::show', $tester->getDisplay());
         self::assertStringContainsString('ProductQuery::execute', $tester->getDisplay());
 
         $tester->execute([...$arguments, '--depth' => 1]);
+        self::assertStringContainsString('ProductQuery::execute', $tester->getDisplay());
+        $tester->execute([...$arguments, '--depth' => 0]);
         self::assertStringNotContainsString('ProductQuery::execute', $tester->getDisplay());
         $tester->execute([...$arguments, '--ignore' => ['ProductController::show']]);
         self::assertStringNotContainsString('ProductQuery::execute', $tester->getDisplay());

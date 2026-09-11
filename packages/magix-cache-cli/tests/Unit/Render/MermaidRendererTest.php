@@ -14,6 +14,7 @@ use Magix\Cache\Cli\Render\MermaidRenderer;
 use Magix\Cache\Cli\Render\NodePresentation;
 use Magix\Cache\Metadata\Visibility;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
@@ -30,6 +31,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlInterval::class)]
 #[UsesClass(\Magix\Cache\Cli\Graph\TtlRangeSet::class)]
 #[UsesClass(\Magix\Cache\Cli\Render\AlternativePresentation::class)]
+#[Medium]
 final class MermaidRendererTest extends TestCase
 {
     public function testRenderIdentifiesAndHighlightsAnUnverifiedCachePath(): void
@@ -91,8 +93,11 @@ final class MermaidRendererTest extends TestCase
     }
     public function testForestEmitsOneDiagramWithUniqueRootIdentifiers(): void
     {
-        $node = \Tests\Package\Cli\Fixture\ReportSource::node('Controller::run');
-        $roots = (new \Magix\Cache\Cli\Render\TreeFilter(uncached: \Magix\Cache\Cli\Render\UncachedMode::None))->apply($node);
+        $filter = new \Magix\Cache\Cli\Render\TreeFilter(uncached: \Magix\Cache\Cli\Render\UncachedMode::None);
+        $roots = [
+            ...$filter->apply(\Tests\Package\Cli\Fixture\ReportSource::node('Page::unrelated')),
+            ...$filter->apply(\Tests\Package\Cli\Fixture\ReportSource::node('Migration::get')),
+        ];
         $chart = (new MermaidRenderer())->forest($roots);
         self::assertSame(1, substr_count($chart, 'flowchart TD'));
         self::assertStringContainsString('n0["Page::unrelated', $chart);

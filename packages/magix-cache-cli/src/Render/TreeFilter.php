@@ -13,20 +13,34 @@ final readonly class TreeFilter
 {
     /**
      * @param list<IgnorePattern> $patterns Matching subtrees are removed before promotion.
-     * @param int $depth Display depth counts original calls, including omitted methods.
+     * @param int $depth Display depth counts printed rows, so a compact mode never reaches less far than an expanded one.
      */
     public function __construct(private array $patterns = [], private UncachedMode $uncached = UncachedMode::Between, private int $depth = 8)
     {
     }
 
     /**
-     * Returns a forest: an undeclared selected root follows the same rule as descendants.
+     * Returns the analyzed root, retained by every mode, with its selected descendants.
      *
      * @return list<CacheNode>
      */
     public function apply(CacheNode $node): array
     {
-        return (new TreeProjection($this->patterns, $this->uncached))->select($node, false, $this->depth)[0];
+        return $this->truncate((new TreeProjection($this->patterns, $this->uncached))->root($node), $this->depth);
     }
 
+    /**
+     * Limits how far selected rows are printed, after selection read the whole hierarchy.
+     *
+     * @param list<CacheNode> $nodes
+     * @return list<CacheNode>
+     */
+    public function truncate(array $nodes, int $remaining): array
+    {
+        if ($remaining < 0) {
+            return [];
+        }
+
+        return array_map(fn (CacheNode $node): CacheNode => $node->withChildren($this->truncate($node->children, $remaining - 1)), $nodes);
+    }
 }

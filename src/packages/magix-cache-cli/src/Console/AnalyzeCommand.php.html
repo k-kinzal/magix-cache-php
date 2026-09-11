@@ -90,7 +90,7 @@
 <span class="src-line" id="L54"><a class="ln" href="#L54">54</a><span class="tok-com">     *</span></span>
 <span class="src-line" id="L55"><a class="ln" href="#L55">55</a><span class="tok-com">     * @param array&lt;array-key, mixed&gt; $path</span></span>
 <span class="src-line" id="L56"><a class="ln" href="#L56">56</a><span class="tok-com">     * @param array&lt;array-key, mixed&gt; $ignore</span></span>
-<span class="src-line" id="L57"><a class="ln" href="#L57">57</a><span class="tok-com">     * @param UncachedMode $uncached Select rows by Cache attributes, independently of execution, types and diagnostics; the selected root follows the same rule.</span></span>
+<span class="src-line" id="L57"><a class="ln" href="#L57">57</a><span class="tok-com">     * @param UncachedMode $uncached Select rows by Cache attributes, independently of execution, types and diagnostics; the analyzed method itself always stays.</span></span>
 <span class="src-line" id="L58"><a class="ln" href="#L58">58</a><span class="tok-com">     * @throws JsonException when the tree cannot be encoded as JSON</span></span>
 <span class="src-line" id="L59"><a class="ln" href="#L59">59</a><span class="tok-com">     */</span></span>
 <span class="src-line" id="L60"><a class="ln" href="#L60">60</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__invoke</span>(</span>
@@ -101,11 +101,11 @@
 <span class="src-line" id="L65"><a class="ln" href="#L65">65</a>        <span class="tok-kw">array</span> <span class="tok-var">$path</span> = [],</span>
 <span class="src-line" id="L66"><a class="ln" href="#L66">66</a>        #[<span class="tok-id">Option</span>(<span class="tok-id">description</span>: <span class="tok-str">&#039;Output format: tree, json or mermaid&#039;</span>)]</span>
 <span class="src-line" id="L67"><a class="ln" href="#L67">67</a>        <span class="tok-id">string</span> <span class="tok-var">$format</span> = <span class="tok-str">&#039;tree&#039;</span>,</span>
-<span class="src-line" id="L68"><a class="ln" href="#L68">68</a>        #[<span class="tok-id">Option</span>(<span class="tok-id">description</span>: <span class="tok-str">&#039;Maximum dependency depth to print; analysis always covers the whole graph&#039;</span>)]</span>
+<span class="src-line" id="L68"><a class="ln" href="#L68">68</a>        #[<span class="tok-id">Option</span>(<span class="tok-id">description</span>: <span class="tok-str">&#039;Maximum depth of printed rows; row selection and analysis always cover the whole graph&#039;</span>)]</span>
 <span class="src-line" id="L69"><a class="ln" href="#L69">69</a>        <span class="tok-id">int</span> <span class="tok-var">$depth</span> = <span class="tok-num">8</span>,</span>
 <span class="src-line" id="L70"><a class="ln" href="#L70">70</a>        #[<span class="tok-id">Option</span>(<span class="tok-id">description</span>: <span class="tok-str">&#039;Hide matching class or Class::method subtrees (* and ? wildcards), repeatable&#039;</span>)]</span>
 <span class="src-line" id="L71"><a class="ln" href="#L71">71</a>        <span class="tok-kw">array</span> <span class="tok-var">$ignore</span> = [],</span>
-<span class="src-line" id="L72"><a class="ln" href="#L72">72</a>        #[<span class="tok-id">Option</span>(<span class="tok-id">description</span>: <span class="tok-str">&#039;Rows without #[Cache]: between declarations (default), all, or none; applies to the selected root too&#039;</span>)]</span>
+<span class="src-line" id="L72"><a class="ln" href="#L72">72</a>        #[<span class="tok-id">Option</span>(<span class="tok-id">description</span>: <span class="tok-str">&#039;Rows without #[Cache]: between declarations (default), all, or none; the analyzed method itself is always shown&#039;</span>)]</span>
 <span class="src-line" id="L73"><a class="ln" href="#L73">73</a>        <span class="tok-id">UncachedMode</span> <span class="tok-var">$uncached</span> = <span class="tok-id">UncachedMode</span>::<span class="tok-id">Between</span>,</span>
 <span class="src-line" id="L74"><a class="ln" href="#L74">74</a>    ): <span class="tok-id">int</span> {</span>
 <span class="src-line" id="L75"><a class="ln" href="#L75">75</a>        <span class="tok-var">$catalog</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">catalog</span>-&gt;<span class="tok-id">load</span>(<span class="tok-var">$path</span>);</span>

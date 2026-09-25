@@ -434,3 +434,7 @@ semantics, and the responsibility of the strategy implementation.
 
 
 TTL/ExpiresAt contracts describe expiration only. Readable strategies preserve other fields unless `#[WritesMetadata]` declares their replacement; those replacement values remain runtime-dependent. Unreadable strategies retain analysis uncertainty. `#[AssumeTtl]` covers expiration alone, and later parent settings can explicitly replace affected fields.
+
+## Asynchronous boundaries
+
+`analyze` recognizes `asyncCached()` and the `AsyncCached` composition API alongside `cached()` and `Cached`. `toCached()` preserves metadata while synchronizing; `value()` detaches it. `AsyncCached::fromCached()` preserves a complete result, while `of()` keeps a nested Cached as a payload until an explicit flatten. Promise completion order does not change the reported metadata meet or override priority. Analysis never waits for or executes a promise.

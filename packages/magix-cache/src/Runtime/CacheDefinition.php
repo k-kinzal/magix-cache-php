@@ -7,6 +7,7 @@ namespace Magix\Cache\Runtime;
 use Closure;
 use InvalidArgumentException;
 use LogicException;
+use Magix\Cache\AsyncCached;
 use Magix\Cache\Attribute\BypassCacheErrors;
 use Magix\Cache\Attribute\Cache;
 use Magix\Cache\Attribute\CacheIgnore;
@@ -125,7 +126,7 @@ final readonly class CacheDefinition
      *
      * @template T
      * @param array<array-key, mixed> $arguments
-     * @param Closure(): Cached<T> $origin
+     * @param Closure(): (Cached<T>|AsyncCached<T>) $origin
      * @return CacheInvocation<T>
      * @throws InvalidArgumentException when parameter values do not satisfy their cache constraints
      * @throws LogicException when the strategy factory does not produce a construction definition

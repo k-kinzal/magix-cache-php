@@ -6,6 +6,7 @@ namespace Tests\Fixture;
 
 use ArrayObject;
 use Closure;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
@@ -46,17 +47,18 @@ final class RecordingStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>
-     * @param Closure(): Cached<mixed> $next
+     * @return Promise<Cached<mixed>>
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
         $this->record($this->name.'.fetch.before');
-        $result = $next();
-        $this->record($this->name.'.fetch.after');
+        return $next()->then(function (Cached $result): Cached {
+            $this->record($this->name.'.fetch.after');
 
-        return $result;
+            return $result;
+        });
     }
 
     /**

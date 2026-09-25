@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Magix\Cache\Strategy;
 
 use Closure;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use RuntimeException;
 
@@ -31,17 +32,18 @@ interface CacheStrategy
     public function get(string $key, Closure $next): ?CacheRead;
 
     /**
-     * Wraps an origin inquiry and may transform its Cached response.
+     * Wraps an origin inquiry and may transform its eventual Cached response.
      *
      * The key identifies this cache boundary for key-dependent metadata rules.
-     * It is not an origin input: next takes no arguments. Every response must
+     * It is not an origin input: next takes no arguments. Use then for post-processing and rejection callbacks for delayed failures.
+     * Every resolved response must
      * preserve the boundary's value type and honor declared metadata effects.
      *
-     * @param Closure(): Cached<mixed> $next Performs the argument-free inquiry.
-     * @return Cached<mixed>
+     * @param Closure(): Promise<Cached<mixed>> $next Performs the argument-free inquiry.
+     * @return Promise<Cached<mixed>>
      * @throws RuntimeException when the middleware or delegated inquiry fails
      */
-    public function fetch(string $key, Closure $next): Cached;
+    public function fetch(string $key, Closure $next): Promise;
 
     /**
      * Wraps a write by key and may replace or decline its request.

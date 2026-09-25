@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Fixture;
 
 use Closure;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Clock\SystemClock;
 use Magix\Cache\Metadata\CacheMetadata;
@@ -13,6 +14,7 @@ use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CacheWrite;
 use Override;
 use Psr\Clock\ClockInterface;
+use RuntimeException;
 
 /**
  * Produces a fresh replacement on failure without reading a retained candidate.
@@ -37,17 +39,15 @@ final readonly class FreshRecoveryStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>
-     * @param Closure(): Cached<mixed> $next
+     * @return Promise<Cached<mixed>>
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
-        try {
-            return $next();
-        } catch (UpstreamUnavailable) {
-            return Cached::of('fresh replacement', new CacheMetadata(expiresAt: (float) $this->clock->now()->format('U.u') + 30.0, tags: ['recovered']));
-        }
+        return Promise::call($next)->recover(fn (RuntimeException $error): Cached => $error instanceof UpstreamUnavailable
+            ? Cached::of('fresh replacement', new CacheMetadata(expiresAt: (float) $this->clock->now()->format('U.u') + 30.0, tags: ['recovered']))
+            : throw $error);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Reader;
 
+use Magix\Cache\AsyncCached;
 use Magix\Cache\Cached;
 use Magix\Cache\Cli\Declaration\MetadataFlow;
 use PhpParser\Node\Identifier;
@@ -44,7 +45,7 @@ final readonly class MetadataFlowReader
                 return false;
             }
 
-            if ($name instanceof Name && $name->toString() === Cached::class) {
+            if ($name instanceof Name && in_array($name->toString(), [Cached::class, AsyncCached::class], true)) {
                 return false;
             }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Fixture;
 
 use Closure;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Clock\SystemClock;
 use Magix\Cache\Metadata\CacheMetadata;
@@ -27,6 +28,14 @@ final readonly class ImmediateStrategy implements CacheStrategy
     }
 
     /**
+     * Describes the short-circuit middleware used by async boundary tests.
+     */
+    public static function create(): \Magix\Cache\Strategy\StrategyDefinition
+    {
+        return \Magix\Cache\Strategy\StrategyDefinition::of(self::class);
+    }
+
+    /**
      * @return CacheRead<mixed>|null
      * @param Closure(string): (CacheRead<mixed>|null) $next
      */
@@ -37,13 +46,13 @@ final readonly class ImmediateStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<string>
-     * @param Closure(): Cached<mixed> $next
+     * @return Promise<Cached<string>>
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
-        return Cached::of('immediate', new CacheMetadata(expiresAt: (float) $this->clock->now()->format('U.u') + 30.0));
+        return Promise::resolved(Cached::of('immediate', new CacheMetadata(expiresAt: (float) $this->clock->now()->format('U.u') + 30.0)));
     }
 
     /**

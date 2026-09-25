@@ -33,7 +33,7 @@ final class CompositeCacheStrategyTest extends TestCase
         $handlers = new CacheHandlers(hit: null, fetched: Cached::of('origin'));
         $key = 'key';
 
-        $result = $strategy->fetch($key, $handlers->fetch(...));
+        $result = $strategy->fetch($key, $handlers->fetch(...))->wait();
 
 
         self::assertSame('origin', $result->value());
@@ -46,7 +46,7 @@ final class CompositeCacheStrategyTest extends TestCase
         $handlers = new CacheHandlers(hit: null, fetched: Cached::of('origin'));
         $key = 'key';
 
-        $fetched1 = $composed->fetch($key, $handlers->fetch(...));
+        $fetched1 = $composed->fetch($key, $handlers->fetch(...))->wait();
 
         $expiresAt = $fetched1->metadata->expiresAt;
 

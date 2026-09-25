@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Fixture;
 
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheWrite;
@@ -40,16 +41,16 @@ final class CacheHandlers
     }
 
     /**
-     * @return Cached<mixed>
-     * @throws RuntimeException when configured to fail the inquiry
+     * @return Promise<Cached<mixed>>
+     * A configured inquiry failure rejects the returned promise.
      */
-    public function fetch(): Cached
+    public function fetch(): Promise
     {
         if ($this->error !== null) {
-            throw $this->error;
+            return Promise::rejected($this->error);
         }
 
-        return $this->fetched;
+        return Promise::resolved($this->fetched);
     }
 
     /**

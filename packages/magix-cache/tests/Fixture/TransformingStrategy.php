@@ -6,6 +6,7 @@ namespace Tests\Fixture;
 
 use ArrayObject;
 use Closure;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
@@ -45,17 +46,18 @@ final readonly class TransformingStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>
-     * @param Closure(): Cached<mixed> $next
+     * @return Promise<Cached<mixed>>
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
         $this->log?->append($this->label.'.before');
-        $result = $next();
-        $this->log?->append($this->label.'.after');
+        return $next()->then(function (Cached $result): Cached {
+            $this->log?->append($this->label.'.after');
 
-        return $result->map(fn (mixed $value): array => [$this->label, $value]);
+            return $result->map(fn (mixed $value): array => [$this->label, $value]);
+        });
     }
 
     /**

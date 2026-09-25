@@ -32,14 +32,14 @@ final class KeySpreadExpirationStrategyTest extends TestCase
         $first = 'key';
         $second = 'key';
 
-        $fetched1 = $strategy->fetch($first, $handlers->fetch(...));
+        $fetched1 = $strategy->fetch($first, $handlers->fetch(...))->wait();
 
         $expiresAt = $fetched1->metadata->expiresAt;
 
         self::assertNotNull($expiresAt);
         self::assertGreaterThanOrEqual(130.0, $expiresAt);
         self::assertLessThanOrEqual(160.0, $expiresAt);
-        $fetched2 = $strategy->fetch($second, $handlers->fetch(...));
+        $fetched2 = $strategy->fetch($second, $handlers->fetch(...))->wait();
 
         self::assertSame($expiresAt, $fetched2->metadata->expiresAt);
     }
@@ -50,7 +50,7 @@ final class KeySpreadExpirationStrategyTest extends TestCase
         $handlers = new CacheHandlers(hit: null, fetched: Cached::of('value', new CacheMetadata(expiresAt: 110.0)));
         $key = 'key';
 
-        $fetched3 = $strategy->fetch($key, $handlers->fetch(...));
+        $fetched3 = $strategy->fetch($key, $handlers->fetch(...))->wait();
 
         self::assertGreaterThanOrEqual(130.0, $fetched3->metadata->expiresAt);
         self::assertLessThanOrEqual(160.0, $fetched3->metadata->expiresAt);
@@ -62,7 +62,7 @@ final class KeySpreadExpirationStrategyTest extends TestCase
         $handlers = new CacheHandlers(hit: null, fetched: Cached::of('value'));
         $key = 'key';
 
-        $fetched4 = $strategy->fetch($key, $handlers->fetch(...));
+        $fetched4 = $strategy->fetch($key, $handlers->fetch(...))->wait();
 
         self::assertSame(160.0, $fetched4->metadata->expiresAt);
     }
@@ -74,7 +74,7 @@ final class KeySpreadExpirationStrategyTest extends TestCase
         $handlers = new CacheHandlers(hit: null, fetched: $stale);
         $key = 'key';
 
-        $fetched5 = $strategy->fetch($key, $handlers->fetch(...));
+        $fetched5 = $strategy->fetch($key, $handlers->fetch(...))->wait();
 
         self::assertSame('stale', $fetched5->value());
         self::assertGreaterThanOrEqual(130.0, $fetched5->metadata->expiresAt);

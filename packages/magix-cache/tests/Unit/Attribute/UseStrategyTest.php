@@ -42,7 +42,7 @@ final class UseStrategyTest extends TestCase
         $handlers = new CacheHandlers(hit: null, fetched: Cached::of('origin'));
         $key = 'key';
 
-        $result = $strategy->fetch($key, $handlers->fetch(...));
+        $result = $strategy->fetch($key, $handlers->fetch(...))->wait();
 
 
         self::assertSame('origin', $result->value());

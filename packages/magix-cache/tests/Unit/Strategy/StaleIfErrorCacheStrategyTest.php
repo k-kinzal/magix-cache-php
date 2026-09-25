@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Strategy;
 
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Strategy\CacheRead;
@@ -35,7 +36,7 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         $next = new CacheHandlers($stale, Cached::of('unused'), retainedUntil: 130.0, error: new UpstreamUnavailable('down'));
 
         $read = $strategy->get($key, $next->get(...));
-        $answer = $strategy->fetch($key, $next->fetch(...));
+        $answer = $strategy->fetch($key, $next->fetch(...))->wait();
 
         self::assertSame($stale, $read?->cached);
         self::assertSame($stale, $answer);
@@ -70,7 +71,7 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         $clock->time = $now;
 
         $this->expectExceptionObject($error);
-        $strategy->fetch($key, $next->fetch(...));
+        $strategy->fetch($key, $next->fetch(...))->wait();
     }
 
     public function testFetchDeclinesAnUnacceptedFailure(): void
@@ -87,7 +88,7 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         $strategy->get($key, $next->get(...));
 
         $this->expectExceptionObject($error);
-        $strategy->fetch($key, $next->fetch(...));
+        $strategy->fetch($key, $next->fetch(...))->wait();
     }
 
     public function testFetchCannotUseAnotherStrategyInstancesCandidate(): void
@@ -105,7 +106,7 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         $first->get($key, $next->get(...));
 
         $this->expectExceptionObject($error);
-        $second->fetch($key, $next->fetch(...));
+        $second->fetch($key, $next->fetch(...))->wait();
     }
 
     public function testFetchPassesSuccessThrough(): void
@@ -114,7 +115,7 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         $cached = Cached::of('origin');
         $next = new CacheHandlers(null, $cached);
 
-        $result = $strategy->fetch('key', $next->fetch(...));
+        $result = $strategy->fetch('key', $next->fetch(...))->wait();
 
         self::assertSame($cached, $result);
     }
@@ -158,7 +159,7 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         $inner->get($key, static fn (): CacheRead => new CacheRead($innerCandidate, 130.0));
         $chain = new \Magix\Cache\Strategy\ComposedCacheStrategy($outer, $inner);
 
-        self::assertSame($innerCandidate, $chain->fetch($key, static fn (): Cached => throw new RuntimeException('origin failed')));
+        self::assertSame($innerCandidate, $chain->fetch($key, static fn (): Promise => throw new RuntimeException('origin failed'))->wait());
     }
 
     public function testSetReportsAndSuppressesAWriteOfItsServedCandidate(): void
@@ -170,7 +171,7 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         $next = $terminal;
         $strategy = new StaleIfErrorCacheStrategy(30, [RuntimeException::class], clock: new \Tests\Fixture\MutableClock(100.0), observer: $observer);
         $strategy->get($key, $next->get(...));
-        $recovered = $strategy->fetch($key, $next->fetch(...));
+        $recovered = $strategy->fetch($key, $next->fetch(...))->wait();
 
         self::assertSame($stale, $recovered);
         self::assertSame([], $observer->events);
@@ -188,7 +189,7 @@ final class StaleIfErrorCacheStrategyTest extends TestCase
         $next = $terminal;
         $strategy = new StaleIfErrorCacheStrategy(30, [RuntimeException::class], clock: new \Tests\Fixture\MutableClock(100.0), observer: $observer);
         $strategy->get($key, $next->get(...));
-        $strategy->fetch($key, $next->fetch(...));
+        $strategy->fetch($key, $next->fetch(...))->wait();
 
         $replacement = Cached::of('new recovery', new CacheMetadata(expiresAt: 160.0));
         $strategy->set($key, new CacheWrite($replacement), $next->set(...));

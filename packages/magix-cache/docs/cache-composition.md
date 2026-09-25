@@ -2,6 +2,8 @@
 
 This guide explains how `Cached<T>` propagates cache constraints through multi-stage queries.
 
+`AsyncCached<T>` provides the same composition laws without waiting; see [Asynchronous Cached Values](async-cached.md) for explicit synchronization and nested values.
+
 ## Why Composition Matters
 
 A query result is only as cacheable as the data used to build it. If a page combines a product that expires in 20 seconds with inventory that expires in 60 seconds, caching the page for 60 seconds would allow stale product data to survive too long.

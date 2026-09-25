@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Fixture;
 
 use Closure;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
@@ -35,12 +36,12 @@ final readonly class FailingStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>
+     * @return Promise<Cached<mixed>>
      * @throws RuntimeException when the strategy is executed
-     * @param Closure(): Cached<mixed> $next
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
         throw new RuntimeException($this->message);
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Magix\Cache\Strategy;
 
 use Closure;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Override;
 
@@ -50,14 +51,14 @@ final readonly class ComposedCacheStrategy implements CacheStrategy
      *
      * Delegated failures propagate unchanged.
      *
-     * @param Closure(): Cached<mixed> $next
-     * @return Cached<mixed>
+     * @param Closure(): Promise<Cached<mixed>> $next
+     * @return Promise<Cached<mixed>>
      */
     #[Override]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
         foreach (array_reverse($this->strategies) as $strategy) {
-            $next = static fn (): Cached => $strategy->fetch($key, $next);
+            $next = static fn (): Promise => Promise::call(static fn (): Promise => $strategy->fetch($key, $next));
         }
 
         return $next();

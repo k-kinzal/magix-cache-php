@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Fixture;
 
 use Closure;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
@@ -36,11 +37,11 @@ final readonly class RewritingStrategy implements CacheStrategy
     }
 
     /**
-     * @param Closure(): Cached<mixed> $next
-     * @return Cached<mixed>
+     * @param Closure(): Promise<Cached<mixed>> $next
+     * @return Promise<Cached<mixed>>
      */
     #[Override]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
         return $next();
     }

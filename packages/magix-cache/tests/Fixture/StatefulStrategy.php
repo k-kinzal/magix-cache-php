@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Fixture;
 
 use Closure;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
@@ -54,16 +55,16 @@ final class StatefulStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>
-     * @param Closure(): Cached<mixed> $next
+     * @return Promise<Cached<mixed>>
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
         ++$this->fetches;
-        $result = $this->child === null ? $next() : $this->child->fetch($key, $next);
+        $promise = $this->child === null ? $next() : $this->child->fetch($key, $next);
 
-        return Cached::of($result->value(), $result->metadata->withTags([...$result->metadata->tags, $this->label.':'.$this->lookups.':'.$this->fetches, 'lookup:'.$this->lookupKey]));
+        return $promise->then(fn (Cached $result): Cached => Cached::of($result->value(), $result->metadata->withTags([...$result->metadata->tags, $this->label.':'.$this->lookups.':'.$this->fetches, 'lookup:'.$this->lookupKey])));
     }
 
     /**

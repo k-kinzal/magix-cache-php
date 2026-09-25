@@ -6,6 +6,7 @@ namespace Tests\Package\Cli\Fixture\Expiration;
 
 use Closure;
 use LogicException;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
@@ -49,13 +50,13 @@ final readonly class DailyExpirationStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>
+     * @return Promise<Cached<mixed>>
      * @throws LogicException when this analysis-only fixture is executed
-     * @param Closure(): Cached<mixed> $next
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
     #[ExpiresAt(new ConstructorArg('at'), until: new ConstructorArg('until'), timezone: new ConstructorArg('timezone'))]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
         throw new LogicException('The analyzer must not execute the strategy.');
     }

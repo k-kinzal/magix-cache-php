@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Strategy;
 
 use ArrayObject;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheWrite;
 use Magix\Cache\Strategy\ComposedCacheStrategy;
@@ -36,7 +37,7 @@ final class ComposedCacheStrategyTest extends TestCase
         $terminal = new CacheHandlers(hit: null, fetched: Cached::of('origin'));
         $key = 'key';
 
-        $result = $composed->fetch($key, $terminal->fetch(...));
+        $result = $composed->fetch($key, $terminal->fetch(...))->wait();
 
 
         self::assertSame('origin', $result->value());
@@ -60,7 +61,7 @@ final class ComposedCacheStrategyTest extends TestCase
         $terminal = new CacheHandlers(hit: null, fetched: Cached::of('origin'));
         $key = 'key';
 
-        $fetched1 = $composed->fetch($key, $terminal->fetch(...));
+        $fetched1 = $composed->fetch($key, $terminal->fetch(...))->wait();
 
         self::assertSame('origin', $fetched1->value());
         self::assertSame(
@@ -104,21 +105,21 @@ final class ComposedCacheStrategyTest extends TestCase
     {
         /** @var ArrayObject<int, string> $events */
         $events = new ArrayObject();
-        $origin = static function () use ($events): Cached {
+        $origin = static function () use ($events): Promise {
             $events->append('origin');
 
-            return Cached::of(['origin', func_num_args()]);
+            return Promise::resolved(Cached::of(['origin', func_num_args()]));
         };
         $a = new \Tests\Fixture\TransformingStrategy('a', $events);
         $b = new \Tests\Fixture\TransformingStrategy('b', $events);
         $c = new \Tests\Fixture\TransformingStrategy('c', $events);
         $nested = new ComposedCacheStrategy(new ComposedCacheStrategy($a, $b), $c);
-        $result = $nested->fetch('key', $origin);
+        $result = $nested->fetch('key', $origin)->wait();
 
         self::assertSame(['a', ['b', ['c', ['origin', 0]]]], $result->value());
         self::assertSame(['a.before', 'b.before', 'c.before', 'origin', 'c.after', 'b.after', 'a.after'], $events->getArrayCopy());
         $rightAssociated = new ComposedCacheStrategy($a, new ComposedCacheStrategy($b, $c));
-        self::assertEquals($result, $rightAssociated->fetch('key', $origin));
+        self::assertEquals($result, $rightAssociated->fetch('key', $origin)->wait());
     }
 
     public function testEmptyCompositionCallsEachOperationUnchanged(): void
@@ -129,7 +130,7 @@ final class ComposedCacheStrategyTest extends TestCase
         $request = new CacheWrite($cached);
 
         self::assertSame($cached, $composed->get('key', $handlers->get(...))?->cached);
-        self::assertSame($cached, $composed->fetch('key', $handlers->fetch(...)));
+        self::assertSame($cached, $composed->fetch('key', $handlers->fetch(...))->wait());
         $composed->set('key', $request, $handlers->set(...));
         self::assertSame($request, $handlers->stored);
     }
@@ -182,7 +183,7 @@ final class ComposedCacheStrategyTest extends TestCase
         $error = new \Tests\Fixture\UpstreamUnavailable('down');
 
         try {
-            $strategy->fetch('key', static fn (): Cached => throw $error);
+            $strategy->fetch('key', static fn (): Promise => throw $error)->wait();
             self::fail('The delegated failure must propagate.');
         } catch (\Tests\Fixture\UpstreamUnavailable $caught) {
             self::assertSame($error, $caught);

@@ -14,6 +14,10 @@ deptrac:
       collectors:
         - type: directory
           value: packages/magix-cache/src/Attribute/.*
+    - name: Async
+      collectors:
+        - type: directory
+          value: packages/magix-cache/src/Async/.*
     - name: Metadata
       collectors:
         - type: directory
@@ -80,6 +84,7 @@ deptrac:
           value: packages/magix-cache-cli/src/Key/.*
   ruleset:
     CoreApi:
+      - Async
       - Observation
       - Composition
       - Metadata
@@ -96,12 +101,15 @@ deptrac:
       - CoreApi
       - Metadata
     Metadata: ~
+    Async: ~
     Strategy:
+      - Async
       - CoreApi
       - Metadata
       - Clock
       - Observation
     Runtime:
+      - Async
       - Clock
       - Observation
       - CoreApi

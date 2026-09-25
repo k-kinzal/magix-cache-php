@@ -6,6 +6,7 @@ namespace Tests\Package\Cli\Fixture\TtlAlternatives;
 
 use Closure;
 use InvalidArgumentException;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Clock\SystemClock;
 use Magix\Cache\Strategy\CacheRead;
@@ -59,20 +60,21 @@ final readonly class ConditionalTtlStrategy implements CacheStrategy
     /**
      * Delegated failures propagate unchanged.
      *
-     * @return Cached<mixed>
-     * @param Closure(): Cached<mixed> $next
+     * @return Promise<Cached<mixed>>
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
     #[Ttl(new ConstructorArg('normal'), new TtlRange(min: new ConstructorArg('minimum'), max: new ConstructorArg('maximum')))]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
-        $result = $next();
+        return $next()->then(function (Cached $result) use ($key): Cached {
 
-        $ttl = (int) (float) $this->clock->now()->format('U.u') % 86400 < 21600
-            ? $this->minimum + crc32($key) % ($this->maximum - $this->minimum + 1)
-            : $this->normal;
+            $ttl = (int) (float) $this->clock->now()->format('U.u') % 86400 < 21600
+                ? $this->minimum + crc32($key) % ($this->maximum - $this->minimum + 1)
+                : $this->normal;
 
-        return Cached::of($result->value(), $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + ($ttl)));
+            return Cached::of($result->value(), $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + ($ttl)));
+        });
     }
 
     /**

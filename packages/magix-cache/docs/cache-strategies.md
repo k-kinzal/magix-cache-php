@@ -11,29 +11,31 @@ Every strategy also publishes what it guarantees as a *contract*. The runtime ex
 ## The CacheStrategy Interface
 
 ```php
+use Magix\Cache\Async\Promise;
+
 interface CacheStrategy
 {
     public function get(string $key, Closure $next): ?CacheRead;
-    public function fetch(string $key, Closure $next): Cached;
+    public function fetch(string $key, Closure $next): Promise;
     public function set(string $key, CacheWrite $request, Closure $next): void;
 }
 ```
 
-Each `cached()` call constructs a fresh strategy composition, including every nested child. The same objects participate in that call's `get`, `fetch`, and `set`; a later call or a nested call gets different objects. Strategies may keep execution state in their own properties. The library does not require them to be pure or to support concurrent reuse of one object.
+Each `cached()` or `asyncCached()` call constructs a fresh strategy composition, including every nested child. The same objects participate in that call's `get`, `fetch`, and `set`; a later call or a nested call gets different objects. Strategies may keep execution state in their own properties. The library does not require them to be pure or to support concurrent reuse of one object.
 
 Each `$next` is an ordinary Closure for that operation:
 
 | Middleware | `$next` type | Delegation |
 | --- | --- | --- |
 | `get` | `Closure(string): ?CacheRead` | `$next($key)` |
-| `fetch` | `Closure(): Cached` | `$next()` |
+| `fetch` | `Closure(): Promise<Cached<mixed>>` | `$next()` |
 | `set` | `Closure(string, CacheWrite): void` | `$next($key, $request)` |
 
 `get()` can rewrite the lookup key and the returned `CacheRead` (Cached plus physical retention). The runtime judges freshness afterward. `set()` can rewrite the key and immutable `CacheWrite`, or decline the write. `retainUntil()` changes physical retention only; the runtime rechecks storage eligibility at the actual write. Fetch receives the boundary key for key-dependent metadata rules, such as spreading expirations. Its delegated inquiry takes no arguments.
 
 `ComposedCacheStrategy` nests these closures itself and implements the same interface. `new ComposedCacheStrategy()` and `StrategyDefinition::compose()` with no children are identities: they call the supplied operation unchanged. With no declared Strategy, Runtime calls its actual read, origin inquiry and write directly. Those operations do not implement `CacheStrategy`.
 
-For fetch, composition means `A(B(origin))`: A delegates to B, B delegates to the origin closure, and the result returns through B then A. Runtime invokes the composed fetch on a miss. A fresh hit skips it. Returning without delegating skips the remainder of the inquiry; runtime does not call the origin separately. Every returned Cached enters the same set chain.
+For fetch, composition means `A(B(origin))`: A delegates to B, B delegates to the origin closure, and the result returns through B then A. Runtime invokes the composed fetch on a miss. A fresh hit skips it. Returning without delegating skips the remainder of the inquiry; runtime does not call the origin separately. Every resolved Cached enters the same set chain, registered with `then`.
 
 The origin is an argument-free closure whose inputs are captured normally:
 
@@ -43,7 +45,7 @@ return $this->cached(fn (): Cached => Cached::of($this->client->fetch($id)));
 
 The fetch key identifies the cache boundary; it is not passed to the origin callback. Clock and observation dependencies are constructor parameters, separate from operation data. There is no acquired value or TTL base time in the fetch input.
 
-Exception handling is ordinary middleware code around the delegated call. It covers the inner middleware and the actual inquiry, according to composition order. Runtime does not turn exceptions into another result type or run a separate recovery operation. A returned Cached has no source or store-control flag.
+Rejection handling is ordinary Promise continuation code around the delegated inquiry. `Promise::call($next)->recover(...)` also includes synchronous delegate failures. It covers the inner middleware and the actual inquiry, according to composition order. Runtime does not turn exceptions into another result type or run a separate recovery operation. A returned Cached has no source or store-control flag.
 
 ## Declaring a Composition
 
@@ -104,14 +106,12 @@ final readonly class ProductFreshnessStrategy implements CacheStrategy
     ) {}
 
     #[Ttl(new ConstructorArg('minimum'))]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
-        $result = $next();
-
-        return Cached::of(
+        return $next()->then(fn (Cached $result): Cached => Cached::of(
             $result->value(),
             $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + $this->minimum),
-        );
+        ));
     }
 }
 ```
@@ -156,7 +156,7 @@ Constructor references can appear as points or within ranges:
 
 `#[AssumeTtl(ExternalStrategy::class, 30, new TtlRange(min: new Arg('minimum'), max: 900))]` supports the same alternatives for its one named child, with references bound to `create()` arguments. `#[AssumeTtl(ExternalStrategy::class)]` explicitly assumes that an opaque child does not override TTL; omitting the assumption leaves an unreadable child unknown.
 
-The strategy's `fetch()` implementation selects a lifetime and returns `Cached::of($result->value(), $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + $ttl))`. For time-dependent behavior, evaluate the time window there using its injected clock and the intended timezone. Static-argument `create()` definitions are memoized; they must not freeze a current-time decision into the construction recipe. Fresh cache hits retain their existing expiration and do not run `fetch()`.
+The strategy's `fetch()` continuation selects a lifetime and returns `Cached::of($result->value(), $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + $ttl))`. For time-dependent behavior, evaluate the time window there using its injected clock and the intended timezone. Static-argument `create()` definitions are memoized; they must not freeze a current-time decision into the construction recipe. Fresh cache hits retain their existing expiration and do not run `fetch()`.
 
 Alternatives are carried through dependencies and parent policies without filling their gaps:
 
@@ -255,12 +255,10 @@ Policy, parameter and dynamic TTL share the runtime's origin-success timestamp. 
 `StaleIfErrorCacheStrategy` records a retained candidate in `get()`. Its fetch is ordinary middleware:
 
 ```php
-try {
-    return $next();
-} catch (RuntimeException $error) {
+return Promise::call($next)->recover(function (RuntimeException $error): Cached {
     // Select an eligible candidate using this strategy's own state,
     // or rethrow the same exception when it cannot answer.
-}
+});
 ```
 
 It checks configured exception types, expiration, physical retention and maximum age. It returns the selected Cached with its stored metadata. If that exact object reaches `set()`, it notifies its injected Observer with `CacheEvent::StaleServed` and suppresses its write. A replacement from an outer middleware goes through ordinary retention and storage handling. These decisions belong to StaleIfError alone.
@@ -271,7 +269,7 @@ Order matters for both exceptions and returned values. `compose(StaleIfError, Tt
 
 ## Implementing Fetch Middleware
 
-Forward an inquiry with `return $next();`. To change its output, transform the returned Cached using `map()` or explicit metadata replacements. Handle a declared failure with a catch around the same delegated call. There is no `recover()` operation or special success/failure/source result wrapper.
+Forward an inquiry with `return $next();`. Transform the resolved Cached inside `then`, using `map()` or explicit metadata replacements. Short-circuit with `Promise::resolved(Cached::of($replacement))`. Use `Promise::call($next)->recover(...)` for declared runtime failures, including later rejections. The Strategy interface still has only get/fetch/set; recovery is a Promise continuation. See [Asynchronous Cached Values](async-cached.md).
 
 ## What the Analyzer Shows
 
@@ -316,7 +314,7 @@ The analyzer derives results from contracts and construction code; it does not p
 ```php
 #[Ttl(min: new ConstructorArg('minimum'), max: new ConstructorArg('maximum'))]
 #[WritesMetadata(visibility: true)]
-public function fetch(string $key, Closure $next): Cached
+public function fetch(string $key, Closure $next): Promise
 ```
 
 Omitting the attribute declares that every one of those fields is preserved, the same promise an omitted `#[Ttl]` makes about expiration. Supplying it with no arguments declares that all three are replaced with values the declaration cannot describe, so the analyzer reports them as unknown. Naming fields declares exactly those, and the fields left out stay as precise as the dependencies made them.

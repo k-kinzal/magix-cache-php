@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Strategy;
 
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CacheWrite;
@@ -30,16 +31,16 @@ final class CacheStrategyTest extends TestCase
     public function testFetchReceivesItsKeyAndOperationClosure(): void
     {
         $key = 'key';
-        $next = static fn (): Cached => Cached::of('value');
+        $next = static fn (): Promise => Promise::resolved(Cached::of('value'));
         $produced = Cached::of('value');
         $strategy = $this->createMock(CacheStrategy::class);
         $strategy
             ->expects(self::once())
             ->method('fetch')
             ->with($key, $next)
-            ->willReturn($produced);
+            ->willReturn(Promise::resolved($produced));
 
-        self::assertSame($produced, $strategy->fetch($key, $next));
+        self::assertSame($produced, $strategy->fetch($key, $next)->wait());
     }
 
     public function testSetReceivesTheProducedResult(): void

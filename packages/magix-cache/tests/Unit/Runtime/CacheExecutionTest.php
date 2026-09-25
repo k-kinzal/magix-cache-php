@@ -88,7 +88,7 @@ final class CacheExecutionTest extends TestCase
         );
         $key = 'key';
 
-        $result = $execution->fetch($key);
+        $result = $execution->fetch($key)->wait();
 
         self::assertSame(0, $result->value());
         self::assertSame(130.0, $result->metadata->expiresAt);
@@ -138,7 +138,7 @@ final class CacheExecutionTest extends TestCase
         $execution = new CacheExecution(new GuardedCache(new MemoryCache()), null, static fn (): Cached => throw $error, new \Magix\Cache\Clock\UnixClock(new \Tests\Fixture\MutableClock(100.0)));
 
         $this->expectExceptionObject($error);
-        $execution->fetch('key');
+        $execution->fetch('key')->wait();
     }
     public function testFetchAppliesLocalSettingsAtOneTimeAfterTheOriginReturns(): void
     {
@@ -170,7 +170,7 @@ final class CacheExecutionTest extends TestCase
             parameterTtl: 90,
         );
 
-        $result = $execution->fetch('key');
+        $result = $execution->fetch('key')->wait();
 
         self::assertSame(119.25, $clock->time);
         self::assertSame(109.25, $result->metadata->expiresAt);

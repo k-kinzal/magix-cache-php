@@ -10,6 +10,7 @@ vendor_dev:
   - 'psr/cache'
   - 'psr/simple-cache'
   - 'psr/clock'
+  - 'guzzlehttp/promises'
 
 exclude: []
 

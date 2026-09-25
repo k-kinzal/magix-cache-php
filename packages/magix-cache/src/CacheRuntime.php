@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Magix\Cache;
 
 use LogicException;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cache\Cache;
 use Magix\Cache\Clock\SystemClock;
 use Magix\Cache\Clock\UnixClock;
@@ -67,6 +68,20 @@ final readonly class CacheRuntime
      */
     public function execute(CacheInvocation $invocation): Cached
     {
+        return $this->executeAsync($invocation)->toCached();
+    }
+
+    /**
+     * Starts a boundary and registers its write after successful completion.
+     *
+     * @template T
+     * @param CacheInvocation<T> $invocation
+     * @return AsyncCached<T>
+     * @throws RuntimeException when lookup fails
+     * @throws LogicException when a referenced extension is not registered
+     */
+    public function executeAsync(CacheInvocation $invocation): AsyncCached
+    {
         $clock = new UnixClock($this->clock);
         $key = $this->keyStrategy->generate($invocation->context->withNamespace($this->namespace));
         $execution = new CacheExecution(
@@ -88,22 +103,30 @@ final readonly class CacheRuntime
             if ($read !== null && $read->isFresh($clock->now())) {
                 $this->observer?->observe(CacheEvent::FreshHit, $key);
 
-                return $read->cached;
+                return AsyncCached::fromCached($read->cached);
             }
 
             $this->observer?->observe(CacheEvent::Miss, $key);
         }
 
-        /** @var Cached<T> $result */
-        $result = $strategy === null ? $execution->fetch($key) : $strategy->fetch($key, static fn (): Cached => $execution->fetch($key));
+        $promise = Promise::call(static fn (): Promise => $strategy === null
+            ? $execution->fetch($key)
+            : $strategy->fetch($key, static fn (): Promise => $execution->fetch($key)));
 
-        if ($strategy === null) {
-            $execution->set($key, new CacheWrite($result));
-        } else {
-            $strategy->set($key, new CacheWrite($result), $execution->set(...));
-        }
+        $store = static function (Cached $result) use ($strategy, $execution, $key): Cached {
+            if ($strategy === null) {
+                $execution->set($key, new CacheWrite($result));
+            } else {
+                $strategy->set($key, new CacheWrite($result), $execution->set(...));
+            }
 
-        return $result;
+            return $result;
+        };
+
+        /** @var Promise<Cached<T>> $stored Middleware and storage preserve the boundary's payload type. */
+        $stored = $promise->then($store);
+
+        return AsyncCached::fromCachedPromise($stored);
     }
 
 }

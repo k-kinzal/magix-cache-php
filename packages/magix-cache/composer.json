@@ -21,6 +21,7 @@
     ],
     "require": {
         "php": "^8.3",
+        "guzzlehttp/promises": "^2.3 || ^3.0",
         "psr/cache": "^3.0",
         "psr/clock": "^1.0",
         "psr/simple-cache": "^3.0"

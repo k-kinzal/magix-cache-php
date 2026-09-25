@@ -1,0 +1,17 @@
+<?php
+
+namespace GuzzleHttp\Promise;
+
+/**
+ * @template TValue = mixed
+ * @template TReason = mixed
+ */
+interface PromiseInterface
+{
+    /**
+     * @return ($unwrap is true ? TValue : null)
+     * @throws \RuntimeException when a rejected runtime failure is unwrapped
+     * @throws \LogicException when waiting cannot settle the promise
+     */
+    public function wait(bool $unwrap = true);
+}

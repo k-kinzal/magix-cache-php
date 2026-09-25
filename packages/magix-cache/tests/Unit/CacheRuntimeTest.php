@@ -696,4 +696,20 @@ final class CacheRuntimeTest extends TestCase
         self::assertSame($plainObserver->events, $emptyObserver->events);
         self::assertSame([CacheEvent::Miss, CacheEvent::Stored, CacheEvent::FreshHit], $emptyObserver->events);
     }
+    public function testExecuteAsyncKeepsOriginPendingUntilThePromiseQueueRuns(): void
+    {
+        $source = new \Tests\Fixture\PendingResult('value');
+        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
+        $invocation = new CacheInvocation(
+            new CacheKeyContext('', 'Query', 'Query', 'fetch', [], '0', ''),
+            new CachePolicy(ttl: 20),
+            static fn (): \Magix\Cache\AsyncCached => \Magix\Cache\AsyncCached::fromPromise($source->promise()),
+        );
+        $result = $runtime->executeAsync($invocation);
+        self::assertSame(0, $source->waits);
+        self::assertSame('value', $result->value());
+        self::assertSame(120.0, $result->toCached()->metadata->expiresAt);
+        self::assertSame(1, $source->waits);
+    }
+
 }

@@ -61,9 +61,9 @@ final class StrategyDefinitionTest extends TestCase
         $key = 'key';
         $next = new CacheHandlers(null, Cached::of('value'));
         $first->get($key, $next->get(...));
-        $firstResult = $first->fetch($key, $next->fetch(...));
+        $firstResult = $first->fetch($key, $next->fetch(...))->wait();
         $second->get($key, $next->get(...));
-        $secondResult = $second->fetch($key, $next->fetch(...));
+        $secondResult = $second->fetch($key, $next->fetch(...))->wait();
 
 
         self::assertSame(['lookup:key', 'state:1:1'], $firstResult->metadata->tags);

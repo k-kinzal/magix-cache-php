@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Magix\Cache\Runtime;
 
 use Closure;
+use Magix\Cache\Async\Promise;
+use Magix\Cache\AsyncCached;
 use Magix\Cache\Cached;
 use Magix\Cache\CachePolicy;
 use Magix\Cache\Clock\UnixClock;
@@ -22,7 +24,7 @@ use RuntimeException;
  * Lookups expose retained data and writes recheck storage eligibility.
  * Fetch executes the argument-free origin closure,
  * then applies local boundary settings before returning the Cached result.
- * Exceptions propagate through the ordinary middleware call stack.
+ * Failures reject the inquiry promise and propagate through middleware continuations.
  *
  * @internal
  */
@@ -33,7 +35,7 @@ final readonly class CacheExecution
     /**
      * Supplies storage, the origin and boundary settings for one execution.
      *
-     * @param Closure(): Cached<mixed> $origin
+     * @param Closure(): (Cached<mixed>|AsyncCached<mixed>) $origin
      * @param int<0, max>|null $parameterTtl Validated invocation lifetime.
      */
     public function __construct(
@@ -68,22 +70,29 @@ final readonly class CacheExecution
      *
      * Exceptions from the origin and local resolver propagate unchanged.
      *
-     * @return Cached<mixed>
+     * @return Promise<Cached<mixed>>
      */
-    public function fetch(string $key): Cached
+    public function fetch(string $key): Promise
     {
-        $result = ($this->origin)();
-        $baseTime = $this->clock->now();
-        $metadata = (new BoundaryMetadata())->apply(
-            $this->policy,
-            $this->ttlResolver,
-            $result,
-            $key,
-            $baseTime,
-            $this->parameterTtl,
-        );
+        return Promise::call(function (): Promise {
+            $result = ($this->origin)();
 
-        return Cached::of($result->value(), $metadata);
+            return $result instanceof AsyncCached
+                ? Promise::bridge($result->toCached(...), $result->subscribe(...))
+                : Promise::resolved($result);
+        })->then(function (Cached $result) use ($key): Cached {
+            $baseTime = $this->clock->now();
+            $metadata = (new BoundaryMetadata())->apply(
+                $this->policy,
+                $this->ttlResolver,
+                $result,
+                $key,
+                $baseTime,
+                $this->parameterTtl,
+            );
+
+            return Cached::of($result->value(), $metadata);
+        });
     }
 
     /**

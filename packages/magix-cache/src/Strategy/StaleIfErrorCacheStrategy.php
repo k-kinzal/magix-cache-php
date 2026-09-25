@@ -9,6 +9,7 @@ use InvalidArgumentException;
 
 use function is_a;
 
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Clock\SystemClock;
 use Magix\Cache\Observation\CacheEvent;
@@ -75,16 +76,14 @@ final class StaleIfErrorCacheStrategy implements CacheStrategy
     /**
      * Handles an eligible failure from the delegated inquiry with retained data.
      *
-     * @return Cached<mixed>
+     * @return Promise<Cached<mixed>>
      * @throws RuntimeException when a delegate fails
-     * @param Closure(): Cached<mixed> $next
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
-        try {
-            return $next();
-        } catch (RuntimeException $error) {
+        return Promise::call($next)->recover(function (RuntimeException $error): Cached {
             $accepted = false;
 
             foreach ($this->exceptions as $type) {
@@ -107,7 +106,7 @@ final class StaleIfErrorCacheStrategy implements CacheStrategy
             $this->served = $candidate->cached;
 
             return $this->served;
-        }
+        });
     }
 
     /**

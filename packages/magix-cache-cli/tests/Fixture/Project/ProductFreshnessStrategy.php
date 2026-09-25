@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Package\Cli\Fixture\Project;
 
 use Closure;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Clock\SystemClock;
 use Magix\Cache\Strategy\CacheRead;
@@ -43,18 +44,19 @@ final readonly class ProductFreshnessStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>
-     * @param Closure(): Cached<mixed> $next
+     * @return Promise<Cached<mixed>>
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
     #[Ttl(min: new ConstructorArg('minimum'))]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
-        $result = $next();
+        return $next()->then(function (Cached $result): Cached {
 
-        $volatility = max($this->minimum, $this->lifetime($result->value()));
+            $volatility = max($this->minimum, $this->lifetime($result->value()));
 
-        return Cached::of($result->value(), $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + ($volatility)));
+            return Cached::of($result->value(), $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + ($volatility)));
+        });
     }
 
     /**

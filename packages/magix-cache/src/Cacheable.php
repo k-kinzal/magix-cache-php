@@ -35,15 +35,14 @@ trait Cacheable
      * inquiry; middleware controls delegation and result processing on a miss.
      *
      * @template T
-     * @param Closure(): Cached<T> $compute
+     * @param Closure(): (Cached<T>|AsyncCached<T>) $compute
      * @return Cached<T>
      * @throws LogicException when the calling boundary cannot be identified or declares no #[Cache]
      * @throws RuntimeException when an origin failure is not recovered or a delegated stage fails
      */
     final protected function cached(Closure $compute): Cached
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
-        $caller = $trace[1] ?? throw new LogicException('Unable to identify the method that called cached().');
+        $caller = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2)[1] ?? throw new LogicException('Unable to identify the calling cache boundary.');
 
         if (($caller['object'] ?? null) !== $this || str_contains($caller['function'], '{closure')) {
             throw new LogicException('cached() must be called directly from the boundary method, not through a helper or closure.');
@@ -52,8 +51,29 @@ trait Cacheable
         $definitions = self::$magixCacheDefinitions ??= new CacheDefinitionResolver();
         $definition = $definitions->resolve($this, $caller['function']);
 
-        return CacheRuntimeRegistry::resolve($definition->runtime)->execute(
-            $definition->invocation($caller['args'] ?? [], $compute),
-        );
+        return CacheRuntimeRegistry::resolve($definition->runtime)->execute($definition->invocation($caller['args'] ?? [], $compute));
+    }
+
+    /**
+     * Starts a declared boundary without waiting for its result or cache write.
+     *
+     * @template T
+     * @param Closure(): (Cached<T>|AsyncCached<T>) $compute
+     * @return AsyncCached<T>
+     * @throws LogicException when the calling boundary is invalid
+     * @throws RuntimeException when a cache lookup fails
+     */
+    final protected function asyncCached(Closure $compute): AsyncCached
+    {
+        $caller = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2)[1] ?? throw new LogicException('Unable to identify the calling cache boundary.');
+
+        if (($caller['object'] ?? null) !== $this || str_contains($caller['function'], '{closure')) {
+            throw new LogicException('cached() must be called directly from the boundary method, not through a helper or closure.');
+        }
+
+        $definitions = self::$magixCacheDefinitions ??= new CacheDefinitionResolver();
+        $definition = $definitions->resolve($this, $caller['function']);
+
+        return CacheRuntimeRegistry::resolve($definition->runtime)->executeAsync($definition->invocation($caller['args'] ?? [], $compute));
     }
 }

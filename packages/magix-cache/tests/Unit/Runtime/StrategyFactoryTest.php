@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Runtime;
 
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Observation\CacheEvent;
@@ -37,7 +38,7 @@ final class StrategyFactoryTest extends TestCase
         $strategy = $definition->instantiate($factory->create(...));
         $clock->advance(7.0);
 
-        $result = $strategy->fetch('key', static fn (): Cached => Cached::of('value'));
+        $result = $strategy->fetch('key', static fn (): Promise => Promise::resolved(Cached::of('value')))->wait();
 
         self::assertSame(137.0, $result->metadata->expiresAt);
     }
@@ -49,7 +50,7 @@ final class StrategyFactoryTest extends TestCase
         $strategy = $factory->create(StaleIfErrorCacheStrategy::class, ['maxAge' => 30, 'exceptions' => [RuntimeException::class]]);
         $cached = Cached::of('retained', new CacheMetadata(expiresAt: 90.0));
         $strategy->get('key', static fn (): CacheRead => new CacheRead($cached, 120.0));
-        $result = $strategy->fetch('key', static fn (): Cached => throw new RuntimeException('down'));
+        $result = $strategy->fetch('key', static fn (): Cached => throw new RuntimeException('down'))->wait();
         $handlers = new CacheHandlers(null, Cached::of('unused'));
         $strategy->set('key', new CacheWrite($result), $handlers->set(...));
 
@@ -62,7 +63,7 @@ final class StrategyFactoryTest extends TestCase
         $factory = new StrategyFactory(new MutableClock(100.0), null);
         $strategy = $factory->create(KeySpreadExpirationStrategy::class, [30, 30, new MutableClock(200.0)]);
 
-        self::assertSame(230.0, $strategy->fetch('key', static fn (): Cached => Cached::of('value'))->metadata->expiresAt);
+        self::assertSame(230.0, $strategy->fetch('key', static fn (): Promise => Promise::resolved(Cached::of('value')))->wait()->metadata->expiresAt);
     }
 
     public function testCreateConstructsIndependentStateWithoutRequiringDependencies(): void
@@ -75,7 +76,7 @@ final class StrategyFactoryTest extends TestCase
         self::assertInstanceOf(StatefulStrategy::class, $second);
         $handlers = new CacheHandlers(null, Cached::of('value'));
         $first->get('key', $handlers->get(...));
-        $result = $first->fetch('key', $handlers->fetch(...));
+        $result = $first->fetch('key', $handlers->fetch(...))->wait();
         $first->set('key', new CacheWrite($result), $handlers->set(...));
 
         self::assertSame([1, 1, 1], [$first->lookups, $first->fetches, $first->stores]);

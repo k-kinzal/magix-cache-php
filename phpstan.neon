@@ -19,7 +19,27 @@ parameters:
             - PHPUnit\Framework\MockObject\Exception
     stubFiles:
         - phpstan-stubs/serialize.stub
+        - phpstan-stubs/promise.stub
     ignoreErrors:
+        # Promise validation is an invariant of AsyncCached itself. Exposing
+        # this implementation check or moving it to a public collaborator
+        # would add an unrelated API solely to satisfy method visibility.
+        -
+            identifier: customRules.nonPublicMethod
+            path: packages/magix-cache/src/AsyncCached.php
+            count: 1
+        # flatten registers validation inside a continuation. The rejection
+        # is surfaced only when this async result is synchronized.
+        -
+            identifier: throws.unusedType
+            path: packages/magix-cache/src/AsyncCached.php
+            count: 1
+        # fetch registers the documented RuntimeException rethrow as an
+        # asynchronous rejection callback; it is observable on wait().
+        -
+            identifier: throws.unusedType
+            path: packages/magix-cache/src/Strategy/StaleIfErrorCacheStrategy.php
+            count: 1
         # Attribute repeatability is public PHP behavior, enforced only when
         # ReflectionAttribute::newInstance() materializes the declarations.
         # This regression test reads public attributes, never private state;

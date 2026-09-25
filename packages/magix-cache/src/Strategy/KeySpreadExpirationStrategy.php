@@ -9,6 +9,7 @@ use Closure;
 use function crc32;
 
 use InvalidArgumentException;
+use Magix\Cache\Async\Promise;
 use Magix\Cache\Cached;
 use Magix\Cache\Clock\SystemClock;
 use Magix\Cache\Strategy\Contract\ConstructorArg;
@@ -70,17 +71,18 @@ final readonly class KeySpreadExpirationStrategy implements CacheStrategy
      *
      * Delegated failures propagate unchanged.
      *
-     * @return Cached<mixed>
-     * @param Closure(): Cached<mixed> $next
+     * @return Promise<Cached<mixed>>
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
     #[Ttl(min: new ConstructorArg('minimum'), max: new ConstructorArg('maximum'))]
-    public function fetch(string $key, Closure $next): Cached
+    public function fetch(string $key, Closure $next): Promise
     {
-        $result = $next();
+        return $next()->then(function (Cached $result) use ($key): Cached {
+            $spread = crc32($key) % ($this->maximum - $this->minimum + 1);
 
-        $spread = crc32($key) % ($this->maximum - $this->minimum + 1);
-        return Cached::of($result->value(), $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + ($this->minimum + $spread)));
+            return Cached::of($result->value(), $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + ($this->minimum + $spread)));
+        });
     }
 
     /**

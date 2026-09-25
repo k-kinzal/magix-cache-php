@@ -7,10 +7,10 @@ namespace Magix\Cache\Runtime;
 use Closure;
 use Magix\Cache\Cache\Cache;
 use Magix\Cache\Cache\CacheEntry;
+use Magix\Cache\Observation\CacheEvent;
+use Magix\Cache\Observation\CacheObserver;
 use Magix\Cache\Runtime\Extension\BackendErrorClassifier;
 use Magix\Cache\Runtime\Extension\CacheAccess;
-use Magix\Cache\Runtime\Extension\CacheEvent;
-use Magix\Cache\Runtime\Extension\CacheObserver;
 use RuntimeException;
 
 /**

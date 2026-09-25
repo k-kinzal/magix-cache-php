@@ -4,64 +4,55 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Strategy;
 
+use Closure;
+use Magix\Cache\Cached;
 use RuntimeException;
 
 /**
- * One composable unit of cache behavior with the contract it publishes.
+ * Middleware over cache reads, argument-free origin inquiries and cache writes.
  *
- * A strategy participates in the fixed stage order of the runtime — lookup,
- * origin execution, store — by wrapping the same three operations of the
- * strategies behind it. Composing strategies yields another CacheStrategy,
- * so a composition can be composed again; the order is meaningful, because
- * it decides pre- and post-processing, the capture range of failures, and
- * which delegations are short-circuited.
+ * Each next closure performs just the corresponding operation. Middleware may
+ * change its arguments or response, catch its declared failures, or not call it.
+ * A composition implements this same interface. It neither owns the actual
+ * operations nor requires them to implement CacheStrategy.
  *
- * Each boundary execution constructs its own strategy objects, including
- * every child. They may hold execution state across get/fetch/set.
- *
- * A strategy publishes the effects it guarantees as contract attributes on
- * its operations, such as Contract\Ttl on fetch(). The analyzer derives the
- * composed behavior from those contracts and the construction code alone,
- * so the implementation is free as long as it honors what it declared.
+ * One invocation uses fresh instances, shared across get/fetch/set. Dependencies
+ * such as clocks belong to constructors; operation arguments contain only data.
  */
 interface CacheStrategy
 {
     /**
-     * Returns a storage candidate for this operation, or null for a miss.
+     * Wraps a read by key; the runtime judges the returned candidate's freshness.
      *
-     * Delegating exposes physically retained data, including expired entries.
-     * The runtime judges freshness after the chain returns. A strategy owns
-     * any candidate it needs across the stages of this one execution.
-     *
+     * @param Closure(string): (CacheRead<mixed>|null) $next Reads the supplied key.
      * @return CacheRead<mixed>|null
-     * @throws RuntimeException when a delegated read fails with declared behavior
+     * @throws RuntimeException when the middleware or delegated read fails
      */
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead;
+    public function get(string $key, Closure $next): ?CacheRead;
 
     /**
-     * Produces the value of the boundary with this strategy's explicit overrides.
+     * Wraps an origin inquiry and may transform its Cached response.
      *
-     * Delegating reaches the origin computation at the end of the chain.
-     * OriginResult carries the successful value after local policy, parameter
-     * and dynamic overrides, with its single base time. withTtl() and
-     * withMetadata() replace fields; outer fetch wrappers run last. OriginFailure carries
-     * only declared origin behavior. CacheAnswer ends the execution without
-     * applying origin overrides or storing the answer again.
+     * The key identifies this cache boundary for key-dependent metadata rules.
+     * It is not an origin input: next takes no arguments. Every response must
+     * preserve the boundary's value type and honor declared metadata effects.
      *
-     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
-     * @throws RuntimeException when the origin or a delegate fails with declared behavior
+     * @param Closure(): Cached<mixed> $next Performs the argument-free inquiry.
+     * @return Cached<mixed>
+     * @throws RuntimeException when the middleware or delegated inquiry fails
      */
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer;
+    public function fetch(string $key, Closure $next): Cached;
 
     /**
-     * Stores the produced value, or refuses to by not delegating.
+     * Wraps a write by key and may replace or decline its request.
      *
-     * Delegating reaches the re-judged storage write at the end of the
-     * chain. A strategy may extend the request's physical retention before
-     * delegating; extending retention never changes the expiration itself.
+     * Physical retention is independent of the Cached value's expiration.
+     * The actual write rechecks storage eligibility after middleware returns
+     * its arguments to next.
      *
-     * @param CacheWrite<mixed> $result
-     * @throws RuntimeException when a delegated write fails with declared behavior
+     * @param CacheWrite<mixed> $request
+     * @param Closure(string, CacheWrite<mixed>): void $next Writes the supplied request.
+     * @throws RuntimeException when the middleware or delegated write fails
      */
-    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void;
+    public function set(string $key, CacheWrite $request, Closure $next): void;
 }

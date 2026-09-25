@@ -52,6 +52,24 @@ final class TreeProjectionTest extends TestCase
         self::assertFalse($withoutDeclaration);
     }
 
+    public function testARowThatChangesItsCompositionIsNotReplacedByDependenciesItDetached(): void
+    {
+        $node = ReportSource::node('Composing::get');
+        $projection = new TreeProjection([], UncachedMode::None);
+        $visible = $projection->root($node)[0];
+        self::assertSame(['Leaf::get', 'Detaching::get'], array_map(static fn ($child): string => $child->boundary->id(), $visible->children));
+        self::assertSame(['Relaying::get'], $visible->children[0]->via);
+        self::assertSame(['Leaf::get'], array_map(static fn ($child): string => $child->boundary->id(), $visible->children[1]->children));
+    }
+
+    public function testDetachingRowsAreOnlyRetainedWhereACacheDeclarationConsumesTheirResult(): void
+    {
+        $detaching = ReportSource::node('Composing::get')->children[1];
+        $projection = new TreeProjection([], UncachedMode::None);
+        self::assertSame('Detaching::get', $projection->select($detaching, true)[0][0]->boundary->id());
+        self::assertSame('Leaf::get', $projection->select($detaching, false)[0][0]->boundary->id());
+    }
+
     public function testPromoteRecordsTheOmittedCallerOnEveryConnectionItStoodOn(): void
     {
         $bridge = ReportSource::node('Page::automatic')->children[0];

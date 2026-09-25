@@ -73,6 +73,15 @@ final class TtlEstimateTest extends TestCase
         self::assertFalse(TtlEstimate::unconstrained()->hasFiniteExpiration());
     }
 
+    public function testStoresNothingProvesTheAbsenceOfSomethingToStore(): void
+    {
+        self::assertTrue(TtlEstimate::unconstrained()->storesNothing());
+        self::assertTrue(TtlEstimate::known(0)->storesNothing());
+        self::assertFalse(TtlEstimate::known(30)->storesNothing());
+        self::assertFalse(TtlEstimate::unknown()->storesNothing());
+        self::assertFalse(TtlEstimate::unknown(lowerBound: 0, finite: true)->storesNothing());
+    }
+
     public function testMeetCapsEachAlternativeSeparately(): void
     {
         $estimate = TtlEstimate::oneOf(new TtlInterval(30, 30), new TtlInterval(600, 900));

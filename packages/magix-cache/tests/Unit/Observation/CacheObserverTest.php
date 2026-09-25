@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Runtime\Extension;
+namespace Tests\Unit\Observation;
 
-use Magix\Cache\Runtime\Extension\CacheEvent;
-use Magix\Cache\Runtime\Extension\CacheObserver;
+use Magix\Cache\Observation\CacheEvent;
+use Magix\Cache\Observation\CacheObserver;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 

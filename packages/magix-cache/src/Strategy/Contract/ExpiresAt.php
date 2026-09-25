@@ -11,7 +11,7 @@ use InvalidArgumentException;
 /**
  * Declares a daily wall-clock expiration contributed by fetch().
  *
- * On the normal origin path the strategy chooses a future occurrence of
+ * On every successful fetch return the strategy chooses a future occurrence of
  * the declared local time, or a time in the inclusive at..until window,
  * and replaces the origin expiration with its selected finite deadline. An until
  * earlier than at ends on the following local date; equal endpoints mean

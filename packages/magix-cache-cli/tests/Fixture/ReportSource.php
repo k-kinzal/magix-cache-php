@@ -32,6 +32,20 @@ final readonly class ReportSource
                 public function __construct(private Leaf $leaf) {}
                 public function get() { return opaqueTransform($this->leaf->get()); }
             }
+            class Detaching {
+                public function __construct(private Leaf $leaf) {}
+                public function get(): Cached { return Cached::of($this->leaf->get()->value()); }
+            }
+            class Relaying {
+                public function __construct(private Leaf $leaf) {}
+                public function get(): Cached { return $this->leaf->get()->map(fn ($v) => $v); }
+            }
+            class Composing {
+                use Cacheable;
+                public function __construct(private Detaching $detaching, private Relaying $relaying) {}
+                #[Cache]
+                public function get(): Cached { return $this->cached(fn () => $this->relaying->get()->zip($this->detaching->get())); }
+            }
             class Page {
                 use Cacheable;
                 public function __construct(private Leaf $leaf, private Bridge $bridge, private Utility $utility) {}

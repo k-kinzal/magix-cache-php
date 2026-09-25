@@ -34,6 +34,10 @@ deptrac:
       collectors:
         - type: directory
           value: packages/magix-cache/src/Cache/.*
+    - name: Observation
+      collectors:
+        - type: directory
+          value: packages/magix-cache/src/Observation/.*
     - name: Clock
       collectors:
         - type: directory
@@ -76,6 +80,7 @@ deptrac:
           value: packages/magix-cache-cli/src/Key/.*
   ruleset:
     CoreApi:
+      - Observation
       - Composition
       - Metadata
       - Runtime
@@ -94,7 +99,11 @@ deptrac:
     Strategy:
       - CoreApi
       - Metadata
+      - Clock
+      - Observation
     Runtime:
+      - Clock
+      - Observation
       - CoreApi
       - Attribute
       - Cache
@@ -104,6 +113,7 @@ deptrac:
       - Metadata
       - Clock
     Clock: ~
+    Observation: ~
     Laravel:
       - CoreApi
       - Cache

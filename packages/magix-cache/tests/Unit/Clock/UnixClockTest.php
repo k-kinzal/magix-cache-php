@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Runtime;
+namespace Tests\Unit\Clock;
 
-use Magix\Cache\Runtime\UnixClock;
+use Magix\Cache\Clock\UnixClock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixture\MutableClock;

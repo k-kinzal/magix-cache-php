@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Runtime\Extension;
+namespace Tests\Unit\Observation;
 
 use function count;
 
-use Magix\Cache\Runtime\Extension\CacheEvent;
+use Magix\Cache\Observation\CacheEvent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -18,10 +18,5 @@ final class CacheEventTest extends TestCase
         self::assertSame(7, count(CacheEvent::cases()));
         self::assertNotSame(CacheEvent::FreshHit, CacheEvent::StaleServed);
     }
-    public function testNamedResolvesRecognizedDiagnostics(): void
-    {
-        self::assertSame(CacheEvent::StaleServed, CacheEvent::named('StaleServed'));
-        self::assertNull(CacheEvent::named(null));
-        self::assertNull(CacheEvent::named('application-diagnostic'));
-    }
+
 }

@@ -580,4 +580,13 @@ final class StrategyReaderTest extends TestCase
         self::assertSame($definition, $reader->bound($definition, []));
         self::assertInstanceOf(Variable::class, $reader->bound(new Variable('missing'), []));
     }
+
+    public function testCompositionReadsZeroChildrenAsAnIdentity(): void
+    {
+        $create = new ClassMethod('create', ['stmts' => [
+            new \PhpParser\Node\Stmt\Return_(new StaticCall(new Name('parent'), 'compose')),
+        ]]);
+
+        self::assertSame([[], []], (new StrategyReader())->composition($create));
+    }
 }

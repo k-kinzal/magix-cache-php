@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Magix\Cache\Runtime;
+namespace Magix\Cache\Clock;
 
 use Psr\Clock\ClockInterface;
 

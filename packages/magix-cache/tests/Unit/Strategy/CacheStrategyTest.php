@@ -5,57 +5,57 @@ declare(strict_types=1);
 namespace Tests\Unit\Strategy;
 
 use Magix\Cache\Cached;
-use Magix\Cache\Strategy\CacheOperation;
 use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CacheWrite;
-use Magix\Cache\Strategy\NextCacheStrategy;
-use Magix\Cache\Strategy\OriginResult;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 #[CoversNothing]
 final class CacheStrategyTest extends TestCase
 {
-    public function testGetReceivesTheOperationAndItsContinuation(): void
+    public function testGetReceivesItsKeyAndOperationClosure(): void
     {
-        $operation = new CacheOperation('key', static fn (): float => 100.0);
-        $next = NextCacheStrategy::end();
+        $key = 'key';
+        $next = static fn (string $key): null => null;
         $strategy = $this->createMock(CacheStrategy::class);
         $strategy
             ->expects(self::once())
             ->method('get')
-            ->with($operation, $next)
+            ->with($key, $next)
             ->willReturn(null);
 
-        self::assertNull($strategy->get($operation, $next));
+        self::assertNull($strategy->get($key, $next));
     }
 
-    public function testFetchReceivesTheOperationAndItsContinuation(): void
+    public function testFetchReceivesItsKeyAndOperationClosure(): void
     {
-        $operation = new CacheOperation('key', static fn (): float => 100.0);
-        $next = NextCacheStrategy::end();
-        $produced = new OriginResult(Cached::of('value'), 100.0);
+        $key = 'key';
+        $next = static fn (): Cached => Cached::of('value');
+        $produced = Cached::of('value');
         $strategy = $this->createMock(CacheStrategy::class);
         $strategy
             ->expects(self::once())
             ->method('fetch')
-            ->with($operation, $next)
+            ->with($key, $next)
             ->willReturn($produced);
 
-        self::assertSame($produced, $strategy->fetch($operation, $next));
+        self::assertSame($produced, $strategy->fetch($key, $next));
     }
 
     public function testSetReceivesTheProducedResult(): void
     {
-        $operation = new CacheOperation('key', static fn (): float => 100.0);
-        $next = NextCacheStrategy::end();
+        $key = 'key';
+        $next = static function (string $key, CacheWrite $request): void {
+        };
         $produced = new CacheWrite(Cached::of('value'));
         $strategy = $this->createMock(CacheStrategy::class);
         $strategy
             ->expects(self::once())
             ->method('set')
-            ->with($operation, $produced, $next);
+            ->with($key, $produced, $next);
 
-        $strategy->set($operation, $produced, $next);
+        $strategy->set($key, $produced, $next);
     }
+
+
 }

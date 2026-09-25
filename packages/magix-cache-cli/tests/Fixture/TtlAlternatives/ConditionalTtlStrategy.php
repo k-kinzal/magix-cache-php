@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Fixture\TtlAlternatives;
 
+use Closure;
 use InvalidArgumentException;
-use Magix\Cache\Strategy\CacheAnswer;
-use Magix\Cache\Strategy\CacheOperation;
+use Magix\Cache\Cached;
+use Magix\Cache\Clock\SystemClock;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CacheWrite;
 use Magix\Cache\Strategy\Contract\ConstructorArg;
 use Magix\Cache\Strategy\Contract\Ttl;
 use Magix\Cache\Strategy\Contract\TtlRange;
-use Magix\Cache\Strategy\NextCacheStrategy;
-use Magix\Cache\Strategy\OriginFailure;
-use Magix\Cache\Strategy\OriginResult;
 use Magix\Cache\Strategy\StrategyDefinition;
 use Override;
-use RuntimeException;
+use Psr\Clock\ClockInterface;
 
 /**
  * Selects a longer lifetime between midnight and 06:00 UTC.
@@ -28,8 +26,12 @@ final readonly class ConditionalTtlStrategy implements CacheStrategy
     /**
      * @throws InvalidArgumentException when a lifetime is negative or the range contradicts
      */
-    public function __construct(private int $normal, private int $minimum, private int $maximum)
-    {
+    public function __construct(
+        private int $normal,
+        private int $minimum,
+        private int $maximum,
+        private ClockInterface $clock = new SystemClock(),
+    ) {
         new TtlRange($normal, $normal);
         new TtlRange($minimum, $maximum);
     }
@@ -43,43 +45,46 @@ final readonly class ConditionalTtlStrategy implements CacheStrategy
     }
 
     /**
+     * Delegated failures propagate unchanged.
+     *
      * @return CacheRead<mixed>|null
-     * @throws RuntimeException when the delegated read fails
+     * @param Closure(string): (CacheRead<mixed>|null) $next
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
+    public function get(string $key, Closure $next): ?CacheRead
     {
-        return $next->get($operation);
+        return $next($key);
     }
 
     /**
-     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
-     * @throws RuntimeException when a delegate fails
+     * Delegated failures propagate unchanged.
+     *
+     * @return Cached<mixed>
+     * @param Closure(): Cached<mixed> $next
      */
     #[Override]
     #[Ttl(new ConstructorArg('normal'), new TtlRange(min: new ConstructorArg('minimum'), max: new ConstructorArg('maximum')))]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
+    public function fetch(string $key, Closure $next): Cached
     {
-        $result = $next->fetch($operation);
+        $result = $next();
 
-        if (!$result instanceof OriginResult) {
-            return $result;
-        }
-
-        $ttl = (int) $result->baseTime % 86400 < 21600
-            ? $this->minimum + crc32($operation->key()) % ($this->maximum - $this->minimum + 1)
+        $ttl = (int) (float) $this->clock->now()->format('U.u') % 86400 < 21600
+            ? $this->minimum + crc32($key) % ($this->maximum - $this->minimum + 1)
             : $this->normal;
 
-        return $result->withTtl($ttl);
+        return Cached::of($result->value(), $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + ($ttl)));
     }
 
     /**
+     * Delegated failures propagate unchanged.
+     *
      * @param CacheWrite<mixed> $result
-     * @throws RuntimeException when the delegated write fails
+     * @param Closure(string, CacheWrite<mixed>): void $next
      */
     #[Override]
-    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void
+    public function set(string $key, CacheWrite $result, Closure $next): void
     {
-        $next->set($operation, $result);
+        $next($key, $result);
     }
+
 }

@@ -12,10 +12,10 @@ use function is_a;
 use RuntimeException;
 
 /**
- * Serves a retained expired entry when the origin fails with a declared exception.
+ * Serves a retained expired entry when the delegated inquiry fails.
  *
- * Only the origin call is inside the capture range, and only failures the
- * origin declares as behavior are eligible: every declared type must be a
+ * The normalized strategy catches its delegated fetch, including inner
+ * middleware and local boundary settings. Every accepted type must be a
  * RuntimeException subtype, and an empty list is rejected. Bugs — the
  * LogicException family and PHP Errors — are never RuntimeException, so they
  * can never trigger the fallback; an origin that meets an expected outage in

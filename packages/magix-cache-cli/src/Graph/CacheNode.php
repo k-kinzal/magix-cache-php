@@ -70,12 +70,37 @@ final readonly class CacheNode
     }
 
     /**
+     * Reports whether this row hands its whole composition on to its caller.
+     *
+     * Only a determined result answers this. Metadata the analyzer could not
+     * follow leaves the question open, and the caller's own row already says
+     * so with its uncertainty markers, so an unfollowed return is not read as
+     * a change here. A row that detaches its composition with value() or keeps
+     * only part of it did change it, and is then the reason its caller reads
+     * the way it does. Composing no cache at all leaves nothing to change.
+     */
+    public function propagates(): bool
+    {
+        $composed = $this->composed;
+
+        if ($composed === null || $this->effect->ttl->state === TtlEstimateState::Unknown
+            || $this->effect->visibilityUnknown || $this->effect->tagsUnknown) {
+            return true;
+        }
+
+        return $this->effect->ttl->equals($composed->ttl)
+            && $this->effect->visibility === $composed->visibility
+            && $this->effect->tags === $composed->tags
+            && $this->effect->expirationConstraints === $composed->expirationConstraints;
+    }
+
+    /**
      * Reports storage from the returned result, independently of diagnostic counts.
      */
     public function storage(): string
     {
         if (!$this->boundary->isCacheBoundary || $this->effect->problems !== [] || $this->effect->ttl->state === TtlEstimateState::Invalid
-            || $this->effect->visibility === Visibility::NoStore || $this->effect->ttl->seconds === 0) {
+            || $this->effect->visibility === Visibility::NoStore || $this->effect->ttl->storesNothing()) {
             return 'no';
         }
 

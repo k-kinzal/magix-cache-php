@@ -5,27 +5,23 @@ declare(strict_types=1);
 namespace Tests\Unit\Strategy;
 
 use Magix\Cache\Cached;
-use Magix\Cache\Strategy\CacheOperation;
-use Magix\Cache\Strategy\NextCacheStrategy;
-use Magix\Cache\Strategy\OriginResult;
 use Magix\Cache\Strategy\StrategyArguments;
 use Magix\Cache\Strategy\StrategyDefinition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
-use Tests\Fixture\AnsweringStrategy;
+use Tests\Fixture\CacheHandlers;
 use Tests\Fixture\StatefulStrategy;
 
 #[CoversClass(StrategyDefinition::class)]
 #[UsesClass(StrategyArguments::class)]
 #[UsesClass(\Magix\Cache\Strategy\ComposedCacheStrategy::class)]
-#[UsesClass(CacheOperation::class)]
-#[UsesClass(NextCacheStrategy::class)]
-#[UsesClass(OriginResult::class)]
 #[UsesClass(Cached::class)]
 #[UsesClass(\Magix\Cache\Metadata\CacheMetadata::class)]
 #[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
+#[UsesNamespace('Magix\Cache')]
 final class StrategyDefinitionTest extends TestCase
 {
     public function testOfDefersConstructionAndInstantiateCreatesIndependentState(): void
@@ -62,17 +58,16 @@ final class StrategyDefinitionTest extends TestCase
         $definition = StrategyDefinition::compose($leaf, StrategyDefinition::compose($leaf, $leaf));
         $first = $definition->instantiate();
         $second = $definition->instantiate();
-        $operation = new CacheOperation('key', static fn (): float => 100.0);
-        $next = NextCacheStrategy::of(new AnsweringStrategy(null, Cached::of('value')));
-        $first->get($operation, $next);
-        $firstResult = $first->fetch($operation, $next);
-        $second->get($operation, $next);
-        $secondResult = $second->fetch($operation, $next);
+        $key = 'key';
+        $next = new CacheHandlers(null, Cached::of('value'));
+        $first->get($key, $next->get(...));
+        $firstResult = $first->fetch($key, $next->fetch(...));
+        $second->get($key, $next->get(...));
+        $secondResult = $second->fetch($key, $next->fetch(...));
 
-        self::assertInstanceOf(OriginResult::class, $firstResult);
-        self::assertInstanceOf(OriginResult::class, $secondResult);
-        self::assertSame(['lookup:key', 'state:1:1'], $firstResult->cached->metadata->tags);
-        self::assertSame($firstResult->cached->metadata->tags, $secondResult->cached->metadata->tags);
+
+        self::assertSame(['lookup:key', 'state:1:1'], $firstResult->metadata->tags);
+        self::assertSame($firstResult->metadata->tags, $secondResult->metadata->tags);
     }
 
     public function testDefinitionDetachesReferencedConfiguration(): void

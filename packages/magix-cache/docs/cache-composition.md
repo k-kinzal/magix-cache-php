@@ -194,7 +194,7 @@ Consequently, replacing any evaluated subtree with a hit for that same result pr
 - The compared executions have the same effective keys, declarations, source values and source metadata, and the same evaluated strategy and dynamic-TTL constraints.
 - Recomputed relative lifetimes use the same base times for exact expiration equality.
 - Dependencies stay inside the composition API. Extracting `value()` and wrapping it again without its metadata breaks the premise.
-- Custom storage and strategies preserve the metadata associated with the result they return. A custom strategy that invents a different `CacheRead` or `CacheAnswer` must supply the constraints of that answer.
+- Custom storage and strategies preserve the metadata associated with the result they return. A custom strategy that invents a different `CacheRead` or `Cached` must supply the constraints of that answer.
 
 This is equality of metadata values (`CacheMetadata::equals()`), not PHP object identity. Deserialization may create a new metadata object.
 

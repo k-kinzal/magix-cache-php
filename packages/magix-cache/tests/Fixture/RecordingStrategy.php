@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace Tests\Fixture;
 
 use ArrayObject;
-use Magix\Cache\Strategy\CacheAnswer;
-use Magix\Cache\Strategy\CacheOperation;
+use Closure;
+use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CacheWrite;
-use Magix\Cache\Strategy\NextCacheStrategy;
-use Magix\Cache\Strategy\OriginFailure;
-use Magix\Cache\Strategy\OriginResult;
 use Override;
 
 /**
@@ -36,25 +33,27 @@ final class RecordingStrategy implements CacheStrategy
 
     /**
      * @return CacheRead<mixed>|null
+     * @param Closure(string): (CacheRead<mixed>|null) $next
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
+    public function get(string $key, Closure $next): ?CacheRead
     {
         $this->record($this->name.'.get.before');
-        $result = $next->get($operation);
+        $result = $next($key);
         $this->record($this->name.'.get.after');
 
         return $result;
     }
 
     /**
-     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
+     * @return Cached<mixed>
+     * @param Closure(): Cached<mixed> $next
      */
     #[Override]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
+    public function fetch(string $key, Closure $next): Cached
     {
         $this->record($this->name.'.fetch.before');
-        $result = $next->fetch($operation);
+        $result = $next();
         $this->record($this->name.'.fetch.after');
 
         return $result;
@@ -62,12 +61,13 @@ final class RecordingStrategy implements CacheStrategy
 
     /**
      * @param CacheWrite<mixed> $result
+     * @param Closure(string, CacheWrite<mixed>): void $next
      */
     #[Override]
-    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void
+    public function set(string $key, CacheWrite $result, Closure $next): void
     {
         $this->record($this->name.'.set.before');
-        $next->set($operation, $result);
+        $next($key, $result);
         $this->record($this->name.'.set.after');
     }
 
@@ -79,4 +79,5 @@ final class RecordingStrategy implements CacheStrategy
         $this->calls[] = $call;
         $this->log?->append($call);
     }
+
 }

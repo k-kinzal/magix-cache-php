@@ -49,6 +49,7 @@ final class NodePresentationTest extends TestCase
         self::assertFalse($presentation->disabled(new CacheEffect(TtlEstimate::unknown(lowerBound: 0, finite: true))));
         self::assertTrue($presentation->disabled(new CacheEffect(TtlEstimate::known(0))));
         self::assertTrue($presentation->disabled(new CacheEffect(TtlEstimate::known(30), Visibility::NoStore)));
+        self::assertTrue($presentation->disabled(new CacheEffect(TtlEstimate::unconstrained())));
     }
 
     public function testMermaidKeepsTheSameColorForPartialAndCompleteCacheNodes(): void

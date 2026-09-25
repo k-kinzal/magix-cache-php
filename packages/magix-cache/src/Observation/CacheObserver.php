@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Magix\Cache\Runtime\Extension;
+namespace Magix\Cache\Observation;
 
 /**
  * Receives diagnostic events from the runtime.

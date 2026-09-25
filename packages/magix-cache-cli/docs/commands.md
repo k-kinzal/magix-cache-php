@@ -96,7 +96,7 @@ branches disagree; the individual candidates remain in `metadataAlternatives`.
 | `ttl dynamic` | A finite expiration is established, with its duration decided at runtime |
 | `ttl ≤60s`, `30-?s`, `30-60s` | Proven bounds; `?` means undetermined, never unlimited |
 | `ttl 30/600-900s` | Disjoint lifetime alternatives, without filling the gap |
-| `ttl unconstrained` | Proven absence of an expiration constraint |
+| `ttl unconstrained` | Proven absence of an expiration constraint, so nothing is stored |
 | `ttl invalid` | A confirmed invalid expiration declaration |
 | `?` in visibility | No usable visibility reference is known |
 | `shared?`, `private?`, `nostore?` | Visibility observed before an opaque operation, whose survival is unverified |
@@ -138,8 +138,8 @@ for omitted tentative names. Full tag lists, key parameters,
 strategy candidates, alternative returns, source locations and diagnostic
 explanations are available with `--format=json`.
 
-Normal declared rows are white; ordinary methods and effective NoStore or TTL 0
-are gray. Explicit local field overrides use yellow. Invalid TTL and the compact
+Normal declared rows are white; ordinary methods, effective NoStore, TTL 0 and a
+proven absence of any expiration are gray. Explicit local field overrides use yellow. Invalid TTL and the compact
 declaration-problem marker use red. An unrelated descendant's diagnostic never
 colors the whole parent. White does not prove storage. JSON separately reports
 `effective.storage` as `yes`, `no`, `runtime-dependent`, or `unknown`.
@@ -163,7 +163,7 @@ has none. A `Cached` return type or a `cached()` call alone does not qualify.
 |---|---|
 | `all` | Every analyzed method, including wholly unattributed branches |
 | `between` | Attributed methods and unattributed methods with both an attributed ancestor and an attributed descendant |
-| `none` | Only attributed methods; promote their visible descendants across omitted methods |
+| `none` | Attributed methods; promote their visible descendants across omitted methods |
 
 Errors and diagnostics never make a row exempt from these rules.
 **The analyzed method itself is exempt from them**: it names what the report
@@ -172,6 +172,34 @@ result, such as a controller action that renders a response, declares no cache
 of its own and would otherwise disappear from its own report. For example,
 `Controller → Helper → CachedB` keeps `Controller` with `CachedB` promoted under
 it in `between` and `none`. Only `--ignore` removes it.
+
+**A row that breaks the chain it stands in is exempt too.** Omitting a row
+promotes its callees under its own caller, which says the caller's metadata came
+from them. That holds only while the row passes its composition on unchanged. A
+relay that returns a `Cached` intact caches nothing and still hands everything
+up, so it is omitted and its dependencies explain the caller directly. A method
+that detaches its composition with `value()`, or keeps only part of it, is
+itself the reason its caller reads the way it does, so it stays visible instead:
+
+```text
+PageQuery::execute  ttl 10s  shared  tags leaf
+|-- Leaf::get  ttl 10s  shared  tags leaf
+`-- Detaching::get (uncached)  composes ttl 10s  shared  tags leaf
+    `-- Leaf::get  ttl 10s  shared  tags leaf
+```
+
+The first `Leaf::get` was promoted across a relay and does bound the parent. The
+second is behind a method that dropped it, and `composes ttl 10s` next to a
+parent that inherited nothing from it says so. Reading the two rows together is
+the whole signal; there is no separate marker.
+
+Only a **determined** return counts as breaking the chain. A return the analyzer
+could not follow leaves the question open, and the caller's own `?` markers
+already carry that, so such a row stays promotable. Only a cache declaration
+above consumes what a row returns: below an unattributed caller, every row
+reports what it composes and folds its callees in either way, so nothing is
+retained there. This exemption applies in `between` and `none` alike, and `all`
+shows every row regardless.
 
 ```bash
 vendor/bin/magix analyze ProductController::show --uncached=all

@@ -6,12 +6,11 @@ namespace Tests\Unit\Attribute;
 
 use Magix\Cache\Attribute\UseStrategy;
 use Magix\Cache\Cached;
-use Magix\Cache\Strategy\CacheOperation;
-use Magix\Cache\Strategy\NextCacheStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\UsesNamespace;
 use PHPUnit\Framework\TestCase;
-use Tests\Fixture\AnsweringStrategy;
+use Tests\Fixture\CacheHandlers;
 use Tests\Fixture\ProductCacheStrategy;
 
 #[CoversClass(UseStrategy::class)]
@@ -19,15 +18,13 @@ use Tests\Fixture\ProductCacheStrategy;
 #[UsesClass(\Magix\Cache\Metadata\CacheMetadata::class)]
 #[UsesClass(\Magix\Cache\Metadata\CacheTokenSet::class)]
 #[UsesClass(\Magix\Cache\Metadata\Visibility::class)]
-#[UsesClass(CacheOperation::class)]
 #[UsesClass(\Magix\Cache\Strategy\ComposedCacheStrategy::class)]
 #[UsesClass(\Magix\Cache\Strategy\CompositeCacheStrategy::class)]
 #[UsesClass(\Magix\Cache\Strategy\KeySpreadExpirationStrategy::class)]
-#[UsesClass(NextCacheStrategy::class)]
 #[UsesClass(\Magix\Cache\Strategy\StaleIfErrorCacheStrategy::class)]
-#[UsesClass(\Magix\Cache\Strategy\OriginResult::class)]
 #[UsesClass(\Magix\Cache\Strategy\StrategyArguments::class)]
 #[UsesClass(\Magix\Cache\Strategy\StrategyDefinition::class)]
+#[UsesNamespace('Magix\Cache')]
 final class UseStrategyTest extends TestCase
 {
     public function testCarriesTheTypedArgumentsForCreate(): void
@@ -41,15 +38,15 @@ final class UseStrategyTest extends TestCase
 
     public function testResolveBuildsTheStrategyThroughCreate(): void
     {
-        $strategy = (new UseStrategy(strategy: ProductCacheStrategy::class, min: 60))->resolve()->instantiate();
-        $terminal = new AnsweringStrategy(hit: null, fetched: Cached::of('origin'));
-        $operation = new CacheOperation('key', static fn (): float => 100.0);
+        $strategy = (new UseStrategy(strategy: ProductCacheStrategy::class, min: 60))->resolve()->instantiate((new \Magix\Cache\Runtime\StrategyFactory(new \Tests\Fixture\MutableClock(100.0), null))->create(...));
+        $handlers = new CacheHandlers(hit: null, fetched: Cached::of('origin'));
+        $key = 'key';
 
-        $result = $strategy->fetch($operation, NextCacheStrategy::of($terminal));
-        self::assertInstanceOf(\Magix\Cache\Strategy\OriginResult::class, $result);
+        $result = $strategy->fetch($key, $handlers->fetch(...));
 
-        self::assertSame('origin', $result->cached->value());
-        self::assertSame(160.0, $result->cached->metadata->expiresAt, 'the declared min: 60 pins the spread');
+
+        self::assertSame('origin', $result->value());
+        self::assertSame(160.0, $result->metadata->expiresAt, 'the declared min: 60 pins the spread');
     }
 
     public function testDisablingKeepsTheDeclarationReadable(): void

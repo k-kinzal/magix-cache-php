@@ -113,6 +113,9 @@ Return types, observed execution and diagnostics never override selection.
 The analyzed method itself always stays, even when it declares no cache because
 it converts its result; such a row reports what it `composes` from the caches it
 reaches, which is the page-level bound its returned metadata cannot carry.
+An unattributed row under a cache declaration also stays when it provably returns
+something other than what it composes, because promoting its callees would
+attribute the caller's metadata to dependencies it detached.
 `--depth` counts printed rows, so omitted methods never spend the budget the
 displayed ones need.
 All formats preserve the effective results of displayed nodes.

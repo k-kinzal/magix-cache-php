@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Strategy;
 
+use Closure;
 use InvalidArgumentException;
 
 use function is_array;
@@ -47,18 +48,20 @@ final readonly class StrategyArguments
     /**
      * Creates independent constructor arguments, including nested strategies.
      *
+     * @param Closure(class-string<CacheStrategy>, array<array-key, mixed>): CacheStrategy|null $factory
+     *
      * @param array<array-key, mixed> $arguments
      * @return array<array-key, mixed>
      */
-    public function instantiate(array $arguments): array
+    public function instantiate(array $arguments, ?Closure $factory = null): array
     {
         $result = $this->copy($arguments);
 
         foreach ($result as $name => $value) {
             if (is_array($value)) {
-                $result[$name] = $this->instantiate($value);
+                $result[$name] = $this->instantiate($value, $factory);
             } elseif ($value instanceof StrategyDefinition) {
-                $result[$name] = $value->instantiate();
+                $result[$name] = $value->instantiate($factory);
             }
         }
 

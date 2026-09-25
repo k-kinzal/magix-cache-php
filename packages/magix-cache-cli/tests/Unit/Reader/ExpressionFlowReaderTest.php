@@ -102,6 +102,15 @@ final class ExpressionFlowReaderTest extends TestCase
         self::assertSame(Visibility::NoStore, $node->effect->visibility);
     }
 
+    public function testArgumentsComposeEveryInputOfTheWidestCombine(): void
+    {
+        $inputs = '$this->inputs->b(), $this->inputs->a(), $this->inputs->b(), $this->inputs->a(), $this->inputs->b(), $this->inputs->a(), $this->inputs->b(), $this->inputs->c()';
+        $node = AnalysisSource::node('return $this->inputs->a()->combine10('.$inputs.')->map(fn ($a) => $a);');
+        self::assertSame(['a', 'b', 'c'], $node->effect->tags);
+        self::assertSame(Visibility::NoStore, $node->effect->visibility);
+        self::assertSame([], $node->effect->analysis->causes());
+    }
+
     public function testArgumentResolvesReorderedNamedMetadata(): void
     {
         $node = AnalysisSource::node('$v = $this->inputs->b(); return Cached::of(metadata: $v->metadata, value: $v->value());');

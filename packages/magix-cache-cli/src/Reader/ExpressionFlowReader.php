@@ -18,6 +18,14 @@ use PhpParser\Node\Scalar;
 final readonly class ExpressionFlowReader
 {
     /**
+     * Cached methods that meet the metadata of the receiver and of every argument.
+     */
+    private const array COMPOSITIONS = [
+        'zip', 'combine2', 'combine3', 'combine4', 'combine5',
+        'combine6', 'combine7', 'combine8', 'combine9', 'combine10',
+    ];
+
+    /**
      * @param array<string, string> $propertyTypes
      * @param array<string, string> $parameterTypes
      * @param array<string, list<array{int, string}>> $assignments Local bindings with the position that establishes them.
@@ -105,7 +113,7 @@ final readonly class ExpressionFlowReader
             $name === 'map', $name === 'unzip' => new MetadataFlow('preserve', [$receiver]),
             $name === 'flatMap' => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), $this->callback($this->argument($call, 0), $variables)]),
             $name === 'flatten' => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), $this->nested($call->var, $variables)]),
-            $name === 'zip', in_array($name, ['combine2', 'combine3', 'combine4', 'combine5'], true) => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), ...$this->arguments($call, $variables)]),
+            in_array($name, self::COMPOSITIONS, true) => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), ...$this->arguments($call, $variables)]),
             default => MetadataFlow::unknown('opaque-method', $call->getStartLine(), [$receiver, ...$this->arguments($call, $variables)]),
         };
     }

@@ -4,18 +4,22 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Strategy;
 
+use Closure;
+
 use function crc32;
 
 use InvalidArgumentException;
+use Magix\Cache\Cached;
+use Magix\Cache\Clock\SystemClock;
 use Magix\Cache\Strategy\Contract\ConstructorArg;
 use Magix\Cache\Strategy\Contract\Ttl;
 use Override;
-use RuntimeException;
+use Psr\Clock\ClockInterface;
 
 /**
  * Spreads expirations across keys to avoid synchronized expiry.
  *
- * On the normal origin path the strategy overrides the lifetime of
+ * On every successful fetch return the strategy overrides the lifetime of
  * the produced metadata, chosen deterministically from the key so that
  * entries written in the same instant expire spread over the declared range
  * instead of together. Knowing the range does not mean the runtime values
@@ -33,6 +37,7 @@ final readonly class KeySpreadExpirationStrategy implements CacheStrategy
     public function __construct(
         private int $minimum,
         private int $maximum,
+        private ClockInterface $clock = new SystemClock(),
     ) {
         if ($minimum < 0) {
             throw new InvalidArgumentException('The minimum lifetime must be zero or greater.');
@@ -46,44 +51,50 @@ final readonly class KeySpreadExpirationStrategy implements CacheStrategy
     /**
      * Delegates the lookup unchanged.
      *
+     * Delegated failures propagate unchanged.
+     *
      * @return CacheRead<mixed>|null
-     * @throws RuntimeException when the delegated read fails with declared behavior
+     * @param Closure(string): (CacheRead<mixed>|null) $next
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
+    public function get(string $key, Closure $next): ?CacheRead
     {
-        return $next->get($operation);
+        return $next($key);
     }
 
     /**
-     * Overrides the origin lifetime with the key-derived lifetime.
+     * Overrides the result lifetime with the key-derived lifetime.
      *
-     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
-     * @throws RuntimeException when the origin or a delegate fails with declared behavior
+     * The lifetime starts at this middleware's clock read after delegation.
+     * It applies equally to origin values and answers supplied by delegates.
+     *
+     * Delegated failures propagate unchanged.
+     *
+     * @return Cached<mixed>
+     * @param Closure(): Cached<mixed> $next
      */
     #[Override]
     #[Ttl(min: new ConstructorArg('minimum'), max: new ConstructorArg('maximum'))]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
+    public function fetch(string $key, Closure $next): Cached
     {
-        $result = $next->fetch($operation);
+        $result = $next();
 
-        if (!$result instanceof OriginResult) {
-            return $result;
-        }
-
-        $spread = crc32($operation->key()) % ($this->maximum - $this->minimum + 1);
-        return $result->withTtl($this->minimum + $spread);
+        $spread = crc32($key) % ($this->maximum - $this->minimum + 1);
+        return Cached::of($result->value(), $result->metadata->withExpiration((float) $this->clock->now()->format('U.u') + ($this->minimum + $spread)));
     }
 
     /**
      * Delegates the store unchanged.
      *
+     * Delegated failures propagate unchanged.
+     *
      * @param CacheWrite<mixed> $result
-     * @throws RuntimeException when the delegated write fails with declared behavior
+     * @param Closure(string, CacheWrite<mixed>): void $next
      */
     #[Override]
-    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void
+    public function set(string $key, CacheWrite $result, Closure $next): void
     {
-        $next->set($operation, $result);
+        $next($key, $result);
     }
+
 }

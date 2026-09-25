@@ -7,43 +7,31 @@ namespace Magix\Cache;
 use LogicException;
 use Magix\Cache\Cache\Cache;
 use Magix\Cache\Clock\SystemClock;
+use Magix\Cache\Clock\UnixClock;
 use Magix\Cache\Metadata\Visibility;
+use Magix\Cache\Observation\CacheEvent;
+use Magix\Cache\Observation\CacheObserver;
+use Magix\Cache\Runtime\CacheExecution;
 use Magix\Cache\Runtime\CacheInvocation;
 use Magix\Cache\Runtime\CacheKeyContext;
 use Magix\Cache\Runtime\CacheKeyStrategy;
-use Magix\Cache\Runtime\Extension\CacheEvent;
-use Magix\Cache\Runtime\Extension\CacheObserver;
 use Magix\Cache\Runtime\Extension\RegisteredExtensions;
 use Magix\Cache\Runtime\GuardedCache;
 use Magix\Cache\Runtime\KeyStrategy\HashCacheKeyStrategy;
-use Magix\Cache\Runtime\StrategyChain;
-use Magix\Cache\Runtime\UnixClock;
-use Magix\Cache\Strategy\CacheAnswer;
-use Magix\Cache\Strategy\CacheOperation;
+use Magix\Cache\Runtime\StrategyFactory;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheWrite;
-use Magix\Cache\Strategy\OriginFailure;
-use Magix\Cache\Strategy\OriginResult;
 use Psr\Clock\ClockInterface;
 use RuntimeException;
 
 /**
  * Executes cache boundaries through a fixed sequence of stages.
  *
- * The order never depends on how attributes are written: lookup, fresh-hit
- * judgement, origin execution, metadata overrides at one base time, and a
- * re-judged store. Each stage runs through the strategy chain of the boundary
- * — the declared composition, when one exists, in front of the terminal that
- * owns the stage bodies — so a strategy wraps the stages without being able
- * to reorder them. Policy, parameter TTL, dynamic TTL and strategies override
- * in that order, using the single base time taken right after origin success.
- * The outer strategy runs last on the return path and wins for fields it replaces.
- * Only the origin
- * call is captured as OriginFailure; strategies decide whether to answer it,
- * and unhandled failures propagate with their original identity.
- * Every invocation constructs fresh strategy
- * instances. Only storage reads and writes sit inside the backend bypass
- * range.
+ * After lookup and fresh-hit judgement the runtime invokes the composed
+ * fetch handler. Middleware owns delegation, result transformations and
+ * exception handling. Every returned Cached
+ * enters the same set chain. Each invocation constructs fresh strategy
+ * instances, shared across that invocation's operations.
  */
 final readonly class CacheRuntime
 {
@@ -81,19 +69,23 @@ final readonly class CacheRuntime
     {
         $clock = new UnixClock($this->clock);
         $key = $this->keyStrategy->generate($invocation->context->withNamespace($this->namespace));
-        $operation = new CacheOperation($key, $clock->now(...));
-        $resolver = $this->extensions->ttlResolver($invocation->dynamicTtl);
-        $chain = (new StrategyChain(
+        $execution = new CacheExecution(
             new GuardedCache($this->cache, $this->observer),
             $this->extensions->classifier($invocation->bypassCacheErrors),
+            $invocation->origin,
+            $clock,
             $this->observer,
-        ))->bind($invocation, $resolver);
+            $invocation->policy,
+            $this->extensions->ttlResolver($invocation->dynamicTtl),
+            $invocation->parameterTtl,
+        );
+        $strategy = $invocation->strategy?->instantiate((new StrategyFactory($this->clock, $this->observer))->create(...));
 
         if ($invocation->policy->visibility !== Visibility::NoStore) {
             /** @var CacheRead<T>|null $read */
-            $read = $chain->get($operation);
+            $read = $strategy === null ? $execution->get($key) : $strategy->get($key, $execution->get(...));
 
-            if ($read !== null && $read->isFresh($operation->now())) {
+            if ($read !== null && $read->isFresh($clock->now())) {
                 $this->observer?->observe(CacheEvent::FreshHit, $key);
 
                 return $read->cached;
@@ -102,26 +94,16 @@ final readonly class CacheRuntime
             $this->observer?->observe(CacheEvent::Miss, $key);
         }
 
-        /** @var OriginResult<T>|OriginFailure|CacheAnswer<T> $fetched */
-        $fetched = $chain->fetch($operation);
+        /** @var Cached<T> $result */
+        $result = $strategy === null ? $execution->fetch($key) : $strategy->fetch($key, static fn (): Cached => $execution->fetch($key));
 
-        if ($fetched instanceof OriginFailure) {
-            throw $fetched->error;
+        if ($strategy === null) {
+            $execution->set($key, new CacheWrite($result));
+        } else {
+            $strategy->set($key, new CacheWrite($result), $execution->set(...));
         }
-
-        if ($fetched instanceof CacheAnswer) {
-            $event = CacheEvent::named($fetched->event);
-
-            if ($event !== null) {
-                $this->observer?->observe($event, $key);
-            }
-
-            return $fetched->cached;
-        }
-
-        $result = $fetched->cached;
-        $chain->set($operation, new CacheWrite($result));
 
         return $result;
     }
+
 }

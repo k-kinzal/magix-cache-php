@@ -4,68 +4,82 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Strategy;
 
+use Closure;
+use Magix\Cache\Cached;
 use Override;
-use RuntimeException;
 
 /**
- * A sequence of strategies acting as one strategy.
+ * Composes middleware by nesting ordinary operation closures.
  *
- * Every operation binds the sequence in front of the received continuation,
- * so the first strategy wraps the rest and delegation order follows the
- * composition order. The result is itself a CacheStrategy, which is what
- * makes composition closed: a composed strategy composes again without
- * losing the order or the short-circuit behavior of its parts.
+ * The first strategy is outermost. Compositions nest with the same interface;
+ * an empty composition calls next unchanged for each operation.
  */
 final readonly class ComposedCacheStrategy implements CacheStrategy
 {
-    /**
-     * Strategies in delegation order.
-     *
-     * @var non-empty-list<CacheStrategy>
-     */
+    /** @var list<CacheStrategy> */
     private array $strategies;
 
     /**
-     * Creates one strategy from a delegation sequence.
+     * Creates a composition in delegation order, including the empty identity.
      */
-    public function __construct(CacheStrategy $first, CacheStrategy ...$rest)
+    public function __construct(CacheStrategy ...$strategies)
     {
-        $this->strategies = [$first, ...array_values($rest)];
+        $this->strategies = array_values($strategies);
     }
 
     /**
-     * Runs the lookup operation through the sequence.
+     * Wraps a read in the composed middleware.
      *
+     * Delegated failures propagate unchanged.
+     *
+     * @param Closure(string): (CacheRead<mixed>|null) $next
      * @return CacheRead<mixed>|null
-     * @throws RuntimeException when a delegated read fails with declared behavior
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
+    public function get(string $key, Closure $next): ?CacheRead
     {
-        return $next->prepend(...$this->strategies)->get($operation);
+        foreach (array_reverse($this->strategies) as $strategy) {
+            $next = static fn (string $key): ?CacheRead => $strategy->get($key, $next);
+        }
+
+        return $next($key);
     }
 
     /**
-     * Runs the origin operation through the sequence.
+     * Wraps an argument-free inquiry in the composed middleware.
      *
-     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
-     * @throws RuntimeException when the origin or a delegate fails with declared behavior
+     * Delegated failures propagate unchanged.
+     *
+     * @param Closure(): Cached<mixed> $next
+     * @return Cached<mixed>
      */
     #[Override]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
+    public function fetch(string $key, Closure $next): Cached
     {
-        return $next->prepend(...$this->strategies)->fetch($operation);
+        foreach (array_reverse($this->strategies) as $strategy) {
+            $next = static fn (): Cached => $strategy->fetch($key, $next);
+        }
+
+        return $next();
     }
 
     /**
-     * Runs the store operation through the sequence.
+     * Wraps a write in the composed middleware.
      *
-     * @param CacheWrite<mixed> $result
-     * @throws RuntimeException when a delegated write fails with declared behavior
+     * Delegated failures propagate unchanged.
+     *
+     * @param CacheWrite<mixed> $request
+     * @param Closure(string, CacheWrite<mixed>): void $next
      */
     #[Override]
-    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void
+    public function set(string $key, CacheWrite $request, Closure $next): void
     {
-        $next->prepend(...$this->strategies)->set($operation, $result);
+        foreach (array_reverse($this->strategies) as $strategy) {
+            $next = static function (string $key, CacheWrite $request) use ($strategy, $next): void {
+                $strategy->set($key, $request, $next);
+            };
+        }
+
+        $next($key, $request);
     }
 }

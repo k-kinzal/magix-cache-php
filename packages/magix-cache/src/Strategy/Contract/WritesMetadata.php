@@ -9,7 +9,7 @@ use Attribute;
 /**
  * Declares which non-expiration metadata fields fetch() replaces.
  *
- * OriginResult::withMetadata() may replace visibility, tags and cacheability,
+ * A fetch result may replace visibility, tags and cacheability,
  * which no lifetime contract describes. This attribute states which of them an
  * operation writes, so a strategy that only adjusts expiration keeps the
  * composed metadata of its dependencies precise instead of erasing it.
@@ -19,7 +19,7 @@ use Attribute;
  * arguments declares that the operation replaces all of them with values the
  * declaration cannot describe. Naming fields declares exactly those.
  *
- * The declaration covers the normal origin path only. As with every contract
+ * The declaration covers every successful fetch return. As with every contract
  * here, the implementation is free as long as it honors what it declared: an
  * operation that writes a field it did not name breaks its own contract.
  */

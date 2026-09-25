@@ -6,21 +6,23 @@ namespace Tests\Fixture;
 
 use Closure;
 use Magix\Cache\Cached;
+use Magix\Cache\Clock\SystemClock;
+use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CacheWrite;
 use Override;
-use RuntimeException;
+use Psr\Clock\ClockInterface;
 
 /**
- * A delegate whose successful-result processing fails with declared behavior.
+ * Supplies its own origin answer without delegating the inquiry.
  */
-final readonly class FailingStrategy implements CacheStrategy
+final readonly class ImmediateStrategy implements CacheStrategy
 {
     /**
-     * Creates a failing delegate.
+     * Supplies the clock used for relative expiration.
      */
-    public function __construct(private string $message)
+    public function __construct(private readonly ClockInterface $clock = new SystemClock())
     {
     }
 
@@ -35,22 +37,22 @@ final readonly class FailingStrategy implements CacheStrategy
     }
 
     /**
-     * @return Cached<mixed>
-     * @throws RuntimeException when the strategy is executed
+     * @return Cached<string>
      * @param Closure(): Cached<mixed> $next
      */
     #[Override]
     public function fetch(string $key, Closure $next): Cached
     {
-        throw new RuntimeException($this->message);
+        return Cached::of('immediate', new CacheMetadata(expiresAt: (float) $this->clock->now()->format('U.u') + 30.0));
     }
 
     /**
-     * @param CacheWrite<mixed> $result
+     * @param CacheWrite<mixed> $request
      * @param Closure(string, CacheWrite<mixed>): void $next
      */
     #[Override]
-    public function set(string $key, CacheWrite $result, Closure $next): void
+    public function set(string $key, CacheWrite $request, Closure $next): void
     {
+        $next($key, $request);
     }
 }

@@ -29,13 +29,16 @@ trait Cacheable
     private static ?CacheDefinitionResolver $magixCacheDefinitions = null;
 
     /**
-     * Executes the computation once per cache key and propagates its metadata.
+     * Runs a declared cache boundary and propagates the returned metadata.
+     *
+     * The computation is called without arguments. A fresh hit skips the
+     * inquiry; middleware controls delegation and result processing on a miss.
      *
      * @template T
      * @param Closure(): Cached<T> $compute
      * @return Cached<T>
      * @throws LogicException when the calling boundary cannot be identified or declares no #[Cache]
-     * @throws RuntimeException when the origin computation fails without an eligible stale fallback
+     * @throws RuntimeException when an origin failure is not recovered or a delegated stage fails
      */
     final protected function cached(Closure $compute): Cached
     {

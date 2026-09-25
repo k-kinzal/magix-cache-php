@@ -16,11 +16,11 @@ use Magix\Cache\Runtime\Policy\PolicySemantics;
  * Applies policy, parameter TTL and dynamic TTL in ascending priority.
  *
  * All relative expirations use the same time taken after origin success.
- * Strategies receive this result and may override its metadata afterward.
+ * The runtime returns these settings through the middleware call stack.
  *
  * @internal
  */
-final readonly class OriginOverrides
+final readonly class BoundaryMetadata
 {
     /**
      * Creates the success-stage override application.

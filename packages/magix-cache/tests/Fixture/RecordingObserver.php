@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Fixture;
 
-use Magix\Cache\Runtime\Extension\CacheEvent;
-use Magix\Cache\Runtime\Extension\CacheObserver;
+use Magix\Cache\Observation\CacheEvent;
+use Magix\Cache\Observation\CacheObserver;
 use Override;
 
 /**

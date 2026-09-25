@@ -20,7 +20,7 @@
 <script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}}catch(e){}</script>
 </head>
 <body data-root="../../../../../">
-<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li><a href="../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li><a href="../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li><a href="../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li><a href="../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li><a href="../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li><a href="../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li><a href="../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li><a href="../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li><a href="../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li><a href="../../../../../guzzlehttp/promises/index.html">guzzlehttp/promises</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
 <div class="page">
 <header class="topbar">
 <button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
@@ -43,10 +43,10 @@
 <span class="src-line" id="L7"><a class="ln" href="#L7">7</a><span class="tok-kw">use</span> <span class="tok-id">Closure</span>;</span>
 <span class="src-line" id="L8"><a class="ln" href="#L8">8</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cache\Cache</span>;</span>
 <span class="src-line" id="L9"><a class="ln" href="#L9">9</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Cache\CacheEntry</span>;</span>
-<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\BackendErrorClassifier</span>;</span>
-<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\CacheAccess</span>;</span>
-<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\CacheEvent</span>;</span>
-<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\CacheObserver</span>;</span>
+<span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Observation\CacheEvent</span>;</span>
+<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Observation\CacheObserver</span>;</span>
+<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\BackendErrorClassifier</span>;</span>
+<span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-kw">use</span> <span class="tok-id">Magix\Cache\Runtime\Extension\CacheAccess</span>;</span>
 <span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-kw">use</span> <span class="tok-id">RuntimeException</span>;</span>
 <span class="src-line" id="L15"><a class="ln" href="#L15">15</a></span>
 <span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-com">/**</span></span>

@@ -20,7 +20,7 @@
 <script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}}catch(e){}</script>
 </head>
 <body data-root="../../../../../../">
-<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li><a href="../../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li><a href="../../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li><a href="../../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li><a href="../../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li><a href="../../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li><a href="../../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li><a href="../../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li><a href="../../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li><a href="../../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li><a href="../../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li><a href="../../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li><a href="../../../../../../guzzlehttp/promises/index.html">guzzlehttp/promises</a><span class="sb-note">dev</span></li><li><a href="../../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li><a href="../../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li><a href="../../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
 <div class="page">
 <header class="topbar">
 <button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
@@ -45,7 +45,7 @@
 <span class="src-line" id="L9"><a class="ln" href="#L9">9</a><span class="tok-com">/**</span></span>
 <span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-com"> * Declares which non-expiration metadata fields fetch() replaces.</span></span>
 <span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * OriginResult::withMetadata() may replace visibility, tags and cacheability,</span></span>
+<span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> * A fetch result may replace visibility, tags and cacheability,</span></span>
 <span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> * which no lifetime contract describes. This attribute states which of them an</span></span>
 <span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com"> * operation writes, so a strategy that only adjusts expiration keeps the</span></span>
 <span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com"> * composed metadata of its dependencies precise instead of erasing it.</span></span>
@@ -55,7 +55,7 @@
 <span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com"> * arguments declares that the operation replaces all of them with values the</span></span>
 <span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com"> * declaration cannot describe. Naming fields declares exactly those.</span></span>
 <span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L22"><a class="ln" href="#L22">22</a><span class="tok-com"> * The declaration covers the normal origin path only. As with every contract</span></span>
+<span class="src-line" id="L22"><a class="ln" href="#L22">22</a><span class="tok-com"> * The declaration covers every successful fetch return. As with every contract</span></span>
 <span class="src-line" id="L23"><a class="ln" href="#L23">23</a><span class="tok-com"> * here, the implementation is free as long as it honors what it declared: an</span></span>
 <span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-com"> * operation that writes a field it did not name breaks its own contract.</span></span>
 <span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-com"> */</span></span>

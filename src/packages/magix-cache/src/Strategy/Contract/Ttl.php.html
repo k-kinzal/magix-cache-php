@@ -20,7 +20,7 @@
 <script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}}catch(e){}</script>
 </head>
 <body data-root="../../../../../../">
-<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li><a href="../../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li><a href="../../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li><a href="../../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li><a href="../../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li><a href="../../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li><a href="../../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li><a href="../../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li><a href="../../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li><a href="../../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li><a href="../../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li><a href="../../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li><a href="../../../../../../guzzlehttp/promises/index.html">guzzlehttp/promises</a><span class="sb-note">dev</span></li><li><a href="../../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li><a href="../../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li><a href="../../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
 <div class="page">
 <header class="topbar">
 <button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
@@ -44,12 +44,12 @@
 <span class="src-line" id="L8"><a class="ln" href="#L8">8</a><span class="tok-kw">use</span> <span class="tok-id">InvalidArgumentException</span>;</span>
 <span class="src-line" id="L9"><a class="ln" href="#L9">9</a></span>
 <span class="src-line" id="L10"><a class="ln" href="#L10">10</a><span class="tok-com">/**</span></span>
-<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com"> * Declares the lifetime override a strategy makes on the normal origin path.</span></span>
+<span class="src-line" id="L11"><a class="ln" href="#L11">11</a><span class="tok-com"> * Declares the lifetime override a strategy makes on every successful fetch return.</span></span>
 <span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-com"> *</span></span>
 <span class="src-line" id="L13"><a class="ln" href="#L13">13</a><span class="tok-com"> * The contract is about the candidate constraint the operation contributes,</span></span>
 <span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com"> * not about the format of an algorithm: a declaration with bounds promises</span></span>
 <span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com"> * that the strategy replaces expiration with a finite lifetime within the</span></span>
-<span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-com"> * declared bounds relative to the origin base time. This override may extend</span></span>
+<span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-com"> * declared bounds relative to its chosen evaluation time. This override may extend</span></span>
 <span class="src-line" id="L17"><a class="ln" href="#L17">17</a><span class="tok-com"> * an inherited or policy deadline. A missing bound is undetermined, not</span></span>
 <span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com"> * unlimited. Omitting the attribute, or supplying no arguments, declares</span></span>
 <span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com"> * that the operation preserves the incoming expiration.</span></span>
@@ -57,8 +57,8 @@
 <span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com"> * declared points and ranges. Alternatives describe possible outcomes, not simultaneous</span></span>
 <span class="src-line" id="L22"><a class="ln" href="#L22">22</a><span class="tok-com"> * constraints, and do not prove which runtime condition selects each one.</span></span>
 <span class="src-line" id="L23"><a class="ln" href="#L23">23</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-com"> * The declaration covers the normal origin path only; a stale answer keeps</span></span>
-<span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-com"> * the expired expiration it was stored with.</span></span>
+<span class="src-line" id="L24"><a class="ln" href="#L24">24</a><span class="tok-com"> * An outer middleware applies the same override to a value returned by an</span></span>
+<span class="src-line" id="L25"><a class="ln" href="#L25">25</a><span class="tok-com"> * inner error handler. The common contract never classifies value sources.</span></span>
 <span class="src-line" id="L26"><a class="ln" href="#L26">26</a><span class="tok-com"> */</span></span>
 <span class="src-line" id="L27"><a class="ln" href="#L27">27</a>#[<span class="tok-id">Attribute</span>(<span class="tok-id">Attribute</span>::<span class="tok-id">TARGET_METHOD</span>)]</span>
 <span class="src-line" id="L28"><a class="ln" href="#L28">28</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">Ttl</span></span>

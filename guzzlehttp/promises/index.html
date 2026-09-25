@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>guzzlehttp/promises — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/guzzlehttp/promises/">
+<meta name="description" content="Guzzle promises library">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="guzzlehttp/promises — magix-cache-php">
+<meta property="og:description" content="Guzzle promises library">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/guzzlehttp/promises/">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}}catch(e){}</script>
+</head>
+<body data-root="../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../index.html">magix-cache-php</a></div><div class="sb-pkg"><a href="../../guzzlehttp/promises/index.html">guzzlehttp/promises</a></div><nav class="sb-block"><div class="sb-title">On this page</div><ul class="sb-list"><li><a href="#namespaces">Namespaces</a></li><li><a href="#readme">README</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Package</div><ul class="sb-list"><li><a href="../../guzzlehttp/promises/all-items.html">All items</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Namespaces</div><ul class="sb-list"><li><a href="../../guzzlehttp/promises/GuzzleHttp/Promise/index.html" title="GuzzleHttp\Promise">GuzzleHttp\Promise</a></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><span class="crumb-current">guzzlehttp/promises</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<div class="symbol-head"><h1><span class="chip chip-kind k-package">package</span>guzzlehttp/promises <span class="chip chip-sm chip-ghost">dev dependency</span></h1></div>
+<p class="lede">Guzzle promises library</p>
+<div class="relation-row"><span class="relation-label">Required by</span> <a href="../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></div>
+<section><h2 id="namespaces">Namespaces<a class="anchor" href="#namespaces">§</a></h2><div class="table-wrap"><table class="symbol-table"><tr><td><a href="../../guzzlehttp/promises/GuzzleHttp/Promise/index.html">GuzzleHttp\Promise</a></td><td class="ns-counts"> <span class="ns-count k-interface">3 interfaces</span> <span class="ns-count k-class">13 classes</span> <span class="ns-count k-trait">1 trait</span></td></tr></table></div></section>
+<section class="readme"><h2 id="readme">README<a class="anchor" href="#readme">§</a></h2><h2>Guzzle Promises</h2>
+<p><code>guzzlehttp/promises</code> is a small promise library used by Guzzle for asynchronous operations. It implements promise chaining, synchronous waiting, cancellation, and helpers for working with groups of promises.</p>
+<p>Most application developers use this package through <a href="https://github.com/guzzle/guzzle/blob/8.0/README.md"><code>guzzlehttp/guzzle</code></a> by calling methods such as <code>requestAsync()</code>. Install this package directly when you need promise composition without the full HTTP client.</p>
+<h3>Installation</h3>
+<pre class="code-block"><code>composer require guzzlehttp/promises</code></pre>
+<h3>Version Guidance</h3>
+<div class="table-wrap"><table><thead><tr><th>Version</th><th>Status</th><th>PHP Version</th></tr></thead><tbody><tr><td>3.0</td><td>Latest</td><td>&gt;=7.4,&lt;8.7</td></tr><tr><td>2.5</td><td>Maintenance</td><td>&gt;=7.2.5,&lt;8.7</td></tr><tr><td>1.5</td><td>End of Life</td><td>&gt;=5.5,&lt;8.3</td></tr></tbody></table></div>
+<h3>Quick Start</h3>
+<pre class="code-block"><code><span class="tok-kw">use</span> <span class="tok-id">GuzzleHttp\Promise\Promise</span>;
+<span class="tok-kw">use</span> <span class="tok-id">GuzzleHttp\Promise\Utils</span>;
+
+<span class="tok-var">$promise</span> = <span class="tok-kw">new</span> <span class="tok-id">Promise</span>();
+
+<span class="tok-var">$promise</span>-&gt;<span class="tok-id">then</span>(
+    <span class="tok-kw">function</span> (<span class="tok-var">$value</span>) {
+        <span class="tok-kw">echo</span> <span class="tok-str">&#039;Fulfilled: &#039;</span> . <span class="tok-var">$value</span>;
+    },
+    <span class="tok-kw">function</span> (<span class="tok-var">$reason</span>) {
+        <span class="tok-kw">echo</span> <span class="tok-str">&#039;Rejected: &#039;</span> . <span class="tok-var">$reason</span>;
+    }
+);
+
+<span class="tok-var">$promise</span>-&gt;<span class="tok-id">resolve</span>(<span class="tok-str">&#039;done&#039;</span>);
+<span class="tok-id">Utils</span>::<span class="tok-id">queue</span>()-&gt;<span class="tok-id">run</span>();</code></pre>
+<p>You can wait for a promise to complete synchronously:</p>
+<pre class="code-block"><code><span class="tok-var">$value</span> = <span class="tok-var">$promise</span>-&gt;<span class="tok-id">wait</span>();</code></pre>
+<p>A promise&#039;s <code>getState()</code> describes how it was settled, not the eventual outcome: a promise that was resolved with another promise, directly or by returning one from a <code>then()</code> handler, reports <code>fulfilled</code> while the inner promise may still be pending, and <code>wait()</code> can still throw if the inner promise rejects. Poll the state only on promises settled with plain values, or call <code>wait()</code> first (see <a href="https://github.com/guzzle/promises/issues/101">guzzle/promises#101</a>).</p>
+<p>When using Guzzle HTTP requests, asynchronous methods return <code>GuzzleHttp\Promise\PromiseInterface</code> instances:</p>
+<pre class="code-block"><code><span class="tok-var">$promise</span> = <span class="tok-var">$client</span>-&gt;<span class="tok-id">requestAsync</span>(<span class="tok-str">&#039;GET&#039;</span>, <span class="tok-str">&#039;https://example.com&#039;</span>);
+<span class="tok-var">$response</span> = <span class="tok-var">$promise</span>-&gt;<span class="tok-id">wait</span>();</code></pre>
+<h3>Documentation</h3>
+<ul><li><span class="md-target" title="docs/promise-quick-start.md">Promise Quick Start</span></li><li><span class="md-target" title="docs/promise-api.md">Promise API</span></li><li><span class="md-target" title="docs/promise-interoperability.md">Promise Interoperability</span></li><li><span class="md-target" title="docs/implementation-notes.md">Implementation Notes</span></li><li><span class="md-target" title="UPGRADING.md">Upgrade Guide</span></li><li><span class="md-target" title="CHANGELOG.md">Changelog</span></li></ul>
+<h3>Security</h3>
+<p>If you discover a security vulnerability within this package, please send an email to security@tidelift.com. All security vulnerabilities will be promptly addressed. Please do not disclose security-related issues publicly until a fix has been announced. Please see <a href="https://github.com/guzzle/promises/security/policy">Security Policy</a> for more information.</p>
+<h3>License</h3>
+<p>Guzzle is made available under the MIT License (MIT). Please see <span class="md-target" title="LICENSE">License File</span> for more information.</p>
+<h3>For Enterprise</h3>
+<p>Available as part of the Tidelift Subscription</p>
+<p>The maintainers of Guzzle and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. <a href="https://tidelift.com/subscription/pkg/packagist-guzzlehttp-promises?utm_source=packagist-guzzlehttp-promises&amp;utm_medium=referral&amp;utm_campaign=enterprise&amp;utm_term=repo">Learn more.</a></p>
+</section>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/app.js" defer></script>
+</body>
+</html>

@@ -20,7 +20,7 @@
 <script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}}catch(e){}</script>
 </head>
 <body data-root="../../../../../">
-<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li><a href="../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li><a href="../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li><a href="../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li><a href="../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li><a href="../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li><a href="../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li><a href="../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li><a href="../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li><a href="../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li><a href="../../../../../guzzlehttp/promises/index.html">guzzlehttp/promises</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
 <div class="page">
 <header class="topbar">
 <button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
@@ -48,10 +48,10 @@
 <span class="src-line" id="L12"><a class="ln" href="#L12">12</a><span class="tok-kw">use</span> <span class="tok-id">RuntimeException</span>;</span>
 <span class="src-line" id="L13"><a class="ln" href="#L13">13</a></span>
 <span class="src-line" id="L14"><a class="ln" href="#L14">14</a><span class="tok-com">/**</span></span>
-<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com"> * Serves a retained expired entry when the origin fails with a declared exception.</span></span>
+<span class="src-line" id="L15"><a class="ln" href="#L15">15</a><span class="tok-com"> * Serves a retained expired entry when the delegated inquiry fails.</span></span>
 <span class="src-line" id="L16"><a class="ln" href="#L16">16</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L17"><a class="ln" href="#L17">17</a><span class="tok-com"> * Only the origin call is inside the capture range, and only failures the</span></span>
-<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com"> * origin declares as behavior are eligible: every declared type must be a</span></span>
+<span class="src-line" id="L17"><a class="ln" href="#L17">17</a><span class="tok-com"> * The normalized strategy catches its delegated fetch, including inner</span></span>
+<span class="src-line" id="L18"><a class="ln" href="#L18">18</a><span class="tok-com"> * middleware and local boundary settings. Every accepted type must be a</span></span>
 <span class="src-line" id="L19"><a class="ln" href="#L19">19</a><span class="tok-com"> * RuntimeException subtype, and an empty list is rejected. Bugs — the</span></span>
 <span class="src-line" id="L20"><a class="ln" href="#L20">20</a><span class="tok-com"> * LogicException family and PHP Errors — are never RuntimeException, so they</span></span>
 <span class="src-line" id="L21"><a class="ln" href="#L21">21</a><span class="tok-com"> * can never trigger the fallback; an origin that meets an expected outage in</span></span>

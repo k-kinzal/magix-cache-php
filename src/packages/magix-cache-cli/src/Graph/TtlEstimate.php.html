@@ -20,7 +20,7 @@
 <script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}}catch(e){}</script>
 </head>
 <body data-root="../../../../../">
-<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li><a href="../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li><a href="../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li><a href="../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li><a href="../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li><a href="../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../index.html">magix-cache-php</a></div><nav class="sb-block"><div class="sb-title">Packages</div><ul class="sb-list"><li><a href="../../../../../k-kinzal/magix-cache/index.html">k-kinzal/magix-cache</a></li><li><a href="../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></li><li><a href="../../../../../k-kinzal/magix-cache-laravel/index.html">k-kinzal/magix-cache-laravel</a></li><li><a href="../../../../../k-kinzal/magix-cache-symfony/index.html">k-kinzal/magix-cache-symfony</a></li><li><a href="../../../../../guzzlehttp/promises/index.html">guzzlehttp/promises</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/cache/index.html">psr/cache</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/clock/index.html">psr/clock</a><span class="sb-note">dev</span></li><li><a href="../../../../../psr/simple-cache/index.html">psr/simple-cache</a><span class="sb-note">dev</span></li></ul></nav></nav>
 <div class="page">
 <header class="topbar">
 <button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
@@ -211,161 +211,173 @@
 <span class="src-line" id="L175"><a class="ln" href="#L175">175</a>    }</span>
 <span class="src-line" id="L176"><a class="ln" href="#L176">176</a></span>
 <span class="src-line" id="L177"><a class="ln" href="#L177">177</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L178"><a class="ln" href="#L178">178</a><span class="tok-com">     * Returns the stricter combination of two estimates.</span></span>
+<span class="src-line" id="L178"><a class="ln" href="#L178">178</a><span class="tok-com">     * Reports the proof that this lifetime alone leaves nothing to store.</span></span>
 <span class="src-line" id="L179"><a class="ln" href="#L179">179</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L180"><a class="ln" href="#L180">180</a><span class="tok-com">     * Invalid dominates, Unconstrained is the identity, and two Known values</span></span>
-<span class="src-line" id="L181"><a class="ln" href="#L181">181</a><span class="tok-com">     * keep the earlier one. Every other combination keeps the provable</span></span>
-<span class="src-line" id="L182"><a class="ln" href="#L182">182</a><span class="tok-com">     * bounds: the upper bound is the tightest one any side guarantees, the</span></span>
-<span class="src-line" id="L183"><a class="ln" href="#L183">183</a><span class="tok-com">     * lower bound survives only when both sides guarantee one, and a</span></span>
-<span class="src-line" id="L184"><a class="ln" href="#L184">184</a><span class="tok-com">     * combination pinned to one value without a runtime condition becomes</span></span>
-<span class="src-line" id="L185"><a class="ln" href="#L185">185</a><span class="tok-com">     * Known.</span></span>
-<span class="src-line" id="L186"><a class="ln" href="#L186">186</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L187"><a class="ln" href="#L187">187</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">meet</span>(<span class="tok-id">self</span> <span class="tok-var">$other</span>): <span class="tok-id">self</span></span>
-<span class="src-line" id="L188"><a class="ln" href="#L188">188</a>    {</span>
-<span class="src-line" id="L189"><a class="ln" href="#L189">189</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Invalid</span>) {</span>
-<span class="src-line" id="L190"><a class="ln" href="#L190">190</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>;</span>
-<span class="src-line" id="L191"><a class="ln" href="#L191">191</a>        }</span>
-<span class="src-line" id="L192"><a class="ln" href="#L192">192</a></span>
-<span class="src-line" id="L193"><a class="ln" href="#L193">193</a>        <span class="tok-kw">if</span> (<span class="tok-var">$other</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Invalid</span>) {</span>
-<span class="src-line" id="L194"><a class="ln" href="#L194">194</a>            <span class="tok-kw">return</span> <span class="tok-var">$other</span>;</span>
-<span class="src-line" id="L195"><a class="ln" href="#L195">195</a>        }</span>
-<span class="src-line" id="L196"><a class="ln" href="#L196">196</a></span>
-<span class="src-line" id="L197"><a class="ln" href="#L197">197</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unconstrained</span>) {</span>
-<span class="src-line" id="L198"><a class="ln" href="#L198">198</a>            <span class="tok-kw">return</span> <span class="tok-var">$other</span>;</span>
-<span class="src-line" id="L199"><a class="ln" href="#L199">199</a>        }</span>
-<span class="src-line" id="L200"><a class="ln" href="#L200">200</a></span>
-<span class="src-line" id="L201"><a class="ln" href="#L201">201</a>        <span class="tok-kw">if</span> (<span class="tok-var">$other</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unconstrained</span>) {</span>
+<span class="src-line" id="L180"><a class="ln" href="#L180">180</a><span class="tok-com">     * Storing requires a future finite expiration, so a proven absence of one</span></span>
+<span class="src-line" id="L181"><a class="ln" href="#L181">181</a><span class="tok-com">     * is as conclusive as a proven zero. Neither is a defect: the boundary</span></span>
+<span class="src-line" id="L182"><a class="ln" href="#L182">182</a><span class="tok-com">     * simply computes its result every time.</span></span>
+<span class="src-line" id="L183"><a class="ln" href="#L183">183</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L184"><a class="ln" href="#L184">184</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">storesNothing</span>(): <span class="tok-id">bool</span></span>
+<span class="src-line" id="L185"><a class="ln" href="#L185">185</a>    {</span>
+<span class="src-line" id="L186"><a class="ln" href="#L186">186</a>        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unconstrained</span> || <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> === <span class="tok-num">0</span>;</span>
+<span class="src-line" id="L187"><a class="ln" href="#L187">187</a>    }</span>
+<span class="src-line" id="L188"><a class="ln" href="#L188">188</a></span>
+<span class="src-line" id="L189"><a class="ln" href="#L189">189</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L190"><a class="ln" href="#L190">190</a><span class="tok-com">     * Returns the stricter combination of two estimates.</span></span>
+<span class="src-line" id="L191"><a class="ln" href="#L191">191</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L192"><a class="ln" href="#L192">192</a><span class="tok-com">     * Invalid dominates, Unconstrained is the identity, and two Known values</span></span>
+<span class="src-line" id="L193"><a class="ln" href="#L193">193</a><span class="tok-com">     * keep the earlier one. Every other combination keeps the provable</span></span>
+<span class="src-line" id="L194"><a class="ln" href="#L194">194</a><span class="tok-com">     * bounds: the upper bound is the tightest one any side guarantees, the</span></span>
+<span class="src-line" id="L195"><a class="ln" href="#L195">195</a><span class="tok-com">     * lower bound survives only when both sides guarantee one, and a</span></span>
+<span class="src-line" id="L196"><a class="ln" href="#L196">196</a><span class="tok-com">     * combination pinned to one value without a runtime condition becomes</span></span>
+<span class="src-line" id="L197"><a class="ln" href="#L197">197</a><span class="tok-com">     * Known.</span></span>
+<span class="src-line" id="L198"><a class="ln" href="#L198">198</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L199"><a class="ln" href="#L199">199</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">meet</span>(<span class="tok-id">self</span> <span class="tok-var">$other</span>): <span class="tok-id">self</span></span>
+<span class="src-line" id="L200"><a class="ln" href="#L200">200</a>    {</span>
+<span class="src-line" id="L201"><a class="ln" href="#L201">201</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Invalid</span>) {</span>
 <span class="src-line" id="L202"><a class="ln" href="#L202">202</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>;</span>
 <span class="src-line" id="L203"><a class="ln" href="#L203">203</a>        }</span>
 <span class="src-line" id="L204"><a class="ln" href="#L204">204</a></span>
-<span class="src-line" id="L205"><a class="ln" href="#L205">205</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> !== <span class="tok-id">null</span> &amp;&amp; <span class="tok-var">$other</span>-&gt;<span class="tok-id">seconds</span> !== <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L206"><a class="ln" href="#L206">206</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> &lt;= <span class="tok-var">$other</span>-&gt;<span class="tok-id">seconds</span> ? <span class="tok-var">$this</span> : <span class="tok-var">$other</span>;</span>
+<span class="src-line" id="L205"><a class="ln" href="#L205">205</a>        <span class="tok-kw">if</span> (<span class="tok-var">$other</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Invalid</span>) {</span>
+<span class="src-line" id="L206"><a class="ln" href="#L206">206</a>            <span class="tok-kw">return</span> <span class="tok-var">$other</span>;</span>
 <span class="src-line" id="L207"><a class="ln" href="#L207">207</a>        }</span>
 <span class="src-line" id="L208"><a class="ln" href="#L208">208</a></span>
-<span class="src-line" id="L209"><a class="ln" href="#L209">209</a>        <span class="tok-kw">return</span> <span class="tok-id">self</span>::<span class="tok-id">fromRanges</span>(</span>
-<span class="src-line" id="L210"><a class="ln" href="#L210">210</a>            <span class="tok-var">$this</span>-&gt;<span class="tok-id">ranges</span>()-&gt;<span class="tok-id">meet</span>(<span class="tok-var">$other</span>-&gt;<span class="tok-id">ranges</span>()),</span>
-<span class="src-line" id="L211"><a class="ln" href="#L211">211</a>            <span class="tok-var">$this</span>-&gt;<span class="tok-id">condition</span>(<span class="tok-var">$other</span>),</span>
-<span class="src-line" id="L212"><a class="ln" href="#L212">212</a>            <span class="tok-var">$this</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>() || <span class="tok-var">$other</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>(),</span>
-<span class="src-line" id="L213"><a class="ln" href="#L213">213</a>        );</span>
-<span class="src-line" id="L214"><a class="ln" href="#L214">214</a>    }</span>
-<span class="src-line" id="L215"><a class="ln" href="#L215">215</a></span>
-<span class="src-line" id="L216"><a class="ln" href="#L216">216</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L217"><a class="ln" href="#L217">217</a><span class="tok-com">     * Returns the tightest upper bound two combined estimates guarantee.</span></span>
-<span class="src-line" id="L218"><a class="ln" href="#L218">218</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L219"><a class="ln" href="#L219">219</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">bound</span>(<span class="tok-id">self</span> <span class="tok-var">$other</span>): ?<span class="tok-id">int</span></span>
-<span class="src-line" id="L220"><a class="ln" href="#L220">220</a>    {</span>
-<span class="src-line" id="L221"><a class="ln" href="#L221">221</a>        <span class="tok-var">$first</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> ?? <span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span>;</span>
-<span class="src-line" id="L222"><a class="ln" href="#L222">222</a>        <span class="tok-var">$second</span> = <span class="tok-var">$other</span>-&gt;<span class="tok-id">seconds</span> ?? <span class="tok-var">$other</span>-&gt;<span class="tok-id">upperBound</span>;</span>
-<span class="src-line" id="L223"><a class="ln" href="#L223">223</a></span>
-<span class="src-line" id="L224"><a class="ln" href="#L224">224</a>        <span class="tok-kw">if</span> (<span class="tok-var">$first</span> === <span class="tok-id">null</span> || <span class="tok-var">$second</span> === <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L225"><a class="ln" href="#L225">225</a>            <span class="tok-kw">return</span> <span class="tok-var">$first</span> ?? <span class="tok-var">$second</span>;</span>
-<span class="src-line" id="L226"><a class="ln" href="#L226">226</a>        }</span>
+<span class="src-line" id="L209"><a class="ln" href="#L209">209</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unconstrained</span>) {</span>
+<span class="src-line" id="L210"><a class="ln" href="#L210">210</a>            <span class="tok-kw">return</span> <span class="tok-var">$other</span>;</span>
+<span class="src-line" id="L211"><a class="ln" href="#L211">211</a>        }</span>
+<span class="src-line" id="L212"><a class="ln" href="#L212">212</a></span>
+<span class="src-line" id="L213"><a class="ln" href="#L213">213</a>        <span class="tok-kw">if</span> (<span class="tok-var">$other</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unconstrained</span>) {</span>
+<span class="src-line" id="L214"><a class="ln" href="#L214">214</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>;</span>
+<span class="src-line" id="L215"><a class="ln" href="#L215">215</a>        }</span>
+<span class="src-line" id="L216"><a class="ln" href="#L216">216</a></span>
+<span class="src-line" id="L217"><a class="ln" href="#L217">217</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> !== <span class="tok-id">null</span> &amp;&amp; <span class="tok-var">$other</span>-&gt;<span class="tok-id">seconds</span> !== <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L218"><a class="ln" href="#L218">218</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> &lt;= <span class="tok-var">$other</span>-&gt;<span class="tok-id">seconds</span> ? <span class="tok-var">$this</span> : <span class="tok-var">$other</span>;</span>
+<span class="src-line" id="L219"><a class="ln" href="#L219">219</a>        }</span>
+<span class="src-line" id="L220"><a class="ln" href="#L220">220</a></span>
+<span class="src-line" id="L221"><a class="ln" href="#L221">221</a>        <span class="tok-kw">return</span> <span class="tok-id">self</span>::<span class="tok-id">fromRanges</span>(</span>
+<span class="src-line" id="L222"><a class="ln" href="#L222">222</a>            <span class="tok-var">$this</span>-&gt;<span class="tok-id">ranges</span>()-&gt;<span class="tok-id">meet</span>(<span class="tok-var">$other</span>-&gt;<span class="tok-id">ranges</span>()),</span>
+<span class="src-line" id="L223"><a class="ln" href="#L223">223</a>            <span class="tok-var">$this</span>-&gt;<span class="tok-id">condition</span>(<span class="tok-var">$other</span>),</span>
+<span class="src-line" id="L224"><a class="ln" href="#L224">224</a>            <span class="tok-var">$this</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>() || <span class="tok-var">$other</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>(),</span>
+<span class="src-line" id="L225"><a class="ln" href="#L225">225</a>        );</span>
+<span class="src-line" id="L226"><a class="ln" href="#L226">226</a>    }</span>
 <span class="src-line" id="L227"><a class="ln" href="#L227">227</a></span>
-<span class="src-line" id="L228"><a class="ln" href="#L228">228</a>        <span class="tok-kw">return</span> <span class="tok-id">min</span>(<span class="tok-var">$first</span>, <span class="tok-var">$second</span>);</span>
-<span class="src-line" id="L229"><a class="ln" href="#L229">229</a>    }</span>
-<span class="src-line" id="L230"><a class="ln" href="#L230">230</a></span>
-<span class="src-line" id="L231"><a class="ln" href="#L231">231</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L232"><a class="ln" href="#L232">232</a><span class="tok-com">     * Returns the lower bound two combined estimates still guarantee.</span></span>
-<span class="src-line" id="L233"><a class="ln" href="#L233">233</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L234"><a class="ln" href="#L234">234</a><span class="tok-com">     * The combination takes the earlier constraint, so the guarantee only</span></span>
-<span class="src-line" id="L235"><a class="ln" href="#L235">235</a><span class="tok-com">     * survives when both sides carry one.</span></span>
-<span class="src-line" id="L236"><a class="ln" href="#L236">236</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L237"><a class="ln" href="#L237">237</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">floor</span>(<span class="tok-id">self</span> <span class="tok-var">$other</span>): ?<span class="tok-id">int</span></span>
-<span class="src-line" id="L238"><a class="ln" href="#L238">238</a>    {</span>
-<span class="src-line" id="L239"><a class="ln" href="#L239">239</a>        <span class="tok-var">$first</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> ?? <span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span>;</span>
-<span class="src-line" id="L240"><a class="ln" href="#L240">240</a>        <span class="tok-var">$second</span> = <span class="tok-var">$other</span>-&gt;<span class="tok-id">seconds</span> ?? <span class="tok-var">$other</span>-&gt;<span class="tok-id">lowerBound</span>;</span>
-<span class="src-line" id="L241"><a class="ln" href="#L241">241</a></span>
-<span class="src-line" id="L242"><a class="ln" href="#L242">242</a>        <span class="tok-kw">if</span> (<span class="tok-var">$first</span> === <span class="tok-id">null</span> || <span class="tok-var">$second</span> === <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L243"><a class="ln" href="#L243">243</a>            <span class="tok-kw">return</span> <span class="tok-id">null</span>;</span>
-<span class="src-line" id="L244"><a class="ln" href="#L244">244</a>        }</span>
-<span class="src-line" id="L245"><a class="ln" href="#L245">245</a></span>
-<span class="src-line" id="L246"><a class="ln" href="#L246">246</a>        <span class="tok-kw">return</span> <span class="tok-id">min</span>(<span class="tok-var">$first</span>, <span class="tok-var">$second</span>);</span>
-<span class="src-line" id="L247"><a class="ln" href="#L247">247</a>    }</span>
-<span class="src-line" id="L248"><a class="ln" href="#L248">248</a></span>
-<span class="src-line" id="L249"><a class="ln" href="#L249">249</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L250"><a class="ln" href="#L250">250</a><span class="tok-com">     * Returns the runtime condition that survives combining two estimates.</span></span>
-<span class="src-line" id="L251"><a class="ln" href="#L251">251</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L252"><a class="ln" href="#L252">252</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">condition</span>(<span class="tok-id">self</span> <span class="tok-var">$other</span>): ?<span class="tok-id">string</span></span>
-<span class="src-line" id="L253"><a class="ln" href="#L253">253</a>    {</span>
-<span class="src-line" id="L254"><a class="ln" href="#L254">254</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">reason</span> !== <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L255"><a class="ln" href="#L255">255</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">reason</span>;</span>
+<span class="src-line" id="L228"><a class="ln" href="#L228">228</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L229"><a class="ln" href="#L229">229</a><span class="tok-com">     * Returns the tightest upper bound two combined estimates guarantee.</span></span>
+<span class="src-line" id="L230"><a class="ln" href="#L230">230</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L231"><a class="ln" href="#L231">231</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">bound</span>(<span class="tok-id">self</span> <span class="tok-var">$other</span>): ?<span class="tok-id">int</span></span>
+<span class="src-line" id="L232"><a class="ln" href="#L232">232</a>    {</span>
+<span class="src-line" id="L233"><a class="ln" href="#L233">233</a>        <span class="tok-var">$first</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> ?? <span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span>;</span>
+<span class="src-line" id="L234"><a class="ln" href="#L234">234</a>        <span class="tok-var">$second</span> = <span class="tok-var">$other</span>-&gt;<span class="tok-id">seconds</span> ?? <span class="tok-var">$other</span>-&gt;<span class="tok-id">upperBound</span>;</span>
+<span class="src-line" id="L235"><a class="ln" href="#L235">235</a></span>
+<span class="src-line" id="L236"><a class="ln" href="#L236">236</a>        <span class="tok-kw">if</span> (<span class="tok-var">$first</span> === <span class="tok-id">null</span> || <span class="tok-var">$second</span> === <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L237"><a class="ln" href="#L237">237</a>            <span class="tok-kw">return</span> <span class="tok-var">$first</span> ?? <span class="tok-var">$second</span>;</span>
+<span class="src-line" id="L238"><a class="ln" href="#L238">238</a>        }</span>
+<span class="src-line" id="L239"><a class="ln" href="#L239">239</a></span>
+<span class="src-line" id="L240"><a class="ln" href="#L240">240</a>        <span class="tok-kw">return</span> <span class="tok-id">min</span>(<span class="tok-var">$first</span>, <span class="tok-var">$second</span>);</span>
+<span class="src-line" id="L241"><a class="ln" href="#L241">241</a>    }</span>
+<span class="src-line" id="L242"><a class="ln" href="#L242">242</a></span>
+<span class="src-line" id="L243"><a class="ln" href="#L243">243</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L244"><a class="ln" href="#L244">244</a><span class="tok-com">     * Returns the lower bound two combined estimates still guarantee.</span></span>
+<span class="src-line" id="L245"><a class="ln" href="#L245">245</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L246"><a class="ln" href="#L246">246</a><span class="tok-com">     * The combination takes the earlier constraint, so the guarantee only</span></span>
+<span class="src-line" id="L247"><a class="ln" href="#L247">247</a><span class="tok-com">     * survives when both sides carry one.</span></span>
+<span class="src-line" id="L248"><a class="ln" href="#L248">248</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L249"><a class="ln" href="#L249">249</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">floor</span>(<span class="tok-id">self</span> <span class="tok-var">$other</span>): ?<span class="tok-id">int</span></span>
+<span class="src-line" id="L250"><a class="ln" href="#L250">250</a>    {</span>
+<span class="src-line" id="L251"><a class="ln" href="#L251">251</a>        <span class="tok-var">$first</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> ?? <span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span>;</span>
+<span class="src-line" id="L252"><a class="ln" href="#L252">252</a>        <span class="tok-var">$second</span> = <span class="tok-var">$other</span>-&gt;<span class="tok-id">seconds</span> ?? <span class="tok-var">$other</span>-&gt;<span class="tok-id">lowerBound</span>;</span>
+<span class="src-line" id="L253"><a class="ln" href="#L253">253</a></span>
+<span class="src-line" id="L254"><a class="ln" href="#L254">254</a>        <span class="tok-kw">if</span> (<span class="tok-var">$first</span> === <span class="tok-id">null</span> || <span class="tok-var">$second</span> === <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L255"><a class="ln" href="#L255">255</a>            <span class="tok-kw">return</span> <span class="tok-id">null</span>;</span>
 <span class="src-line" id="L256"><a class="ln" href="#L256">256</a>        }</span>
 <span class="src-line" id="L257"><a class="ln" href="#L257">257</a></span>
-<span class="src-line" id="L258"><a class="ln" href="#L258">258</a>        <span class="tok-kw">return</span> <span class="tok-var">$other</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> ? <span class="tok-var">$other</span>-&gt;<span class="tok-id">reason</span> : <span class="tok-id">null</span>;</span>
+<span class="src-line" id="L258"><a class="ln" href="#L258">258</a>        <span class="tok-kw">return</span> <span class="tok-id">min</span>(<span class="tok-var">$first</span>, <span class="tok-var">$second</span>);</span>
 <span class="src-line" id="L259"><a class="ln" href="#L259">259</a>    }</span>
 <span class="src-line" id="L260"><a class="ln" href="#L260">260</a></span>
 <span class="src-line" id="L261"><a class="ln" href="#L261">261</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L262"><a class="ln" href="#L262">262</a><span class="tok-com">     * Reports whether two estimates say exactly the same thing.</span></span>
+<span class="src-line" id="L262"><a class="ln" href="#L262">262</a><span class="tok-com">     * Returns the runtime condition that survives combining two estimates.</span></span>
 <span class="src-line" id="L263"><a class="ln" href="#L263">263</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L264"><a class="ln" href="#L264">264</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">equals</span>(<span class="tok-id">self</span> <span class="tok-var">$other</span>): <span class="tok-id">bool</span></span>
+<span class="src-line" id="L264"><a class="ln" href="#L264">264</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">condition</span>(<span class="tok-id">self</span> <span class="tok-var">$other</span>): ?<span class="tok-id">string</span></span>
 <span class="src-line" id="L265"><a class="ln" href="#L265">265</a>    {</span>
-<span class="src-line" id="L266"><a class="ln" href="#L266">266</a>        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-var">$other</span>-&gt;<span class="tok-id">state</span></span>
-<span class="src-line" id="L267"><a class="ln" href="#L267">267</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> === <span class="tok-var">$other</span>-&gt;<span class="tok-id">seconds</span></span>
-<span class="src-line" id="L268"><a class="ln" href="#L268">268</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span> === <span class="tok-var">$other</span>-&gt;<span class="tok-id">upperBound</span></span>
-<span class="src-line" id="L269"><a class="ln" href="#L269">269</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span> === <span class="tok-var">$other</span>-&gt;<span class="tok-id">lowerBound</span></span>
-<span class="src-line" id="L270"><a class="ln" href="#L270">270</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">alternatives</span>?-&gt;<span class="tok-id">bounds</span>() === <span class="tok-var">$other</span>-&gt;<span class="tok-id">alternatives</span>?-&gt;<span class="tok-id">bounds</span>()</span>
-<span class="src-line" id="L271"><a class="ln" href="#L271">271</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>() === <span class="tok-var">$other</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>()</span>
-<span class="src-line" id="L272"><a class="ln" href="#L272">272</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">reason</span> === <span class="tok-var">$other</span>-&gt;<span class="tok-id">reason</span>;</span>
-<span class="src-line" id="L273"><a class="ln" href="#L273">273</a>    }</span>
-<span class="src-line" id="L274"><a class="ln" href="#L274">274</a></span>
-<span class="src-line" id="L275"><a class="ln" href="#L275">275</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L276"><a class="ln" href="#L276">276</a><span class="tok-com">     * Returns the estimate rendered for human readable output.</span></span>
-<span class="src-line" id="L277"><a class="ln" href="#L277">277</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L278"><a class="ln" href="#L278">278</a><span class="tok-com">     * A range keeps what is proven: &quot;30-60s&quot; for both bounds, &quot;30-?s&quot; when</span></span>
-<span class="src-line" id="L279"><a class="ln" href="#L279">279</a><span class="tok-com">     * only the lower bound is known — the ? is undetermined, not unlimited —</span></span>
-<span class="src-line" id="L280"><a class="ln" href="#L280">280</a><span class="tok-com">     * and &quot;≤60s&quot; when only the upper bound is known.</span></span>
-<span class="src-line" id="L281"><a class="ln" href="#L281">281</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L282"><a class="ln" href="#L282">282</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">label</span>(): <span class="tok-id">string</span></span>
-<span class="src-line" id="L283"><a class="ln" href="#L283">283</a>    {</span>
-<span class="src-line" id="L284"><a class="ln" href="#L284">284</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">alternatives</span> !== <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L285"><a class="ln" href="#L285">285</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">alternatives</span>-&gt;<span class="tok-id">label</span>();</span>
-<span class="src-line" id="L286"><a class="ln" href="#L286">286</a>        }</span>
-<span class="src-line" id="L287"><a class="ln" href="#L287">287</a></span>
-<span class="src-line" id="L288"><a class="ln" href="#L288">288</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> !== <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L289"><a class="ln" href="#L289">289</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span>.<span class="tok-str">&#039;s&#039;</span>;</span>
-<span class="src-line" id="L290"><a class="ln" href="#L290">290</a>        }</span>
-<span class="src-line" id="L291"><a class="ln" href="#L291">291</a></span>
-<span class="src-line" id="L292"><a class="ln" href="#L292">292</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span> !== <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L293"><a class="ln" href="#L293">293</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span> === <span class="tok-id">null</span></span>
-<span class="src-line" id="L294"><a class="ln" href="#L294">294</a>                ? <span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span>.<span class="tok-str">&#039;-?s&#039;</span></span>
-<span class="src-line" id="L295"><a class="ln" href="#L295">295</a>                : <span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span>.<span class="tok-str">&#039;-&#039;</span>.<span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span>.<span class="tok-str">&#039;s&#039;</span>;</span>
-<span class="src-line" id="L296"><a class="ln" href="#L296">296</a>        }</span>
-<span class="src-line" id="L297"><a class="ln" href="#L297">297</a></span>
-<span class="src-line" id="L298"><a class="ln" href="#L298">298</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span> !== <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L299"><a class="ln" href="#L299">299</a>            <span class="tok-kw">return</span> <span class="tok-str">&#039;≤&#039;</span>.<span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span>.<span class="tok-str">&#039;s&#039;</span>;</span>
-<span class="src-line" id="L300"><a class="ln" href="#L300">300</a>        }</span>
-<span class="src-line" id="L301"><a class="ln" href="#L301">301</a></span>
-<span class="src-line" id="L302"><a class="ln" href="#L302">302</a>        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span>-&gt;<span class="tok-id">value</span>;</span>
-<span class="src-line" id="L303"><a class="ln" href="#L303">303</a>    }</span>
-<span class="src-line" id="L304"><a class="ln" href="#L304">304</a></span>
-<span class="src-line" id="L305"><a class="ln" href="#L305">305</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L306"><a class="ln" href="#L306">306</a><span class="tok-com">     * Returns the estimate as plain data for machine readable output.</span></span>
-<span class="src-line" id="L307"><a class="ln" href="#L307">307</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L308"><a class="ln" href="#L308">308</a><span class="tok-com">     * @return array{state: string, seconds: int|null, lowerBound: int|null, upperBound: int|null, reason: string|null, ranges?: non-empty-list&lt;array{min: int|null, max: int|null}&gt;, finite?: true}</span></span>
-<span class="src-line" id="L309"><a class="ln" href="#L309">309</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L310"><a class="ln" href="#L310">310</a>    #[<span class="tok-id">Override</span>]</span>
-<span class="src-line" id="L311"><a class="ln" href="#L311">311</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">jsonSerialize</span>(): <span class="tok-kw">array</span></span>
-<span class="src-line" id="L312"><a class="ln" href="#L312">312</a>    {</span>
-<span class="src-line" id="L313"><a class="ln" href="#L313">313</a>        <span class="tok-var">$serialized</span> = [</span>
-<span class="src-line" id="L314"><a class="ln" href="#L314">314</a>            <span class="tok-str">&#039;state&#039;</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span>-&gt;<span class="tok-id">value</span>,</span>
-<span class="src-line" id="L315"><a class="ln" href="#L315">315</a>            <span class="tok-str">&#039;seconds&#039;</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span>,</span>
-<span class="src-line" id="L316"><a class="ln" href="#L316">316</a>            <span class="tok-str">&#039;lowerBound&#039;</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span>,</span>
-<span class="src-line" id="L317"><a class="ln" href="#L317">317</a>            <span class="tok-str">&#039;upperBound&#039;</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span>,</span>
-<span class="src-line" id="L318"><a class="ln" href="#L318">318</a>            <span class="tok-str">&#039;reason&#039;</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">reason</span>,</span>
-<span class="src-line" id="L319"><a class="ln" href="#L319">319</a>        ];</span>
-<span class="src-line" id="L320"><a class="ln" href="#L320">320</a></span>
-<span class="src-line" id="L321"><a class="ln" href="#L321">321</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">alternatives</span> !== <span class="tok-id">null</span>) {</span>
-<span class="src-line" id="L322"><a class="ln" href="#L322">322</a>            <span class="tok-var">$serialized</span>[<span class="tok-str">&#039;ranges&#039;</span>] = <span class="tok-var">$this</span>-&gt;<span class="tok-id">alternatives</span>-&gt;<span class="tok-id">bounds</span>();</span>
-<span class="src-line" id="L323"><a class="ln" href="#L323">323</a>        }</span>
-<span class="src-line" id="L324"><a class="ln" href="#L324">324</a></span>
-<span class="src-line" id="L325"><a class="ln" href="#L325">325</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">finite</span>) {</span>
-<span class="src-line" id="L326"><a class="ln" href="#L326">326</a>            <span class="tok-var">$serialized</span>[<span class="tok-str">&#039;finite&#039;</span>] = <span class="tok-id">true</span>;</span>
-<span class="src-line" id="L327"><a class="ln" href="#L327">327</a>        }</span>
-<span class="src-line" id="L328"><a class="ln" href="#L328">328</a></span>
-<span class="src-line" id="L329"><a class="ln" href="#L329">329</a>        <span class="tok-kw">return</span> <span class="tok-var">$serialized</span>;</span>
-<span class="src-line" id="L330"><a class="ln" href="#L330">330</a>    }</span>
-<span class="src-line" id="L331"><a class="ln" href="#L331">331</a>}</span>
+<span class="src-line" id="L266"><a class="ln" href="#L266">266</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">reason</span> !== <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L267"><a class="ln" href="#L267">267</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">reason</span>;</span>
+<span class="src-line" id="L268"><a class="ln" href="#L268">268</a>        }</span>
+<span class="src-line" id="L269"><a class="ln" href="#L269">269</a></span>
+<span class="src-line" id="L270"><a class="ln" href="#L270">270</a>        <span class="tok-kw">return</span> <span class="tok-var">$other</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> ? <span class="tok-var">$other</span>-&gt;<span class="tok-id">reason</span> : <span class="tok-id">null</span>;</span>
+<span class="src-line" id="L271"><a class="ln" href="#L271">271</a>    }</span>
+<span class="src-line" id="L272"><a class="ln" href="#L272">272</a></span>
+<span class="src-line" id="L273"><a class="ln" href="#L273">273</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L274"><a class="ln" href="#L274">274</a><span class="tok-com">     * Reports whether two estimates say exactly the same thing.</span></span>
+<span class="src-line" id="L275"><a class="ln" href="#L275">275</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L276"><a class="ln" href="#L276">276</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">equals</span>(<span class="tok-id">self</span> <span class="tok-var">$other</span>): <span class="tok-id">bool</span></span>
+<span class="src-line" id="L277"><a class="ln" href="#L277">277</a>    {</span>
+<span class="src-line" id="L278"><a class="ln" href="#L278">278</a>        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-var">$other</span>-&gt;<span class="tok-id">state</span></span>
+<span class="src-line" id="L279"><a class="ln" href="#L279">279</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> === <span class="tok-var">$other</span>-&gt;<span class="tok-id">seconds</span></span>
+<span class="src-line" id="L280"><a class="ln" href="#L280">280</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span> === <span class="tok-var">$other</span>-&gt;<span class="tok-id">upperBound</span></span>
+<span class="src-line" id="L281"><a class="ln" href="#L281">281</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span> === <span class="tok-var">$other</span>-&gt;<span class="tok-id">lowerBound</span></span>
+<span class="src-line" id="L282"><a class="ln" href="#L282">282</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">alternatives</span>?-&gt;<span class="tok-id">bounds</span>() === <span class="tok-var">$other</span>-&gt;<span class="tok-id">alternatives</span>?-&gt;<span class="tok-id">bounds</span>()</span>
+<span class="src-line" id="L283"><a class="ln" href="#L283">283</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>() === <span class="tok-var">$other</span>-&gt;<span class="tok-id">hasFiniteExpiration</span>()</span>
+<span class="src-line" id="L284"><a class="ln" href="#L284">284</a>            &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">reason</span> === <span class="tok-var">$other</span>-&gt;<span class="tok-id">reason</span>;</span>
+<span class="src-line" id="L285"><a class="ln" href="#L285">285</a>    }</span>
+<span class="src-line" id="L286"><a class="ln" href="#L286">286</a></span>
+<span class="src-line" id="L287"><a class="ln" href="#L287">287</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L288"><a class="ln" href="#L288">288</a><span class="tok-com">     * Returns the estimate rendered for human readable output.</span></span>
+<span class="src-line" id="L289"><a class="ln" href="#L289">289</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L290"><a class="ln" href="#L290">290</a><span class="tok-com">     * A range keeps what is proven: &quot;30-60s&quot; for both bounds, &quot;30-?s&quot; when</span></span>
+<span class="src-line" id="L291"><a class="ln" href="#L291">291</a><span class="tok-com">     * only the lower bound is known — the ? is undetermined, not unlimited —</span></span>
+<span class="src-line" id="L292"><a class="ln" href="#L292">292</a><span class="tok-com">     * and &quot;≤60s&quot; when only the upper bound is known.</span></span>
+<span class="src-line" id="L293"><a class="ln" href="#L293">293</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L294"><a class="ln" href="#L294">294</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">label</span>(): <span class="tok-id">string</span></span>
+<span class="src-line" id="L295"><a class="ln" href="#L295">295</a>    {</span>
+<span class="src-line" id="L296"><a class="ln" href="#L296">296</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">alternatives</span> !== <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L297"><a class="ln" href="#L297">297</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">alternatives</span>-&gt;<span class="tok-id">label</span>();</span>
+<span class="src-line" id="L298"><a class="ln" href="#L298">298</a>        }</span>
+<span class="src-line" id="L299"><a class="ln" href="#L299">299</a></span>
+<span class="src-line" id="L300"><a class="ln" href="#L300">300</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span> !== <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L301"><a class="ln" href="#L301">301</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span>.<span class="tok-str">&#039;s&#039;</span>;</span>
+<span class="src-line" id="L302"><a class="ln" href="#L302">302</a>        }</span>
+<span class="src-line" id="L303"><a class="ln" href="#L303">303</a></span>
+<span class="src-line" id="L304"><a class="ln" href="#L304">304</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span> !== <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L305"><a class="ln" href="#L305">305</a>            <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span> === <span class="tok-id">null</span></span>
+<span class="src-line" id="L306"><a class="ln" href="#L306">306</a>                ? <span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span>.<span class="tok-str">&#039;-?s&#039;</span></span>
+<span class="src-line" id="L307"><a class="ln" href="#L307">307</a>                : <span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span>.<span class="tok-str">&#039;-&#039;</span>.<span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span>.<span class="tok-str">&#039;s&#039;</span>;</span>
+<span class="src-line" id="L308"><a class="ln" href="#L308">308</a>        }</span>
+<span class="src-line" id="L309"><a class="ln" href="#L309">309</a></span>
+<span class="src-line" id="L310"><a class="ln" href="#L310">310</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span> !== <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L311"><a class="ln" href="#L311">311</a>            <span class="tok-kw">return</span> <span class="tok-str">&#039;≤&#039;</span>.<span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span>.<span class="tok-str">&#039;s&#039;</span>;</span>
+<span class="src-line" id="L312"><a class="ln" href="#L312">312</a>        }</span>
+<span class="src-line" id="L313"><a class="ln" href="#L313">313</a></span>
+<span class="src-line" id="L314"><a class="ln" href="#L314">314</a>        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span>-&gt;<span class="tok-id">value</span>;</span>
+<span class="src-line" id="L315"><a class="ln" href="#L315">315</a>    }</span>
+<span class="src-line" id="L316"><a class="ln" href="#L316">316</a></span>
+<span class="src-line" id="L317"><a class="ln" href="#L317">317</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L318"><a class="ln" href="#L318">318</a><span class="tok-com">     * Returns the estimate as plain data for machine readable output.</span></span>
+<span class="src-line" id="L319"><a class="ln" href="#L319">319</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L320"><a class="ln" href="#L320">320</a><span class="tok-com">     * @return array{state: string, seconds: int|null, lowerBound: int|null, upperBound: int|null, reason: string|null, ranges?: non-empty-list&lt;array{min: int|null, max: int|null}&gt;, finite?: true}</span></span>
+<span class="src-line" id="L321"><a class="ln" href="#L321">321</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L322"><a class="ln" href="#L322">322</a>    #[<span class="tok-id">Override</span>]</span>
+<span class="src-line" id="L323"><a class="ln" href="#L323">323</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">jsonSerialize</span>(): <span class="tok-kw">array</span></span>
+<span class="src-line" id="L324"><a class="ln" href="#L324">324</a>    {</span>
+<span class="src-line" id="L325"><a class="ln" href="#L325">325</a>        <span class="tok-var">$serialized</span> = [</span>
+<span class="src-line" id="L326"><a class="ln" href="#L326">326</a>            <span class="tok-str">&#039;state&#039;</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span>-&gt;<span class="tok-id">value</span>,</span>
+<span class="src-line" id="L327"><a class="ln" href="#L327">327</a>            <span class="tok-str">&#039;seconds&#039;</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">seconds</span>,</span>
+<span class="src-line" id="L328"><a class="ln" href="#L328">328</a>            <span class="tok-str">&#039;lowerBound&#039;</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">lowerBound</span>,</span>
+<span class="src-line" id="L329"><a class="ln" href="#L329">329</a>            <span class="tok-str">&#039;upperBound&#039;</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">upperBound</span>,</span>
+<span class="src-line" id="L330"><a class="ln" href="#L330">330</a>            <span class="tok-str">&#039;reason&#039;</span> =&gt; <span class="tok-var">$this</span>-&gt;<span class="tok-id">reason</span>,</span>
+<span class="src-line" id="L331"><a class="ln" href="#L331">331</a>        ];</span>
 <span class="src-line" id="L332"><a class="ln" href="#L332">332</a></span>
+<span class="src-line" id="L333"><a class="ln" href="#L333">333</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">alternatives</span> !== <span class="tok-id">null</span>) {</span>
+<span class="src-line" id="L334"><a class="ln" href="#L334">334</a>            <span class="tok-var">$serialized</span>[<span class="tok-str">&#039;ranges&#039;</span>] = <span class="tok-var">$this</span>-&gt;<span class="tok-id">alternatives</span>-&gt;<span class="tok-id">bounds</span>();</span>
+<span class="src-line" id="L335"><a class="ln" href="#L335">335</a>        }</span>
+<span class="src-line" id="L336"><a class="ln" href="#L336">336</a></span>
+<span class="src-line" id="L337"><a class="ln" href="#L337">337</a>        <span class="tok-kw">if</span> (<span class="tok-var">$this</span>-&gt;<span class="tok-id">state</span> === <span class="tok-id">TtlEstimateState</span>::<span class="tok-id">Unknown</span> &amp;&amp; <span class="tok-var">$this</span>-&gt;<span class="tok-id">finite</span>) {</span>
+<span class="src-line" id="L338"><a class="ln" href="#L338">338</a>            <span class="tok-var">$serialized</span>[<span class="tok-str">&#039;finite&#039;</span>] = <span class="tok-id">true</span>;</span>
+<span class="src-line" id="L339"><a class="ln" href="#L339">339</a>        }</span>
+<span class="src-line" id="L340"><a class="ln" href="#L340">340</a></span>
+<span class="src-line" id="L341"><a class="ln" href="#L341">341</a>        <span class="tok-kw">return</span> <span class="tok-var">$serialized</span>;</span>
+<span class="src-line" id="L342"><a class="ln" href="#L342">342</a>    }</span>
+<span class="src-line" id="L343"><a class="ln" href="#L343">343</a>}</span>
+<span class="src-line" id="L344"><a class="ln" href="#L344">344</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

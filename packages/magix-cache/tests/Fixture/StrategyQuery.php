@@ -49,4 +49,14 @@ final class StrategyQuery
     {
         return $this->cached(static fn (): Cached => Cached::of('plain:'.$id));
     }
+    /**
+     * Transforms a value produced by an argument-free origin.
+     *
+     * @return Cached<array<array-key, mixed>>
+     */
+    #[UseStrategy(strategy: TransformingStrategy::class, label: 'boundary')]
+    public function transformed(): Cached
+    {
+        return $this->cached(static fn (): Cached => Cached::of(['origin', func_num_args()]));
+    }
 }

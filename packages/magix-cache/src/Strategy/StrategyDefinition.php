@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Strategy;
 
+use Closure;
 use InvalidArgumentException;
 
 use function is_a;
@@ -53,18 +54,23 @@ final readonly class StrategyDefinition
     /**
      * Composes definitions in delegation order without constructing them.
      */
-    public static function compose(self $first, self ...$rest): self
+    public static function compose(self ...$definitions): self
     {
-        return new self(ComposedCacheStrategy::class, $first, ...$rest);
+        return new self(ComposedCacheStrategy::class, ...$definitions);
     }
 
     /**
      * Constructs a fresh execution, including every nested child.
+     *
+     * The optional factory supplies constructor dependencies without storing
+     * them in the immutable definition. It is forwarded to every nested child.
+     *
+     * @param Closure(class-string<CacheStrategy>, array<array-key, mixed>): CacheStrategy|null $factory
      */
-    public function instantiate(): CacheStrategy
+    public function instantiate(?Closure $factory = null): CacheStrategy
     {
-        $arguments = (new StrategyArguments())->instantiate($this->arguments);
+        $arguments = (new StrategyArguments())->instantiate($this->arguments, $factory);
 
-        return new ($this->class)(...$arguments);
+        return $factory === null ? new ($this->class)(...$arguments) : $factory($this->class, $arguments);
     }
 }

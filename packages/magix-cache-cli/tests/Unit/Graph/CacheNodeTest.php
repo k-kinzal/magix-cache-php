@@ -51,6 +51,13 @@ final class CacheNodeTest extends TestCase
         self::assertSame('no', \Tests\Package\Cli\Fixture\ReportSource::node('Migration::get')->storage());
     }
 
+    public function testStorageIsProvenAbsentWhenNoExpirationConstraintSurvives(): void
+    {
+        $boundary = new BoundaryDeclaration('App\\PageQuery', 'execute', 'b.php', 1);
+        self::assertSame('no', (new CacheNode($boundary, new CacheEffect(TtlEstimate::unconstrained())))->storage());
+        self::assertSame('runtime-dependent', (new CacheNode($boundary, new CacheEffect(TtlEstimate::unknown())))->storage());
+    }
+
     public function testCompositionAnswersWithTheStoredResultOrWhatTheReachedBoundariesBound(): void
     {
         $page = \Tests\Package\Cli\Fixture\ReportSource::node('Page::unrelated');
@@ -63,6 +70,15 @@ final class CacheNodeTest extends TestCase
 
         $inspection = \Tests\Package\Cli\Fixture\ReportSource::node('Utility::get');
         self::assertSame('unconstrained', $inspection->composition()->ttl->state->value);
+    }
+
+    public function testPropagatesSeparatesADeterminedChangeFromAnUnfollowedReturn(): void
+    {
+        self::assertFalse(\Tests\Package\Cli\Fixture\ReportSource::node('Detaching::get')->propagates());
+        self::assertTrue(\Tests\Package\Cli\Fixture\ReportSource::node('Relaying::get')->propagates());
+        self::assertTrue(\Tests\Package\Cli\Fixture\ReportSource::node('Bridge::get')->propagates());
+        self::assertTrue(\Tests\Package\Cli\Fixture\ReportSource::node('Utility::get')->propagates());
+        self::assertTrue(\Tests\Package\Cli\Fixture\ReportSource::node('Composing::get')->propagates());
     }
 
     public function testWithChildrenRetainsFactsWhenProjectionOmitsTheOrigin(): void

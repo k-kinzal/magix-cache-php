@@ -40,6 +40,13 @@ final readonly class TreeProjection
     /**
      * Selects between rows using the unignored hierarchy, independently of display depth.
      *
+     * A row the mode does not ask for is still retained when promoting its
+     * callees would misattribute a caller's metadata to them, the same reason
+     * the analyzed method itself is exempt: a compact report may leave a
+     * method out, never explain a result by something that did not produce it.
+     * Only a cache declaration above consumes what this row returns; a row
+     * that reports what it composes folds its callees in either way.
+     *
      * @return array{list<CacheNode>, bool} Visible roots and whether this subtree declares Cache.
      */
     public function select(CacheNode $node, bool $declaredAncestor): array
@@ -51,7 +58,7 @@ final readonly class TreeProjection
         $declared = $node->boundary->policy !== null;
         [$children, $descendant] = $this->callees($node, $declaredAncestor || $declared);
 
-        if ($this->uncached->keeps($declared, $declaredAncestor, $descendant)) {
+        if ($this->uncached->keeps($declared, $declaredAncestor, $descendant) || ($declaredAncestor && !$node->propagates())) {
             return [[$node->withChildren($children)], $declared || $descendant];
         }
 

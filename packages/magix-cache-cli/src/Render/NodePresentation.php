@@ -43,7 +43,7 @@ final readonly class NodePresentation
      */
     public function disabled(CacheEffect $effect): bool
     {
-        return $effect->visibility === Visibility::NoStore || $effect->ttl->seconds === 0;
+        return $effect->visibility === Visibility::NoStore || $effect->ttl->storesNothing();
     }
 
     /**

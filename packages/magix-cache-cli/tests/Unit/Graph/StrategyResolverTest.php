@@ -600,4 +600,15 @@ final class StrategyResolverTest extends TestCase
         self::assertNull($outerOpaque->ttl->upperBound);
         self::assertNull($outerOpaque->overridesExpiration);
     }
+
+    public function testCompositionWithZeroChildrenPreservesEveryMetadataField(): void
+    {
+        $effect = (new StrategyResolver(new Catalog([])))->composition(new StrategyDeclaration('EmptyComposition', composed: []), []);
+
+        self::assertEquals(TtlEstimate::unconstrained(), $effect->ttl);
+        self::assertFalse($effect->overridesExpiration);
+        self::assertTrue($effect->writes->preservesEverything());
+        self::assertSame([], $effect->steps);
+        self::assertSame([], $effect->problems);
+    }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Magix\Cache\Runtime;
 
 use Closure;
+use Magix\Cache\AsyncCached;
 use Magix\Cache\Attribute\BypassCacheErrors;
 use Magix\Cache\Attribute\DynamicTtl;
 use Magix\Cache\Attribute\StaleIfError;
@@ -32,7 +33,7 @@ final readonly class CacheInvocation
     /**
      * Creates the input of one runtime execution.
      *
-     * @param Closure(): Cached<T> $origin
+     * @param Closure(): (Cached<T>|AsyncCached<T>) $origin
      * @param int<0, max>|null $parameterTtl Validated lifetime supplied by boundary parameters.
      */
     public function __construct(

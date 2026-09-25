@@ -7,7 +7,7 @@ namespace Tests\Unit\Runtime;
 use Magix\Cache\Cache\CacheBackendFailure;
 use Magix\Cache\Cache\CacheEntry;
 use Magix\Cache\Metadata\CacheMetadata;
-use Magix\Cache\Runtime\Extension\CacheEvent;
+use Magix\Cache\Observation\CacheEvent;
 use Magix\Cache\Runtime\Extension\DefaultBackendErrorClassifier;
 use Magix\Cache\Runtime\GuardedCache;
 use PHPUnit\Framework\Attributes\CoversClass;

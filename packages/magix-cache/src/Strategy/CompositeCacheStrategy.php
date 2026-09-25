@@ -28,8 +28,8 @@ abstract class CompositeCacheStrategy
      * first, its post-processing last, and its failure capture surrounds the
      * delegates. The result composes again.
      */
-    final protected static function compose(StrategyDefinition $first, StrategyDefinition ...$rest): StrategyDefinition
+    final protected static function compose(StrategyDefinition ...$definitions): StrategyDefinition
     {
-        return StrategyDefinition::compose($first, ...$rest);
+        return StrategyDefinition::compose(...$definitions);
     }
 }

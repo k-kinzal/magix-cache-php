@@ -8,12 +8,12 @@ use Attribute;
 use InvalidArgumentException;
 
 /**
- * Declares the lifetime override a strategy makes on the normal origin path.
+ * Declares the lifetime override a strategy makes on every successful fetch return.
  *
  * The contract is about the candidate constraint the operation contributes,
  * not about the format of an algorithm: a declaration with bounds promises
  * that the strategy replaces expiration with a finite lifetime within the
- * declared bounds relative to the origin base time. This override may extend
+ * declared bounds relative to its chosen evaluation time. This override may extend
  * an inherited or policy deadline. A missing bound is undetermined, not
  * unlimited. Omitting the attribute, or supplying no arguments, declares
  * that the operation preserves the incoming expiration.
@@ -21,8 +21,8 @@ use InvalidArgumentException;
  * declared points and ranges. Alternatives describe possible outcomes, not simultaneous
  * constraints, and do not prove which runtime condition selects each one.
  *
- * The declaration covers the normal origin path only; a stale answer keeps
- * the expired expiration it was stored with.
+ * An outer middleware applies the same override to a value returned by an
+ * inner error handler. The common contract never classifies value sources.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final readonly class Ttl

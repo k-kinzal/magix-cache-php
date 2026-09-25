@@ -695,7 +695,7 @@ final class AnalyzeCommandTest extends TestCase
     {
         yield 'between' => ['between', [ViewerQuery::class.'::execute', InventoryLookup::class.'::get'], [ViewerQuery::class.'::execute']];
         yield 'all' => ['all', [ViewerQuery::class.'::execute', InventoryLookup::class.'::get', InspectionQuery::class.'::offset'], [ViewerQuery::class.'::execute', InspectionQuery::class.'::offset']];
-        yield 'none' => ['none', [ViewerQuery::class.'::execute', ProductQuery::class.'::execute'], [ViewerQuery::class.'::execute']];
+        yield 'none' => ['none', [ViewerQuery::class.'::execute', InventoryLookup::class.'::get'], [ViewerQuery::class.'::execute']];
     }
 
     /**
@@ -716,7 +716,7 @@ final class AnalyzeCommandTest extends TestCase
         foreach (['tree', 'mermaid'] as $format) {
             yield $format.' between' => [$format, 'between', ['InventoryLookup::get']];
             yield $format.' all' => [$format, 'all', ['InventoryLookup::get', 'InspectionQuery::offset']];
-            yield $format.' none' => [$format, 'none', []];
+            yield $format.' none' => [$format, 'none', ['InventoryLookup::get']];
         }
     }
     /**

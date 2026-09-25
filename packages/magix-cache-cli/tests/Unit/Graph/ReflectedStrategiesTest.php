@@ -55,13 +55,15 @@ final class ReflectedStrategiesTest extends TestCase
 
         self::assertInstanceOf(StrategyDeclaration::class, $declaration);
         self::assertSame(KeySpreadExpirationStrategy::class, $declaration->name);
-        self::assertCount(2, $declaration->parameters);
+        self::assertCount(3, $declaration->parameters);
         self::assertSame('minimum', $declaration->parameters[0]->name);
         self::assertSame(0, $declaration->parameters[0]->position);
         self::assertFalse($declaration->parameters[0]->hasDefault);
         self::assertSame('maximum', $declaration->parameters[1]->name);
         self::assertSame(1, $declaration->parameters[1]->position);
         self::assertFalse($declaration->parameters[1]->hasDefault);
+        self::assertSame('clock', $declaration->parameters[2]->name);
+        self::assertTrue($declaration->parameters[2]->hasDefault);
         self::assertFalse($declaration->hasCreate);
         self::assertNull($declaration->composed);
     }

@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Fixture;
 
-use Magix\Cache\Strategy\CacheAnswer;
-use Magix\Cache\Strategy\CacheOperation;
+use Closure;
+use Magix\Cache\Async\Promise;
+use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CacheWrite;
-use Magix\Cache\Strategy\NextCacheStrategy;
-use Magix\Cache\Strategy\OriginFailure;
-use Magix\Cache\Strategy\OriginResult;
 use Override;
 
 /**
@@ -45,37 +43,43 @@ final class StatefulStrategy implements CacheStrategy
 
     /**
      * @return CacheRead<mixed>|null
+     * @param Closure(string): (CacheRead<mixed>|null) $next
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
+    public function get(string $key, Closure $next): ?CacheRead
     {
         ++$this->lookups;
-        $this->lookupKey = $operation->key();
+        $this->lookupKey = $key;
 
-        return ($this->child === null ? $next : $next->prepend($this->child))->get($operation);
+        return $this->child === null ? $next($key) : $this->child->get($key, $next);
     }
 
     /**
-     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
+     * @return Promise<Cached<mixed>>
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
+    public function fetch(string $key, Closure $next): Promise
     {
         ++$this->fetches;
-        $result = ($this->child === null ? $next : $next->prepend($this->child))->fetch($operation);
+        $promise = $this->child === null ? $next() : $this->child->fetch($key, $next);
 
-        return $result instanceof OriginResult
-            ? $result->withMetadata($result->cached->metadata->withTags([...$result->cached->metadata->tags, $this->label.':'.$this->lookups.':'.$this->fetches, 'lookup:'.$this->lookupKey]))
-            : $result;
+        return $promise->then(fn (Cached $result): Cached => Cached::of($result->value(), $result->metadata->withTags([...$result->metadata->tags, $this->label.':'.$this->lookups.':'.$this->fetches, 'lookup:'.$this->lookupKey])));
     }
 
     /**
      * @param CacheWrite<mixed> $request
+     * @param Closure(string, CacheWrite<mixed>): void $next
      */
     #[Override]
-    public function set(CacheOperation $operation, CacheWrite $request, NextCacheStrategy $next): void
+    public function set(string $key, CacheWrite $request, Closure $next): void
     {
         ++$this->stores;
-        ($this->child === null ? $next : $next->prepend($this->child))->set($operation, $request);
+        if ($this->child === null) {
+            $next($key, $request);
+        } else {
+            $this->child->set($key, $request, $next);
+        }
     }
+
 }

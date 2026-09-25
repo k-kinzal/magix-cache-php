@@ -32,7 +32,7 @@ final readonly class CallAnalysis implements JsonSerializable
         foreach ($boundary->dependencies as $dependency) {
             $target = $dependency->class.'::'.$dependency->method;
             $candidates = array_values(array_unique(array_map(static fn (CacheNode $node): string => $node->boundary->id(), $calls[$target] ?? [])));
-            $operation = $dependency->class === 'Magix\\Cache\\Cached' || ($dependency->class === $boundary->class && $dependency->method === 'cached');
+            $operation = in_array($dependency->class, ['Magix\\Cache\\Cached', 'Magix\\Cache\\AsyncCached'], true) || ($dependency->class === $boundary->class && in_array($dependency->method, ['cached', 'asyncCached'], true));
             $resolution = $operation ? 'operation' : match (count($candidates)) {
                 0 => 'unscanned', 1 => 'resolved', default => 'alternatives'
             };

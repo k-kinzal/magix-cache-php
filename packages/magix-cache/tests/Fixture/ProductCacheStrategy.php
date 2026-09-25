@@ -21,14 +21,14 @@ final class ProductCacheStrategy extends CompositeCacheStrategy
     {
         return parent::compose(
             StrategyDefinition::of(
-                KeySpreadExpirationStrategy::class,
-                minimum: $min,
-                maximum: 60,
-            ),
-            StrategyDefinition::of(
                 StaleIfErrorCacheStrategy::class,
                 maxAge: 300,
                 exceptions: [UpstreamUnavailable::class],
+            ),
+            StrategyDefinition::of(
+                KeySpreadExpirationStrategy::class,
+                minimum: $min,
+                maximum: 60,
             ),
         );
     }

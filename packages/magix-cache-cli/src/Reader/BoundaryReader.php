@@ -71,7 +71,7 @@ final readonly class BoundaryReader
             && $node->var instanceof Variable
             && $node->var->name === 'this'
             && $node->name instanceof Identifier
-            && $node->name->toString() === 'cached');
+            && in_array($node->name->toString(), ['cached', 'asyncCached'], true));
 
         if (!$call instanceof MethodCall) {
             return null;

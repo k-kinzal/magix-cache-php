@@ -29,7 +29,7 @@ final class TtlRangeTest extends TestCase
 
     public function testAlternativesPreservesPointsReferencesAndRanges(): void
     {
-        $alternatives = [30, new ConstructorArg('normal'), new Arg('fallback'), new TtlRange(600, 900)];
+        $alternatives = [30, new ConstructorArg('normal'), new Arg('recover'), new TtlRange(600, 900)];
 
         self::assertSame($alternatives, TtlRange::alternatives($alternatives));
     }

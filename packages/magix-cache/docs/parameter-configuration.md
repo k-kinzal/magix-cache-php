@@ -47,7 +47,7 @@ With `#[Cache(ttl: 60)]`, a parameter TTL of 90 replaces both that policy TTL
 and a dependency's remaining 20 seconds. A final zero TTL prevents storage.
 Parameters can supply an automatic boundary's finite expiration. A dynamic TTL
 runs next, then Strategies; each explicit writer can replace the earlier value.
-All relative lifetimes use one origin base time.
+Policy, parameter and dynamic lifetimes use one origin-success base time. Middleware chooses the time for its own expiration overrides.
 
 Visibility and tags are bound before lookup. Shared can replace a private
 policy or scope. NoStore skips reads; final NoStore metadata prevents writes.

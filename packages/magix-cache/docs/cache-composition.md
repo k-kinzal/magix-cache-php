@@ -2,6 +2,8 @@
 
 This guide explains how `Cached<T>` propagates cache constraints through multi-stage queries.
 
+`AsyncCached<T>` provides the same composition laws without waiting; see [Asynchronous Cached Values](async-cached.md) for explicit synchronization and nested values.
+
 ## Why Composition Matters
 
 A query result is only as cacheable as the data used to build it. If a page combines a product that expires in 20 seconds with inventory that expires in 60 seconds, caching the page for 60 seconds would allow stale product data to survive too long.
@@ -194,7 +196,7 @@ Consequently, replacing any evaluated subtree with a hit for that same result pr
 - The compared executions have the same effective keys, declarations, source values and source metadata, and the same evaluated strategy and dynamic-TTL constraints.
 - Recomputed relative lifetimes use the same base times for exact expiration equality.
 - Dependencies stay inside the composition API. Extracting `value()` and wrapping it again without its metadata breaks the premise.
-- Custom storage and strategies preserve the metadata associated with the result they return. A custom strategy that invents a different `CacheRead` or `CacheAnswer` must supply the constraints of that answer.
+- Custom storage and strategies preserve the metadata associated with the result they return. A custom strategy that invents a different `CacheRead` or `Cached` must supply the constraints of that answer.
 
 This is equality of metadata values (`CacheMetadata::equals()`), not PHP object identity. Deserialization may create a new metadata object.
 

@@ -64,7 +64,7 @@ final class ProductQuery
 }
 ```
 
-`cached()` takes exactly one closure, which must return a `Cached` value — wrap even a plain leaf value explicitly with `Cached::of()`. Policy and behaviors come from attributes alone: `#[Cache]` on the method wins over the concrete class as a whole, and there is no per-call override.
+`cached()` takes exactly one closure, which returns a `Cached` or `AsyncCached` result (waiting for the latter) — wrap even a plain leaf value explicitly with `Cached::of()`. Policy and behaviors come from attributes alone: `#[Cache]` on the method wins over the concrete class as a whole, and there is no per-call override.
 
 When a parent only composes cached children, `#[Cache]` with no arguments is enough. The composed expiration, cacheability, visibility, tags, and reasons bubble up with the returned `Cached` value. Add policy options only when the parent needs explicit overrides or configuration.
 
@@ -80,6 +80,7 @@ For more detailed information, check out the documentation:
 - [Parameter Configuration](docs/parameter-configuration.md): Bind method parameters to overrides and strategy settings
 - [Cache Policies](docs/cache-policies.md): TTL modes, tags, visibility, versions, and scopes
 - [Cache Keys](docs/cache-keys.md): Default keys, argument reduction, ignored arguments, and custom strategies
+- [Asynchronous Cached Values](docs/async-cached.md): Guzzle promises, asynchronous composition, and explicit synchronization
 - [Cache Composition](docs/cache-composition.md): Safely combine cached values and their constraints
 - [Storage Adapters](docs/storage-adapters.md): PSR-6, PSR-16, framework integrations, and custom storage
 - [Cache Behaviors](docs/cache-behaviors.md): Stale-if-error, dynamic TTL, backend-failure bypass, and observation

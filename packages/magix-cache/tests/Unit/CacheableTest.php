@@ -248,4 +248,16 @@ final class CacheableTest extends TestCase
         self::assertSame(115.0, $both->metadata->expiresAt);
         self::assertContains('both:1:1', $both->metadata->tags);
     }
+    public function testCachedKeepsTheOriginArgumentFreeThroughResponseMiddleware(): void
+    {
+        CacheRuntimeRegistry::register('default', new CacheRuntime(new MemoryCache(), new MutableClock(100.0)));
+        $query = new StrategyQuery();
+
+        $first = $query->transformed();
+        $hit = $query->transformed();
+
+        self::assertSame(['boundary', ['origin', 0]], $first->value());
+        self::assertSame(160.0, $first->metadata->expiresAt);
+        self::assertEquals($first, $hit);
+    }
 }

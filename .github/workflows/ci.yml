@@ -29,6 +29,8 @@ jobs:
         include:
           - php: '8.5'
             dependencies: latest-symfony
+          - php: '8.3'
+            dependencies: promises-2
 
     steps:
       - name: Check out repository
@@ -52,6 +54,10 @@ jobs:
         run: |
           composer config --unset platform.php
           composer update 'symfony/*' --with-all-dependencies --prefer-dist
+
+      - name: Test the Guzzle 7 compatible promise version
+        if: matrix.dependencies == 'promises-2'
+        run: composer update guzzlehttp/promises --with='guzzlehttp/promises:^2.3' --with-all-dependencies --prefer-dist
 
       - name: Check installed platform requirements
         run: composer check-platform-reqs

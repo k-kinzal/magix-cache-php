@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Package\Cli\Fixture\Expiration;
 
+use Closure;
 use LogicException;
-use Magix\Cache\Strategy\CacheAnswer;
-use Magix\Cache\Strategy\CacheOperation;
+use Magix\Cache\Async\Promise;
+use Magix\Cache\Cached;
 use Magix\Cache\Strategy\CacheRead;
 use Magix\Cache\Strategy\CacheStrategy;
 use Magix\Cache\Strategy\CacheWrite;
 use Magix\Cache\Strategy\Contract\ConstructorArg;
 use Magix\Cache\Strategy\Contract\ExpiresAt;
-use Magix\Cache\Strategy\NextCacheStrategy;
-use Magix\Cache\Strategy\OriginFailure;
-use Magix\Cache\Strategy\OriginResult;
 use Magix\Cache\Strategy\StrategyDefinition;
 use Override;
-use RuntimeException;
 
 /**
  * Analysis-only fixture with several independent daily expiration constraints.
@@ -40,35 +37,41 @@ final readonly class MultipleExpirationStrategy implements CacheStrategy
     }
 
     /**
+     * Delegated failures propagate unchanged.
+     *
      * @return CacheRead<mixed>|null
-     * @throws RuntimeException when a delegated read fails
+     * @param Closure(string): (CacheRead<mixed>|null) $next
      */
     #[Override]
-    public function get(CacheOperation $operation, NextCacheStrategy $next): ?CacheRead
+    public function get(string $key, Closure $next): ?CacheRead
     {
-        return $next->get($operation);
+        return $next($key);
     }
 
     /**
-     * @return OriginResult<mixed>|OriginFailure|CacheAnswer<mixed>
+     * @return Promise<Cached<mixed>>
      * @throws LogicException when this analysis-only fixture is executed
+     * @param Closure(): Promise<Cached<mixed>> $next
      */
     #[Override]
     #[ExpiresAt('09:00', timezone: 'Asia/Tokyo')]
     #[ExpiresAt('23:55:30', until: '00:10:15', timezone: 'America/New_York')]
     #[ExpiresAt(new ConstructorArg('at'), until: new ConstructorArg('until'), timezone: new ConstructorArg('timezone'))]
-    public function fetch(CacheOperation $operation, NextCacheStrategy $next): OriginResult|OriginFailure|CacheAnswer
+    public function fetch(string $key, Closure $next): Promise
     {
         throw new LogicException('The analyzer must not execute the strategy.');
     }
 
     /**
+     * Delegated failures propagate unchanged.
+     *
      * @param CacheWrite<mixed> $result
-     * @throws RuntimeException when a delegated write fails
+     * @param Closure(string, CacheWrite<mixed>): void $next
      */
     #[Override]
-    public function set(CacheOperation $operation, CacheWrite $result, NextCacheStrategy $next): void
+    public function set(string $key, CacheWrite $result, Closure $next): void
     {
-        $next->set($operation, $result);
+        $next($key, $result);
     }
+
 }

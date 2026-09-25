@@ -175,6 +175,18 @@ final readonly class TtlEstimate implements JsonSerializable
     }
 
     /**
+     * Reports the proof that this lifetime alone leaves nothing to store.
+     *
+     * Storing requires a future finite expiration, so a proven absence of one
+     * is as conclusive as a proven zero. Neither is a defect: the boundary
+     * simply computes its result every time.
+     */
+    public function storesNothing(): bool
+    {
+        return $this->state === TtlEstimateState::Unconstrained || $this->seconds === 0;
+    }
+
+    /**
      * Returns the stricter combination of two estimates.
      *
      * Invalid dominates, Unconstrained is the identity, and two Known values

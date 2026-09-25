@@ -567,4 +567,36 @@ final class EffectCalculatorTest extends TestCase
     }
 
 
+    /**
+     * @return iterable<string, array{string, int|null, Visibility, list<string>, bool}>
+     */
+    public static function providerAsyncOperations(): iterable
+    {
+        yield 'async zip' => ['composed', 20, Visibility::Private, ['a', 'b'], true];
+        yield 'synchronize' => ['synchronized', 20, Visibility::Private, ['a', 'b'], true];
+        yield 'lift Cached' => ['lifted', 20, Visibility::Shared, ['a'], true];
+        yield 'nested Cached flatten' => ['nested', 60, Visibility::Private, ['b'], true];
+        yield 'detach value' => ['detached', null, Visibility::Shared, [], false];
+        yield 'explicit override' => ['overridden', 90, Visibility::Shared, [], true];
+        yield 'async sequence' => ['collected', 20, Visibility::Private, ['a', 'b'], true];
+    }
+
+    /**
+     * @param list<string> $tags
+     */
+    #[DataProvider('providerAsyncOperations')]
+    public function testCalculateKeepsAsyncAndSyncCompositionEquivalent(string $method, ?int $ttl, Visibility $visibility, array $tags, bool $storable): void
+    {
+        $catalog = (new CatalogLoader(dirname(__DIR__, 5)))->load(['packages/magix-cache-cli/tests/Fixture/AsyncComposition']);
+        $boundaries = $catalog->search('AsyncQueries::'.$method);
+        self::assertCount(1, $boundaries);
+        $node = (new CacheTree($catalog))->build($boundaries[0]);
+        self::assertSame($ttl, $node->effect->ttl->seconds);
+        self::assertSame($visibility, $node->effect->visibility);
+        self::assertSame($tags, $node->effect->tags);
+        self::assertSame($storable, $node->effect->storable);
+        self::assertSame([], $node->effect->problems);
+        self::assertSame([], $node->gaps);
+    }
+
 }

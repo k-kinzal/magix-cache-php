@@ -22,7 +22,7 @@ public function execute(int $productId): Cached
 }
 ```
 
-Each behavior applies to a fixed part of the execution, and the stage order never depends on how the attributes are written: only the origin call is inside the stale-if-error capture range, and only cache reads and writes are inside the backend bypass range.
+Each behavior applies to a fixed part of the execution, and the stage order never depends on how the attributes are written: stale-if-error wraps the delegated fetch inquiry, while backend bypass wraps only cache reads and writes. The stale middleware catches eligible failures from inner middleware and runtime inquiry work, including origin and local settings; failures from outer middleware remain outside its catch.
 
 A method disables a class-level default with `enabled: false`:
 
@@ -78,7 +78,7 @@ A served stale value keeps its expired expiration. A parent that composes it inh
 
 `#[StaleIfError]` declares the same `StaleIfErrorCacheStrategy` available to compositions. The strategy is constructed for each invocation and owns its own candidate and reuse judgement; the runtime has no separate attribute fallback path.
 
-`maxAge` must be zero or greater. Only the origin call is inside the capture range: a failure while reading or writing the cache never produces a stale fallback.
+`maxAge` must be zero or greater. The capture range is its delegated fetch call, including inner middleware and local boundary settings. A failure while reading or writing the cache never produces a stale fallback.
 
 ## Dynamic TTL
 
@@ -135,7 +135,7 @@ The context exposes:
 | `result` | Successful origin `Cached` result |
 | `now` | The same base time the policy is evaluated at, as a Unix timestamp |
 
-The resolver must return a lifetime of zero or more seconds; a negative return value is a configuration error. The resolved lifetime replaces the policy, parameter and inherited expiration at the origin base time. A subsequent Strategy override has higher priority. The resolver runs only after a successful origin call — not on a fresh hit and not for a stale fallback.
+The resolver must return a lifetime of zero or more seconds; a negative return value is a configuration error. The resolved lifetime replaces the policy, parameter and inherited expiration at the origin base time. A subsequent Strategy override has higher priority. The resolver runs only after a successful origin call — not on a fresh hit or when the origin throws before producing a value.
 
 The default `Ttl::Auto` pairs naturally with a dynamic TTL because it declares no lifetime of its own, so the resolver's expiration is the only one. A dynamic TTL overrides a fixed policy TTL; a later Strategy override wins over the resolver.
 
@@ -208,8 +208,8 @@ Behaviors change control flow; observation does not. Pass a `CacheObserver` to t
 ```php
 <?php
 
-use Magix\Cache\Runtime\Extension\CacheEvent;
-use Magix\Cache\Runtime\Extension\CacheObserver;
+use Magix\Cache\Observation\CacheEvent;
+use Magix\Cache\Observation\CacheObserver;
 use Override;
 use Psr\Log\LoggerInterface;
 

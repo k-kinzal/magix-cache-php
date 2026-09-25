@@ -15,9 +15,9 @@ use Magix\Cache\CachePolicy;
 use Magix\Cache\CacheRuntime;
 use Magix\Cache\Metadata\CacheMetadata;
 use Magix\Cache\Metadata\Visibility;
+use Magix\Cache\Observation\CacheEvent;
 use Magix\Cache\Runtime\CacheInvocation;
 use Magix\Cache\Runtime\CacheKeyContext;
-use Magix\Cache\Runtime\Extension\CacheEvent;
 use Magix\Cache\Runtime\Extension\CacheTtlResolver;
 use Magix\Cache\Runtime\Extension\DynamicTtlContext;
 use Magix\Cache\Runtime\Policy\Ttl;
@@ -40,7 +40,7 @@ use Tests\Fixture\UpstreamUnavailable;
 #[UsesNamespace('Magix\Cache')]
 final class CacheRuntimeTest extends TestCase
 {
-    public function testExecuteServesAFreshHitWithoutReExecutingTheOrigin(): void
+    public function testExecuteWithoutStrategiesFetchesStoresAndHitsWithoutReExecutingTheOrigin(): void
     {
         $calls = 0;
         $clock = new MutableClock(100.0);
@@ -201,12 +201,12 @@ final class CacheRuntimeTest extends TestCase
         ));
     }
 
-    public function testExecuteDoesNotHideAResolverFailureBehindStale(): void
+    public function testExecuteStaleCanHandleADeclaredFailureWithinItsDelegatedInquiry(): void
     {
         $clock = new MutableClock(100.0);
         $resolver = new class () implements CacheTtlResolver {
             /**
-             * @throws RuntimeException always, to prove stale cannot hide it
+             * @throws RuntimeException when resolving the origin result fails
              */
             #[Override]
             public function resolve(DynamicTtlContext $context): int
@@ -228,15 +228,16 @@ final class CacheRuntimeTest extends TestCase
         ));
         $clock->advance(11.0);
 
-        $this->expectException(RuntimeException::class);
-
-        $runtime->execute(new CacheInvocation(
+        $result = $runtime->execute(new CacheInvocation(
             context: $context,
             policy: new CachePolicy(ttl: 10),
             origin: static fn (): Cached => Cached::of('recomputed'),
             staleIfError: $behavior,
             dynamicTtl: new DynamicTtl(resolver: $resolver::class),
         ));
+
+        self::assertSame('fresh', $result->value());
+        self::assertSame(110.0, $result->metadata->expiresAt);
     }
 
     public function testExecuteBypassesOnlyClassifiedBackendFailures(): void
@@ -529,4 +530,186 @@ final class CacheRuntimeTest extends TestCase
         );
         self::assertEquals($source->withExpiration(135.25), $runtime->execute($reversed)->metadata);
     }
+
+    public function testExecuteDoesNotHideAFetchStrategyFailureBehindStale(): void
+    {
+        $clock = new MutableClock(100.0);
+        $runtime = new CacheRuntime(new MemoryCache(), $clock);
+        $behavior = new StaleIfError(maxAge: 30, exceptions: [RuntimeException::class]);
+        $context = new CacheKeyContext('', 'Q', 'Q', 'execute', [], '1', 'f');
+        $runtime->execute(new CacheInvocation($context, new CachePolicy(ttl: 10), static fn (): Cached => Cached::of('old'), staleIfError: $behavior));
+        $clock->advance(11.0);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('strategy failed');
+        $runtime->execute(new CacheInvocation(
+            $context,
+            new CachePolicy(ttl: 10),
+            static fn (): Cached => Cached::of('new'),
+            staleIfError: $behavior,
+            strategy: StrategyDefinition::of(\Tests\Fixture\FailingStrategy::class, message: 'strategy failed'),
+        ));
+    }
+
+    public function testExecuteStoresAFreshRecoveryAndServesItOnTheNextLookup(): void
+    {
+        $calls = 0;
+        $clock = new MutableClock(100.0);
+        $observer = new RecordingObserver();
+        $runtime = new CacheRuntime(new MemoryCache(), $clock, observer: $observer);
+        $invocation = new CacheInvocation(
+            new CacheKeyContext('', 'Q', 'Q', 'execute', [], '1', 'f'),
+            new CachePolicy(ttl: 20),
+            /** @throws UpstreamUnavailable */
+            static function () use (&$calls): Cached {
+                ++$calls;
+
+                throw new UpstreamUnavailable('primary unavailable');
+            },
+            strategy: StrategyDefinition::compose(
+                StrategyDefinition::of(KeySpreadExpirationStrategy::class, minimum: 60, maximum: 60),
+                StrategyDefinition::of(\Tests\Fixture\FreshRecoveryStrategy::class),
+            ),
+        );
+
+        $recovered = $runtime->execute($invocation);
+        $clock->advance(5.0);
+        $hit = $runtime->execute($invocation);
+
+        self::assertSame('fresh replacement', $recovered->value());
+        self::assertSame(160.0, $recovered->metadata->expiresAt);
+        self::assertSame(['recovered'], $recovered->metadata->tags);
+        self::assertEquals($recovered, $hit);
+        self::assertSame(1, $calls);
+        self::assertSame([CacheEvent::Miss, CacheEvent::Stored, CacheEvent::FreshHit], $observer->events);
+    }
+    public function testExecuteStoresAMiddlewareAnswerWithoutInvokingTheOrigin(): void
+    {
+        $calls = 0;
+        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
+        $invocation = new CacheInvocation(
+            new CacheKeyContext('', 'Q', 'Q', 'execute', [], '1', 'f'),
+            new CachePolicy(ttl: 20),
+            static function () use (&$calls): Cached {
+                ++$calls;
+
+                return Cached::of('origin');
+            },
+            strategy: StrategyDefinition::of(\Tests\Fixture\ImmediateStrategy::class),
+        );
+
+        $first = $runtime->execute($invocation);
+        $hit = $runtime->execute($invocation);
+
+        self::assertSame(0, $calls);
+        self::assertSame('immediate', $first->value());
+        self::assertSame(130.0, $first->metadata->expiresAt);
+        self::assertEquals($first, $hit);
+    }
+
+    public function testExecuteAnOuterTtlMiddlewareCanOverrideAndStoreAnInnerStaleAnswer(): void
+    {
+        $clock = new MutableClock(100.0);
+        $observer = new RecordingObserver();
+        $runtime = new CacheRuntime(new MemoryCache(), $clock, observer: $observer);
+        $context = new CacheKeyContext('', 'Q', 'Q', 'execute', [], '1', 'f');
+        $definition = StrategyDefinition::compose(
+            StrategyDefinition::of(KeySpreadExpirationStrategy::class, minimum: 10, maximum: 10),
+            StrategyDefinition::of(\Magix\Cache\Strategy\StaleIfErrorCacheStrategy::class, maxAge: 30, exceptions: [UpstreamUnavailable::class]),
+        );
+        $runtime->execute(new CacheInvocation($context, new CachePolicy(), static fn (): Cached => Cached::of('old'), strategy: $definition));
+        $clock->advance(11.0);
+        $invocation = new CacheInvocation($context, new CachePolicy(), static fn (): Cached => throw new UpstreamUnavailable('down'), strategy: $definition);
+
+        $result = $runtime->execute($invocation);
+        $clock->advance(1.0);
+        $hit = $runtime->execute($invocation);
+
+        self::assertSame('old', $result->value());
+        self::assertSame(121.0, $result->metadata->expiresAt);
+        self::assertEquals($result, $hit);
+        self::assertSame([CacheEvent::Miss, CacheEvent::Stored, CacheEvent::Miss, CacheEvent::Stored, CacheEvent::FreshHit], $observer->events);
+    }
+
+    public function testExecuteLocalSettingsKeepTheirOriginTimeAndMiddlewareChoosesItsOwnTime(): void
+    {
+        $clock = new MutableClock(100.0);
+        $resolver = new class ($clock) implements CacheTtlResolver {
+            public function __construct(private readonly MutableClock $clock)
+            {
+            }
+
+            #[Override]
+            public function resolve(DynamicTtlContext $context): int
+            {
+                $this->clock->advance(17.0);
+
+                return 7;
+            }
+        };
+        $runtime = new CacheRuntime(new MemoryCache(), $clock, ttlResolvers: [$resolver]);
+        $invocation = new CacheInvocation(
+            new CacheKeyContext('', 'Q', 'Q', 'execute', [], '1', 'f'),
+            new CachePolicy(ttl: 100),
+            static function () use ($clock): Cached {
+                $clock->advance(2.25);
+
+                return Cached::of('value', new CacheMetadata(tags: ['dependency']));
+            },
+            dynamicTtl: new DynamicTtl(resolver: $resolver::class),
+            parameterTtl: 90,
+            strategy: StrategyDefinition::of(KeySpreadExpirationStrategy::class, minimum: 60, maximum: 60),
+        );
+
+        $result = $runtime->execute($invocation);
+
+        self::assertSame(119.25, $clock->time);
+        self::assertSame(179.25, $result->metadata->expiresAt);
+        self::assertSame(['dependency'], $result->metadata->tags);
+    }
+
+
+    public function testExecuteWithAnEmptyCompositionMatchesExecutionWithoutStrategies(): void
+    {
+        $clock = new MutableClock(100.25);
+        $plainObserver = new RecordingObserver();
+        $emptyObserver = new RecordingObserver();
+        $plain = new CacheRuntime(new MemoryCache(), $clock, observer: $plainObserver);
+        $empty = new CacheRuntime(new MemoryCache(), $clock, observer: $emptyObserver);
+        $calls = 0;
+        $origin = static function () use (&$calls): Cached {
+            ++$calls;
+
+            return Cached::of(func_num_args(), new CacheMetadata(tags: ['origin']));
+        };
+        $context = new CacheKeyContext('', 'Q', 'Q', 'execute', [], '1', 'f');
+        $policy = new CachePolicy(ttl: 10);
+        $plainInvocation = new CacheInvocation($context, $policy, $origin);
+        $emptyInvocation = new CacheInvocation($context, $policy, $origin, strategy: StrategyDefinition::compose());
+        $first = $plain->execute($plainInvocation);
+        self::assertEquals($first, $empty->execute($emptyInvocation));
+        $clock->advance(2.0);
+        self::assertEquals($plain->execute($plainInvocation), $empty->execute($emptyInvocation));
+        self::assertSame(2, $calls);
+        self::assertSame(0, $first->value());
+        self::assertSame(110.25, $first->metadata->expiresAt);
+        self::assertSame($plainObserver->events, $emptyObserver->events);
+        self::assertSame([CacheEvent::Miss, CacheEvent::Stored, CacheEvent::FreshHit], $emptyObserver->events);
+    }
+    public function testExecuteAsyncKeepsOriginPendingUntilThePromiseQueueRuns(): void
+    {
+        $source = new \Tests\Fixture\PendingResult('value');
+        $runtime = new CacheRuntime(new MemoryCache(), new MutableClock(100.0));
+        $invocation = new CacheInvocation(
+            new CacheKeyContext('', 'Query', 'Query', 'fetch', [], '0', ''),
+            new CachePolicy(ttl: 20),
+            static fn (): \Magix\Cache\AsyncCached => \Magix\Cache\AsyncCached::fromPromise($source->promise()),
+        );
+        $result = $runtime->executeAsync($invocation);
+        self::assertSame(0, $source->waits);
+        self::assertSame('value', $result->value());
+        self::assertSame(120.0, $result->toCached()->metadata->expiresAt);
+        self::assertSame(1, $source->waits);
+    }
+
 }

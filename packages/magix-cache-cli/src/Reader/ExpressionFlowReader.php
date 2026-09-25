@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Magix\Cache\Cli\Reader;
 
+use Magix\Cache\AsyncCached;
 use Magix\Cache\Cached;
 use Magix\Cache\Cli\Declaration\MetadataFlow;
 use PhpParser\Node\Arg;
@@ -17,6 +18,14 @@ use PhpParser\Node\Scalar;
  */
 final readonly class ExpressionFlowReader
 {
+    /**
+     * Cached methods that meet the metadata of the receiver and of every argument.
+     */
+    private const array COMPOSITIONS = [
+        'zip', 'combine2', 'combine3', 'combine4', 'combine5',
+        'combine6', 'combine7', 'combine8', 'combine9', 'combine10',
+    ];
+
     /**
      * @param array<string, string> $propertyTypes
      * @param array<string, string> $parameterTypes
@@ -85,13 +94,13 @@ final readonly class ExpressionFlowReader
 
         $name = $call->name->toString();
 
-        if ($name === 'cached' && $call->var instanceof Expr\Variable && $call->var->name === 'this') {
+        if (in_array($name, ['cached', 'asyncCached'], true) && $call->var instanceof Expr\Variable && $call->var->name === 'this') {
             return $this->callback($this->argument($call, 0), $variables);
         }
 
         $target = (new DependencyReader())->target($call, $this->class, $this->propertyTypes, $this->types($call));
 
-        if ($target !== null && $target[0] !== Cached::class) {
+        if ($target !== null && !in_array($target[0], [Cached::class, AsyncCached::class], true)) {
             return new MetadataFlow('call', target: implode('::', $target), line: $call->getStartLine());
         }
 
@@ -102,10 +111,11 @@ final readonly class ExpressionFlowReader
         }
 
         return match (true) {
+            $name === 'toCached' => $receiver,
             $name === 'map', $name === 'unzip' => new MetadataFlow('preserve', [$receiver]),
             $name === 'flatMap' => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), $this->callback($this->argument($call, 0), $variables)]),
             $name === 'flatten' => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), $this->nested($call->var, $variables)]),
-            $name === 'zip', in_array($name, ['combine2', 'combine3', 'combine4', 'combine5'], true) => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), ...$this->arguments($call, $variables)]),
+            in_array($name, self::COMPOSITIONS, true) => new MetadataFlow('meet', [new MetadataFlow('preserve', [$receiver]), ...$this->arguments($call, $variables)]),
             default => MetadataFlow::unknown('opaque-method', $call->getStartLine(), [$receiver, ...$this->arguments($call, $variables)]),
         };
     }
@@ -144,7 +154,7 @@ final readonly class ExpressionFlowReader
             return new MetadataFlow('unknown');
         }
 
-        if ($call->class->toString() !== Cached::class) {
+        if (!in_array($call->class->toString(), [Cached::class, AsyncCached::class], true)) {
             $target = (new DependencyReader())->target($call, $this->class, $this->propertyTypes, $this->types($call));
 
             return $target === null ? new MetadataFlow('unknown') : new MetadataFlow('call', target: implode('::', $target));
@@ -152,6 +162,8 @@ final readonly class ExpressionFlowReader
 
         return match ($call->name->toString()) {
             'of' => new MetadataFlow('wrap', [$this->metadata($this->argument($call, 1), $variables)], payload: $this->contents($this->argument($call, 0), $variables)),
+            'fromCached' => $this->contents($this->argument($call, 0), $variables) ?? new MetadataFlow('unknown'),
+            'fromPromise', 'fromGuzzle' => new MetadataFlow('wrap', [$this->metadata($this->argument($call, 1), $variables)]),
             'sequence' => new MetadataFlow('wrap', [$this->collection($this->argument($call, 0), $variables)]),
             'traverse' => new MetadataFlow('wrap', [$this->traverse($call, $variables)]),
             default => new MetadataFlow('unknown'),
@@ -313,8 +325,10 @@ final readonly class ExpressionFlowReader
     public function argument(Expr\MethodCall|Expr\StaticCall $call, int $position): ?Expr
     {
         $names = match ($call->name instanceof Identifier ? $call->name->toString() : '') {
-            'cached' => ['compute'],
+            'cached', 'asyncCached' => ['compute'],
             'of' => ['value', 'metadata'],
+            'fromCached' => ['cached'],
+            'fromPromise', 'fromGuzzle' => ['promise', 'metadata'],
             'sequence' => ['items'],
             'traverse' => ['items', 'transform'],
             'map', 'flatMap' => ['transform'],

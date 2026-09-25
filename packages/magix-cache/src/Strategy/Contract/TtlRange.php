@@ -9,7 +9,7 @@ use InvalidArgumentException;
 /**
  * Describes one inclusive alternative for the finite lifetime a strategy selects.
  *
- * Bounds are seconds relative to the origin base time. A missing bound is
+ * Bounds are seconds relative to the strategy's chosen evaluation time. A missing bound is
  * undetermined, not a promise of unlimited retention. References are bound
  * in the enclosing Ttl or AssumeTtl declaration's argument environment.
  */

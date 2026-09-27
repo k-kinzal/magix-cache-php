@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analyze value-resolution baseline — magix-cache-php</title>
+<link rel="canonical" href="https://k-kinzal.github.io/magix-cache-php/pr/31/k-kinzal/magix-cache-cli/doc/tests/Invariance/Baseline/README.md.html">
+<meta name="description" content="Analyze value-resolution baseline, a document of the k-kinzal/magix-cache-cli package.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="magix-cache-php">
+<meta property="og:title" content="Analyze value-resolution baseline — magix-cache-php">
+<meta property="og:description" content="Analyze value-resolution baseline, a document of the k-kinzal/magix-cache-cli package.">
+<meta property="og:url" content="https://k-kinzal.github.io/magix-cache-php/pr/31/k-kinzal/magix-cache-cli/doc/tests/Invariance/Baseline/README.md.html">
+<meta property="og:image" content="https://k-kinzal.github.io/magix-cache-php/pr/31/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="magix-cache-php">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../../../../assets/style.css">
+<script>try{var t=localStorage.getItem("docgen-theme");if(t){document.documentElement.dataset.theme=t}document.documentElement.dataset.diffMode=localStorage.getItem("docgen-diff-mode")||"inline"}catch(e){}</script>
+</head>
+<body data-root="../../../../../../">
+<nav class="sidebar" id="sidebar"><div class="sb-head"><a class="sb-site" href="../../../../../../index.html">magix-cache-php</a></div><div class="sb-pkg"><a href="../../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a></div><nav class="sb-block"><div class="sb-title">Package</div><ul class="sb-list"><li data-diff="modified"><a href="../../../../../../k-kinzal/magix-cache-cli/all-items.html">All items</a></li><li data-diff="modified"><a href="../../../../../../k-kinzal/magix-cache-cli/index.html#documents">Documents</a></li></ul><div class="sb-kind" data-diff="modified">Layers</div><ul class="sb-list"><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/layer.CliConsole.html">CliConsole</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/layer.CliDeclaration.html">CliDeclaration</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/layer.CliGraph.html">CliGraph</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/layer.CliKey.html">CliKey</a></li><li data-diff="modified"><a href="../../../../../../k-kinzal/magix-cache-cli/layer.CliReader.html">CliReader</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/layer.CliRender.html">CliRender</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/layer.CliSource.html">CliSource</a></li></ul></nav><nav class="sb-block"><div class="sb-title">Namespaces</div><ul class="sb-list"><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Console/index.html" title="Magix\Cache\Cli\Console">Magix\Cache\Cli\Console</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Declaration/index.html" title="Magix\Cache\Cli\Declaration">Magix\Cache\Cli\Declaration</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Graph/index.html" title="Magix\Cache\Cli\Graph">Magix\Cache\Cli\Graph</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Graph/Analysis/index.html" title="Magix\Cache\Cli\Graph\Analysis">Magix\Cache\Cli\Graph\Analysis</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Key/index.html" title="Magix\Cache\Cli\Key">Magix\Cache\Cli\Key</a></li><li data-diff="modified"><a href="../../../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Reader/index.html" title="Magix\Cache\Cli\Reader">Magix\Cache\Cli\Reader</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Render/index.html" title="Magix\Cache\Cli\Render">Magix\Cache\Cli\Render</a></li><li data-diff="same"><a href="../../../../../../k-kinzal/magix-cache-cli/Magix/Cache/Cli/Source/index.html" title="Magix\Cache\Cli\Source">Magix\Cache\Cli\Source</a></li></ul></nav></nav>
+<div class="page">
+<header class="topbar">
+<button class="nav-toggle" id="nav-toggle" title="Toggle navigation">☰</button>
+<nav class="crumbs"><a href="../../../../../../k-kinzal/magix-cache-cli/index.html">k-kinzal/magix-cache-cli</a><span class="crumb-sep">::</span><span class="crumb-current">tests/Invariance/Baseline/README.md</span></nav>
+<div class="topbar-tools">
+<input type="search" id="search" placeholder="Search… ( / )" autocomplete="off" spellcheck="false">
+<span class="diff-range" title="Comparing 688356c3 to working tree">688356c3 <span class="diff-arrow">→</span> working tree</span><div class="diff-modes" id="diff-modes" role="group" aria-label="Diff display mode"><button type="button" class="diff-mode" data-diff-mode="off" title="Documentation of the head revision, without diff marks">Off</button><button type="button" class="diff-mode" data-diff-mode="inline" title="Every page with additions and removals marked">Diff</button><button type="button" class="diff-mode" data-diff-mode="changes" title="Only what the head revision added, changed, or removed">Changes</button></div><a class="repo-link" href="https://github.com/k-kinzal/magix-cache-php" title="Repository: https://github.com/k-kinzal/magix-cache-php" rel="noreferrer">github.com</a>
+<button id="theme-toggle" title="Toggle theme">◐</button>
+</div>
+</header>
+<div class="search-results" id="search-results" hidden></div>
+<main class="content">
+<p class="diff-empty" id="diff-empty" data-changes="Nothing on this page changed between 688356c3 and working tree." data-off="This page documents what 688356c3 had and working tree no longer has. Switch to Diff to read it." hidden></p>
+<div class="symbol-head"><h1><span class="chip chip-kind k-document">document</span>Analyze value-resolution baseline</h1><div class="symbol-meta"><span class="src-link">tests/Invariance/Baseline/README.md</span></div></div>
+<div class="notice diff-banner" data-diff="added">Added in working tree, compared to 688356c3.</div>
+<section class="readme" data-diff="added"><div class="doc-block" data-diff="added"><h2>Analyze value-resolution baseline</h2>
+</div><div class="doc-block" data-diff="added"><p>These reports were captured from <code>688356c3</code> before changing production code or adding a resolver dependency. <code>AnalyzeBaselineTest::reports()</code> is the manifest: it records the source paths, selected entry points, formats, display filters and ANSI decoration used to produce each file.</p>
+</div><div class="doc-block" data-diff="added"><p>The 33 reports preserve complete output, rather than selected TTL labels or hashes. JSON retains declarations, execution facts, alternatives, uncertainty, diagnostics, strategy steps, source locations and storage judgments. Tree snapshots also preserve ANSI colors; Mermaid preserves labels and styles. The corpus covers policies, strategies, daily expiration, alternative TTLs, functional and asynchronous composition, invocation parameters, incomplete analysis and display filtering.</p>
+</div><div class="doc-block" data-diff="added"><p><code>LiteralBaselineTest</code> separately records the existing constant-expression value domain. Both resolved values and unresolved expressions are part of the refactoring baseline. Existing reader, graph and invariance tests cover local bindings, constant catalogs, recursion, exclusive branches and metadata laws.</p>
+</div><div class="doc-block" data-diff="added"><p>Run the comparisons from the repository root:</p>
+</div><div class="doc-block" data-diff="added"><pre class="code-block"><code>vendor/bin/phpunit packages/magix-cache-cli/tests/Invariance/AnalyzeBaselineTest.php
+vendor/bin/phpunit packages/magix-cache-cli/tests/Invariance/LiteralBaselineTest.php
+composer test</code></pre>
+</div><div class="doc-block" data-diff="added"><p>Tests never update these files. Do not regenerate them to accept a resolver regression. Investigate a difference against the original revision and record the source, expected result, actual result and resolver revision in an upstream reproducer first. An intentional later behavior change requires a separate review of the corresponding expectations.</p>
+</div><div class="doc-block" data-diff="added"><p>To independently reproduce a snapshot, use the manifest&#039;s exact options with <code>CommandTester</code> and <code>Application</code> at the baseline revision. Pass the recorded <code>decorated</code> option to <code>execute()</code> and compare <code>getDisplay()</code> byte for byte. Use the repository root as <code>Application</code>&#039;s working directory so source paths remain relative; no paths, diagnostics or numeric fields are stripped from the reports.</p>
+</div></section>
+</main>
+<footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>
+</div>
+<script src="../../../../../../assets/search-index.js" defer></script>
+<script src="../../../../../../assets/app.js" defer></script>
+</body>
+</html>

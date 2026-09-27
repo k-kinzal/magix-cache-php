@@ -38,6 +38,7 @@ final readonly class ExpressionDeriver
      * Evaluates one admitted expression with explicit scalar inputs.
      *
      * @param array<string, int|float|string|bool|null> $bindings
+     * @return mixed Concrete value, or LiteralReader::UNRESOLVED when exhaustive derivation is unavailable.
      */
     public function value(Expr $expression, array $bindings = []): mixed
     {
@@ -54,6 +55,7 @@ final readonly class ExpressionDeriver
      * Reads a concrete return from generated, isolated analysis source.
      *
      * @param list<Term> $arguments Explicit inputs; user parameters are never inferred from defaults.
+     * @return mixed Concrete value, or LiteralReader::UNRESOLVED for partial, exceptional or non-concrete results.
      */
     public function source(string $source, array $arguments = []): mixed
     {

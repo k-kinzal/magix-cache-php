@@ -27,6 +27,7 @@ final readonly class BindingDeriver
      * Resolves the selected alias within the reader's existing expansion budget.
      *
      * @param array<string, Expr> $bindings
+     * @return Expr Selected original node, or the input expression when no exhaustive selection can be derived.
      */
     public function bound(Expr $expression, array $bindings, int $budget): Expr
     {

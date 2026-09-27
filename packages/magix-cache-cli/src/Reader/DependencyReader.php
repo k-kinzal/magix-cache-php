@@ -11,6 +11,7 @@ use Magix\Cache\Cli\Declaration\DependencyCall;
 use Magix\Cache\Cli\Declaration\KeyParameter;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
+use PhpParser\Node\ArgPlaceholder;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\New_;
@@ -252,7 +253,7 @@ final readonly class DependencyReader
     /**
      * Returns which caller parameters are passed on to the called method.
      *
-     * @param array<Arg|VariadicPlaceholder> $arguments
+     * @param array<Arg|ArgPlaceholder|VariadicPlaceholder> $arguments
      * @param list<KeyParameter> $parameters
      * @return array<int|string, string>
      */

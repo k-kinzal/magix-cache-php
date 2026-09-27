@@ -8,12 +8,19 @@ use Magix\Cache\Cli\Reader\StrategyReader;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Scalar\Int_;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Pins the existing recipe alias scope and expansion limit before replacement.
  */
 #[CoversClass(StrategyReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Declaration\ConstantCatalog::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ArgumentReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\BindingDeriver::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ContractReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionDeriver::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\LiteralReader::class)]
 final class BindingBaselineTest extends TestCase
 {
     /**

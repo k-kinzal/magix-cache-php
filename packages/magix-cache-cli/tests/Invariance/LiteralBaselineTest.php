@@ -11,6 +11,7 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,6 +21,8 @@ use PHPUnit\Framework\TestCase;
  * different declaration, even when it supports more PHP than this reader.
  */
 #[CoversClass(LiteralReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Declaration\ConstantCatalog::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionDeriver::class)]
 final class LiteralBaselineTest extends TestCase
 {
     /**

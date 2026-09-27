@@ -57,6 +57,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Reader\ExpressionFlowReader::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\MetadataFlowReader::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\StatementFlowReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionDeriver::class)]
 final class BoundaryReaderTest extends TestCase
 {
     public function testEntryPointReadsCallsWithoutApplyingCacheDeclarations(): void

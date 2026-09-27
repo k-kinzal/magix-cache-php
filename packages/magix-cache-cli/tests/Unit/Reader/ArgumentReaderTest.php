@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ArgumentReader::class)]
 #[UsesClass(ConstantCatalog::class)]
 #[UsesClass(LiteralReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionDeriver::class)]
 final class ArgumentReaderTest extends TestCase
 {
     public function testValuesBindPositionalAndNamedArguments(): void

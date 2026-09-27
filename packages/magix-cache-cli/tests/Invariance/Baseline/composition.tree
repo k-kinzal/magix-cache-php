@@ -1,0 +1,17 @@
+[37;1mPage::__construct[39;22m[37m  ttl Ttl::Auto [declared][39m
+[90;1mPage::emptySequence[39;22m[90m  ttl unconstrained  shared  tags page[39m
+[37;1mPage::flatten[39;22m[37m  ttl 20s  private  tags [39m[33mpage[39m
+|-- [37;1mInputs::product[39;22m[37m  ttl 20s  shared  tags product[39m
+`-- [37;1mInputs::viewer[39;22m[37m  ttl 60s  private  tags viewer[39m
+[37;1mPage::sequence[39;22m[37m  ttl 20s  private  tags [39m[33mpage[39m
+|-- [37;1mInputs::product[39;22m[37m  ttl 20s  shared  tags product[39m
+`-- [37;1mInputs::viewer[39;22m[37m  ttl 60s  private  tags viewer[39m
+[37;1mPage::traverse[39;22m[37m  ttl 20s  private  tags [39m[33mpage[39m
+|-- [37;1mInputs::product[39;22m[37m  ttl 20s  shared  tags product[39m
+`-- [37;1mInputs::viewer[39;22m[37m  ttl 60s  private  tags viewer[39m
+[37;1mPage::unzip[39;22m[37m  ttl 20s  private  tags [39m[33mpage[39m
+|-- [37;1mInputs::product[39;22m[37m  ttl 20s  shared  tags product[39m
+`-- [37;1mInputs::viewer[39;22m[37m  ttl 60s  private  tags viewer[39m
+[37;1mPage::zip[39;22m[37m  ttl 20s  private  tags [39m[33mpage[39m
+|-- [37;1mInputs::product[39;22m[37m  ttl 20s  shared  tags product[39m
+`-- [37;1mInputs::viewer[39;22m[37m  ttl 60s  private  tags viewer[39m

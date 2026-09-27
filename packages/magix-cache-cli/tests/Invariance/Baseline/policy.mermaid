@@ -1,0 +1,35 @@
+flowchart TD
+    n0["BubblingPageQuery::__construct<br/>Ttl::Auto [declared]"]
+    style n0 fill:#ffffff,stroke:#495057,color:#212529
+    n1["BubblingPageQuery::execute<br/>120s - private - tags page"]
+    style n1 fill:#ffffff,stroke:#495057,color:#212529
+    n1_0["ProductPageQuery::execute<br/>120s - private - tags page"]
+    style n1_0 fill:#ffffff,stroke:#495057,color:#212529
+    n1_0_0["ProductQuery::execute<br/>20s - shared - tags product"]
+    style n1_0_0 fill:#ffffff,stroke:#495057,color:#212529
+    n1_0 --> n1_0_0
+    n1_0_1["InventoryQuery::execute<br/>60s - shared - tags inventory"]
+    style n1_0_1 fill:#ffffff,stroke:#495057,color:#212529
+    n1_0 --> n1_0_1
+    n1_0_2["ViewerQuery::execute<br/>30s - private - tags viewer"]
+    style n1_0_2 fill:#ffffff,stroke:#495057,color:#212529
+    n1_0 --> n1_0_2
+    n1 --> n1_0
+    n2["BubblingPageQuery::explicit<br/>120s - private - tags page"]
+    style n2 fill:#ffffff,stroke:#495057,color:#212529
+    n2_0["BubblingPageQuery::execute<br/>120s - private - tags page"]
+    style n2_0 fill:#ffffff,stroke:#495057,color:#212529
+    n2_0_0["ProductPageQuery::execute<br/>120s - private - tags page"]
+    style n2_0_0 fill:#ffffff,stroke:#495057,color:#212529
+    n2_0_0_0["ProductQuery::execute<br/>20s - shared - tags product"]
+    style n2_0_0_0 fill:#ffffff,stroke:#495057,color:#212529
+    n2_0_0 --> n2_0_0_0
+    n2_0_0_1["InventoryQuery::execute<br/>60s - shared - tags inventory"]
+    style n2_0_0_1 fill:#ffffff,stroke:#495057,color:#212529
+    n2_0_0 --> n2_0_0_1
+    n2_0_0_2["ViewerQuery::execute<br/>30s - private - tags viewer"]
+    style n2_0_0_2 fill:#ffffff,stroke:#495057,color:#212529
+    n2_0_0 --> n2_0_0_2
+    n2_0 --> n2_0_0
+    n2 --> n2_0
+

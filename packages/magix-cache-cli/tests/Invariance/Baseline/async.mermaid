@@ -1,0 +1,50 @@
+flowchart TD
+    n0["AsyncQueries::collected<br/>20s - private - tags a,b"]
+    style n0 fill:#ffffff,stroke:#495057,color:#212529
+    n0_0["AsyncQueries::first<br/>20s - shared - tags a"]
+    style n0_0 fill:#ffffff,stroke:#495057,color:#212529
+    n0 --> n0_0
+    n0_1["AsyncQueries::second<br/>60s - private - tags b"]
+    style n0_1 fill:#ffffff,stroke:#495057,color:#212529
+    n0 --> n0_1
+    n1["AsyncQueries::composed<br/>20s - private - tags a,b"]
+    style n1 fill:#ffffff,stroke:#495057,color:#212529
+    n1_0["AsyncQueries::first<br/>20s - shared - tags a"]
+    style n1_0 fill:#ffffff,stroke:#495057,color:#212529
+    n1 --> n1_0
+    n1_1["AsyncQueries::second<br/>60s - private - tags b"]
+    style n1_1 fill:#ffffff,stroke:#495057,color:#212529
+    n1 --> n1_1
+    n2["AsyncQueries::detached<br/>unconstrained - shared"]
+    style n2 fill:#e9ecef,stroke:#868e96,color:#495057
+    n2_0["AsyncQueries::second<br/>60s - private - tags b"]
+    style n2_0 fill:#ffffff,stroke:#495057,color:#212529
+    n2 --> n2_0
+    n3["AsyncQueries::first<br/>20s - shared - tags a"]
+    style n3 fill:#ffffff,stroke:#495057,color:#212529
+    n4["AsyncQueries::lifted<br/>20s - shared - tags a"]
+    style n4 fill:#ffffff,stroke:#495057,color:#212529
+    n4_0["AsyncQueries::first<br/>20s - shared - tags a"]
+    style n4_0 fill:#ffffff,stroke:#495057,color:#212529
+    n4 --> n4_0
+    n5["AsyncQueries::nested<br/>60s - private - tags b"]
+    style n5 fill:#ffffff,stroke:#495057,color:#212529
+    n5_0["AsyncQueries::second<br/>60s - private - tags b"]
+    style n5_0 fill:#ffffff,stroke:#495057,color:#212529
+    n5 --> n5_0
+    n6["AsyncQueries::overridden<br/>90s - shared"]
+    style n6 fill:#ffffff,stroke:#495057,color:#212529
+    n6_0["AsyncQueries::second<br/>60s - private - tags b"]
+    style n6_0 fill:#ffffff,stroke:#495057,color:#212529
+    n6 --> n6_0
+    n7["AsyncQueries::second<br/>60s - private - tags b"]
+    style n7 fill:#ffffff,stroke:#495057,color:#212529
+    n8["AsyncQueries::synchronized<br/>20s - private - tags a,b"]
+    style n8 fill:#ffffff,stroke:#495057,color:#212529
+    n8_0["AsyncQueries::first<br/>20s - shared - tags a"]
+    style n8_0 fill:#ffffff,stroke:#495057,color:#212529
+    n8 --> n8_0
+    n8_1["AsyncQueries::second<br/>60s - private - tags b"]
+    style n8_1 fill:#ffffff,stroke:#495057,color:#212529
+    n8 --> n8_1
+

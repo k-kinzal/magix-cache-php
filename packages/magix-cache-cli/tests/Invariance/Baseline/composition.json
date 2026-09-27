@@ -1,0 +1,2427 @@
+{
+    "roots": [
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::__construct",
+            "kind": "entry-point",
+            "declared": true,
+            "execution": "not-observed",
+            "returnType": null,
+            "parameters": [
+                {
+                    "name": "inputs",
+                    "type": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [],
+            "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Page.php",
+            "line": 23,
+            "policy": {
+                "source": "ClassAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [
+                    "page"
+                ],
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": null,
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unconstrained",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "unconstrained",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "unconstrained",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unconstrained",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::emptySequence",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::cached",
+                    "line": 81,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Magix\\Cache\\Cached::sequence",
+                    "line": 81,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "sequence"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Page.php",
+            "line": 79,
+            "policy": {
+                "source": "ClassAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [
+                    "page"
+                ],
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unconstrained",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [
+                    "page"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "unconstrained",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "unconstrained",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unconstrained",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "page"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::flatten",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::cached",
+                    "line": 32,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product",
+                    "line": 32,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product"
+                    ],
+                    "resolution": "resolved",
+                    "method": "product"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer",
+                    "line": 33,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer"
+                    ],
+                    "resolution": "resolved",
+                    "method": "viewer"
+                },
+                {
+                    "target": null,
+                    "line": 32,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "flatten"
+                },
+                {
+                    "target": null,
+                    "line": 32,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "map"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Page.php",
+            "line": 30,
+            "policy": {
+                "source": "ClassAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [
+                    "page"
+                ],
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                }
+            ],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from Inputs::product"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from Inputs::viewer",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "page"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": {
+                    "tags": "local tags replace inherited tags"
+                }
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "Inputs::product",
+                        "Inputs::viewer"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from Inputs::product"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "page"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::cached",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Inputs.php",
+                    "line": 24,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "20s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "product"
+                        ],
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 20,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "product"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 20,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "product"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                },
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::cached",
+                            "line": 38,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 38,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Inputs.php",
+                    "line": 35,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "viewer"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "viewer"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "viewer"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::sequence",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::cached",
+                    "line": 59,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Magix\\Cache\\Cached::sequence",
+                    "line": 59,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "sequence"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product",
+                    "line": 60,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product"
+                    ],
+                    "resolution": "resolved",
+                    "method": "product"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer",
+                    "line": 61,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer"
+                    ],
+                    "resolution": "resolved",
+                    "method": "viewer"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Page.php",
+            "line": 57,
+            "policy": {
+                "source": "ClassAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [
+                    "page"
+                ],
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                }
+            ],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from Inputs::product"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from Inputs::viewer",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "page"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": {
+                    "tags": "local tags replace inherited tags"
+                }
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "Inputs::product",
+                        "Inputs::viewer"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from Inputs::product"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "page"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::cached",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Inputs.php",
+                    "line": 24,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "20s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "product"
+                        ],
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 20,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "product"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 20,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "product"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                },
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::cached",
+                            "line": 38,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 38,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Inputs.php",
+                    "line": 35,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "viewer"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "viewer"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "viewer"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::traverse",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::cached",
+                    "line": 70,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Magix\\Cache\\Cached::traverse",
+                    "line": 70,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "traverse"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product",
+                    "line": 72,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product"
+                    ],
+                    "resolution": "resolved",
+                    "method": "product"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer",
+                    "line": 72,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer"
+                    ],
+                    "resolution": "resolved",
+                    "method": "viewer"
+                },
+                {
+                    "target": null,
+                    "line": 72,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "zip"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Page.php",
+            "line": 68,
+            "policy": {
+                "source": "ClassAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [
+                    "page"
+                ],
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                }
+            ],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from Inputs::product"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from Inputs::viewer",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "page"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": {
+                    "tags": "local tags replace inherited tags"
+                }
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "Inputs::product",
+                        "Inputs::viewer"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from Inputs::product"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "page"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::cached",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Inputs.php",
+                    "line": 24,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "20s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "product"
+                        ],
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 20,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "product"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 20,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "product"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                },
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::cached",
+                            "line": 38,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 38,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Inputs.php",
+                    "line": 35,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "viewer"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "viewer"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "viewer"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::unzip",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::cached",
+                    "line": 50,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product",
+                    "line": 50,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product"
+                    ],
+                    "resolution": "resolved",
+                    "method": "product"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer",
+                    "line": 51,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer"
+                    ],
+                    "resolution": "resolved",
+                    "method": "viewer"
+                },
+                {
+                    "target": null,
+                    "line": 50,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "unzip"
+                },
+                {
+                    "target": null,
+                    "line": 50,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "zip"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Page.php",
+            "line": 48,
+            "policy": {
+                "source": "ClassAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [
+                    "page"
+                ],
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                }
+            ],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from Inputs::product"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from Inputs::viewer",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "page"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": {
+                    "tags": "local tags replace inherited tags"
+                }
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "Inputs::product",
+                        "Inputs::viewer"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from Inputs::product"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "page"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::cached",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Inputs.php",
+                    "line": 24,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "20s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "product"
+                        ],
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 20,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "product"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 20,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "product"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                },
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::cached",
+                            "line": 38,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 38,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Inputs.php",
+                    "line": 35,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "viewer"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "viewer"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "viewer"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::zip",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Page::cached",
+                    "line": 42,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product",
+                    "line": 42,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product"
+                    ],
+                    "resolution": "resolved",
+                    "method": "product"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer",
+                    "line": 42,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer"
+                    ],
+                    "resolution": "resolved",
+                    "method": "viewer"
+                },
+                {
+                    "target": null,
+                    "line": 42,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "zip"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Page.php",
+            "line": 40,
+            "policy": {
+                "source": "ClassAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [
+                    "page"
+                ],
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                }
+            ],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from Inputs::product"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from Inputs::viewer",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "page"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": {
+                    "tags": "local tags replace inherited tags"
+                }
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "Inputs::product",
+                        "Inputs::viewer"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from Inputs::product"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "page"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::product",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::cached",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Inputs.php",
+                    "line": 24,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "20s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "product"
+                        ],
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 20,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "product"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 20,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "product"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                },
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::viewer",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\FunctionalComposition\\Inputs::cached",
+                            "line": 38,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 38,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/FunctionalComposition/Inputs.php",
+                    "line": 35,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "viewer"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "viewer"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "viewer"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        }
+    ],
+    "diagnostics": []
+}

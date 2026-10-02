@@ -131,9 +131,7 @@ final readonly class LiteralReader
     /**
      * Joins two scalars the way a constant expression concatenates them.
      *
-     * Deriver leaves float-to-string conversion unresolved without a precision
-     * profile. Capture the host conversion this CLI uses explicitly before
-     * deriving concatenation, preserving the existing declaration value domain.
+     * Deriver converts floats using the host precision captured in its snapshot.
      */
     public function concatenate(mixed $left, mixed $right): string
     {
@@ -143,8 +141,8 @@ final readonly class LiteralReader
         }
 
         $value = $this->deriver->value(new BinaryOp\Concat(new Variable('left'), new Variable('right')), [
-            'left' => (string) $left,
-            'right' => (string) $right,
+            'left' => $left,
+            'right' => $right,
         ]);
 
         return is_string($value) ? $value : self::UNRESOLVED;

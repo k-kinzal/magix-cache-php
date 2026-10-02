@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Magix\Cache\Cli\Reader;
 
 use Deriver\Analyzer;
+use Deriver\Project\Configuration;
 use Deriver\Project\EntryPoint;
 use Deriver\Project\ProjectInput;
 use Deriver\Project\SourceFile;
+use Deriver\Project\TargetProfile;
 use Deriver\Query\QueryScope;
 use Deriver\Query\ReturnQuery;
 use Deriver\Value\Term;
@@ -60,7 +62,10 @@ final readonly class ExpressionDeriver
     public function source(string $source, array $arguments = []): mixed
     {
         try {
-            $session = $this->analyzer->open(new ProjectInput([new SourceFile('expression.php', $source)]));
+            $session = $this->analyzer->open(
+                new ProjectInput([new SourceFile('expression.php', $source)]),
+                new Configuration(new TargetProfile(floatPrecision: (int) ini_get('precision'))),
+            );
         } catch (JsonException) {
             return LiteralReader::UNRESOLVED;
         }
@@ -73,14 +78,12 @@ final readonly class ExpressionDeriver
             || $result->assessment->precision !== 'exact-symbolic'
             || $result->assessment->correlation !== 'preserved'
             || $result->assessment->enumeration !== 'finite-exhaustive'
-            || $result->assessment->coverage !== 'over-approximation'
-            || $result->frontiers !== [] || $result->projectDiagnostics !== []
-            || $result->exceptionalOutcomes !== [] || count($result->normalOutcomes) !== 1) {
+            || $result->assessment->coverage !== 'over-approximation') {
             return LiteralReader::UNRESOLVED;
         }
 
-        $value = $result->normalOutcomes[0]->values['return'] ?? null;
+        $value = $result->definite()?->values['return'] ?? null;
 
-        return $value !== null && $value->isConcrete() ? $value->native() : LiteralReader::UNRESOLVED;
+        return $value !== null ? $value->native() : LiteralReader::UNRESOLVED;
     }
 }

@@ -16,6 +16,35 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ExpressionDeriver::class)]
 final class ExpressionDeriverTest extends TestCase
 {
+    public function testSourceCapturesPrecisionPerSnapshotWithoutChangingTheHost(): void
+    {
+        $reader = new ExpressionDeriver();
+        $source = '<?php function resolve() { return "v" . (1 / 3); }';
+        $original = ini_get('precision');
+
+        try {
+            ini_set('precision', '3');
+            self::assertSame('v0.333', $reader->source($source));
+            self::assertSame('3', ini_get('precision'));
+            ini_set('precision', '17');
+            self::assertSame('v0.33333333333333331', $reader->source($source));
+            self::assertSame('17', ini_get('precision'));
+            ini_set('precision', '3');
+            self::assertSame('v0.333', $reader->source($source));
+            self::assertSame('3', ini_get('precision'));
+        } finally {
+            ini_set('precision', $original);
+        }
+    }
+
+    public function testSourceDerivesZeroPowersWithoutLeakingHostDeprecations(): void
+    {
+        $reader = new ExpressionDeriver();
+
+        self::assertSame(INF, $reader->source('<?php function resolve() { return 0 ** -1; }'));
+        self::assertSame(-INF, $reader->source('<?php function resolve() { return (-0.0) ** -3; }'));
+    }
+
     public function testValueKeepsExplicitInputsIsolatedAcrossRepeatedQueries(): void
     {
         $reader = new ExpressionDeriver();

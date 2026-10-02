@@ -1,6 +1,23 @@
 # Deriver integration and upstream feedback
 
-## Current assessment (2026-10-02)
+## Current assessment (2026-10-03)
+
+Updated Deriver to `97ad01a77f46cf33986c95314eafe40b63d169b5` and repeated the
+compatibility, direct reproducer, complete Analyze and timing checks.
+All 3,492 tests and the required Composer checks pass, and normal fixture
+outputs still match. A project containing 200 cached declarations remains
+usable in the measured scenario (about 307 ms to scan and analyze one selected
+entry, compared with 202 ms for the original reader and 304 ms for the previous
+integration). However, the large-array memory interruption and resulting loss
+of 8,192 known cache tags still reproduce. The strict refactor merge blocker
+therefore remains; the PR stays draft.
+
+See the [dated evaluation](deriver-evaluation-2026-10-03.md) for the upstream
+changes, measurements, limits and concrete feedback. The earlier investigation
+below is retained as historical evidence, with its original revision and
+measurements rather than replacing them with new numbers.
+
+## Previous assessment (2026-10-02, Deriver 0d1cb9e)
 
 Updated [`k-kinzal/deriver`](https://github.com/k-kinzal/deriver) from
 `e2773a13fbe3d58100240e455dc045785fa78f50` to

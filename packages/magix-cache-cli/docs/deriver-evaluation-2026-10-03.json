@@ -1,0 +1,544 @@
+{
+  "evaluatedAt": "2026-10-03",
+  "originalMagix": "688356c3",
+  "integrationBase": "f85773692c4d8459bf95c6e37fc44f2403f53793",
+  "previousDeriver": "0d1cb9e0fdee7575bd79d008bc8f9b23ee3e3d35",
+  "updatedDeriver": "97ad01a77f46cf33986c95314eafe40b63d169b5",
+  "hostPhp": "8.5.8",
+  "phpParser": "5.9.0",
+  "method": "Three serial alternating process rounds, 3 warmups and 20 command samples per normal fixture per round. Same Magix code and dependencies; original readers or previous Deriver sources preloaded where selected. Xdebug and CLI opcache disabled, PHP memory_limit=1G. These command timings exclude process startup. Array timings are single warm samples.",
+  "timingLimitations": "Shared developer machine with variable load; this is not a production benchmark or proof of a precise revision-level speed ratio.",
+  "analyze": {
+    "project-controller": {
+      "original": {
+        "medianMs": 24.529,
+        "samples": 60,
+        "roundMediansMs": [
+          20.598,
+          24.873,
+          28.275
+        ],
+        "outputHashes": [
+          "2aa2df9c48c6a5f30d148a0ce49610e8980abd4cbb40355e61a903452e9d7891"
+        ]
+      },
+      "previous": {
+        "medianMs": 30.718,
+        "samples": 60,
+        "roundMediansMs": [
+          30.718,
+          26.243,
+          36.58
+        ],
+        "outputHashes": [
+          "2aa2df9c48c6a5f30d148a0ce49610e8980abd4cbb40355e61a903452e9d7891"
+        ]
+      },
+      "latest": {
+        "medianMs": 32.888,
+        "samples": 60,
+        "roundMediansMs": [
+          30.778,
+          44.873,
+          30.175
+        ],
+        "outputHashes": [
+          "2aa2df9c48c6a5f30d148a0ce49610e8980abd4cbb40355e61a903452e9d7891"
+        ]
+      },
+      "outputsEqual": true
+    },
+    "functional-composition": {
+      "original": {
+        "medianMs": 9.106,
+        "samples": 60,
+        "roundMediansMs": [
+          7.348,
+          12.929,
+          8.978
+        ],
+        "outputHashes": [
+          "56707e8f23b26440a0474f7e47c3334a2def1f9b8f10457859ae220f56b93087"
+        ]
+      },
+      "previous": {
+        "medianMs": 10.494,
+        "samples": 60,
+        "roundMediansMs": [
+          10.494,
+          8.015,
+          12.248
+        ],
+        "outputHashes": [
+          "56707e8f23b26440a0474f7e47c3334a2def1f9b8f10457859ae220f56b93087"
+        ]
+      },
+      "latest": {
+        "medianMs": 12.105,
+        "samples": 60,
+        "roundMediansMs": [
+          12.745,
+          12.622,
+          10.682
+        ],
+        "outputHashes": [
+          "56707e8f23b26440a0474f7e47c3334a2def1f9b8f10457859ae220f56b93087"
+        ]
+      },
+      "outputsEqual": true
+    },
+    "expiration": {
+      "original": {
+        "medianMs": 13.619,
+        "samples": 60,
+        "roundMediansMs": [
+          11.571,
+          17.218,
+          13.619
+        ],
+        "outputHashes": [
+          "430e153b5af4a82e4d2297eaa0230249c8e9cda2018284204abbadf0861e78d6"
+        ]
+      },
+      "previous": {
+        "medianMs": 13.661,
+        "samples": 60,
+        "roundMediansMs": [
+          13.501,
+          11.547,
+          16.948
+        ],
+        "outputHashes": [
+          "430e153b5af4a82e4d2297eaa0230249c8e9cda2018284204abbadf0861e78d6"
+        ]
+      },
+      "latest": {
+        "medianMs": 17.04,
+        "samples": 60,
+        "roundMediansMs": [
+          16.97,
+          18.648,
+          16.607
+        ],
+        "outputHashes": [
+          "430e153b5af4a82e4d2297eaa0230249c8e9cda2018284204abbadf0861e78d6"
+        ]
+      },
+      "outputsEqual": true
+    },
+    "async-composition": {
+      "original": {
+        "medianMs": 8.405,
+        "samples": 60,
+        "roundMediansMs": [
+          7.946,
+          9.375,
+          7.597
+        ],
+        "outputHashes": [
+          "690e0d5dc56a63e8be238f00395fe588246970020a5f0d7faedfe22ae6eab4ae"
+        ]
+      },
+      "previous": {
+        "medianMs": 9.508,
+        "samples": 60,
+        "roundMediansMs": [
+          8.923,
+          8.922,
+          10.687
+        ],
+        "outputHashes": [
+          "690e0d5dc56a63e8be238f00395fe588246970020a5f0d7faedfe22ae6eab4ae"
+        ]
+      },
+      "latest": {
+        "medianMs": 11.641,
+        "samples": 60,
+        "roundMediansMs": [
+          11.768,
+          11.582,
+          11.259
+        ],
+        "outputHashes": [
+          "690e0d5dc56a63e8be238f00395fe588246970020a5f0d7faedfe22ae6eab4ae"
+        ]
+      },
+      "outputsEqual": true
+    }
+  },
+  "arrays": {
+    "original": {
+      "array-128": {
+        "milliseconds": 0.014583,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 128
+      },
+      "array-1024": {
+        "milliseconds": 0.07975,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 1024
+      },
+      "array-4096": {
+        "milliseconds": 0.327583,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 4096
+      },
+      "array-8192": {
+        "milliseconds": 0.765708,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 8192
+      }
+    },
+    "previous": {
+      "array-128": {
+        "milliseconds": 8.077917,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 128
+      },
+      "array-1024": {
+        "milliseconds": 230.926166,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 1024
+      },
+      "array-4096": {
+        "milliseconds": 3599.225666,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 4096
+      },
+      "array-8192": {
+        "milliseconds": 4581.274417,
+        "matchesOriginalValue": false,
+        "resolved": false,
+        "count": null
+      }
+    },
+    "latest": {
+      "array-128": {
+        "milliseconds": 10.237542,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 128
+      },
+      "array-1024": {
+        "milliseconds": 248.854667,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 1024
+      },
+      "array-4096": {
+        "milliseconds": 3343.585,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 4096
+      },
+      "array-8192": {
+        "milliseconds": 3709.056334,
+        "matchesOriginalValue": false,
+        "resolved": false,
+        "count": null
+      }
+    }
+  },
+  "largeTags": {
+    "original": {
+      "inputTagCount": 8192,
+      "knownTagCount": 8192,
+      "tagsUnknown": false,
+      "ttl": {
+        "state": "known",
+        "seconds": 30,
+        "lowerBound": null,
+        "upperBound": null,
+        "reason": null
+      },
+      "storage": "yes",
+      "diagnostics": []
+    },
+    "latest": {
+      "inputTagCount": 8192,
+      "knownTagCount": 0,
+      "tagsUnknown": true,
+      "ttl": {
+        "state": "known",
+        "seconds": 30,
+        "lowerBound": null,
+        "upperBound": null,
+        "reason": null
+      },
+      "storage": "yes",
+      "diagnostics": [
+        {
+          "id": "27d9b783b325fc5e4a1a59d0db9dadcde1196d98105369980f35e2ab8296addf",
+          "kind": "unreadable-policy",
+          "method": "DeriverFeedback\\LargeTags::execute",
+          "file": "/tmp/magix-deriver-evaluation-20261003/large-tags/LargeTags.php",
+          "line": 8,
+          "message": "The declared tags could not be read"
+        }
+      ]
+    }
+  },
+  "differential": {
+    "cases": 3072,
+    "differences": []
+  },
+  "checks": {
+    "tests": 3492,
+    "assertions": 22866,
+    "frozenReports": 33,
+    "literalBaselineCases": 61,
+    "requiredComposerChecks": "passed"
+  },
+  "directDeriver": {
+    "float-without-precision": {
+      "definite": false,
+      "assessment": {
+        "closure": "open",
+        "precision": "opaque",
+        "correlation": "preserved",
+        "coverage": "over-approximation",
+        "enumeration": "not-enumerated"
+      },
+      "frontierCodes": [
+        "FLOAT_STRING_CONFIGURATION"
+      ]
+    },
+    "float-with-precision": {
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "over-approximation",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontierCodes": []
+    },
+    "precision-three": {
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "over-approximation",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontierCodes": []
+    },
+    "precision-seventeen": {
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "over-approximation",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontierCodes": []
+    },
+    "null-array-key": {
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "over-approximation",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontierCodes": []
+    },
+    "numeric-string": {
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "over-approximation",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontierCodes": []
+    },
+    "undefined-variable": {
+      "definite": false,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "over-approximation",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontierCodes": [
+        "PHP_WARNING"
+      ]
+    },
+    "concrete-null": {
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "over-approximation",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontierCodes": []
+    },
+    "host-deprecation": {
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "over-approximation",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontierCodes": []
+    },
+    "large-array": {
+      "definite": false,
+      "assessment": {
+        "closure": "open",
+        "precision": "opaque",
+        "correlation": "preserved",
+        "coverage": "over-approximation",
+        "enumeration": "not-enumerated"
+      },
+      "frontierCodes": [
+        "MEMORY_LIMIT"
+      ],
+      "frontiers": [
+        {
+          "code": "MEMORY_LIMIT",
+          "at": {
+            "snapshotId": "07eeca8f3f64d4b9024dc28181f248181611a0f10622472af1acb66664765d33",
+            "path": "reproducer.php",
+            "start": 21370,
+            "end": 21374,
+            "line": 1,
+            "column": 21371
+          },
+          "operation": "runtime-resources",
+          "affectedProjections": [
+            "value",
+            "state"
+          ],
+          "knownDependencies": [],
+          "residual": "v0",
+          "missingCapability": "runtime-resources"
+        },
+        {
+          "code": "MEMORY_LIMIT",
+          "at": {
+            "snapshotId": "07eeca8f3f64d4b9024dc28181f248181611a0f10622472af1acb66664765d33",
+            "path": "reproducer.php",
+            "start": 21370,
+            "end": 21374,
+            "line": 1,
+            "column": 21371
+          },
+          "operation": "logical-work",
+          "affectedProjections": [
+            "value",
+            "state"
+          ],
+          "knownDependencies": [],
+          "residual": "v0",
+          "missingCapability": "logical-work"
+        },
+        {
+          "code": "MEMORY_LIMIT",
+          "at": {
+            "snapshotId": "07eeca8f3f64d4b9024dc28181f248181611a0f10622472af1acb66664765d33",
+            "path": "reproducer.php",
+            "start": 6,
+            "end": 39888,
+            "line": 1,
+            "column": 7
+          },
+          "operation": "summary-fixed-point",
+          "affectedProjections": [
+            "value",
+            "state"
+          ],
+          "knownDependencies": [],
+          "residual": "v0",
+          "missingCapability": "summary-fixed-point"
+        }
+      ]
+    }
+  },
+  "directDeriverStderrBytes": 0,
+  "project200": {
+    "method": "Scan 200 independent cached declarations with TTL 30 + 5 and three literal tags each, select Query0. Three serial alternating full CLI process runs per mode, including process startup; one output root.",
+    "sourceSha256": "eda4e4204cf0f62575276b52a1cff854e6c52d8f7e762a0e19716230eb722575",
+    "results": {
+      "original": {
+        "medianMs": 201.986,
+        "runs": [
+          {
+            "milliseconds": 198.102834,
+            "sha256": "8a9e9c74d0ea39bc7c789dd88d4319704453545c636a52ac3fcab9146027cc96",
+            "roots": 1
+          },
+          {
+            "milliseconds": 201.986208,
+            "sha256": "8a9e9c74d0ea39bc7c789dd88d4319704453545c636a52ac3fcab9146027cc96",
+            "roots": 1
+          },
+          {
+            "milliseconds": 206.609125,
+            "sha256": "8a9e9c74d0ea39bc7c789dd88d4319704453545c636a52ac3fcab9146027cc96",
+            "roots": 1
+          }
+        ]
+      },
+      "previous": {
+        "medianMs": 304.408,
+        "runs": [
+          {
+            "milliseconds": 307.129584,
+            "sha256": "8a9e9c74d0ea39bc7c789dd88d4319704453545c636a52ac3fcab9146027cc96",
+            "roots": 1
+          },
+          {
+            "milliseconds": 302.870542,
+            "sha256": "8a9e9c74d0ea39bc7c789dd88d4319704453545c636a52ac3fcab9146027cc96",
+            "roots": 1
+          },
+          {
+            "milliseconds": 304.408041,
+            "sha256": "8a9e9c74d0ea39bc7c789dd88d4319704453545c636a52ac3fcab9146027cc96",
+            "roots": 1
+          }
+        ]
+      },
+      "latest": {
+        "medianMs": 307.456,
+        "runs": [
+          {
+            "milliseconds": 298.700458,
+            "sha256": "8a9e9c74d0ea39bc7c789dd88d4319704453545c636a52ac3fcab9146027cc96",
+            "roots": 1
+          },
+          {
+            "milliseconds": 307.455875,
+            "sha256": "8a9e9c74d0ea39bc7c789dd88d4319704453545c636a52ac3fcab9146027cc96",
+            "roots": 1
+          },
+          {
+            "milliseconds": 328.6885,
+            "sha256": "8a9e9c74d0ea39bc7c789dd88d4319704453545c636a52ac3fcab9146027cc96",
+            "roots": 1
+          }
+        ]
+      }
+    },
+    "outputsEqual": true
+  }
+}

@@ -25,9 +25,16 @@ $cases = [
 ];
 
 $size = isset($argv[1]) ? max(1, (int) $argv[1]) : 0;
+$variant = $argv[2] ?? 'plain';
 
 if ($size > 0) {
-    $cases['large-array'] = ['['.implode(',', range(0, $size - 1)).']', 'The original Magix reader resolves every element; inspect latency and budget frontiers.', 14];
+    $items = array_map(static fn (int $index): string => (string) $index, range(0, $size - 1));
+    $items[0] = match ($variant) {
+        'negative-key' => '-1 => 0',
+        'negative-string-key' => "'-1' => 0",
+        default => '0',
+    };
+    $cases['large-array'] = ['['.implode(',', $items).']', 'The original Magix reader resolves every element; inspect latency and budget frontiers.', 14];
 }
 
 try {
@@ -37,6 +44,7 @@ try {
         'hostPhp' => PHP_VERSION,
         'hostPrecision' => ini_get('precision'),
         'target' => 'php-8.3-64bit',
+        'arrayVariant' => $variant,
         'cases' => [],
     ];
     $analyzer = new Analyzer();

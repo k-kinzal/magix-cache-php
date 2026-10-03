@@ -1,6 +1,24 @@
 # Deriver integration and upstream feedback
 
-## Current assessment (2026-10-03)
+## Current assessment (2026-10-03, Deriver 5996928)
+
+Updated to `5996928a3757e13ccc83250d4048f4ed59e18dc3`. The previous plain-array
+and 8,192-tag failures are fixed: full Analyze output now matches the original
+reader, and the 4,096-element benchmark improved from about 4 seconds to 71 ms
+in this run. Two large-array invariance tests were added and verified against
+both the original reader and the new dependency. All 3,494 tests and required
+checks pass.
+
+Expanded shape testing found the remaining boundary: a single negative integer
+key (`-1 => 0`) disables the literal fast path, and an 8,192-element array still
+reaches `MEMORY_LIMIT`; the equivalent string key (`'-1' => 0`) succeeds. A valid
+`array<int, int>` Strategy argument becomes unknown in Analyze. The improvement
+is substantial and the tested ordinary workloads are usable, but strict
+behavioral equivalence still has this narrower blocker, so the PR stays draft.
+See the [latest evaluation](deriver-evaluation-5996928.md) and
+[measurements](deriver-evaluation-5996928.json).
+
+## Previous assessment (2026-10-03, Deriver 97ad01a)
 
 Updated Deriver to `97ad01a77f46cf33986c95314eafe40b63d169b5` and repeated the
 compatibility, direct reproducer, complete Analyze and timing checks.

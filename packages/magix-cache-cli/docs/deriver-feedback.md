@@ -1,6 +1,31 @@
 # Deriver integration and upstream feedback
 
-## Current assessment (2026-10-03, Deriver 5996928)
+## Current assessment (2026-10-05, Deriver e59f993)
+
+Updated to `e59f993c3d84d23066772b85e1226a66a2d16ae6` and adopted the default
+source-candidate contract. Magix accepts a complete singleton concrete candidate
+for its isolated admitted expressions and generated aliases; it does not ask
+Deriver to prove execution reachability or switch to `forExecution()`.
+
+The remaining signed-key array blocker is fixed. All 8,192 entries in the valid
+Strategy-map fixture stay known, and its complete Analyze output matches the
+original reader. The 33 frozen reports, 61 literal cases and 3,072 arithmetic
+combinations are unchanged. All 3,497 tests and required checks pass. The
+previously observed regressions in the current replacement domain are resolved.
+
+The candidate API correctly retains tested dynamic inputs, finite alternatives,
+known array neighbors, and depth/enumeration residuals. Broader probes found
+exception-region gaps: a fully static return after `try/finally` can disappear
+without an unresolved frontier, and standalone throws differ from throw
+expressions. These do not enter the generated source used by this integration,
+but prevent a general claim that all static PHP is completely analyzed.
+
+See the [current evaluation](deriver-evaluation-e59f993.md),
+[machine-readable evidence](deriver-evaluation-e59f993.json), and
+[candidate reproducer](deriver-candidate-reproducer.php). The earlier assessments
+below retain their original revisions and observations.
+
+## Previous assessment (2026-10-03, Deriver 5996928)
 
 Updated to `5996928a3757e13ccc83250d4048f4ed59e18dc3`. The previous plain-array
 and 8,192-tag failures are fixed: full Analyze output now matches the original
@@ -15,7 +40,7 @@ reaches `MEMORY_LIMIT`; the equivalent string key (`'-1' => 0`) succeeds. A vali
 `array<int, int>` Strategy argument becomes unknown in Analyze. The improvement
 is substantial and the tested ordinary workloads are usable, but strict
 behavioral equivalence still has this narrower blocker, so the PR stays draft.
-See the [latest evaluation](deriver-evaluation-5996928.md) and
+See the [evaluation for that revision](deriver-evaluation-5996928.md) and
 [measurements](deriver-evaluation-5996928.json).
 
 ## Previous assessment (2026-10-03, Deriver 97ad01a)
@@ -67,7 +92,8 @@ they cover JSON diagnostics, alternatives and certainty, Tree ANSI colors, and
 Mermaid. See [the baseline manifest](../tests/Invariance/Baseline/README.md).
 
 `ExpressionDeriver` evaluates isolated generated source with captured inputs.
-It requires the existing exact/closed assessment and uses `definite()` to reject
+It requires the `candidates` contract, exact/closed `source-candidates` assessment
+and finite enumeration, and uses `definite()` to reject
 multiple, symbolic, exceptional, frontier-bearing or diagnostic-bearing results.
 The host's `precision` directive is now captured in `TargetProfile` for each
 snapshot. `LiteralReader` passes the original numeric operands to Deriver;
@@ -116,14 +142,20 @@ previous Deriver revision emitted the host deprecation.
 ### Definite-result API — adopted
 
 `DerivationResult::definite()` supplies the requested consumer acceptance
-helper. The adapter now uses it, retaining its existing assessment requirements.
-An unbound `$missing` has a concrete null and closed assessment but a
-`PHP_WARNING` frontier, so `definite()` rejects it; a literal `null` is accepted.
-Tests continue to reject symbolic branches, exceptional alternatives and opaque
-calls. This removes duplicated outcome validation without widening what Magix
+helper. The adapter uses it with the candidate assessment requirements.
+An unbound `$missing` now retains an `UNRESOLVED_LOCAL` reference and is rejected;
+a literal `null` is accepted. Earlier execution-contract revisions represented
+the missing read as null with `PHP_WARNING`. Tests reject multiple candidates,
+exceptional return expressions, and unresolved dependencies. Unrelated calls
+do not invalidate source candidates under the current contract. This removes duplicated outcome validation without widening what Magix
 accepts as a declaration fact.
 
-## Remaining feedback
+## Historical feedback (Deriver 0d1cb9e)
+
+The measurements and failures in this section describe the older execution
+contract. D4 and the later signed-key variant are fixed in `e59f993`; see the
+current evaluation for remaining candidate-contract feedback.
+
 
 ### D3: Large literal arrays have substantial evaluation overhead
 
@@ -206,7 +238,7 @@ output hashes and remaining frontiers are in
 |---|---|---|---|
 | `[null => 'a']` | `[0 => 'a']` | `['' => 'a']`, matching PHP | Normalize null keys to append. Correcting the existing Magix interpretation belongs in a separate behavior change. |
 | `'60' + 5` | Unresolved | `65`, matching PHP | Keep the reader's numeric operand admission rules. |
-| `$missing` without a binding | Unresolved | Concrete null with a `PHP_WARNING` frontier | Reject via `definite()`. |
+| `$missing` without a binding | Unresolved | `UNRESOLVED_LOCAL` reference under the candidate contract | Reject via `definite()`. |
 | `Visibility::Private` without its source | The trusted library enum case | `INCOMPLETE_SOURCE` | Capture trusted enum identity; never execute an application autoloader. |
 
 Deriver also supports boolean expressions, ternaries and array unpacking that

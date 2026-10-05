@@ -56,15 +56,32 @@ final class ExpressionDeriverTest extends TestCase
         self::assertSame(LiteralReader::UNRESOLVED, $reader->value($expression));
     }
 
-    public function testSourceRejectsConcreteValuesThatDoNotDescribeEveryOutcome(): void
+    public function testSourceRejectsMultipleExceptionalAndResidualCandidates(): void
     {
         $reader = new ExpressionDeriver();
 
         $arguments = [Term::parameter('flag', 'bool')];
         self::assertSame(LiteralReader::UNRESOLVED, $reader->source('<?php function resolve(bool $flag) { return $flag ? 30 : 60; }', $arguments));
-        self::assertSame(LiteralReader::UNRESOLVED, $reader->source('<?php function resolve(bool $flag) { if ($flag) { throw new RuntimeException(); } return 30; }', $arguments));
-        self::assertSame(LiteralReader::UNRESOLVED, $reader->source('<?php function resolve() { unknown(); return 30; }'));
+        self::assertSame(LiteralReader::UNRESOLVED, $reader->source('<?php function resolve(bool $flag) { return $flag ? throw new RuntimeException() : 30; }', $arguments));
+        self::assertSame(LiteralReader::UNRESOLVED, $reader->source('<?php function resolve() { return unknown(); }'));
         self::assertSame(LiteralReader::UNRESOLVED, $reader->source('<?php function resolve() { return $missing; }'));
+    }
+
+    public function testSourceSelectsCandidatesWithoutClaimingExecutionReachability(): void
+    {
+        $reader = new ExpressionDeriver();
+
+        self::assertSame(30, $reader->source('<?php function resolve() { unknown(); return 30; }'));
+        self::assertSame(30, $reader->source('<?php function resolve(bool $flag) { return $flag ? 30 : 30; }', [Term::parameter('flag', 'bool')]));
+    }
+
+    public function testSourceDoesNotPromoteKnownNeighborsOrDefaultsOverDynamicInputs(): void
+    {
+        $reader = new ExpressionDeriver();
+
+        self::assertSame(LiteralReader::UNRESOLVED, $reader->source('<?php function resolve(int $ttl = 30) { return $ttl; }', [Term::parameter('ttl', 'int')]));
+        self::assertSame(LiteralReader::UNRESOLVED, $reader->source('<?php function resolve($tag) { return ["known", $tag, "tail"]; }', [Term::parameter('tag')]));
+        self::assertSame(LiteralReader::UNRESOLVED, $reader->source('<?php function resolve() { return "tag:" . $_GET["tag"]; }'));
     }
 
     public function testSourceDistinguishesConcreteNullFromAnUnresolvedResult(): void

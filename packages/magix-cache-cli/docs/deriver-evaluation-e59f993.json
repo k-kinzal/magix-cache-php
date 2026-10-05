@@ -1,0 +1,6914 @@
+{
+  "date": "2026-10-05",
+  "revisions": {
+    "originalMagix": "688356c3",
+    "previousDeriver": "5996928a3757e13ccc83250d4048f4ed59e18dc3",
+    "currentDeriver": "e59f993c3d84d23066772b85e1226a66a2d16ae6"
+  },
+  "environment": {
+    "php": "8.5.8",
+    "phpParser": "5.9.0",
+    "target": "PHP 8.3, 64 bit",
+    "xdebug": "off",
+    "cliOpcache": false,
+    "phpMemoryLimit": "1G",
+    "deriverBudgets": "defaults except explicitly labeled depth/enumeration probes"
+  },
+  "decision": {
+    "magixReplacement": "Usable in the current admitted expression and alias domain; previously observed value regressions are resolved.",
+    "generalStaticCandidateAnalysis": "Exception-region candidate loss and throw representation require upstream follow-up.",
+    "contract": "candidates",
+    "executionFallback": false
+  },
+  "commandMeasurements": {
+    "project-controller": {
+      "original": {
+        "medianMs": 12.164895999999999,
+        "rounds": [
+          [
+            12.263791,
+            12.127292,
+            12.381416,
+            13.42525,
+            13.1875,
+            13.158792,
+            21.436584,
+            12.846834,
+            12.437375,
+            12.170375,
+            12.412042,
+            12.634292,
+            12.489166,
+            12.78275,
+            12.335375,
+            12.532125,
+            12.159417,
+            12.226417,
+            12.307417,
+            12.416375
+          ],
+          [
+            12.240833,
+            11.933792,
+            11.964458,
+            12.061916,
+            11.80025,
+            11.889791,
+            11.766583,
+            12.141083,
+            12.025083,
+            12.375292,
+            11.879458,
+            11.824542,
+            11.863,
+            11.718166,
+            12.733458,
+            12.252416,
+            12.206333,
+            12.008167,
+            12.405458,
+            12.027041
+          ],
+          [
+            11.933625,
+            12.095833,
+            11.832333,
+            12.207958,
+            11.818167,
+            11.898583,
+            11.980459,
+            12.24825,
+            12.142041,
+            12.201584,
+            12.018875,
+            11.562584,
+            13.310958,
+            12.107375,
+            12.26775,
+            11.872167,
+            12.542625,
+            11.758584,
+            11.8855,
+            11.908792
+          ]
+        ],
+        "hashes": [
+          "2aa2df9c48c6a5f30d148a0ce49610e8980abd4cbb40355e61a903452e9d7891"
+        ]
+      },
+      "previous": {
+        "medianMs": 13.958646,
+        "rounds": [
+          [
+            13.878958,
+            14.084541,
+            13.934417,
+            13.767959,
+            13.589416,
+            13.913708,
+            13.439541,
+            13.571292,
+            14.264625,
+            14.111625,
+            14.225875,
+            13.767333,
+            13.907792,
+            14.727792,
+            13.557667,
+            14.327708,
+            13.730333,
+            14.081833,
+            13.585875,
+            14.936167
+          ],
+          [
+            13.92675,
+            13.975166,
+            13.880541,
+            13.874041,
+            13.349417,
+            14.187042,
+            14.16225,
+            13.969375,
+            13.702,
+            14.153917,
+            13.915791,
+            13.988541,
+            21.342208,
+            14.224958,
+            14.173875,
+            14.11925,
+            14.2115,
+            13.792583,
+            13.976875,
+            14.084042
+          ],
+          [
+            14.097458,
+            15.790417,
+            16.989584,
+            16.210958,
+            17.30625,
+            14.506458,
+            13.947917,
+            13.633583,
+            13.653334,
+            14.732375,
+            14.446125,
+            14.019209,
+            13.808917,
+            13.760208,
+            13.811792,
+            13.45175,
+            13.780667,
+            13.798292,
+            13.892667,
+            13.741458
+          ]
+        ],
+        "hashes": [
+          "2aa2df9c48c6a5f30d148a0ce49610e8980abd4cbb40355e61a903452e9d7891"
+        ]
+      },
+      "latest": {
+        "medianMs": 13.9147085,
+        "rounds": [
+          [
+            13.60125,
+            14.120542,
+            13.66925,
+            13.79675,
+            13.404583,
+            14.502916,
+            14.009875,
+            14.37925,
+            14.083291,
+            13.519459,
+            13.796958,
+            13.751333,
+            14.680542,
+            14.807542,
+            14.061667,
+            13.769125,
+            13.807916,
+            13.416958,
+            14.286833,
+            13.67675
+          ],
+          [
+            14.160375,
+            14.39,
+            14.132333,
+            13.692166,
+            14.942667,
+            13.709916,
+            14.259375,
+            13.960416,
+            14.017292,
+            13.561291,
+            13.793417,
+            13.656083,
+            13.855042,
+            13.82825,
+            13.889709,
+            13.371834,
+            14.357167,
+            13.402291,
+            13.332292,
+            14.032625
+          ],
+          [
+            14.323083,
+            14.31475,
+            15.7685,
+            14.291,
+            14.087625,
+            14.144542,
+            13.823,
+            14.62475,
+            13.783791,
+            13.854166,
+            13.851625,
+            13.939708,
+            13.962667,
+            13.822084,
+            14.050666,
+            13.742708,
+            13.408625,
+            13.944084,
+            14.104667,
+            13.884542
+          ]
+        ],
+        "hashes": [
+          "2aa2df9c48c6a5f30d148a0ce49610e8980abd4cbb40355e61a903452e9d7891"
+        ]
+      }
+    },
+    "functional-composition": {
+      "original": {
+        "medianMs": 4.0524585,
+        "rounds": [
+          [
+            4.330542,
+            3.97375,
+            4.870208,
+            4.277208,
+            4.376333,
+            3.813833,
+            4.111833,
+            4.097834,
+            4.971333,
+            3.717792,
+            3.6855,
+            3.835292,
+            4.17825,
+            3.62975,
+            3.544667,
+            5.213458,
+            4.456042,
+            3.607959,
+            3.581042,
+            3.826041
+          ],
+          [
+            4.0805,
+            3.750833,
+            5.412542,
+            4.498958,
+            3.678875,
+            3.673542,
+            4.185917,
+            4.821459,
+            3.622,
+            3.635042,
+            4.300917,
+            4.1995,
+            3.606834,
+            3.699583,
+            4.603125,
+            5.092458,
+            3.757667,
+            3.867709,
+            4.926333,
+            3.743791
+          ],
+          [
+            3.668834,
+            4.055584,
+            5.457834,
+            3.983375,
+            4.359708,
+            4.844375,
+            3.792792,
+            3.701458,
+            4.209875,
+            4.356666,
+            3.672875,
+            3.742916,
+            4.5455,
+            4.268166,
+            3.734042,
+            4.512417,
+            4.55625,
+            3.706042,
+            3.601292,
+            4.049333
+          ]
+        ],
+        "hashes": [
+          "56707e8f23b26440a0474f7e47c3334a2def1f9b8f10457859ae220f56b93087"
+        ]
+      },
+      "previous": {
+        "medianMs": 4.9254795,
+        "rounds": [
+          [
+            5.995667,
+            6.352125,
+            5.658708,
+            6.7285,
+            4.838916,
+            5.233292,
+            5.611583,
+            7.569292,
+            7.787,
+            4.707209,
+            5.066459,
+            5.463792,
+            4.297375,
+            4.629958,
+            5.299833,
+            5.493083,
+            4.803,
+            5.501584,
+            4.525417,
+            4.160375
+          ],
+          [
+            4.324875,
+            7.10225,
+            4.710667,
+            4.563833,
+            5.222583,
+            4.152459,
+            4.065833,
+            5.63825,
+            4.953459,
+            4.450834,
+            4.851833,
+            4.842084,
+            4.133458,
+            4.11925,
+            5.403708,
+            5.700166,
+            4.466083,
+            5.12825,
+            4.368083,
+            4.142667
+          ],
+          [
+            5.13975,
+            6.0335,
+            4.52075,
+            4.8975,
+            4.478083,
+            4.24075,
+            5.266042,
+            4.962916,
+            4.257417,
+            4.982292,
+            5.987,
+            4.702583,
+            4.856667,
+            5.750666,
+            4.324125,
+            5.905458,
+            5.591291,
+            4.182833,
+            4.243167,
+            5.170375
+          ]
+        ],
+        "hashes": [
+          "56707e8f23b26440a0474f7e47c3334a2def1f9b8f10457859ae220f56b93087"
+        ]
+      },
+      "latest": {
+        "medianMs": 4.7369795,
+        "rounds": [
+          [
+            4.248875,
+            6.829167,
+            4.620458,
+            4.287666,
+            5.63775,
+            4.706875,
+            4.211292,
+            5.165041,
+            5.048583,
+            4.085833,
+            4.893791,
+            5.551792,
+            4.311709,
+            4.339541,
+            4.742375,
+            5.352583,
+            4.355666,
+            5.15625,
+            4.907958,
+            4.072333
+          ],
+          [
+            4.663542,
+            5.380583,
+            5.022375,
+            4.674417,
+            4.133584,
+            4.919208,
+            5.179791,
+            4.133375,
+            4.523542,
+            5.503167,
+            4.159083,
+            4.519042,
+            5.23025,
+            4.60425,
+            4.116209,
+            6.336917,
+            4.731584,
+            4.04075,
+            4.757875,
+            5.634583
+          ],
+          [
+            5.59775,
+            5.445542,
+            5.006958,
+            5.720625,
+            4.217042,
+            4.701292,
+            5.738375,
+            4.344042,
+            4.300667,
+            5.290917,
+            4.461292,
+            4.109916,
+            4.834667,
+            5.570375,
+            4.225375,
+            5.347,
+            5.3885,
+            4.1115,
+            4.18175,
+            5.02875
+          ]
+        ],
+        "hashes": [
+          "56707e8f23b26440a0474f7e47c3334a2def1f9b8f10457859ae220f56b93087"
+        ]
+      }
+    },
+    "expiration": {
+      "original": {
+        "medianMs": 6.8114170000000005,
+        "rounds": [
+          [
+            6.227541,
+            6.244459,
+            6.533875,
+            6.041209,
+            7.48975,
+            7.539292,
+            8.268125,
+            6.55375,
+            8.021291,
+            7.006167,
+            7.255667,
+            6.667375,
+            6.705791,
+            7.546459,
+            6.536125,
+            6.993125,
+            6.80825,
+            9.693958,
+            7.072292,
+            7.767542
+          ],
+          [
+            6.778084,
+            6.665459,
+            6.944041,
+            7.196208,
+            6.175583,
+            7.810041,
+            6.44475,
+            6.944375,
+            6.525875,
+            6.656167,
+            6.881375,
+            6.008709,
+            7.248542,
+            6.470541,
+            6.843375,
+            6.679167,
+            6.196708,
+            8.396916,
+            6.946583,
+            6.82025
+          ],
+          [
+            6.512791,
+            6.659541,
+            6.79225,
+            6.305833,
+            7.256,
+            6.977708,
+            7.200042,
+            6.425167,
+            7.005292,
+            6.558541,
+            6.10925,
+            7.306,
+            6.311125,
+            6.814584,
+            6.379875,
+            6.558583,
+            7.410875,
+            7.083291,
+            7.509625,
+            6.375875
+          ]
+        ],
+        "hashes": [
+          "430e153b5af4a82e4d2297eaa0230249c8e9cda2018284204abbadf0861e78d6"
+        ]
+      },
+      "previous": {
+        "medianMs": 6.6889375,
+        "rounds": [
+          [
+            6.928667,
+            6.176875,
+            6.944084,
+            6.436209,
+            6.89225,
+            7.484834,
+            6.644375,
+            7.54375,
+            6.375041,
+            6.732375,
+            6.320917,
+            6.662,
+            6.634584,
+            6.07475,
+            6.968334,
+            6.256417,
+            6.87325,
+            7.447666,
+            6.419209,
+            7.152083
+          ],
+          [
+            7.184541,
+            6.03875,
+            7.29925,
+            6.5255,
+            6.914833,
+            7.328917,
+            6.39575,
+            7.607125,
+            6.380834,
+            6.7155,
+            6.2275,
+            6.784875,
+            6.861541,
+            6.087792,
+            6.837958,
+            6.180417,
+            6.604,
+            7.543208,
+            6.492625,
+            6.866041
+          ],
+          [
+            6.378042,
+            7.346417,
+            6.3125,
+            6.985333,
+            6.564167,
+            7.923334,
+            6.754334,
+            6.255208,
+            6.94825,
+            6.295292,
+            6.806959,
+            6.662375,
+            6.282375,
+            7.449084,
+            6.14625,
+            6.832458,
+            6.514959,
+            7.614792,
+            6.571875,
+            6.325042
+          ]
+        ],
+        "hashes": [
+          "430e153b5af4a82e4d2297eaa0230249c8e9cda2018284204abbadf0861e78d6"
+        ]
+      },
+      "latest": {
+        "medianMs": 6.807354,
+        "rounds": [
+          [
+            7.217375,
+            6.256417,
+            7.504041,
+            6.81,
+            7.187583,
+            7.994208,
+            6.841792,
+            7.045417,
+            6.265542,
+            7.501417,
+            6.423875,
+            6.942792,
+            6.302958,
+            6.273792,
+            7.598625,
+            6.141375,
+            6.604541,
+            7.161333,
+            7.254541,
+            6.71525
+          ],
+          [
+            6.642875,
+            7.139375,
+            6.043208,
+            7.858458,
+            6.172667,
+            8.272166,
+            6.608459,
+            7.114834,
+            6.642583,
+            6.429333,
+            7.376,
+            6.053875,
+            6.808083,
+            6.37425,
+            6.672792,
+            6.988459,
+            6.133542,
+            7.8415,
+            6.459458,
+            6.801583
+          ],
+          [
+            6.134791,
+            7.662,
+            6.624542,
+            7.049667,
+            6.733583,
+            7.279833,
+            7.556875,
+            6.276583,
+            6.883792,
+            6.252666,
+            6.793625,
+            7.061125,
+            5.947541,
+            6.918208,
+            6.033834,
+            7.721125,
+            6.806625,
+            8.325917,
+            6.871042,
+            6.427125
+          ]
+        ],
+        "hashes": [
+          "430e153b5af4a82e4d2297eaa0230249c8e9cda2018284204abbadf0861e78d6"
+        ]
+      }
+    },
+    "async-composition": {
+      "original": {
+        "medianMs": 3.8853125,
+        "rounds": [
+          [
+            4.621833,
+            3.889916,
+            4.2075,
+            4.998,
+            4.486125,
+            4.132833,
+            7.607709,
+            4.531875,
+            3.936167,
+            4.842292,
+            4.498459,
+            4.677208,
+            12.166042,
+            7.130084,
+            5.134667,
+            3.880709,
+            3.397959,
+            3.506167,
+            5.849959,
+            3.802458
+          ],
+          [
+            4.638375,
+            3.84325,
+            3.323667,
+            3.615708,
+            3.688375,
+            3.721917,
+            4.058166,
+            3.509542,
+            3.995708,
+            3.96625,
+            3.313166,
+            3.308875,
+            3.677333,
+            3.832792,
+            3.299708,
+            3.330625,
+            3.633042,
+            4.721,
+            4.362417,
+            3.465333
+          ],
+          [
+            3.260917,
+            3.725333,
+            4.588375,
+            3.395125,
+            3.2405,
+            3.632459,
+            5.775583,
+            3.700208,
+            3.95725,
+            3.995,
+            4.660167,
+            3.499458,
+            3.379125,
+            4.162208,
+            4.353417,
+            3.387667,
+            3.202375,
+            3.656917,
+            5.124292,
+            3.336708
+          ]
+        ],
+        "hashes": [
+          "690e0d5dc56a63e8be238f00395fe588246970020a5f0d7faedfe22ae6eab4ae"
+        ]
+      },
+      "previous": {
+        "medianMs": 4.3784375,
+        "rounds": [
+          [
+            4.077417,
+            3.706,
+            4.302584,
+            4.731417,
+            3.966417,
+            4.454,
+            6.411417,
+            4.2155,
+            3.90625,
+            4.6225,
+            4.914625,
+            3.734208,
+            3.755792,
+            4.494,
+            4.135042,
+            3.716542,
+            4.21675,
+            5.196125,
+            4.674916,
+            3.891625
+          ],
+          [
+            4.159459,
+            3.863291,
+            4.426125,
+            4.611333,
+            3.754209,
+            3.816291,
+            5.984666,
+            4.31025,
+            3.866667,
+            4.416208,
+            5.0205,
+            3.813417,
+            3.79625,
+            4.541958,
+            4.528792,
+            4.777875,
+            4.413834,
+            4.790083,
+            4.819333,
+            4.29875
+          ],
+          [
+            4.744041,
+            4.387541,
+            3.885125,
+            3.709292,
+            4.482083,
+            4.464542,
+            4.607542,
+            4.369334,
+            4.802167,
+            3.788375,
+            3.850625,
+            4.702875,
+            4.64575,
+            3.701459,
+            3.758875,
+            4.855292,
+            4.15725,
+            3.7125,
+            4.867542,
+            5.203084
+          ]
+        ],
+        "hashes": [
+          "690e0d5dc56a63e8be238f00395fe588246970020a5f0d7faedfe22ae6eab4ae"
+        ]
+      },
+      "latest": {
+        "medianMs": 4.2089795,
+        "rounds": [
+          [
+            3.865666,
+            3.814833,
+            5.026292,
+            4.41875,
+            3.759417,
+            4.182167,
+            5.714416,
+            4.016875,
+            3.818041,
+            4.498083,
+            4.649375,
+            3.679209,
+            3.820417,
+            4.799833,
+            3.859,
+            3.720708,
+            3.835333,
+            5.927958,
+            4.881084,
+            4.235792
+          ],
+          [
+            4.94475,
+            4.109167,
+            3.641542,
+            4.519875,
+            4.709083,
+            3.73775,
+            4.90675,
+            5.336708,
+            4.006292,
+            3.705125,
+            4.255709,
+            4.908333,
+            3.885833,
+            3.914417,
+            4.496042,
+            3.956209,
+            3.615041,
+            3.91475,
+            6.76425,
+            4.249292
+          ],
+          [
+            4.386542,
+            4.240333,
+            3.9395,
+            3.769541,
+            4.285125,
+            4.702542,
+            4.568917,
+            3.925667,
+            5.609334,
+            4.107,
+            3.870917,
+            4.359167,
+            5.090666,
+            3.7185,
+            4.021416,
+            4.662208,
+            4.025708,
+            3.617,
+            4.696791,
+            5.303625
+          ]
+        ],
+        "hashes": [
+          "690e0d5dc56a63e8be238f00395fe588246970020a5f0d7faedfe22ae6eab4ae"
+        ]
+      }
+    }
+  },
+  "projectScan": {
+    "declarations": 200,
+    "selectedRoots": 1,
+    "includesProcessStartup": true,
+    "runs": {
+      "original": [
+        {
+          "milliseconds": 118.822042,
+          "sha256": "b6285b3aa71566f9a048d44d7812b07156f6d2800972673bd86adfec0d735d35",
+          "roots": 1
+        },
+        {
+          "milliseconds": 116.297,
+          "sha256": "b6285b3aa71566f9a048d44d7812b07156f6d2800972673bd86adfec0d735d35",
+          "roots": 1
+        },
+        {
+          "milliseconds": 115.56025,
+          "sha256": "b6285b3aa71566f9a048d44d7812b07156f6d2800972673bd86adfec0d735d35",
+          "roots": 1
+        }
+      ],
+      "previous": [
+        {
+          "milliseconds": 171.019208,
+          "sha256": "b6285b3aa71566f9a048d44d7812b07156f6d2800972673bd86adfec0d735d35",
+          "roots": 1
+        },
+        {
+          "milliseconds": 170.733542,
+          "sha256": "b6285b3aa71566f9a048d44d7812b07156f6d2800972673bd86adfec0d735d35",
+          "roots": 1
+        },
+        {
+          "milliseconds": 169.591916,
+          "sha256": "b6285b3aa71566f9a048d44d7812b07156f6d2800972673bd86adfec0d735d35",
+          "roots": 1
+        }
+      ],
+      "latest": [
+        {
+          "milliseconds": 167.177166,
+          "sha256": "b6285b3aa71566f9a048d44d7812b07156f6d2800972673bd86adfec0d735d35",
+          "roots": 1
+        },
+        {
+          "milliseconds": 165.852834,
+          "sha256": "b6285b3aa71566f9a048d44d7812b07156f6d2800972673bd86adfec0d735d35",
+          "roots": 1
+        },
+        {
+          "milliseconds": 163.113458,
+          "sha256": "b6285b3aa71566f9a048d44d7812b07156f6d2800972673bd86adfec0d735d35",
+          "roots": 1
+        }
+      ]
+    },
+    "mediansMs": {
+      "original": 116.297,
+      "previous": 170.733542,
+      "latest": 165.852834
+    }
+  },
+  "arrayMeasurements": {
+    "original": {
+      "array-128": {
+        "milliseconds": 0.007417,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 128
+      },
+      "array-1024": {
+        "milliseconds": 0.039875,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 1024
+      },
+      "array-4096": {
+        "milliseconds": 0.160833,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 4096
+      },
+      "array-8192": {
+        "milliseconds": 0.32825,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 8192
+      }
+    },
+    "previous": {
+      "array-128": {
+        "milliseconds": 1.643208,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 128
+      },
+      "array-1024": {
+        "milliseconds": 8.623833,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 1024
+      },
+      "array-4096": {
+        "milliseconds": 34.300125,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 4096
+      },
+      "array-8192": {
+        "milliseconds": 74.441042,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 8192
+      }
+    },
+    "latest": {
+      "array-128": {
+        "milliseconds": 1.358792,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 128
+      },
+      "array-1024": {
+        "milliseconds": 8.370042,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 1024
+      },
+      "array-4096": {
+        "milliseconds": 33.706459,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 4096
+      },
+      "array-8192": {
+        "milliseconds": 73.7645,
+        "matchesOriginalValue": true,
+        "resolved": true,
+        "count": 8192
+      }
+    }
+  },
+  "shapeMeasurements": [
+    {
+      "case": "string-keys",
+      "beforeMs": 2.552375,
+      "latestMs": 152.951667,
+      "equal": true,
+      "beforeCount": 8192,
+      "latestCount": 8192,
+      "latestIsUnresolved": false
+    },
+    {
+      "case": "positive-keys",
+      "beforeMs": 0.790916,
+      "latestMs": 119.942,
+      "equal": true,
+      "beforeCount": 8192,
+      "latestCount": 8192,
+      "latestIsUnresolved": false
+    },
+    {
+      "case": "negative-key",
+      "beforeMs": 0.555667,
+      "latestMs": 65.515916,
+      "equal": true,
+      "beforeCount": 8192,
+      "latestCount": 8192,
+      "latestIsUnresolved": false
+    },
+    {
+      "case": "negative-string-key",
+      "beforeMs": 0.462125,
+      "latestMs": 74.897,
+      "equal": true,
+      "beforeCount": 8192,
+      "latestCount": 8192,
+      "latestIsUnresolved": false
+    },
+    {
+      "case": "nested-values",
+      "beforeMs": 0.2345,
+      "latestMs": 77.850333,
+      "equal": true,
+      "beforeCount": 1024,
+      "latestCount": 1024,
+      "latestIsUnresolved": false
+    }
+  ],
+  "fullAnalyze": {
+    "large-tags": {
+      "original": {
+        "sha256": "31053fccd9cedda612f16cac4080f74499879f778c6b016831f61dc8caf3bee9",
+        "diagnostics": [],
+        "tagCount": 8192,
+        "tagsUnknown": false
+      },
+      "latest": {
+        "sha256": "31053fccd9cedda612f16cac4080f74499879f778c6b016831f61dc8caf3bee9",
+        "diagnostics": [],
+        "tagCount": 8192,
+        "tagsUnknown": false
+      }
+    },
+    "negative-map": {
+      "original": {
+        "sha256": "e727634e1d1b803babe7131c62304d93620af75cbfa69275694e3c8b333ccff8",
+        "diagnostics": [],
+        "argumentState": "known",
+        "itemCount": 8192
+      },
+      "latest": {
+        "sha256": "e727634e1d1b803babe7131c62304d93620af75cbfa69275694e3c8b333ccff8",
+        "diagnostics": [],
+        "argumentState": "known",
+        "itemCount": 8192
+      }
+    }
+  },
+  "rawArrayVariants": {
+    "plain": {
+      "size": 8192,
+      "milliseconds": 67.6425,
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontiers": [],
+      "stderr": ""
+    },
+    "negative-key": {
+      "size": 8192,
+      "milliseconds": 68.017916,
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontiers": [],
+      "stderr": ""
+    },
+    "negative-string-key": {
+      "size": 8192,
+      "milliseconds": 70.048791,
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontiers": [],
+      "stderr": ""
+    },
+    "negative-expression-key": {
+      "size": 8192,
+      "milliseconds": 97.28975,
+      "definite": true,
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "frontiers": [],
+      "stderr": ""
+    }
+  },
+  "candidateProbes": {
+    "literal": {
+      "source": "<?php function resolve(){return 30;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 30
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "30"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "dynamic-branch": {
+      "source": "<?php function resolve(bool $flag){return $flag ? 30 : 60;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 30
+        },
+        {
+          "return": 60
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": {
+            "source:resolve:condition:r1": true
+          },
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        },
+        {
+          "guard": {
+            "source:resolve:condition:r1": false
+          },
+          "values": {
+            "return": "v1"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v2",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "30"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "60"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v4"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v6": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v1"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v5": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v6"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v5"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "same-branch": {
+      "source": "<?php function resolve(bool $flag){return $flag ? 30 : 30;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 30
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "30"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v4"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "throw-branch": {
+      "source": "<?php function resolve(bool $flag){if($flag){throw new RuntimeException();}return 30;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 30
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "30"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v4"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "throw-expression": {
+      "source": "<?php function resolve(bool $flag){return $flag ? throw new RuntimeException() : 30;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 30
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [
+        {
+          "guard": {
+            "source:resolve:condition:r1": true
+          },
+          "exception": "v1",
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": {
+            "source:resolve:condition:r1": false
+          },
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v3",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "30"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "object",
+          "literal": {
+            "type": "bytes",
+            "value": "c291cmNlOnJlc29sdmU6Y2FuZGlkYXRlLnBocDo1NjpyNA=="
+          },
+          "operands": [],
+          "attributes": [
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "UnVudGltZUV4Y2VwdGlvbg=="
+              }
+            },
+            {
+              "key": "class",
+              "value": {
+                "type": "bytes",
+                "value": "UnVudGltZUV4Y2VwdGlvbg=="
+              }
+            },
+            {
+              "key": "allocation",
+              "value": {
+                "type": "bytes",
+                "value": "cjQ="
+              }
+            },
+            {
+              "key": "context",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "throwable",
+          "literal": {
+            "type": "bytes",
+            "value": "ZXhwbGljaXQtdGhyb3c="
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v5": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v1"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v5"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v7": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v6": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v7"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v4"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v6"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "only-throw": {
+      "source": "<?php function resolve(){throw new RuntimeException();}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": null
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "unrelated-call": {
+      "source": "<?php function resolve(){unknown();return 30;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 30
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "30"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "dependent-call": {
+      "source": "<?php function resolve(){return unknown();}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "call"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [
+        {
+          "code": "MISSING_SOURCE",
+          "at": {
+            "snapshotId": "dc73c38c6883cc2371681192bbfbf6c18c985caee18cc08a628ef218d17db195",
+            "path": "candidate.php",
+            "start": 32,
+            "end": 32,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "unknown",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "d4b282dacdf87c552cc010a462939527db7cc4db861b51b3f8a061ab48e8bb20"
+          ],
+          "residual": "v0",
+          "missingCapability": "MISSING_SOURCE"
+        }
+      ],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "call",
+          "literal": {
+            "type": "bytes",
+            "value": "dW5rbm93bg=="
+          },
+          "operands": [],
+          "attributes": [
+            {
+              "key": "source",
+              "value": {
+                "type": "bytes",
+                "value": "Y2FuZGlkYXRlLnBocA=="
+              }
+            },
+            {
+              "key": "start",
+              "value": {
+                "type": "int64",
+                "value": "32"
+              }
+            },
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "TUlTU0lOR19TT1VSQ0U="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "missing-variable": {
+      "source": "<?php function resolve(){return $missing;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "reference"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [
+        {
+          "code": "UNRESOLVED_LOCAL",
+          "at": {
+            "snapshotId": "203271443f54266176e97905e4d3112a694fc3b40749afb20b2f049f01a79bf4",
+            "path": "candidate.php",
+            "start": 32,
+            "end": 40,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "$missing",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "source:resolve:$missing:32"
+          ],
+          "residual": "v0",
+          "missingCapability": "UNRESOLVED_LOCAL"
+        }
+      ],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "reference",
+          "literal": {
+            "type": "bytes",
+            "value": "JG1pc3Npbmc="
+          },
+          "operands": [],
+          "attributes": [
+            {
+              "key": "identity",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU6JG1pc3Npbmc6MzI="
+              }
+            },
+            {
+              "key": "scope",
+              "value": {
+                "type": "bytes",
+                "value": "cmVzb2x2ZQ=="
+              }
+            },
+            {
+              "key": "context",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU="
+              }
+            },
+            {
+              "key": "source",
+              "value": {
+                "type": "bytes",
+                "value": "Y2FuZGlkYXRlLnBocA=="
+              }
+            },
+            {
+              "key": "start",
+              "value": {
+                "type": "int64",
+                "value": "32"
+              }
+            },
+            {
+              "key": "end",
+              "value": {
+                "type": "int64",
+                "value": "40"
+              }
+            },
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "bWl4ZWQ="
+              }
+            },
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "VU5SRVNPTFZFRF9MT0NBTA=="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "dynamic-array": {
+      "source": "<?php function resolve($input){return [\"head\", $input, \"tail\"] ;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "array"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [
+        {
+          "code": "EXTERNAL_INPUT",
+          "at": {
+            "snapshotId": "3081180443c160d2ecaf0da1bac20bc1d2f06a14ae2ed99e2d8498348ff2de9f",
+            "path": "candidate.php",
+            "start": 6,
+            "end": 65,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "$input",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "source:resolve:$input:6"
+          ],
+          "residual": "v2",
+          "missingCapability": "EXTERNAL_INPUT"
+        }
+      ],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v4",
+      "values": {
+        "v1": {
+          "kind": "constant",
+          "literal": {
+            "type": "bytes",
+            "value": "aGVhZA=="
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "reference",
+          "literal": {
+            "type": "bytes",
+            "value": "JGlucHV0"
+          },
+          "operands": [],
+          "attributes": [
+            {
+              "key": "identity",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU6JGlucHV0OjY="
+              }
+            },
+            {
+              "key": "scope",
+              "value": {
+                "type": "bytes",
+                "value": "cmVzb2x2ZQ=="
+              }
+            },
+            {
+              "key": "context",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU="
+              }
+            },
+            {
+              "key": "source",
+              "value": {
+                "type": "bytes",
+                "value": "Y2FuZGlkYXRlLnBocA=="
+              }
+            },
+            {
+              "key": "start",
+              "value": {
+                "type": "int64",
+                "value": "6"
+              }
+            },
+            {
+              "key": "end",
+              "value": {
+                "type": "int64",
+                "value": "65"
+              }
+            },
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "bWl4ZWQ="
+              }
+            },
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "RVhURVJOQUxfSU5QVVQ="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "constant",
+          "literal": {
+            "type": "bytes",
+            "value": "dGFpbA=="
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v0": {
+          "kind": "array",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v1"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v2"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "2"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "open",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "next",
+              "value": {
+                "type": "int64",
+                "value": "3"
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "dynamic-addition": {
+      "source": "<?php function resolve(int $input){return 5+$input;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "binary"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [
+        {
+          "code": "EXTERNAL_INPUT",
+          "at": {
+            "snapshotId": "4a20e67407316a8d0191a88ddd5dabdb5bfca040fa54b2bae1ec9635a0dfbfee",
+            "path": "candidate.php",
+            "start": 6,
+            "end": 52,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "$input",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "source:resolve:$input:6"
+          ],
+          "residual": "v2",
+          "missingCapability": "EXTERNAL_INPUT"
+        }
+      ],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v3",
+      "values": {
+        "v1": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "5"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "reference",
+          "literal": {
+            "type": "bytes",
+            "value": "JGlucHV0"
+          },
+          "operands": [],
+          "attributes": [
+            {
+              "key": "identity",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU6JGlucHV0OjY="
+              }
+            },
+            {
+              "key": "scope",
+              "value": {
+                "type": "bytes",
+                "value": "cmVzb2x2ZQ=="
+              }
+            },
+            {
+              "key": "context",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU="
+              }
+            },
+            {
+              "key": "source",
+              "value": {
+                "type": "bytes",
+                "value": "Y2FuZGlkYXRlLnBocA=="
+              }
+            },
+            {
+              "key": "start",
+              "value": {
+                "type": "int64",
+                "value": "6"
+              }
+            },
+            {
+              "key": "end",
+              "value": {
+                "type": "int64",
+                "value": "52"
+              }
+            },
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "aW50"
+              }
+            },
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "RVhURVJOQUxfSU5QVVQ="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v0": {
+          "kind": "binary",
+          "literal": {
+            "type": "bytes",
+            "value": "Kw=="
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v1"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "aW50fGZsb2F0fGFycmF5"
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "input-default": {
+      "source": "<?php function resolve(int $input=30){return $input;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "reference"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [
+        {
+          "code": "EXTERNAL_INPUT",
+          "at": {
+            "snapshotId": "1c62083690685f610b3c8c17fe505b27ce014c974e3075a8a677d69ee7c86b1e",
+            "path": "candidate.php",
+            "start": 6,
+            "end": 53,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "$input",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "source:resolve:$input:6"
+          ],
+          "residual": "v0",
+          "missingCapability": "EXTERNAL_INPUT"
+        }
+      ],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "reference",
+          "literal": {
+            "type": "bytes",
+            "value": "JGlucHV0"
+          },
+          "operands": [],
+          "attributes": [
+            {
+              "key": "identity",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU6JGlucHV0OjY="
+              }
+            },
+            {
+              "key": "scope",
+              "value": {
+                "type": "bytes",
+                "value": "cmVzb2x2ZQ=="
+              }
+            },
+            {
+              "key": "context",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU="
+              }
+            },
+            {
+              "key": "source",
+              "value": {
+                "type": "bytes",
+                "value": "Y2FuZGlkYXRlLnBocA=="
+              }
+            },
+            {
+              "key": "start",
+              "value": {
+                "type": "int64",
+                "value": "6"
+              }
+            },
+            {
+              "key": "end",
+              "value": {
+                "type": "int64",
+                "value": "53"
+              }
+            },
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "aW50"
+              }
+            },
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "RVhURVJOQUxfSU5QVVQ="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "request-input": {
+      "source": "<?php function resolve(){return \"id:\".$_GET[\"id\"] ;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "concat"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [
+        {
+          "code": "EXTERNAL_INPUT",
+          "at": {
+            "snapshotId": "f5cf63d08cfc1a6dd001746fe74cef59ff332ff3e608f877b35cad616e899261",
+            "path": "candidate.php",
+            "start": 38,
+            "end": 43,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "global:_GET",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "source:resolve:global:_GET:38"
+          ],
+          "residual": "v4",
+          "missingCapability": "EXTERNAL_INPUT"
+        }
+      ],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v6",
+      "values": {
+        "v1": {
+          "kind": "constant",
+          "literal": {
+            "type": "bytes",
+            "value": "aWQ6"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "reference",
+          "literal": {
+            "type": "bytes",
+            "value": "Z2xvYmFsOl9HRVQ="
+          },
+          "operands": [],
+          "attributes": [
+            {
+              "key": "identity",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU6Z2xvYmFsOl9HRVQ6Mzg="
+              }
+            },
+            {
+              "key": "scope",
+              "value": {
+                "type": "bytes",
+                "value": "cmVzb2x2ZQ=="
+              }
+            },
+            {
+              "key": "context",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU="
+              }
+            },
+            {
+              "key": "source",
+              "value": {
+                "type": "bytes",
+                "value": "Y2FuZGlkYXRlLnBocA=="
+              }
+            },
+            {
+              "key": "start",
+              "value": {
+                "type": "int64",
+                "value": "38"
+              }
+            },
+            {
+              "key": "end",
+              "value": {
+                "type": "int64",
+                "value": "43"
+              }
+            },
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "YXJyYXk="
+              }
+            },
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "RVhURVJOQUxfSU5QVVQ="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v5": {
+          "kind": "constant",
+          "literal": {
+            "type": "bytes",
+            "value": "aWQ="
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "array-read",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v4"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v5"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "cast",
+          "literal": {
+            "type": "bytes",
+            "value": "c3RyaW5n"
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "c3RyaW5n"
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v0": {
+          "kind": "concat",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v1"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "c3RyaW5n"
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v6": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "environment-input": {
+      "source": "<?php function resolve(){return getenv(\"TTL\");}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "operation"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [
+        {
+          "code": "EXTERNAL_INPUT",
+          "at": {
+            "snapshotId": "ca60fa48bac5277817325d00b24b0de2385bd55fbbbd8317da2f6e73cb9d7251",
+            "path": "model:php.getenv@1",
+            "start": 0,
+            "end": 0,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "intrinsic:getenv",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "35b5c85f197d2315d937a1e6c1f16cd3a48776734cd55c5d061245738368ec49"
+          ],
+          "residual": "v0",
+          "missingCapability": "EXTERNAL_INPUT"
+        }
+      ],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v3",
+      "values": {
+        "v1": {
+          "kind": "constant",
+          "literal": {
+            "type": "bytes",
+            "value": "VFRM"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "constant",
+          "literal": {
+            "type": "bool",
+            "value": false
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v0": {
+          "kind": "operation",
+          "literal": {
+            "type": "bytes",
+            "value": "aW50cmluc2ljOmdldGVudg=="
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v1"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "RVhURVJOQUxfSU5QVVQ="
+              }
+            },
+            {
+              "key": "source",
+              "value": {
+                "type": "bytes",
+                "value": "bW9kZWw6cGhwLmdldGVudkAx"
+              }
+            },
+            {
+              "key": "start",
+              "value": {
+                "type": "int64",
+                "value": "0"
+              }
+            },
+            {
+              "key": "end",
+              "value": {
+                "type": "int64",
+                "value": "0"
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "known-callers": {
+      "source": "<?php function resolve(int $input){return $input+5;} function a(){return resolve(30);}function b(){return resolve(60);}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 35
+        },
+        {
+          "return": 65
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": {
+            "source:resolve:caller:0": true,
+            "source:resolve:caller:1": false
+          },
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        },
+        {
+          "guard": {
+            "source:resolve:caller:0": false,
+            "source:resolve:caller:1": true
+          },
+          "values": {
+            "return": "v1"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v2",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "35"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "65"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v4"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:caller:0",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:caller:1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v6": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v1"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v5": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v6"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:caller:0",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:source:resolve:caller:1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v5"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "property-origins": {
+      "source": "<?php class Repo {private $table=\"users\";function archive(){$this->table=\"archive\";}function sql(){return $this->table;}}function resolve(){return (new Repo)->sql();}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "users"
+        },
+        {
+          "return": "archive"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        },
+        {
+          "guard": [],
+          "values": {
+            "return": "v1"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v2",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "bytes",
+            "value": "dXNlcnM="
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "constant",
+          "literal": {
+            "type": "bytes",
+            "value": "YXJjaGl2ZQ=="
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v4"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v6": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v1"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v5": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v6"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v5"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "branch-correlation": {
+      "source": "<?php function resolve($flag){if($flag){$ttl=30;$tag=\"a\";}else{$ttl=60;$tag=\"b\";}return [$ttl,$tag];}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "array"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v11",
+      "values": {
+        "v3": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "30"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v5": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "60"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v5"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v4"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v8": {
+          "kind": "constant",
+          "literal": {
+            "type": "bytes",
+            "value": "YQ=="
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v7": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v8"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v10": {
+          "kind": "constant",
+          "literal": {
+            "type": "bytes",
+            "value": "Yg=="
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v9": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v10"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v6": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v7"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v9"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v0": {
+          "kind": "array",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v1"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v6"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "open",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "next",
+              "value": {
+                "type": "int64",
+                "value": "2"
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v13": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v12": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v13"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v14": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v13"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v11": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v12"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v14"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "alias-correlation": {
+      "source": "<?php function resolve($flag){$ttl=$flag?30:60;$same=$ttl;return $ttl-$same;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 0
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "0"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v4"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "dead-branch": {
+      "source": "<?php function resolve(){if(false){return unknown();}return 30;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 30
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": {
+            "source:resolve:condition:r0": false
+          },
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "30"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r0",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "finite-loop": {
+      "source": "<?php function resolve(){$sum=0;for($i=0;$i<10;$i++){$sum+=$i;}return $sum;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 45
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": {
+            "source:resolve:condition:r12": false,
+            "source:resolve:loops:a:1:{i:1;i:0;}:condition:r12": true,
+            "source:resolve:loops:a:1:{i:1;i:1;}:condition:r12": true,
+            "source:resolve:loops:a:1:{i:1;i:2;}:condition:r12": true,
+            "source:resolve:loops:a:1:{i:1;i:3;}:condition:r12": true,
+            "source:resolve:loops:a:1:{i:1;i:4;}:condition:r12": true,
+            "source:resolve:loops:a:1:{i:1;i:5;}:condition:r12": true,
+            "source:resolve:loops:a:1:{i:1;i:6;}:condition:r12": true,
+            "source:resolve:loops:a:1:{i:1;i:7;}:condition:r12": true,
+            "source:resolve:loops:a:1:{i:1;i:8;}:condition:r12": true,
+            "source:resolve:loops:a:1:{i:1;i:9;}:condition:r12": true
+          },
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "45"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:source:resolve:loops:a:1:{i:1;i:0;}:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:loops:a:1:{i:1;i:1;}:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:loops:a:1:{i:1;i:2;}:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:loops:a:1:{i:1;i:3;}:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:loops:a:1:{i:1;i:4;}:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:loops:a:1:{i:1;i:5;}:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:loops:a:1:{i:1;i:6;}:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:loops:a:1:{i:1;i:7;}:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:loops:a:1:{i:1;i:8;}:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:loops:a:1:{i:1;i:9;}:condition:r12",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "finite-recursion": {
+      "source": "<?php function countDown($n){if($n===0){return 0;}$n-=1;return 1+countDown($n);}function resolve(){return countDown(8);}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 8
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": {
+            "call:1caefa375fd56a03354ab164e370b8c77dc80b4c8cff936e0dc7bba06f1d7b61:condition:r3": false,
+            "call:207617d51efc62e894c8892b2e04b2d167ebfac59f1be82d9ac47abd3a05095b:condition:r3": false,
+            "call:38ca73f6918893993dd7ce77407c2a2c505c400b1be9a4f75932a82a85a16d0a:condition:r3": false,
+            "call:76edd9fd3bc89d67d98b2d7511b62642f6d7382dadb981756b30e61b93ccfc17:condition:r3": false,
+            "call:9941c5382cb3982a0a345c60de6fff38489ecffa1b4fc924126341d7e3a96158:condition:r3": false,
+            "call:a76cf3ffe65b5e78d6f6db79c77d5055b39ef5a6ca94f6cf2e033d84dde89aca:condition:r3": true,
+            "call:cc13105b3dcbd726df8e46d9f907b4106358ab56915e26ebb1f9d43fe61d6c26:condition:r3": false,
+            "call:f3bfb9e5231982ade6e62e01086b992d43436e5fc48953a752e69bc398e2c854:condition:r3": false,
+            "call:fe510c502bfc1582a7f06e798f0c0400d2c0df1ec210e726ffd49417f3302a60:condition:r3": false
+          },
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "8"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:call:1caefa375fd56a03354ab164e370b8c77dc80b4c8cff936e0dc7bba06f1d7b61:condition:r3",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:call:207617d51efc62e894c8892b2e04b2d167ebfac59f1be82d9ac47abd3a05095b:condition:r3",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:call:38ca73f6918893993dd7ce77407c2a2c505c400b1be9a4f75932a82a85a16d0a:condition:r3",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:call:76edd9fd3bc89d67d98b2d7511b62642f6d7382dadb981756b30e61b93ccfc17:condition:r3",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:call:9941c5382cb3982a0a345c60de6fff38489ecffa1b4fc924126341d7e3a96158:condition:r3",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:call:a76cf3ffe65b5e78d6f6db79c77d5055b39ef5a6ca94f6cf2e033d84dde89aca:condition:r3",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:call:cc13105b3dcbd726df8e46d9f907b4106358ab56915e26ebb1f9d43fe61d6c26:condition:r3",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:call:f3bfb9e5231982ade6e62e01086b992d43436e5fc48953a752e69bc398e2c854:condition:r3",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:call:fe510c502bfc1582a7f06e798f0c0400d2c0df1ec210e726ffd49417f3302a60:condition:r3",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "integer-shift": {
+      "source": "<?php function resolve(){return 1<<-1;}",
+      "nativeOrSymbolicKind": [],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [
+        {
+          "guard": [],
+          "exception": "v0",
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "throwable",
+          "literal": {
+            "type": "bytes",
+            "value": "QXJpdGhtZXRpY0Vycm9y"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "divide-zero": {
+      "source": "<?php function resolve(){return 1/0;}",
+      "nativeOrSymbolicKind": [],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [
+        {
+          "guard": [],
+          "exception": "v0",
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "throwable",
+          "literal": {
+            "type": "bytes",
+            "value": "RGl2aXNpb25CeVplcm9FcnJvcg=="
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "static-helper": {
+      "source": "<?php function helper(){return 30;}function resolve(){return helper()+5;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 35
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "35"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "catch-statement": {
+      "source": "<?php function resolve(){try{throw new RuntimeException();}catch(RuntimeException $e){return 60;}}",
+      "nativeOrSymbolicKind": [],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [],
+      "candidateGraph": "v0",
+      "values": {
+        "v0": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "catch-expression": {
+      "source": "<?php function resolve(){try{return throw new RuntimeException();}catch(RuntimeException $e){return 60;}}",
+      "nativeOrSymbolicKind": [],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [
+        {
+          "guard": [],
+          "exception": "v0",
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [],
+      "candidateGraph": "v2",
+      "values": {
+        "v1": {
+          "kind": "object",
+          "literal": {
+            "type": "bytes",
+            "value": "c291cmNlOnJlc29sdmU6Y2FuZGlkYXRlLnBocDo0MjpyMw=="
+          },
+          "operands": [],
+          "attributes": [
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "UnVudGltZUV4Y2VwdGlvbg=="
+              }
+            },
+            {
+              "key": "class",
+              "value": {
+                "type": "bytes",
+                "value": "UnVudGltZUV4Y2VwdGlvbg=="
+              }
+            },
+            {
+              "key": "allocation",
+              "value": {
+                "type": "bytes",
+                "value": "cjM="
+              }
+            },
+            {
+              "key": "context",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v0": {
+          "kind": "throwable",
+          "literal": {
+            "type": "bytes",
+            "value": "ZXhwbGljaXQtdGhyb3c="
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v1"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "catch-arithmetic": {
+      "source": "<?php function resolve(){try{return 1/0;}catch(DivisionByZeroError $e){return 60;}}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 60
+        }
+      ],
+      "definite": true,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v1",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "60"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "try-followed-by-return": {
+      "source": "<?php function resolve(){try{$ttl=30;}catch(RuntimeException $e){$ttl=60;}return $ttl;}",
+      "nativeOrSymbolicKind": [],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [],
+      "candidateGraph": "v0",
+      "values": {
+        "v0": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "finally-followed-by-return": {
+      "source": "<?php function resolve(){try{$ttl=30;}finally{}return $ttl;}",
+      "nativeOrSymbolicKind": [],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "finite-exhaustive"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [],
+      "candidateGraph": "v0",
+      "values": {
+        "v0": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "incomplete-branch": {
+      "source": "<?php function resolve($flag,$input){return $flag?30:5+$input;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": 30
+        },
+        {
+          "return": "binary"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "closed",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [
+        {
+          "code": "EXTERNAL_INPUT",
+          "at": {
+            "snapshotId": "21d778f4683ab8df71ca998707695bd8380643cde67654930de50d293ae9fd12",
+            "path": "candidate.php",
+            "start": 6,
+            "end": 63,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "$input",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "source:resolve:$input:6"
+          ],
+          "residual": "v3",
+          "missingCapability": "EXTERNAL_INPUT"
+        }
+      ],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": {
+            "source:resolve:condition:r1": true
+          },
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        },
+        {
+          "guard": {
+            "source:resolve:condition:r1": false
+          },
+          "values": {
+            "return": "v1"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v4",
+      "values": {
+        "v0": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "30"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "5"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "reference",
+          "literal": {
+            "type": "bytes",
+            "value": "JGlucHV0"
+          },
+          "operands": [],
+          "attributes": [
+            {
+              "key": "identity",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU6JGlucHV0OjY="
+              }
+            },
+            {
+              "key": "scope",
+              "value": {
+                "type": "bytes",
+                "value": "cmVzb2x2ZQ=="
+              }
+            },
+            {
+              "key": "context",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU="
+              }
+            },
+            {
+              "key": "source",
+              "value": {
+                "type": "bytes",
+                "value": "Y2FuZGlkYXRlLnBocA=="
+              }
+            },
+            {
+              "key": "start",
+              "value": {
+                "type": "int64",
+                "value": "6"
+              }
+            },
+            {
+              "key": "end",
+              "value": {
+                "type": "int64",
+                "value": "63"
+              }
+            },
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "bWl4ZWQ="
+              }
+            },
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "RVhURVJOQUxfSU5QVVQ="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "binary",
+          "literal": {
+            "type": "bytes",
+            "value": "Kw=="
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v3"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "aW50fGZsb2F0fGFycmF5"
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v6": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v5": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v6"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v8": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v1"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v7": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v8"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v5"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v7"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "depth-limit": {
+      "source": "<?php function resolve(){$ttl=30;return $ttl+5;}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "binary"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "open",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [
+        {
+          "code": "DEPTH_LIMIT",
+          "at": {
+            "snapshotId": "1fc08eb384f3ed32966d323a43c9e128f6ce08f210ee51fda270cc1e62660fb5",
+            "path": "candidate.php",
+            "start": 40,
+            "end": 44,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "$ttl",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "source:resolve:$ttl:40"
+          ],
+          "residual": "v1",
+          "missingCapability": "DEPTH_LIMIT"
+        }
+      ],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 32,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 0
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v3",
+      "values": {
+        "v1": {
+          "kind": "deferred",
+          "literal": {
+            "type": "bytes",
+            "value": "JHR0bA=="
+          },
+          "operands": [],
+          "attributes": [
+            {
+              "key": "identity",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU6JHR0bDo0MA=="
+              }
+            },
+            {
+              "key": "scope",
+              "value": {
+                "type": "bytes",
+                "value": "cmVzb2x2ZQ=="
+              }
+            },
+            {
+              "key": "context",
+              "value": {
+                "type": "bytes",
+                "value": "c291cmNlOnJlc29sdmU="
+              }
+            },
+            {
+              "key": "source",
+              "value": {
+                "type": "bytes",
+                "value": "Y2FuZGlkYXRlLnBocA=="
+              }
+            },
+            {
+              "key": "start",
+              "value": {
+                "type": "int64",
+                "value": "40"
+              }
+            },
+            {
+              "key": "end",
+              "value": {
+                "type": "int64",
+                "value": "44"
+              }
+            },
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "bWl4ZWQ="
+              }
+            },
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "REVQVEhfTElNSVQ="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "5"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v0": {
+          "kind": "binary",
+          "literal": {
+            "type": "bytes",
+            "value": "Kw=="
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v1"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "type",
+              "value": {
+                "type": "bytes",
+                "value": "aW50fGZsb2F0fGFycmF5"
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    },
+    "enumeration-limit": {
+      "source": "<?php function resolve($first,$second){return ($first?1:2)+($second?10:20);}",
+      "nativeOrSymbolicKind": [
+        {
+          "return": "choice"
+        }
+      ],
+      "definite": false,
+      "contract": "candidates",
+      "assessment": {
+        "closure": "open",
+        "precision": "exact-symbolic",
+        "correlation": "preserved",
+        "coverage": "source-candidates",
+        "enumeration": "not-enumerated"
+      },
+      "reachability": "not-assessed",
+      "frontiers": [
+        {
+          "code": "ENUMERATION_LIMIT",
+          "at": {
+            "snapshotId": "18d0b963c7ba59c1e3effbc5cb8e8043bdfd2324c2d3611c927e3d914149c615",
+            "path": "",
+            "start": 0,
+            "end": 0,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "0c441e9a43145cb40d563db41ab7f96152b9456f2681e055507d57f2c762719d"
+          ],
+          "residual": "v16",
+          "missingCapability": "ENUMERATION_LIMIT"
+        },
+        {
+          "code": "ENUMERATION_LIMIT",
+          "at": {
+            "snapshotId": "18d0b963c7ba59c1e3effbc5cb8e8043bdfd2324c2d3611c927e3d914149c615",
+            "path": "candidate.php",
+            "start": 46,
+            "end": 74,
+            "line": 1,
+            "column": 1
+          },
+          "operation": "binary:+",
+          "affectedProjections": [
+            "value"
+          ],
+          "knownDependencies": [
+            "d85bfdf912bfcb2b4d0fdb2427e2a2db03cc498ac80c281ec71bed042372a382"
+          ],
+          "residual": "v2",
+          "missingCapability": "ENUMERATION_LIMIT"
+        }
+      ],
+      "exceptionalOutcomes": [],
+      "projectDiagnostics": [],
+      "query": {
+        "kind": "return",
+        "symbol": "resolve",
+        "scope": {
+          "mode": "symbolic",
+          "entries": []
+        },
+        "budget": {
+          "transfers": 100000,
+          "partitions": 2,
+          "iterations": 16,
+          "recursion": 64,
+          "nodes": 20000,
+          "symbolicRecursion": 4,
+          "maxDepth": 64
+        }
+      },
+      "normalOutcomes": [
+        {
+          "guard": [],
+          "values": {
+            "return": "v0"
+          },
+          "state": [],
+          "evidence": [],
+          "storage": {
+            "bindings": [],
+            "cells": []
+          }
+        }
+      ],
+      "candidateGraph": "v16",
+      "values": {
+        "v5": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "1"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v4": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v5"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v7": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "2"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v6": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v7"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v3": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v4"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v6"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v10": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "10"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v9": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v10"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r6",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v12": {
+          "kind": "constant",
+          "literal": {
+            "type": "int64",
+            "value": "20"
+          },
+          "operands": [],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v11": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v12"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r6",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v8": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v9"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v11"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v2": {
+          "kind": "operation",
+          "literal": {
+            "type": "bytes",
+            "value": "YmluYXJ5Ois="
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v3"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v8"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "RU5VTUVSQVRJT05fTElNSVQ="
+              }
+            },
+            {
+              "key": "source",
+              "value": {
+                "type": "bytes",
+                "value": "Y2FuZGlkYXRlLnBocA=="
+              }
+            },
+            {
+              "key": "start",
+              "value": {
+                "type": "int64",
+                "value": "46"
+              }
+            },
+            {
+              "key": "end",
+              "value": {
+                "type": "int64",
+                "value": "74"
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v1": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:condition:r6",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v13": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:source:resolve:condition:r6",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v14": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": true
+              }
+            },
+            {
+              "key": "guard:source:resolve:condition:r6",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v15": {
+          "kind": "alternative",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v2"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "guard:source:resolve:condition:r1",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            },
+            {
+              "key": "guard:source:resolve:condition:r6",
+              "value": {
+                "type": "bool",
+                "value": false
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        },
+        "v0": {
+          "kind": "choice",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "int64",
+                "value": "0"
+              },
+              "value": "v1"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "1"
+              },
+              "value": "v13"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "2"
+              },
+              "value": "v14"
+            },
+            {
+              "key": {
+                "type": "int64",
+                "value": "3"
+              },
+              "value": "v15"
+            }
+          ],
+          "attributes": [],
+          "redacted": false,
+          "secret": false
+        },
+        "v16": {
+          "kind": "tuple",
+          "literal": {
+            "type": "null",
+            "value": null
+          },
+          "operands": [
+            {
+              "key": {
+                "type": "bytes",
+                "value": "cmV0dXJu"
+              },
+              "value": "v0"
+            }
+          ],
+          "attributes": [
+            {
+              "key": "reason",
+              "value": {
+                "type": "bytes",
+                "value": "RU5VTUVSQVRJT05fTElNSVQ="
+              }
+            }
+          ],
+          "redacted": false,
+          "secret": false
+        }
+      }
+    }
+  },
+  "differential": {
+    "cases": 3072,
+    "differences": []
+  },
+  "validation": {
+    "frozenReports": 33,
+    "literalCases": 61,
+    "largeArrayInvarianceTests": 3,
+    "largeArrayTestsOnOriginal": true,
+    "tests": 3497,
+    "assertions": 22874,
+    "composerConfigValidate": "pass",
+    "composerPackagesValidate": "pass",
+    "composerSecurityAudit": "pass",
+    "composerLint": "pass",
+    "composerTest": "pass",
+    "composerDocGen": "pass"
+  },
+  "exceptionComparison": {
+    "previous": {
+      "try-followed-by-return": {
+        "normal": [
+          30
+        ],
+        "exceptional": 0,
+        "definite": true,
+        "frontiers": []
+      },
+      "finally-followed-by-return": {
+        "normal": [
+          30
+        ],
+        "exceptional": 0,
+        "definite": true,
+        "frontiers": []
+      },
+      "only-throw": {
+        "normal": [],
+        "exceptional": 1,
+        "definite": false,
+        "frontiers": []
+      },
+      "catch-expression": {
+        "normal": [
+          60
+        ],
+        "exceptional": 0,
+        "definite": true,
+        "frontiers": []
+      }
+    },
+    "latest": {
+      "try-followed-by-return": {
+        "normal": [],
+        "exceptional": 0,
+        "definite": false,
+        "frontiers": []
+      },
+      "finally-followed-by-return": {
+        "normal": [],
+        "exceptional": 0,
+        "definite": false,
+        "frontiers": []
+      },
+      "only-throw": {
+        "normal": [
+          null
+        ],
+        "exceptional": 0,
+        "definite": true,
+        "frontiers": []
+      },
+      "catch-expression": {
+        "normal": [],
+        "exceptional": 1,
+        "definite": false,
+        "frontiers": []
+      }
+    },
+    "interpretation": "The previous default contract was execution. These selected return candidates are still relevant to the current candidate contract; the comparison is not a demand for reachability proof."
+  }
+}

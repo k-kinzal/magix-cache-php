@@ -1758,12 +1758,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/k-kinzal/deriver.git",
-                "reference": "5996928a3757e13ccc83250d4048f4ed59e18dc3"
+                "reference": "e59f993c3d84d23066772b85e1226a66a2d16ae6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k-kinzal/deriver/zipball/5996928a3757e13ccc83250d4048f4ed59e18dc3",
-                "reference": "5996928a3757e13ccc83250d4048f4ed59e18dc3",
+                "url": "https://api.github.com/repos/k-kinzal/deriver/zipball/e59f993c3d84d23066772b85e1226a66a2d16ae6",
+                "reference": "e59f993c3d84d23066772b85e1226a66a2d16ae6",
                 "shasum": ""
             },
             "require": {
@@ -1800,7 +1800,7 @@
                 "docs": "https://k-kinzal.github.io/ztd-query-php/k-kinzal/deriver/",
                 "source": "https://github.com/k-kinzal/ztd-query-php/tree/main/packages/deriver"
             },
-            "time": "2026-10-03T04:30:47+00:00"
+            "time": "2026-10-05T02:46:15+00:00"
         },
         {
             "name": "k-kinzal/php-ai-toolkit",

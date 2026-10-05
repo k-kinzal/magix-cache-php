@@ -19,7 +19,7 @@ $cases = [
     'precision-seventeen' => ["'v' . (1 / 3)", 'Definite v0.33333333333333331, independently of host precision.', 17],
     'null-array-key' => ["[null => 'a']", 'Magix appends at key 0; PHP and Deriver use the empty string key.', 14],
     'numeric-string' => ["'60' + 5", 'Magix leaves coercion unresolved; PHP and Deriver resolve 65.', 14],
-    'undefined-variable' => ['$missing', 'Concrete null with PHP_WARNING; definite() must reject it.', 14],
+    'undefined-variable' => ['$missing', 'An unresolved dependency; definite() must reject it.', 14],
     'concrete-null' => ['null', 'A definite null must remain distinguishable from rejection.', 14],
     'host-deprecation' => ['0 ** -1', 'Definite INF with no PHP 8.5 host deprecation.', 14],
 ];
@@ -32,6 +32,7 @@ if ($size > 0) {
     $items[0] = match ($variant) {
         'negative-key' => '-1 => 0',
         'negative-string-key' => "'-1' => 0",
+        'negative-expression-key' => '-(1 + 0) => 0',
         default => '0',
     };
     $cases['large-array'] = ['['.implode(',', $items).']', 'The original Magix reader resolves every element; inspect latency and budget frontiers.', 14];

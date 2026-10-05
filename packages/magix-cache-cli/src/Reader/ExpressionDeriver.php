@@ -24,8 +24,9 @@ use PhpParser\PrettyPrinter\Standard;
 /**
  * Derives values in an explicit source world without running application code.
  *
- * Only an exhaustive, exact, concrete normal result can become a declaration
- * value. A concrete value on one possible path is insufficient proof.
+ * Only a complete singleton concrete candidate can become a declaration value.
+ * Callers supply admitted expressions or generated alias graphs with explicit
+ * inputs. Candidate coverage does not establish application reachability.
  */
 final readonly class ExpressionDeriver
 {
@@ -40,7 +41,7 @@ final readonly class ExpressionDeriver
      * Evaluates one admitted expression with explicit scalar inputs.
      *
      * @param array<string, int|float|string|bool|null> $bindings
-     * @return mixed Concrete value, or LiteralReader::UNRESOLVED when exhaustive derivation is unavailable.
+     * @return mixed Concrete value, or LiteralReader::UNRESOLVED unless the candidate set is a complete concrete singleton.
      */
     public function value(Expr $expression, array $bindings = []): mixed
     {
@@ -56,8 +57,11 @@ final readonly class ExpressionDeriver
     /**
      * Reads a concrete return from generated, isolated analysis source.
      *
-     * @param list<Term> $arguments Explicit inputs; user parameters are never inferred from defaults.
-     * @return mixed Concrete value, or LiteralReader::UNRESOLVED for partial, exceptional or non-concrete results.
+     * This selects value dependencies, not ordered execution of arbitrary PHP.
+     * Unrelated calls do not affect the candidate set.
+     *
+     * @param list<Term> $arguments Explicit inputs; use symbolic terms for unknown inputs, including those with defaults.
+     * @return mixed Concrete value, or LiteralReader::UNRESOLVED for partial, exceptional, multiple or non-concrete candidates.
      */
     public function source(string $source, array $arguments = []): mixed
     {
@@ -74,11 +78,12 @@ final readonly class ExpressionDeriver
             new EntryPoint('resolve', $arguments),
         ])));
 
-        if ($result->assessment->closure !== 'closed'
+        if ($result->contract !== 'candidates'
+            || $result->assessment->closure !== 'closed'
             || $result->assessment->precision !== 'exact-symbolic'
             || $result->assessment->correlation !== 'preserved'
             || $result->assessment->enumeration !== 'finite-exhaustive'
-            || $result->assessment->coverage !== 'over-approximation') {
+            || $result->assessment->coverage !== 'source-candidates') {
             return LiteralReader::UNRESOLVED;
         }
 

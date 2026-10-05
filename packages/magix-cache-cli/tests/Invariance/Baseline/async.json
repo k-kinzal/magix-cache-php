@@ -1,0 +1,2363 @@
+{
+    "roots": [
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::collected",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\AsyncCached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                    "line": 98,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "asyncCached"
+                },
+                {
+                    "target": "Magix\\Cache\\AsyncCached::sequence",
+                    "line": 98,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "sequence"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first",
+                    "line": 98,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first"
+                    ],
+                    "resolution": "resolved",
+                    "method": "first"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "line": 98,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second"
+                    ],
+                    "resolution": "resolved",
+                    "method": "second"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+            "line": 95,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from AsyncQueries::first"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from AsyncQueries::second",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "a",
+                    "b"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "AsyncQueries::first",
+                        "AsyncQueries::second"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from AsyncQueries::first"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "a",
+                        "b"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\AsyncCached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "asyncCached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\AsyncCached::of",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+                    "line": 23,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "20s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "a"
+                        ],
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 20,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "a"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 20,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "a"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                },
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\AsyncCached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "asyncCached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\AsyncCached::of",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+                    "line": 32,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "b"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "b"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "b"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::composed",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\AsyncCached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                    "line": 44,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "asyncCached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first",
+                    "line": 44,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first"
+                    ],
+                    "resolution": "resolved",
+                    "method": "first"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "line": 44,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second"
+                    ],
+                    "resolution": "resolved",
+                    "method": "second"
+                },
+                {
+                    "target": null,
+                    "line": 44,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "zip"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+            "line": 41,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from AsyncQueries::first"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from AsyncQueries::second",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "a",
+                    "b"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "AsyncQueries::first",
+                        "AsyncQueries::second"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from AsyncQueries::first"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "a",
+                        "b"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\AsyncCached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "asyncCached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\AsyncCached::of",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+                    "line": 23,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "20s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "a"
+                        ],
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 20,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "a"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 20,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "a"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                },
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\AsyncCached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "asyncCached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\AsyncCached::of",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+                    "line": 32,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "b"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "b"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "b"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::detached",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\AsyncCached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                    "line": 80,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "asyncCached"
+                },
+                {
+                    "target": "Magix\\Cache\\AsyncCached::of",
+                    "line": 80,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "of"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "line": 80,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second"
+                    ],
+                    "resolution": "resolved",
+                    "method": "second"
+                },
+                {
+                    "target": null,
+                    "line": 80,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "value"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+            "line": 77,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unconstrained",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "unconstrained",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "unconstrained",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unconstrained",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\AsyncCached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "asyncCached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\AsyncCached::of",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+                    "line": 32,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "b"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "b"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "b"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\AsyncCached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                    "line": 26,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "asyncCached"
+                },
+                {
+                    "target": "Magix\\Cache\\AsyncCached::of",
+                    "line": 26,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "of"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+            "line": 23,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "20s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [
+                    "a"
+                ],
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "a"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "a"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::lifted",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\AsyncCached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                    "line": 62,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "asyncCached"
+                },
+                {
+                    "target": "Magix\\Cache\\AsyncCached::fromCached",
+                    "line": 62,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "fromCached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first",
+                    "line": 62,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first"
+                    ],
+                    "resolution": "resolved",
+                    "method": "first"
+                },
+                {
+                    "target": null,
+                    "line": 62,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "toCached"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+            "line": 59,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from AsyncQueries::first"
+                },
+                "visibility": "shared",
+                "visibilityReason": "inherited from AsyncQueries::first",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "a"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "AsyncQueries::first"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from AsyncQueries::first"
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "a"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\AsyncCached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "asyncCached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\AsyncCached::of",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+                    "line": 23,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "20s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "a"
+                        ],
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 20,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "a"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 20,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "a"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::nested",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::cached",
+                    "line": 71,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Magix\\Cache\\AsyncCached::of",
+                    "line": 71,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "of"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "line": 71,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second"
+                    ],
+                    "resolution": "resolved",
+                    "method": "second"
+                },
+                {
+                    "target": null,
+                    "line": 71,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "flatten"
+                },
+                {
+                    "target": null,
+                    "line": 71,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "toCached"
+                },
+                {
+                    "target": null,
+                    "line": 71,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "toCached"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+            "line": 68,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 60,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from AsyncQueries::second"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from AsyncQueries::second",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "b"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "AsyncQueries::second"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 60,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from AsyncQueries::second"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "b"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\AsyncCached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "asyncCached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\AsyncCached::of",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+                    "line": 32,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "b"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "b"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "b"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::overridden",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\AsyncCached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                    "line": 89,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "asyncCached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "line": 89,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second"
+                    ],
+                    "resolution": "resolved",
+                    "method": "second"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+            "line": 86,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "90s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [],
+                "visibility": "shared",
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 90,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": "declared by the policy",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": {
+                    "ttl": "local ttl 90s; composed 60s",
+                    "visibility": "declared by the policy; composed private",
+                    "tags": "local tags replace inherited tags"
+                }
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "AsyncQueries::second"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 90,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\AsyncCached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "asyncCached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\AsyncCached::of",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+                    "line": 32,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "b"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "b"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "b"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\AsyncCached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                    "line": 35,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "asyncCached"
+                },
+                {
+                    "target": "Magix\\Cache\\AsyncCached::of",
+                    "line": 35,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "of"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+            "line": 32,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "60s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [
+                    "b"
+                ],
+                "visibility": "private",
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 60,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "private",
+                "visibilityReason": "declared by the policy",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "b"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 60,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "b"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::synchronized",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::cached",
+                    "line": 53,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first",
+                    "line": 53,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first"
+                    ],
+                    "resolution": "resolved",
+                    "method": "first"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "line": 53,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second"
+                    ],
+                    "resolution": "resolved",
+                    "method": "second"
+                },
+                {
+                    "target": null,
+                    "line": 53,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "toCached"
+                },
+                {
+                    "target": null,
+                    "line": 53,
+                    "candidates": [],
+                    "resolution": "unresolved",
+                    "method": "zip"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+            "line": 50,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from AsyncQueries::first"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from AsyncQueries::second",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "a",
+                    "b"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "AsyncQueries::first",
+                        "AsyncQueries::second"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from AsyncQueries::first"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "a",
+                        "b"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::first",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\AsyncCached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "asyncCached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\AsyncCached::of",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+                    "line": 23,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "20s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "a"
+                        ],
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 20,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "a"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 20,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "a"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                },
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::second",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\AsyncCached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\AsyncComposition\\AsyncQueries::asyncCached",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "asyncCached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\AsyncCached::of",
+                            "line": 35,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/AsyncComposition/AsyncQueries.php",
+                    "line": 32,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "60s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "b"
+                        ],
+                        "visibility": "private",
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 60,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "declared by the policy",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "b"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 60,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "b"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        }
+    ],
+    "diagnostics": []
+}

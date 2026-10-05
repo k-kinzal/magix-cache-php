@@ -1,0 +1,27 @@
+flowchart TD
+    n0["TimedPage::__construct (uncached)"]
+    style n0 fill:#e9ecef,stroke:#868e96,color:#495057
+    n1["TimedPage::automatic<br/>30/600-900s - shared"]
+    style n1 fill:#ffffff,stroke:#495057,color:#212529
+    n1_0["TimedQuery::execute<br/>30/600-900s - shared"]
+    style n1_0 fill:#ffffff,stroke:#495057,color:#212529
+    n1 --> n1_0
+    n2["TimedPage::fixed<br/>300s - shared"]
+    style n2 fill:#ffffff,stroke:#495057,color:#212529
+    n2_0["TimedQuery::execute<br/>30/600-900s - shared"]
+    style n2_0 fill:#ffffff,stroke:#495057,color:#212529
+    n2 --> n2_0
+    n3["TimedPage::shorter<br/>20s - shared"]
+    style n3 fill:#ffffff,stroke:#495057,color:#212529
+    n3_0["TimedQuery::execute<br/>30/600-900s - shared"]
+    style n3_0 fill:#ffffff,stroke:#495057,color:#212529
+    n3 --> n3_0
+    n4["TimedPage::show (uncached)<br/>composes 30/600-900s - shared"]
+    style n4 fill:#e9ecef,stroke:#868e96,color:#495057
+    n4_0["TimedPage::automatic<br/>30/600-900s - shared"]
+    style n4_0 fill:#ffffff,stroke:#495057,color:#212529
+    n4_0_0["TimedQuery::execute<br/>30/600-900s - shared"]
+    style n4_0_0 fill:#ffffff,stroke:#495057,color:#212529
+    n4_0 --> n4_0_0
+    n4 --> n4_0
+

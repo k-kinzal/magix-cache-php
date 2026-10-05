@@ -1,0 +1,34 @@
+flowchart TD
+    n0["ProductController::__construct (uncached)"]
+    style n0 fill:#e9ecef,stroke:#868e96,color:#495057
+    n1["ProductController::index (uncached)<br/>composes 20s - private - tags inventory,product,viewer"]
+    style n1 fill:#e9ecef,stroke:#868e96,color:#495057
+    n1_0["ProductQuery::execute<br/>20s - shared - tags product"]
+    style n1_0 fill:#ffffff,stroke:#495057,color:#212529
+    n1 -.-> n1_0
+    n1_1["InventoryQuery::execute<br/>60s - shared - tags inventory"]
+    style n1_1 fill:#ffffff,stroke:#495057,color:#212529
+    n1 -.-> n1_1
+    n1_2["ViewerQuery::execute<br/>30s - private - tags viewer"]
+    style n1_2 fill:#ffffff,stroke:#495057,color:#212529
+    n1 -.-> n1_2
+    n2["ProductController::injected (uncached)<br/>composes 20s - shared - tags inventory,product"]
+    style n2 fill:#e9ecef,stroke:#868e96,color:#495057
+    n2_0["ProductQuery::execute<br/>20s - shared - tags product"]
+    style n2_0 fill:#ffffff,stroke:#495057,color:#212529
+    n2 --> n2_0
+    n2_1["InventoryQuery::execute<br/>60s - shared - tags inventory"]
+    style n2_1 fill:#ffffff,stroke:#495057,color:#212529
+    n2 --> n2_1
+    n3["ProductController::show (uncached)<br/>composes 20s - private - tags inventory,product,viewer"]
+    style n3 fill:#e9ecef,stroke:#868e96,color:#495057
+    n3_0["ProductQuery::execute<br/>20s - shared - tags product"]
+    style n3_0 fill:#ffffff,stroke:#495057,color:#212529
+    n3 --> n3_0
+    n3_1["InventoryQuery::execute<br/>60s - shared - tags inventory"]
+    style n3_1 fill:#ffffff,stroke:#495057,color:#212529
+    n3 --> n3_1
+    n3_2["ViewerQuery::execute<br/>30s - private - tags viewer"]
+    style n3_2 fill:#ffffff,stroke:#495057,color:#212529
+    n3 --> n3_2
+

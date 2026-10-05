@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9327548c40f1f95d92ac768df1e1cf7b",
+    "content-hash": "e42cf766dddf8866d4b03bb073c75e38",
     "packages": [],
     "packages-dev": [
         {
@@ -1753,6 +1753,56 @@
             "time": "2026-02-19T20:12:01+00:00"
         },
         {
+            "name": "k-kinzal/deriver",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/k-kinzal/deriver.git",
+                "reference": "e59f993c3d84d23066772b85e1226a66a2d16ae6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/k-kinzal/deriver/zipball/e59f993c3d84d23066772b85e1226a66a2d16ae6",
+                "reference": "e59f993c3d84d23066772b85e1226a66a2d16ae6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "nikic/php-parser": "^5.9",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "brianium/paratest": "^7.3",
+                "deptrac/deptrac": "^3.0",
+                "friendsofphp/php-cs-fixer": "^3.95.25",
+                "k-kinzal/php-ai-toolkit": "dev-main",
+                "nikic/php-fuzzer": "^0.0.11",
+                "opis/json-schema": "^2.6",
+                "phpcompatibility/php-compatibility": "^10.0.0-alpha2",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^10.5",
+                "squizlabs/php_codesniffer": "^4.0.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Deriver\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Derive PHP values, state and dependencies without executing application code",
+            "support": {
+                "docs": "https://k-kinzal.github.io/ztd-query-php/k-kinzal/deriver/",
+                "source": "https://github.com/k-kinzal/ztd-query-php/tree/main/packages/deriver"
+            },
+            "time": "2026-10-05T02:46:15+00:00"
+        },
+        {
             "name": "k-kinzal/php-ai-toolkit",
             "version": "dev-main",
             "source": {
@@ -2041,16 +2091,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v5.8.0",
+            "version": "v5.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "044a6a392ff8ad0d61f14370a5fbbd0a0107152f"
+                "reference": "9e33da9553fe7786f0962b35f4e4ecf01be89def"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/044a6a392ff8ad0d61f14370a5fbbd0a0107152f",
-                "reference": "044a6a392ff8ad0d61f14370a5fbbd0a0107152f",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/9e33da9553fe7786f0962b35f4e4ecf01be89def",
+                "reference": "9e33da9553fe7786f0962b35f4e4ecf01be89def",
                 "shasum": ""
             },
             "require": {
@@ -2092,9 +2142,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.8.0"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.9.0"
             },
-            "time": "2026-07-04T14:30:18+00:00"
+            "time": "2026-09-13T18:51:52+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -8202,6 +8252,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "k-kinzal/deriver": 20,
         "k-kinzal/php-ai-toolkit": 20
     },
     "prefer-stable": true,

@@ -1,0 +1,32 @@
+flowchart TD
+    n0["NoonPage::__construct (uncached)"]
+    style n0 fill:#e9ecef,stroke:#868e96,color:#495057
+    n1["NoonPage::automatic<br/>dynamic - shared<br/>expires by daily 12:00-12:15 Asia/Tokyo"]
+    style n1 fill:#ffffff,stroke:#495057,color:#212529
+    n1_0["NoonQuery::window<br/>dynamic - shared<br/>expires by daily 12:00-12:15 Asia/Tokyo"]
+    style n1_0 fill:#ffffff,stroke:#495057,color:#212529
+    n1 --> n1_0
+    n2["NoonPage::fixed<br/>60s - shared"]
+    style n2 fill:#ffffff,stroke:#495057,color:#212529
+    n2_0["NoonQuery::window<br/>dynamic - shared<br/>expires by daily 12:00-12:15 Asia/Tokyo"]
+    style n2_0 fill:#ffffff,stroke:#495057,color:#212529
+    n2 --> n2_0
+    n3["NoonPage::multipleAutomatic<br/>dynamic - shared<br/>expires by earliest of (daily 09:00 Asia/Tokyo; daily 23:55:30-00:10:15 (+1 day) America/New_York; daily 18:00-18:15 Asia/Tokyo)"]
+    style n3 fill:#ffffff,stroke:#495057,color:#212529
+    n3_0["NoonQuery::multiple<br/>dynamic - shared<br/>expires by earliest of (daily 09:00 Asia/Tokyo; daily 23:55:30-00:10:15 (+1 day) America/New_York; daily 18:00-18:15 Asia/Tokyo)"]
+    style n3_0 fill:#ffffff,stroke:#495057,color:#212529
+    n3 --> n3_0
+    n4["NoonPage::multipleComposed<br/>30s - shared"]
+    style n4 fill:#ffffff,stroke:#495057,color:#212529
+    n4_0["NoonQuery::multipleComposed<br/>dynamic - shared<br/>expires by earliest of (daily 09:00 Asia/Tokyo; daily 23:55:30-00:10:15 (+1 day) America/New_York; daily 18:00-18:15 Asia/Tokyo)"]
+    style n4_0 fill:#ffffff,stroke:#495057,color:#212529
+    n4 --> n4_0
+    n5["NoonPage::show (uncached)<br/>composes dynamic - shared"]
+    style n5 fill:#e9ecef,stroke:#868e96,color:#495057
+    n5_0["NoonPage::automatic<br/>dynamic - shared<br/>expires by daily 12:00-12:15 Asia/Tokyo"]
+    style n5_0 fill:#ffffff,stroke:#495057,color:#212529
+    n5_0_0["NoonQuery::window<br/>dynamic - shared<br/>expires by daily 12:00-12:15 Asia/Tokyo"]
+    style n5_0_0 fill:#ffffff,stroke:#495057,color:#212529
+    n5_0 --> n5_0_0
+    n5 --> n5_0
+

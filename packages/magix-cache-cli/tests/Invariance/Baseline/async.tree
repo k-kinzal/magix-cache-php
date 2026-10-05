@@ -1,0 +1,19 @@
+[37;1mAsyncQueries::collected[39;22m[37m  ttl 20s  private  tags a,b[39m
+|-- [37;1mAsyncQueries::first[39;22m[37m  ttl 20s  shared  tags a[39m
+`-- [37;1mAsyncQueries::second[39;22m[37m  ttl 60s  private  tags b[39m
+[37;1mAsyncQueries::composed[39;22m[37m  ttl 20s  private  tags a,b[39m
+|-- [37;1mAsyncQueries::first[39;22m[37m  ttl 20s  shared  tags a[39m
+`-- [37;1mAsyncQueries::second[39;22m[37m  ttl 60s  private  tags b[39m
+[90;1mAsyncQueries::detached[39;22m[90m  ttl unconstrained  shared[39m
+`-- [37;1mAsyncQueries::second[39;22m[37m  ttl 60s  private  tags b[39m
+[37;1mAsyncQueries::first[39;22m[37m  ttl 20s  shared  tags a[39m
+[37;1mAsyncQueries::lifted[39;22m[37m  ttl 20s  shared  tags a[39m
+`-- [37;1mAsyncQueries::first[39;22m[37m  ttl 20s  shared  tags a[39m
+[37;1mAsyncQueries::nested[39;22m[37m  ttl 60s  private  tags b[39m
+`-- [37;1mAsyncQueries::second[39;22m[37m  ttl 60s  private  tags b[39m
+[37;1mAsyncQueries::overridden[39;22m[37m  ttl [39m[33m90s[39m[37m  [39m[33mshared[39m
+`-- [37;1mAsyncQueries::second[39;22m[37m  ttl 60s  private  tags b[39m
+[37;1mAsyncQueries::second[39;22m[37m  ttl 60s  private  tags b[39m
+[37;1mAsyncQueries::synchronized[39;22m[37m  ttl 20s  private  tags a,b[39m
+|-- [37;1mAsyncQueries::first[39;22m[37m  ttl 20s  shared  tags a[39m
+`-- [37;1mAsyncQueries::second[39;22m[37m  ttl 60s  private  tags b[39m

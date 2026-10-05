@@ -1,0 +1,1516 @@
+{
+    "roots": [
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::__construct",
+            "kind": "entry-point",
+            "declared": false,
+            "execution": "not-observed",
+            "returnType": null,
+            "parameters": [
+                {
+                    "name": "query",
+                    "type": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [],
+            "file": "packages/magix-cache-cli/tests/Fixture/TtlAlternatives/TimedPage.php",
+            "line": 21,
+            "policy": null,
+            "key": null,
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unconstrained",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "unconstrained",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "unconstrained",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unconstrained",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::automatic",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::cached",
+                    "line": 31,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute",
+                    "line": 31,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute"
+                    ],
+                    "resolution": "resolved",
+                    "method": "execute"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/TtlAlternatives/TimedPage.php",
+            "line": 28,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": 30,
+                    "upperBound": 900,
+                    "reason": null,
+                    "ranges": [
+                        {
+                            "min": 30,
+                            "max": 30
+                        },
+                        {
+                            "min": 600,
+                            "max": 900
+                        }
+                    ],
+                    "finite": true
+                },
+                "visibility": "shared",
+                "visibilityReason": "inherited from TimedQuery::execute",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "runtime",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "TimedQuery::execute"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "runtime",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unknown",
+                        "seconds": null,
+                        "lowerBound": 30,
+                        "upperBound": 900,
+                        "reason": null,
+                        "ranges": [
+                            {
+                                "min": 30,
+                                "max": 30
+                            },
+                            {
+                                "min": 600,
+                                "max": 900
+                            }
+                        ],
+                        "finite": true
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": {
+                        "strategy": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\ConditionalTtlStrategy",
+                        "line": 16,
+                        "arguments": []
+                    },
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::cached",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/TtlAlternatives/TimedQuery.php",
+                    "line": 24,
+                    "policy": {
+                        "source": "ClassAttribute",
+                        "ttl": "Ttl::Auto",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": null,
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": {
+                        "declared": "ConditionalTtlStrategy::create()",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": 30,
+                            "upperBound": 900,
+                            "reason": null,
+                            "ranges": [
+                                {
+                                    "min": 30,
+                                    "max": 30
+                                },
+                                {
+                                    "min": 600,
+                                    "max": 900
+                                }
+                            ],
+                            "finite": true
+                        },
+                        "overridesExpiration": true,
+                        "steps": [
+                            {
+                                "strategy": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\ConditionalTtlStrategy",
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": 30,
+                                    "upperBound": 900,
+                                    "reason": null,
+                                    "ranges": [
+                                        {
+                                            "min": 30,
+                                            "max": 30
+                                        },
+                                        {
+                                            "min": 600,
+                                            "max": 900
+                                        }
+                                    ],
+                                    "finite": true
+                                },
+                                "assumed": false
+                            }
+                        ],
+                        "writesMetadata": {
+                            "visibility": false,
+                            "tags": false,
+                            "cacheable": false
+                        },
+                        "problems": []
+                    },
+                    "effective": {
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": 30,
+                            "upperBound": 900,
+                            "reason": null,
+                            "ranges": [
+                                {
+                                    "min": 30,
+                                    "max": 30
+                                },
+                                {
+                                    "min": 600,
+                                    "max": 900
+                                }
+                            ],
+                            "finite": true
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "runtime",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "runtime",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "unknown",
+                                "seconds": null,
+                                "lowerBound": 30,
+                                "upperBound": 900,
+                                "reason": null,
+                                "ranges": [
+                                    {
+                                        "min": 30,
+                                        "max": 30
+                                    },
+                                    {
+                                        "min": 600,
+                                        "max": 900
+                                    }
+                                ],
+                                "finite": true
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::fixed",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::cached",
+                    "line": 40,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute",
+                    "line": 40,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute"
+                    ],
+                    "resolution": "resolved",
+                    "method": "execute"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/TtlAlternatives/TimedPage.php",
+            "line": 37,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "300s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 300,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": "inherited from TimedQuery::execute",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": {
+                    "ttl": "local ttl 300s; composed 30/600-900s"
+                }
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "TimedQuery::execute"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 300,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": {
+                        "strategy": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\ConditionalTtlStrategy",
+                        "line": 16,
+                        "arguments": []
+                    },
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::cached",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/TtlAlternatives/TimedQuery.php",
+                    "line": 24,
+                    "policy": {
+                        "source": "ClassAttribute",
+                        "ttl": "Ttl::Auto",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": null,
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": {
+                        "declared": "ConditionalTtlStrategy::create()",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": 30,
+                            "upperBound": 900,
+                            "reason": null,
+                            "ranges": [
+                                {
+                                    "min": 30,
+                                    "max": 30
+                                },
+                                {
+                                    "min": 600,
+                                    "max": 900
+                                }
+                            ],
+                            "finite": true
+                        },
+                        "overridesExpiration": true,
+                        "steps": [
+                            {
+                                "strategy": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\ConditionalTtlStrategy",
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": 30,
+                                    "upperBound": 900,
+                                    "reason": null,
+                                    "ranges": [
+                                        {
+                                            "min": 30,
+                                            "max": 30
+                                        },
+                                        {
+                                            "min": 600,
+                                            "max": 900
+                                        }
+                                    ],
+                                    "finite": true
+                                },
+                                "assumed": false
+                            }
+                        ],
+                        "writesMetadata": {
+                            "visibility": false,
+                            "tags": false,
+                            "cacheable": false
+                        },
+                        "problems": []
+                    },
+                    "effective": {
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": 30,
+                            "upperBound": 900,
+                            "reason": null,
+                            "ranges": [
+                                {
+                                    "min": 30,
+                                    "max": 30
+                                },
+                                {
+                                    "min": 600,
+                                    "max": 900
+                                }
+                            ],
+                            "finite": true
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "runtime",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "runtime",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "unknown",
+                                "seconds": null,
+                                "lowerBound": 30,
+                                "upperBound": 900,
+                                "reason": null,
+                                "ranges": [
+                                    {
+                                        "min": 30,
+                                        "max": 30
+                                    },
+                                    {
+                                        "min": 600,
+                                        "max": 900
+                                    }
+                                ],
+                                "finite": true
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::shorter",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::cached",
+                    "line": 49,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute",
+                    "line": 49,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute"
+                    ],
+                    "resolution": "resolved",
+                    "method": "execute"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/TtlAlternatives/TimedPage.php",
+            "line": 46,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "20s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 20,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": "inherited from TimedQuery::execute",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": {
+                    "ttl": "local ttl 20s; composed 30/600-900s"
+                }
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "TimedQuery::execute"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 20,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": {
+                        "strategy": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\ConditionalTtlStrategy",
+                        "line": 16,
+                        "arguments": []
+                    },
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::cached",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 26,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/TtlAlternatives/TimedQuery.php",
+                    "line": 24,
+                    "policy": {
+                        "source": "ClassAttribute",
+                        "ttl": "Ttl::Auto",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": null,
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": {
+                        "declared": "ConditionalTtlStrategy::create()",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": 30,
+                            "upperBound": 900,
+                            "reason": null,
+                            "ranges": [
+                                {
+                                    "min": 30,
+                                    "max": 30
+                                },
+                                {
+                                    "min": 600,
+                                    "max": 900
+                                }
+                            ],
+                            "finite": true
+                        },
+                        "overridesExpiration": true,
+                        "steps": [
+                            {
+                                "strategy": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\ConditionalTtlStrategy",
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": 30,
+                                    "upperBound": 900,
+                                    "reason": null,
+                                    "ranges": [
+                                        {
+                                            "min": 30,
+                                            "max": 30
+                                        },
+                                        {
+                                            "min": 600,
+                                            "max": 900
+                                        }
+                                    ],
+                                    "finite": true
+                                },
+                                "assumed": false
+                            }
+                        ],
+                        "writesMetadata": {
+                            "visibility": false,
+                            "tags": false,
+                            "cacheable": false
+                        },
+                        "problems": []
+                    },
+                    "effective": {
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": 30,
+                            "upperBound": 900,
+                            "reason": null,
+                            "ranges": [
+                                {
+                                    "min": 30,
+                                    "max": 30
+                                },
+                                {
+                                    "min": 600,
+                                    "max": 900
+                                }
+                            ],
+                            "finite": true
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "runtime",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "runtime",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "unknown",
+                                "seconds": null,
+                                "lowerBound": 30,
+                                "upperBound": 900,
+                                "reason": null,
+                                "ranges": [
+                                    {
+                                        "min": 30,
+                                        "max": 30
+                                    },
+                                    {
+                                        "min": 600,
+                                        "max": 900
+                                    }
+                                ],
+                                "finite": true
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::show",
+            "kind": "entry-point",
+            "declared": false,
+            "execution": "not-observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::automatic",
+                    "line": 57,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::automatic"
+                    ],
+                    "resolution": "resolved",
+                    "method": "automatic"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/TtlAlternatives/TimedPage.php",
+            "line": 55,
+            "policy": null,
+            "key": null,
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": 30,
+                    "upperBound": 900,
+                    "reason": null,
+                    "ranges": [
+                        {
+                            "min": 30,
+                            "max": 30
+                        },
+                        {
+                            "min": 600,
+                            "max": 900
+                        }
+                    ],
+                    "finite": true
+                },
+                "visibility": "shared",
+                "visibilityReason": "restricted by TimedPage::automatic",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "runtime",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": {
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": 30,
+                    "upperBound": 900,
+                    "reason": null,
+                    "ranges": [
+                        {
+                            "min": 30,
+                            "max": 30
+                        },
+                        {
+                            "min": 600,
+                            "max": 900
+                        }
+                    ],
+                    "finite": true
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "tags": [],
+                "certainty": {
+                    "ttl": "runtime",
+                    "visibility": "known",
+                    "tags": "known"
+                }
+            },
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "TimedPage::automatic"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "runtime",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unknown",
+                        "seconds": null,
+                        "lowerBound": 30,
+                        "upperBound": 900,
+                        "reason": null,
+                        "ranges": [
+                            {
+                                "min": 30,
+                                "max": 30
+                            },
+                            {
+                                "min": 600,
+                                "max": 900
+                            }
+                        ],
+                        "finite": true
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::automatic",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedPage::cached",
+                            "line": 31,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute",
+                            "line": 31,
+                            "candidates": [
+                                "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute"
+                            ],
+                            "resolution": "resolved",
+                            "method": "execute"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/TtlAlternatives/TimedPage.php",
+                    "line": 28,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "Ttl::Auto",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": null,
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": 30,
+                            "upperBound": 900,
+                            "reason": null,
+                            "ranges": [
+                                {
+                                    "min": 30,
+                                    "max": 30
+                                },
+                                {
+                                    "min": 600,
+                                    "max": 900
+                                }
+                            ],
+                            "finite": true
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": "inherited from TimedQuery::execute",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "runtime",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [
+                                "TimedQuery::execute"
+                            ],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "runtime",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "unknown",
+                                "seconds": null,
+                                "lowerBound": 30,
+                                "upperBound": 900,
+                                "reason": null,
+                                "ranges": [
+                                    {
+                                        "min": 30,
+                                        "max": 30
+                                    },
+                                    {
+                                        "min": 600,
+                                        "max": 900
+                                    }
+                                ],
+                                "finite": true
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": [
+                        {
+                            "boundary": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::execute",
+                            "kind": "boundary",
+                            "declared": true,
+                            "execution": "observed",
+                            "returnType": "Magix\\Cache\\Cached",
+                            "parameters": [],
+                            "hasDynamicTtl": false,
+                            "useStrategy": {
+                                "strategy": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\ConditionalTtlStrategy",
+                                "line": 16,
+                                "arguments": []
+                            },
+                            "via": [],
+                            "calls": [
+                                {
+                                    "target": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\TimedQuery::cached",
+                                    "line": 26,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "cached"
+                                },
+                                {
+                                    "target": "Magix\\Cache\\Cached::of",
+                                    "line": 26,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "of"
+                                }
+                            ],
+                            "file": "packages/magix-cache-cli/tests/Fixture/TtlAlternatives/TimedQuery.php",
+                            "line": 24,
+                            "policy": {
+                                "source": "ClassAttribute",
+                                "ttl": "Ttl::Auto",
+                                "ttlUnknown": false,
+                                "tagsUnknown": false,
+                                "visibilityUnknown": false,
+                                "tags": null,
+                                "visibility": null,
+                                "version": "1",
+                                "runtime": "default"
+                            },
+                            "key": [],
+                            "strategy": {
+                                "declared": "ConditionalTtlStrategy::create()",
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": 30,
+                                    "upperBound": 900,
+                                    "reason": null,
+                                    "ranges": [
+                                        {
+                                            "min": 30,
+                                            "max": 30
+                                        },
+                                        {
+                                            "min": 600,
+                                            "max": 900
+                                        }
+                                    ],
+                                    "finite": true
+                                },
+                                "overridesExpiration": true,
+                                "steps": [
+                                    {
+                                        "strategy": "Tests\\Package\\Cli\\Fixture\\TtlAlternatives\\ConditionalTtlStrategy",
+                                        "ttl": {
+                                            "state": "unknown",
+                                            "seconds": null,
+                                            "lowerBound": 30,
+                                            "upperBound": 900,
+                                            "reason": null,
+                                            "ranges": [
+                                                {
+                                                    "min": 30,
+                                                    "max": 30
+                                                },
+                                                {
+                                                    "min": 600,
+                                                    "max": 900
+                                                }
+                                            ],
+                                            "finite": true
+                                        },
+                                        "assumed": false
+                                    }
+                                ],
+                                "writesMetadata": {
+                                    "visibility": false,
+                                    "tags": false,
+                                    "cacheable": false
+                                },
+                                "problems": []
+                            },
+                            "effective": {
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": 30,
+                                    "upperBound": 900,
+                                    "reason": null,
+                                    "ranges": [
+                                        {
+                                            "min": 30,
+                                            "max": 30
+                                        },
+                                        {
+                                            "min": 600,
+                                            "max": 900
+                                        }
+                                    ],
+                                    "finite": true
+                                },
+                                "visibility": "shared",
+                                "visibilityReason": null,
+                                "visibilityUnknown": false,
+                                "tagsUnknown": false,
+                                "storable": true,
+                                "tags": [],
+                                "problems": [],
+                                "certainty": {
+                                    "ttl": "runtime",
+                                    "visibility": "known",
+                                    "tags": "known"
+                                },
+                                "analysis": {
+                                    "ttl": [],
+                                    "visibility": [],
+                                    "tags": [],
+                                    "ttlReference": null,
+                                    "visibilityReference": null,
+                                    "tagsReference": null
+                                },
+                                "storage": "yes",
+                                "localOverrides": []
+                            },
+                            "composed": null,
+                            "notes": [],
+                            "metadataAlternatives": [
+                                {
+                                    "sources": [],
+                                    "analyzed": true,
+                                    "certainty": {
+                                        "ttl": "runtime",
+                                        "visibility": "known",
+                                        "tags": "known"
+                                    },
+                                    "analysis": {
+                                        "ttl": [],
+                                        "visibility": [],
+                                        "tags": [],
+                                        "ttlReference": null,
+                                        "visibilityReference": null,
+                                        "tagsReference": null
+                                    },
+                                    "ttl": {
+                                        "state": "unknown",
+                                        "seconds": null,
+                                        "lowerBound": 30,
+                                        "upperBound": 900,
+                                        "reason": null,
+                                        "ranges": [
+                                            {
+                                                "min": 30,
+                                                "max": 30
+                                            },
+                                            {
+                                                "min": 600,
+                                                "max": 900
+                                            }
+                                        ],
+                                        "finite": true
+                                    },
+                                    "visibility": "shared",
+                                    "visibilityUnknown": false,
+                                    "tags": [],
+                                    "tagsUnknown": false,
+                                    "expirationConstraints": [],
+                                    "storable": true,
+                                    "problems": []
+                                }
+                            ],
+                            "diagnostics": [],
+                            "analysisGaps": [],
+                            "dependencies": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "diagnostics": []
+}

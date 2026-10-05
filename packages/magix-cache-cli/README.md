@@ -22,15 +22,20 @@ The result answers the questions that are otherwise only observable in productio
 
 ## Requirements
 
-- PHP 8.3 or later
+- PHP 8.3 or later on a 64-bit runtime
 - Composer
 - A project that uses [k-kinzal/magix-cache](../magix-cache/)
 
 ## Installation
 
 ```bash
-composer require --dev k-kinzal/magix-cache-cli
+composer require --dev k-kinzal/magix-cache-cli k-kinzal/deriver:dev-main
 ```
+
+Deriver currently has no tagged release, so applications must explicitly allow
+its development branch. The CLI uses it for static value and recipe alias
+resolution. [Integration notes and reproducible upstream feedback](docs/deriver-feedback.md)
+describe the behavior-preserving boundary and known limitations.
 
 ## Quick Start
 

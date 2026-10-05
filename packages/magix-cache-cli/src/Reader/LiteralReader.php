@@ -12,6 +12,7 @@ use function is_int;
 use function is_string;
 
 use Magix\Cache\Cli\Declaration\ConstantCatalog;
+use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\BinaryOp;
@@ -19,6 +20,7 @@ use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\UnaryMinus;
 use PhpParser\Node\Expr\UnaryPlus;
+use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\Float_;
@@ -30,10 +32,9 @@ use function str_starts_with;
 /**
  * Reads the constant expressions MagixCache attributes are written with.
  *
- * PHP restricts attribute arguments to constant expressions, so this reader
- * can decide every declared value given the sources the constants live in.
- * Anything it returns as unresolved is a missing source or an expression PHP
- * itself would reject, never a value the reader chose not to compute.
+ * Source lookup and the admitted declaration value domain belong to this
+ * reader. Deriver evaluates operations within that domain. Unsupported or
+ * incomplete derivations remain unresolved rather than becoming policy facts.
  */
 final readonly class LiteralReader
 {
@@ -50,8 +51,10 @@ final readonly class LiteralReader
     /**
      * Creates a literal reader over the constants of the scanned sources.
      */
-    public function __construct(private ConstantCatalog $constants = new ConstantCatalog())
-    {
+    public function __construct(
+        private ConstantCatalog $constants = new ConstantCatalog(),
+        private ExpressionDeriver $deriver = new ExpressionDeriver(),
+    ) {
     }
 
     /**
@@ -72,7 +75,10 @@ final readonly class LiteralReader
                 return self::UNRESOLVED;
             }
 
-            return $expression instanceof UnaryMinus ? -$value : $value;
+            $operation = clone $expression;
+            $operation->expr = new Variable('value');
+
+            return $this->deriver->value($operation, ['value' => $value]);
         }
 
         if ($expression instanceof ConstFetch) {
@@ -113,17 +119,19 @@ final readonly class LiteralReader
         }
 
         return match (true) {
-            $expression instanceof BinaryOp\Plus => $left + $right,
-            $expression instanceof BinaryOp\Minus => $left - $right,
-            $expression instanceof BinaryOp\Mul => $left * $right,
-            $expression instanceof BinaryOp\Pow => $left ** $right,
-            $expression instanceof BinaryOp\Div => $right === 0 || $right === 0.0 ? self::UNRESOLVED : $left / $right,
+            $expression instanceof BinaryOp\Plus,
+            $expression instanceof BinaryOp\Minus,
+            $expression instanceof BinaryOp\Mul,
+            $expression instanceof BinaryOp\Pow,
+            $expression instanceof BinaryOp\Div => $this->operation($expression, $left, $right),
             default => $this->integerOperator($expression, $left, $right),
         };
     }
 
     /**
      * Joins two scalars the way a constant expression concatenates them.
+     *
+     * Deriver converts floats using the host precision captured in its snapshot.
      */
     public function concatenate(mixed $left, mixed $right): string
     {
@@ -132,7 +140,12 @@ final readonly class LiteralReader
             return self::UNRESOLVED;
         }
 
-        return $left.$right;
+        $value = $this->deriver->value(new BinaryOp\Concat(new Variable('left'), new Variable('right')), [
+            'left' => $left,
+            'right' => $right,
+        ]);
+
+        return is_string($value) ? $value : self::UNRESOLVED;
     }
 
     /**
@@ -147,15 +160,29 @@ final readonly class LiteralReader
             return self::UNRESOLVED;
         }
 
-        return match (true) {
-            $expression instanceof BinaryOp\Mod => $right === 0 ? self::UNRESOLVED : $left % $right,
-            $expression instanceof BinaryOp\BitwiseAnd => $left & $right,
-            $expression instanceof BinaryOp\BitwiseOr => $left | $right,
-            $expression instanceof BinaryOp\BitwiseXor => $left ^ $right,
-            $expression instanceof BinaryOp\ShiftLeft => $right < 0 ? self::UNRESOLVED : $left << $right,
-            $expression instanceof BinaryOp\ShiftRight => $right < 0 ? self::UNRESOLVED : $left >> $right,
+        $value = match (true) {
+            $expression instanceof BinaryOp\Mod,
+            $expression instanceof BinaryOp\BitwiseAnd,
+            $expression instanceof BinaryOp\BitwiseOr,
+            $expression instanceof BinaryOp\BitwiseXor,
+            $expression instanceof BinaryOp\ShiftLeft,
+            $expression instanceof BinaryOp\ShiftRight => $this->operation($expression, $left, $right),
             default => self::UNRESOLVED,
         };
+
+        return is_int($value) ? $value : self::UNRESOLVED;
+    }
+
+    /**
+     * Derives a binary operation over already resolved declaration operands.
+     */
+    public function operation(BinaryOp $expression, int|float $left, int|float $right): mixed
+    {
+        $operation = clone $expression;
+        $operation->left = new Variable('left');
+        $operation->right = new Variable('right');
+
+        return $this->deriver->value($operation, ['left' => $left, 'right' => $right]);
     }
 
     /**
@@ -239,6 +266,7 @@ final readonly class LiteralReader
     public function items(Array_ $expression, array $seen = []): array|string
     {
         $values = [];
+        $items = [];
 
         foreach ($expression->items as $item) {
             if ($item->unpack) {
@@ -253,19 +281,46 @@ final readonly class LiteralReader
 
             $key = $item->key === null ? null : $this->value($item->key, $seen);
 
-            if ($key === null) {
-                $values[] = $value;
-
-                continue;
-            }
-
-            if (!is_int($key) && !is_string($key)) {
+            if ($key !== null && !is_int($key) && !is_string($key)) {
                 return self::UNRESOLVED;
             }
 
-            $values[$key] = $value;
+            $items[] = new ArrayItem(new Int_(count($values)), match (true) {
+                is_int($key) => new Int_($key),
+                is_string($key) => new String_($key),
+                default => null,
+            });
+            $values[] = $value;
         }
 
-        return $values;
+        return $this->arrayValues($items, $values);
+    }
+
+    /**
+     * Derives array ordering and key collisions while retaining enum values.
+     *
+     * @param list<ArrayItem> $items Array entries holding opaque value indices.
+     * @param list<mixed> $values Values supplied by the declaration source.
+     * @return array<array-key, mixed>|string
+     */
+    public function arrayValues(array $items, array $values): array|string
+    {
+        $indices = $this->deriver->value(new Array_($items));
+
+        if (!is_array($indices)) {
+            return self::UNRESOLVED;
+        }
+
+        $result = [];
+
+        foreach ($indices as $key => $index) {
+            if (!is_int($index) || !array_key_exists($index, $values)) {
+                return self::UNRESOLVED;
+            }
+
+            $result[$key] = $values[$index];
+        }
+
+        return $result;
     }
 }

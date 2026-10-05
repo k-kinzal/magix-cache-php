@@ -1,0 +1,12 @@
+[37;1mBubblingPageQuery::__construct[39;22m[37m  ttl Ttl::Auto [declared][39m
+[37;1mBubblingPageQuery::execute[39;22m[37m  ttl 120s  private  tags page[39m
+`-- [37;1mProductPageQuery::execute[39;22m[37m  ttl [39m[33m120s[39m[37m  private  tags [39m[33mpage[39m
+    |-- [37;1mProductQuery::execute[39;22m[37m  ttl 20s  shared  tags product[39m
+    |-- [37;1mInventoryQuery::execute[39;22m[37m  ttl 60s  shared  tags inventory[39m
+    `-- [37;1mViewerQuery::execute[39;22m[37m  ttl 30s  private  tags viewer[39m
+[37;1mBubblingPageQuery::explicit[39;22m[37m  ttl 120s  private  tags page[39m
+`-- [37;1mBubblingPageQuery::execute[39;22m[37m  ttl 120s  private  tags page[39m
+    `-- [37;1mProductPageQuery::execute[39;22m[37m  ttl [39m[33m120s[39m[37m  private  tags [39m[33mpage[39m
+        |-- [37;1mProductQuery::execute[39;22m[37m  ttl 20s  shared  tags product[39m
+        |-- [37;1mInventoryQuery::execute[39;22m[37m  ttl 60s  shared  tags inventory[39m
+        `-- [37;1mViewerQuery::execute[39;22m[37m  ttl 30s  private  tags viewer[39m

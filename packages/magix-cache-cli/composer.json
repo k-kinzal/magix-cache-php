@@ -23,8 +23,9 @@
     ],
     "require": {
         "php": "^8.3",
+        "k-kinzal/deriver": "dev-main",
         "k-kinzal/magix-cache": "^1.0",
-        "nikic/php-parser": "^5.4",
+        "nikic/php-parser": "^5.9",
         "symfony/console": "^7.4 || ^8.0"
     },
     "autoload": {

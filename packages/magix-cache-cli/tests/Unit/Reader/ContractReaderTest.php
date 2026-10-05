@@ -40,6 +40,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TtlEstimate::class)]
 #[UsesClass(TtlInterval::class)]
 #[UsesClass(TtlRangeSet::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionDeriver::class)]
 final class ContractReaderTest extends TestCase
 {
     #[DataProvider('providerLifetimeSyntax')]

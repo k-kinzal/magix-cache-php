@@ -1,0 +1,2049 @@
+{
+    "roots": [
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::__construct",
+            "kind": "entry-point",
+            "declared": false,
+            "execution": "not-observed",
+            "returnType": null,
+            "parameters": [
+                {
+                    "name": "query",
+                    "type": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [],
+            "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonPage.php",
+            "line": 21,
+            "policy": null,
+            "key": null,
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unconstrained",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "unconstrained",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "unconstrained",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unconstrained",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::automatic",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::cached",
+                    "line": 31,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::window",
+                    "line": 31,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::window"
+                    ],
+                    "resolution": "resolved",
+                    "method": "window"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonPage.php",
+            "line": 28,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "duration depends on the origin time and daily expiration",
+                    "finite": true
+                },
+                "expirationConstraints": [
+                    {
+                        "at": "12:00",
+                        "until": "12:15",
+                        "timezone": "Asia/Tokyo",
+                        "window": true,
+                        "crossesMidnight": false,
+                        "recurrence": "daily"
+                    }
+                ],
+                "visibility": "shared",
+                "visibilityReason": "inherited from NoonQuery::window",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "runtime",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "runtime-dependent",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "NoonQuery::window"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "runtime",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unknown",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "duration depends on the origin time and daily expiration",
+                        "finite": true
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [
+                        {
+                            "at": "12:00",
+                            "until": "12:15",
+                            "timezone": "Asia/Tokyo",
+                            "window": true,
+                            "crossesMidnight": false,
+                            "recurrence": "daily"
+                        }
+                    ],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::window",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": {
+                        "strategy": "Tests\\Package\\Cli\\Fixture\\Expiration\\DailyExpirationStrategy",
+                        "line": 24,
+                        "arguments": {
+                            "at": {
+                                "state": "known",
+                                "value": "12:00"
+                            },
+                            "until": {
+                                "state": "known",
+                                "value": "12:15"
+                            },
+                            "timezone": {
+                                "state": "known",
+                                "value": "Asia/Tokyo"
+                            }
+                        }
+                    },
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::cached",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonQuery.php",
+                    "line": 24,
+                    "policy": {
+                        "source": "ClassAttribute",
+                        "ttl": "Ttl::Auto",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": null,
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": {
+                        "declared": "DailyExpirationStrategy::create(at: '12:00', until: '12:15', timezone: 'Asia/Tokyo')",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "duration depends on the origin time and daily expiration",
+                            "finite": true
+                        },
+                        "overridesExpiration": true,
+                        "expirations": [
+                            {
+                                "at": "12:00",
+                                "until": "12:15",
+                                "timezone": "Asia/Tokyo",
+                                "window": true,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            }
+                        ],
+                        "steps": [
+                            {
+                                "strategy": "Tests\\Package\\Cli\\Fixture\\Expiration\\DailyExpirationStrategy",
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": "duration depends on the origin time and daily expiration",
+                                    "finite": true
+                                },
+                                "assumed": false,
+                                "expirations": [
+                                    {
+                                        "at": "12:00",
+                                        "until": "12:15",
+                                        "timezone": "Asia/Tokyo",
+                                        "window": true,
+                                        "crossesMidnight": false,
+                                        "recurrence": "daily"
+                                    }
+                                ]
+                            }
+                        ],
+                        "writesMetadata": {
+                            "visibility": false,
+                            "tags": false,
+                            "cacheable": false
+                        },
+                        "problems": []
+                    },
+                    "effective": {
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "duration depends on the origin time and daily expiration",
+                            "finite": true
+                        },
+                        "expirationConstraints": [
+                            {
+                                "at": "12:00",
+                                "until": "12:15",
+                                "timezone": "Asia/Tokyo",
+                                "window": true,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            }
+                        ],
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": false,
+                        "tags": [],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "runtime",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "runtime-dependent",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "runtime",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "unknown",
+                                "seconds": null,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": "duration depends on the origin time and daily expiration",
+                                "finite": true
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [
+                                {
+                                    "at": "12:00",
+                                    "until": "12:15",
+                                    "timezone": "Asia/Tokyo",
+                                    "window": true,
+                                    "crossesMidnight": false,
+                                    "recurrence": "daily"
+                                }
+                            ],
+                            "storable": false,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::fixed",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::cached",
+                    "line": 40,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::window",
+                    "line": 40,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::window"
+                    ],
+                    "resolution": "resolved",
+                    "method": "window"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonPage.php",
+            "line": 37,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "60s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 60,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": "inherited from NoonQuery::window",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": {
+                    "ttl": "local ttl 60s; composed unknown"
+                }
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "NoonQuery::window"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 60,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::window",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": {
+                        "strategy": "Tests\\Package\\Cli\\Fixture\\Expiration\\DailyExpirationStrategy",
+                        "line": 24,
+                        "arguments": {
+                            "at": {
+                                "state": "known",
+                                "value": "12:00"
+                            },
+                            "until": {
+                                "state": "known",
+                                "value": "12:15"
+                            },
+                            "timezone": {
+                                "state": "known",
+                                "value": "Asia/Tokyo"
+                            }
+                        }
+                    },
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::cached",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonQuery.php",
+                    "line": 24,
+                    "policy": {
+                        "source": "ClassAttribute",
+                        "ttl": "Ttl::Auto",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": null,
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": {
+                        "declared": "DailyExpirationStrategy::create(at: '12:00', until: '12:15', timezone: 'Asia/Tokyo')",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "duration depends on the origin time and daily expiration",
+                            "finite": true
+                        },
+                        "overridesExpiration": true,
+                        "expirations": [
+                            {
+                                "at": "12:00",
+                                "until": "12:15",
+                                "timezone": "Asia/Tokyo",
+                                "window": true,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            }
+                        ],
+                        "steps": [
+                            {
+                                "strategy": "Tests\\Package\\Cli\\Fixture\\Expiration\\DailyExpirationStrategy",
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": "duration depends on the origin time and daily expiration",
+                                    "finite": true
+                                },
+                                "assumed": false,
+                                "expirations": [
+                                    {
+                                        "at": "12:00",
+                                        "until": "12:15",
+                                        "timezone": "Asia/Tokyo",
+                                        "window": true,
+                                        "crossesMidnight": false,
+                                        "recurrence": "daily"
+                                    }
+                                ]
+                            }
+                        ],
+                        "writesMetadata": {
+                            "visibility": false,
+                            "tags": false,
+                            "cacheable": false
+                        },
+                        "problems": []
+                    },
+                    "effective": {
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "duration depends on the origin time and daily expiration",
+                            "finite": true
+                        },
+                        "expirationConstraints": [
+                            {
+                                "at": "12:00",
+                                "until": "12:15",
+                                "timezone": "Asia/Tokyo",
+                                "window": true,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            }
+                        ],
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": false,
+                        "tags": [],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "runtime",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "runtime-dependent",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "runtime",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "unknown",
+                                "seconds": null,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": "duration depends on the origin time and daily expiration",
+                                "finite": true
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [
+                                {
+                                    "at": "12:00",
+                                    "until": "12:15",
+                                    "timezone": "Asia/Tokyo",
+                                    "window": true,
+                                    "crossesMidnight": false,
+                                    "recurrence": "daily"
+                                }
+                            ],
+                            "storable": false,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::multipleAutomatic",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::cached",
+                    "line": 57,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::multiple",
+                    "line": 57,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::multiple"
+                    ],
+                    "resolution": "resolved",
+                    "method": "multiple"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonPage.php",
+            "line": 54,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "duration depends on the origin time and daily expiration",
+                    "finite": true
+                },
+                "expirationConstraints": [
+                    {
+                        "at": "09:00",
+                        "until": null,
+                        "timezone": "Asia/Tokyo",
+                        "window": false,
+                        "crossesMidnight": false,
+                        "recurrence": "daily"
+                    },
+                    {
+                        "at": "23:55:30",
+                        "until": "00:10:15",
+                        "timezone": "America/New_York",
+                        "window": true,
+                        "crossesMidnight": true,
+                        "recurrence": "daily"
+                    },
+                    {
+                        "at": "18:00",
+                        "until": "18:15",
+                        "timezone": "Asia/Tokyo",
+                        "window": true,
+                        "crossesMidnight": false,
+                        "recurrence": "daily"
+                    }
+                ],
+                "visibility": "shared",
+                "visibilityReason": "inherited from NoonQuery::multiple",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "runtime",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "runtime-dependent",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "NoonQuery::multiple"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "runtime",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unknown",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "duration depends on the origin time and daily expiration",
+                        "finite": true
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [
+                        {
+                            "at": "09:00",
+                            "until": null,
+                            "timezone": "Asia/Tokyo",
+                            "window": false,
+                            "crossesMidnight": false,
+                            "recurrence": "daily"
+                        },
+                        {
+                            "at": "23:55:30",
+                            "until": "00:10:15",
+                            "timezone": "America/New_York",
+                            "window": true,
+                            "crossesMidnight": true,
+                            "recurrence": "daily"
+                        },
+                        {
+                            "at": "18:00",
+                            "until": "18:15",
+                            "timezone": "Asia/Tokyo",
+                            "window": true,
+                            "crossesMidnight": false,
+                            "recurrence": "daily"
+                        }
+                    ],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::multiple",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": {
+                        "strategy": "Tests\\Package\\Cli\\Fixture\\Expiration\\MultipleExpirationStrategy",
+                        "line": 69,
+                        "arguments": {
+                            "timezone": {
+                                "state": "known",
+                                "value": "Asia/Tokyo"
+                            }
+                        }
+                    },
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::cached",
+                            "line": 72,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 72,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonQuery.php",
+                    "line": 69,
+                    "policy": {
+                        "source": "ClassAttribute",
+                        "ttl": "Ttl::Auto",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": null,
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": {
+                        "declared": "MultipleExpirationStrategy::create(timezone: 'Asia/Tokyo')",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "duration depends on the origin time and daily expiration",
+                            "finite": true
+                        },
+                        "overridesExpiration": true,
+                        "expirations": [
+                            {
+                                "at": "09:00",
+                                "until": null,
+                                "timezone": "Asia/Tokyo",
+                                "window": false,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            },
+                            {
+                                "at": "23:55:30",
+                                "until": "00:10:15",
+                                "timezone": "America/New_York",
+                                "window": true,
+                                "crossesMidnight": true,
+                                "recurrence": "daily"
+                            },
+                            {
+                                "at": "18:00",
+                                "until": "18:15",
+                                "timezone": "Asia/Tokyo",
+                                "window": true,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            }
+                        ],
+                        "steps": [
+                            {
+                                "strategy": "Tests\\Package\\Cli\\Fixture\\Expiration\\MultipleExpirationStrategy",
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": "duration depends on the origin time and daily expiration",
+                                    "finite": true
+                                },
+                                "assumed": false,
+                                "expirations": [
+                                    {
+                                        "at": "09:00",
+                                        "until": null,
+                                        "timezone": "Asia/Tokyo",
+                                        "window": false,
+                                        "crossesMidnight": false,
+                                        "recurrence": "daily"
+                                    },
+                                    {
+                                        "at": "23:55:30",
+                                        "until": "00:10:15",
+                                        "timezone": "America/New_York",
+                                        "window": true,
+                                        "crossesMidnight": true,
+                                        "recurrence": "daily"
+                                    },
+                                    {
+                                        "at": "18:00",
+                                        "until": "18:15",
+                                        "timezone": "Asia/Tokyo",
+                                        "window": true,
+                                        "crossesMidnight": false,
+                                        "recurrence": "daily"
+                                    }
+                                ]
+                            }
+                        ],
+                        "writesMetadata": {
+                            "visibility": false,
+                            "tags": false,
+                            "cacheable": false
+                        },
+                        "problems": []
+                    },
+                    "effective": {
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "duration depends on the origin time and daily expiration",
+                            "finite": true
+                        },
+                        "expirationConstraints": [
+                            {
+                                "at": "09:00",
+                                "until": null,
+                                "timezone": "Asia/Tokyo",
+                                "window": false,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            },
+                            {
+                                "at": "23:55:30",
+                                "until": "00:10:15",
+                                "timezone": "America/New_York",
+                                "window": true,
+                                "crossesMidnight": true,
+                                "recurrence": "daily"
+                            },
+                            {
+                                "at": "18:00",
+                                "until": "18:15",
+                                "timezone": "Asia/Tokyo",
+                                "window": true,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            }
+                        ],
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": false,
+                        "tags": [],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "runtime",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "runtime-dependent",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "runtime",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "unknown",
+                                "seconds": null,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": "duration depends on the origin time and daily expiration",
+                                "finite": true
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [
+                                {
+                                    "at": "09:00",
+                                    "until": null,
+                                    "timezone": "Asia/Tokyo",
+                                    "window": false,
+                                    "crossesMidnight": false,
+                                    "recurrence": "daily"
+                                },
+                                {
+                                    "at": "23:55:30",
+                                    "until": "00:10:15",
+                                    "timezone": "America/New_York",
+                                    "window": true,
+                                    "crossesMidnight": true,
+                                    "recurrence": "daily"
+                                },
+                                {
+                                    "at": "18:00",
+                                    "until": "18:15",
+                                    "timezone": "Asia/Tokyo",
+                                    "window": true,
+                                    "crossesMidnight": false,
+                                    "recurrence": "daily"
+                                }
+                            ],
+                            "storable": false,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::multipleComposed",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::cached",
+                    "line": 66,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::multipleComposed",
+                    "line": 66,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::multipleComposed"
+                    ],
+                    "resolution": "resolved",
+                    "method": "multipleComposed"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonPage.php",
+            "line": 63,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "30s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 30,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": "inherited from NoonQuery::multipleComposed",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": {
+                    "ttl": "local ttl 30s; composed unknown"
+                }
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "NoonQuery::multipleComposed"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 30,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::multipleComposed",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": {
+                        "strategy": "Tests\\Package\\Cli\\Fixture\\Expiration\\MultipleExpirationComposition",
+                        "line": 87,
+                        "arguments": []
+                    },
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::cached",
+                            "line": 90,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Magix\\Cache\\Cached::of",
+                            "line": 90,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "of"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonQuery.php",
+                    "line": 87,
+                    "policy": {
+                        "source": "ClassAttribute",
+                        "ttl": "Ttl::Auto",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": null,
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": {
+                        "declared": "MultipleExpirationComposition::create()",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "duration depends on the origin time and daily expiration",
+                            "finite": true
+                        },
+                        "overridesExpiration": true,
+                        "expirations": [
+                            {
+                                "at": "09:00",
+                                "until": null,
+                                "timezone": "Asia/Tokyo",
+                                "window": false,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            },
+                            {
+                                "at": "23:55:30",
+                                "until": "00:10:15",
+                                "timezone": "America/New_York",
+                                "window": true,
+                                "crossesMidnight": true,
+                                "recurrence": "daily"
+                            },
+                            {
+                                "at": "18:00",
+                                "until": "18:15",
+                                "timezone": "Asia/Tokyo",
+                                "window": true,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            }
+                        ],
+                        "steps": [
+                            {
+                                "strategy": "Tests\\Package\\Cli\\Fixture\\Expiration\\MultipleExpirationStrategy",
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": "duration depends on the origin time and daily expiration",
+                                    "finite": true
+                                },
+                                "assumed": false,
+                                "expirations": [
+                                    {
+                                        "at": "09:00",
+                                        "until": null,
+                                        "timezone": "Asia/Tokyo",
+                                        "window": false,
+                                        "crossesMidnight": false,
+                                        "recurrence": "daily"
+                                    },
+                                    {
+                                        "at": "23:55:30",
+                                        "until": "00:10:15",
+                                        "timezone": "America/New_York",
+                                        "window": true,
+                                        "crossesMidnight": true,
+                                        "recurrence": "daily"
+                                    },
+                                    {
+                                        "at": "18:00",
+                                        "until": "18:15",
+                                        "timezone": "Asia/Tokyo",
+                                        "window": true,
+                                        "crossesMidnight": false,
+                                        "recurrence": "daily"
+                                    }
+                                ]
+                            },
+                            {
+                                "strategy": "Magix\\Cache\\Strategy\\KeySpreadExpirationStrategy",
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": 30,
+                                    "upperBound": 60,
+                                    "reason": null,
+                                    "finite": true
+                                },
+                                "assumed": false
+                            }
+                        ],
+                        "writesMetadata": {
+                            "visibility": false,
+                            "tags": false,
+                            "cacheable": false
+                        },
+                        "problems": []
+                    },
+                    "effective": {
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "duration depends on the origin time and daily expiration",
+                            "finite": true
+                        },
+                        "expirationConstraints": [
+                            {
+                                "at": "09:00",
+                                "until": null,
+                                "timezone": "Asia/Tokyo",
+                                "window": false,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            },
+                            {
+                                "at": "23:55:30",
+                                "until": "00:10:15",
+                                "timezone": "America/New_York",
+                                "window": true,
+                                "crossesMidnight": true,
+                                "recurrence": "daily"
+                            },
+                            {
+                                "at": "18:00",
+                                "until": "18:15",
+                                "timezone": "Asia/Tokyo",
+                                "window": true,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            }
+                        ],
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": false,
+                        "tags": [],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "runtime",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "runtime-dependent",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "runtime",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "unknown",
+                                "seconds": null,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": "duration depends on the origin time and daily expiration",
+                                "finite": true
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [
+                                {
+                                    "at": "09:00",
+                                    "until": null,
+                                    "timezone": "Asia/Tokyo",
+                                    "window": false,
+                                    "crossesMidnight": false,
+                                    "recurrence": "daily"
+                                },
+                                {
+                                    "at": "23:55:30",
+                                    "until": "00:10:15",
+                                    "timezone": "America/New_York",
+                                    "window": true,
+                                    "crossesMidnight": true,
+                                    "recurrence": "daily"
+                                },
+                                {
+                                    "at": "18:00",
+                                    "until": "18:15",
+                                    "timezone": "Asia/Tokyo",
+                                    "window": true,
+                                    "crossesMidnight": false,
+                                    "recurrence": "daily"
+                                }
+                            ],
+                            "storable": false,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": []
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::show",
+            "kind": "entry-point",
+            "declared": false,
+            "execution": "not-observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::automatic",
+                    "line": 48,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::automatic"
+                    ],
+                    "resolution": "resolved",
+                    "method": "automatic"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonPage.php",
+            "line": 46,
+            "policy": null,
+            "key": null,
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "duration depends on the origin time and daily expiration",
+                    "finite": true
+                },
+                "expirationConstraints": [
+                    {
+                        "at": "12:00",
+                        "until": "12:15",
+                        "timezone": "Asia/Tokyo",
+                        "window": true,
+                        "crossesMidnight": false,
+                        "recurrence": "daily"
+                    }
+                ],
+                "visibility": "shared",
+                "visibilityReason": "restricted by NoonPage::automatic",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "runtime",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": {
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "duration depends on the origin time and daily expiration",
+                    "finite": true
+                },
+                "expirationConstraints": [
+                    {
+                        "at": "12:00",
+                        "until": "12:15",
+                        "timezone": "Asia/Tokyo",
+                        "window": true,
+                        "crossesMidnight": false,
+                        "recurrence": "daily"
+                    }
+                ],
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "tags": [],
+                "certainty": {
+                    "ttl": "runtime",
+                    "visibility": "known",
+                    "tags": "known"
+                }
+            },
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "NoonPage::automatic"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "runtime",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unknown",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "duration depends on the origin time and daily expiration",
+                        "finite": true
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [
+                        {
+                            "at": "12:00",
+                            "until": "12:15",
+                            "timezone": "Asia/Tokyo",
+                            "window": true,
+                            "crossesMidnight": false,
+                            "recurrence": "daily"
+                        }
+                    ],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::automatic",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonPage::cached",
+                            "line": 31,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::window",
+                            "line": 31,
+                            "candidates": [
+                                "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::window"
+                            ],
+                            "resolution": "resolved",
+                            "method": "window"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonPage.php",
+                    "line": 28,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "Ttl::Auto",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": null,
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "duration depends on the origin time and daily expiration",
+                            "finite": true
+                        },
+                        "expirationConstraints": [
+                            {
+                                "at": "12:00",
+                                "until": "12:15",
+                                "timezone": "Asia/Tokyo",
+                                "window": true,
+                                "crossesMidnight": false,
+                                "recurrence": "daily"
+                            }
+                        ],
+                        "visibility": "shared",
+                        "visibilityReason": "inherited from NoonQuery::window",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": false,
+                        "tags": [],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "runtime",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "runtime-dependent",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [
+                                "NoonQuery::window"
+                            ],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "runtime",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "unknown",
+                                "seconds": null,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": "duration depends on the origin time and daily expiration",
+                                "finite": true
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": false,
+                            "tags": [],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [
+                                {
+                                    "at": "12:00",
+                                    "until": "12:15",
+                                    "timezone": "Asia/Tokyo",
+                                    "window": true,
+                                    "crossesMidnight": false,
+                                    "recurrence": "daily"
+                                }
+                            ],
+                            "storable": false,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": [
+                        {
+                            "boundary": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::window",
+                            "kind": "boundary",
+                            "declared": true,
+                            "execution": "observed",
+                            "returnType": "Magix\\Cache\\Cached",
+                            "parameters": [],
+                            "hasDynamicTtl": false,
+                            "useStrategy": {
+                                "strategy": "Tests\\Package\\Cli\\Fixture\\Expiration\\DailyExpirationStrategy",
+                                "line": 24,
+                                "arguments": {
+                                    "at": {
+                                        "state": "known",
+                                        "value": "12:00"
+                                    },
+                                    "until": {
+                                        "state": "known",
+                                        "value": "12:15"
+                                    },
+                                    "timezone": {
+                                        "state": "known",
+                                        "value": "Asia/Tokyo"
+                                    }
+                                }
+                            },
+                            "via": [],
+                            "calls": [
+                                {
+                                    "target": "Tests\\Package\\Cli\\Fixture\\Expiration\\NoonQuery::cached",
+                                    "line": 27,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "cached"
+                                },
+                                {
+                                    "target": "Magix\\Cache\\Cached::of",
+                                    "line": 27,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "of"
+                                }
+                            ],
+                            "file": "packages/magix-cache-cli/tests/Fixture/Expiration/NoonQuery.php",
+                            "line": 24,
+                            "policy": {
+                                "source": "ClassAttribute",
+                                "ttl": "Ttl::Auto",
+                                "ttlUnknown": false,
+                                "tagsUnknown": false,
+                                "visibilityUnknown": false,
+                                "tags": null,
+                                "visibility": null,
+                                "version": "1",
+                                "runtime": "default"
+                            },
+                            "key": [],
+                            "strategy": {
+                                "declared": "DailyExpirationStrategy::create(at: '12:00', until: '12:15', timezone: 'Asia/Tokyo')",
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": "duration depends on the origin time and daily expiration",
+                                    "finite": true
+                                },
+                                "overridesExpiration": true,
+                                "expirations": [
+                                    {
+                                        "at": "12:00",
+                                        "until": "12:15",
+                                        "timezone": "Asia/Tokyo",
+                                        "window": true,
+                                        "crossesMidnight": false,
+                                        "recurrence": "daily"
+                                    }
+                                ],
+                                "steps": [
+                                    {
+                                        "strategy": "Tests\\Package\\Cli\\Fixture\\Expiration\\DailyExpirationStrategy",
+                                        "ttl": {
+                                            "state": "unknown",
+                                            "seconds": null,
+                                            "lowerBound": null,
+                                            "upperBound": null,
+                                            "reason": "duration depends on the origin time and daily expiration",
+                                            "finite": true
+                                        },
+                                        "assumed": false,
+                                        "expirations": [
+                                            {
+                                                "at": "12:00",
+                                                "until": "12:15",
+                                                "timezone": "Asia/Tokyo",
+                                                "window": true,
+                                                "crossesMidnight": false,
+                                                "recurrence": "daily"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "writesMetadata": {
+                                    "visibility": false,
+                                    "tags": false,
+                                    "cacheable": false
+                                },
+                                "problems": []
+                            },
+                            "effective": {
+                                "ttl": {
+                                    "state": "unknown",
+                                    "seconds": null,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": "duration depends on the origin time and daily expiration",
+                                    "finite": true
+                                },
+                                "expirationConstraints": [
+                                    {
+                                        "at": "12:00",
+                                        "until": "12:15",
+                                        "timezone": "Asia/Tokyo",
+                                        "window": true,
+                                        "crossesMidnight": false,
+                                        "recurrence": "daily"
+                                    }
+                                ],
+                                "visibility": "shared",
+                                "visibilityReason": null,
+                                "visibilityUnknown": false,
+                                "tagsUnknown": false,
+                                "storable": false,
+                                "tags": [],
+                                "problems": [],
+                                "certainty": {
+                                    "ttl": "runtime",
+                                    "visibility": "known",
+                                    "tags": "known"
+                                },
+                                "analysis": {
+                                    "ttl": [],
+                                    "visibility": [],
+                                    "tags": [],
+                                    "ttlReference": null,
+                                    "visibilityReference": null,
+                                    "tagsReference": null
+                                },
+                                "storage": "runtime-dependent",
+                                "localOverrides": []
+                            },
+                            "composed": null,
+                            "notes": [],
+                            "metadataAlternatives": [
+                                {
+                                    "sources": [],
+                                    "analyzed": true,
+                                    "certainty": {
+                                        "ttl": "runtime",
+                                        "visibility": "known",
+                                        "tags": "known"
+                                    },
+                                    "analysis": {
+                                        "ttl": [],
+                                        "visibility": [],
+                                        "tags": [],
+                                        "ttlReference": null,
+                                        "visibilityReference": null,
+                                        "tagsReference": null
+                                    },
+                                    "ttl": {
+                                        "state": "unknown",
+                                        "seconds": null,
+                                        "lowerBound": null,
+                                        "upperBound": null,
+                                        "reason": "duration depends on the origin time and daily expiration",
+                                        "finite": true
+                                    },
+                                    "visibility": "shared",
+                                    "visibilityUnknown": false,
+                                    "tags": [],
+                                    "tagsUnknown": false,
+                                    "expirationConstraints": [
+                                        {
+                                            "at": "12:00",
+                                            "until": "12:15",
+                                            "timezone": "Asia/Tokyo",
+                                            "window": true,
+                                            "crossesMidnight": false,
+                                            "recurrence": "daily"
+                                        }
+                                    ],
+                                    "storable": false,
+                                    "problems": []
+                                }
+                            ],
+                            "diagnostics": [],
+                            "analysisGaps": [],
+                            "dependencies": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "diagnostics": []
+}

@@ -21,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ConstantCatalog::class)]
 #[UsesClass(LiteralReader::class)]
 #[UsesClass(UseStrategyDeclaration::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionDeriver::class)]
 final class UseStrategyReaderTest extends TestCase
 {
     public function testReadReadsANamedStrategyWithItsCreateArguments(): void

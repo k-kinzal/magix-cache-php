@@ -28,8 +28,27 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(LiteralReader::class)]
 #[UsesClass(ConstantCatalog::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionDeriver::class)]
 final class LiteralReaderTest extends TestCase
 {
+    public function testOperationDerivesWithoutMutatingTheParsedExpression(): void
+    {
+        $expression = new Plus(new Int_(1), new Int_(2));
+
+        self::assertSame(65, (new LiteralReader())->operation($expression, 60, 5));
+        self::assertInstanceOf(Int_::class, $expression->left);
+        self::assertSame(1, $expression->left->value);
+        self::assertInstanceOf(Int_::class, $expression->right);
+        self::assertSame(2, $expression->right->value);
+    }
+
+    public function testArrayValuesPreservesEnumIdentityThroughKeyCollisions(): void
+    {
+        $items = [new ArrayItem(new Int_(0), new String_('tag')), new ArrayItem(new Int_(1), new String_('tag'))];
+
+        self::assertSame(['tag' => Visibility::Private], (new LiteralReader())->arrayValues($items, [Visibility::Shared, Visibility::Private]));
+    }
+
     public function testValueReadsScalarsAndConstants(): void
     {
         $reader = new LiteralReader();

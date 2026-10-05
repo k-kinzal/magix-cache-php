@@ -50,6 +50,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(\Magix\Cache\Cli\Declaration\ExpirationContract::class)]
 #[UsesClass(\Magix\Cache\Cli\Declaration\MetadataContract::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\ArgumentReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\BindingDeriver::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionDeriver::class)]
 final class StrategyReaderTest extends TestCase
 {
     public function testReadReadsACompositeStrategyWithItsCompositionInOrder(): void

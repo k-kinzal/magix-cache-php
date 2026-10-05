@@ -62,70 +62,75 @@
 <span class="src-line" id="L24" data-diff="added"><a class="ln" href="#L24">24</a><span class="tok-com">/**</span></span>
 <span class="src-line" id="L25" data-diff="added"><a class="ln" href="#L25">25</a><span class="tok-com"> * Derives values in an explicit source world without running application code.</span></span>
 <span class="src-line" id="L26" data-diff="added"><a class="ln" href="#L26">26</a><span class="tok-com"> *</span></span>
-<span class="src-line" id="L27" data-diff="added"><a class="ln" href="#L27">27</a><span class="tok-com"> * Only an exhaustive, exact, concrete normal result can become a declaration</span></span>
-<span class="src-line" id="L28" data-diff="added"><a class="ln" href="#L28">28</a><span class="tok-com"> * value. A concrete value on one possible path is insufficient proof.</span></span>
-<span class="src-line" id="L29" data-diff="added"><a class="ln" href="#L29">29</a><span class="tok-com"> */</span></span>
-<span class="src-line" id="L30" data-diff="added"><a class="ln" href="#L30">30</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">ExpressionDeriver</span></span>
-<span class="src-line" id="L31" data-diff="added"><a class="ln" href="#L31">31</a>{</span>
-<span class="src-line" id="L32" data-diff="added"><a class="ln" href="#L32">32</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L33" data-diff="added"><a class="ln" href="#L33">33</a><span class="tok-com">     * Shares Deriver&#039;s bounded source caches across expressions read together.</span></span>
-<span class="src-line" id="L34" data-diff="added"><a class="ln" href="#L34">34</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L35" data-diff="added"><a class="ln" href="#L35">35</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(<span class="tok-kw">private</span> <span class="tok-id">Analyzer</span> <span class="tok-var">$analyzer</span> = <span class="tok-kw">new</span> <span class="tok-id">Analyzer</span>())</span>
-<span class="src-line" id="L36" data-diff="added"><a class="ln" href="#L36">36</a>    {</span>
-<span class="src-line" id="L37" data-diff="added"><a class="ln" href="#L37">37</a>    }</span>
-<span class="src-line" id="L38" data-diff="added"><a class="ln" href="#L38">38</a></span>
-<span class="src-line" id="L39" data-diff="added"><a class="ln" href="#L39">39</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L40" data-diff="added"><a class="ln" href="#L40">40</a><span class="tok-com">     * Evaluates one admitted expression with explicit scalar inputs.</span></span>
-<span class="src-line" id="L41" data-diff="added"><a class="ln" href="#L41">41</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L42" data-diff="added"><a class="ln" href="#L42">42</a><span class="tok-com">     * @param array&lt;string, int|float|string|bool|null&gt; $bindings</span></span>
-<span class="src-line" id="L43" data-diff="added"><a class="ln" href="#L43">43</a><span class="tok-com">     * @return mixed Concrete value, or LiteralReader::UNRESOLVED when exhaustive derivation is unavailable.</span></span>
-<span class="src-line" id="L44" data-diff="added"><a class="ln" href="#L44">44</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L45" data-diff="added"><a class="ln" href="#L45">45</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">value</span>(<span class="tok-id">Expr</span> <span class="tok-var">$expression</span>, <span class="tok-kw">array</span> <span class="tok-var">$bindings</span> = []): <span class="tok-id">mixed</span></span>
-<span class="src-line" id="L46" data-diff="added"><a class="ln" href="#L46">46</a>    {</span>
-<span class="src-line" id="L47" data-diff="added"><a class="ln" href="#L47">47</a>        <span class="tok-var">$parameters</span> = <span class="tok-id">array_map</span>(<span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">string</span> <span class="tok-var">$name</span>): <span class="tok-id">Param</span> =&gt; <span class="tok-kw">new</span> <span class="tok-id">Param</span>(<span class="tok-kw">new</span> <span class="tok-id">Variable</span>(<span class="tok-var">$name</span>)), <span class="tok-id">array_keys</span>(<span class="tok-var">$bindings</span>));</span>
-<span class="src-line" id="L48" data-diff="added"><a class="ln" href="#L48">48</a>        <span class="tok-var">$source</span> = (<span class="tok-kw">new</span> <span class="tok-id">Standard</span>())-&gt;<span class="tok-id">prettyPrintFile</span>([<span class="tok-kw">new</span> <span class="tok-id">Function_</span>(<span class="tok-str">&#039;resolve&#039;</span>, [</span>
-<span class="src-line" id="L49" data-diff="added"><a class="ln" href="#L49">49</a>            <span class="tok-str">&#039;params&#039;</span> =&gt; <span class="tok-var">$parameters</span>,</span>
-<span class="src-line" id="L50" data-diff="added"><a class="ln" href="#L50">50</a>            <span class="tok-str">&#039;stmts&#039;</span> =&gt; [<span class="tok-kw">new</span> <span class="tok-id">Return_</span>(<span class="tok-var">$expression</span>)],</span>
-<span class="src-line" id="L51" data-diff="added"><a class="ln" href="#L51">51</a>        ])]);</span>
-<span class="src-line" id="L52" data-diff="added"><a class="ln" href="#L52">52</a></span>
-<span class="src-line" id="L53" data-diff="added"><a class="ln" href="#L53">53</a>        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">source</span>(<span class="tok-var">$source</span>, <span class="tok-id">array_map</span>(<span class="tok-id">Term</span>::<span class="tok-id">constant</span>(...), <span class="tok-id">array_values</span>(<span class="tok-var">$bindings</span>)));</span>
-<span class="src-line" id="L54" data-diff="added"><a class="ln" href="#L54">54</a>    }</span>
-<span class="src-line" id="L55" data-diff="added"><a class="ln" href="#L55">55</a></span>
-<span class="src-line" id="L56" data-diff="added"><a class="ln" href="#L56">56</a>    <span class="tok-com">/**</span></span>
-<span class="src-line" id="L57" data-diff="added"><a class="ln" href="#L57">57</a><span class="tok-com">     * Reads a concrete return from generated, isolated analysis source.</span></span>
-<span class="src-line" id="L58" data-diff="added"><a class="ln" href="#L58">58</a><span class="tok-com">     *</span></span>
-<span class="src-line" id="L59" data-diff="added"><a class="ln" href="#L59">59</a><span class="tok-com">     * @param list&lt;Term&gt; $arguments Explicit inputs; user parameters are never inferred from defaults.</span></span>
-<span class="src-line" id="L60" data-diff="added"><a class="ln" href="#L60">60</a><span class="tok-com">     * @return mixed Concrete value, or LiteralReader::UNRESOLVED for partial, exceptional or non-concrete results.</span></span>
-<span class="src-line" id="L61" data-diff="added"><a class="ln" href="#L61">61</a><span class="tok-com">     */</span></span>
-<span class="src-line" id="L62" data-diff="added"><a class="ln" href="#L62">62</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">source</span>(<span class="tok-id">string</span> <span class="tok-var">$source</span>, <span class="tok-kw">array</span> <span class="tok-var">$arguments</span> = []): <span class="tok-id">mixed</span></span>
-<span class="src-line" id="L63" data-diff="added"><a class="ln" href="#L63">63</a>    {</span>
-<span class="src-line" id="L64" data-diff="added"><a class="ln" href="#L64">64</a>        <span class="tok-kw">try</span> {</span>
-<span class="src-line" id="L65" data-diff="added"><a class="ln" href="#L65">65</a>            <span class="tok-var">$session</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">analyzer</span>-&gt;<span class="tok-id">open</span>(</span>
-<span class="src-line" id="L66" data-diff="added"><a class="ln" href="#L66">66</a>                <span class="tok-kw">new</span> <span class="tok-id">ProjectInput</span>([<span class="tok-kw">new</span> <span class="tok-id">SourceFile</span>(<span class="tok-str">&#039;expression.php&#039;</span>, <span class="tok-var">$source</span>)]),</span>
-<span class="src-line" id="L67" data-diff="added"><a class="ln" href="#L67">67</a>                <span class="tok-kw">new</span> <span class="tok-id">Configuration</span>(<span class="tok-kw">new</span> <span class="tok-id">TargetProfile</span>(<span class="tok-id">floatPrecision</span>: (int) <span class="tok-id">ini_get</span>(<span class="tok-str">&#039;precision&#039;</span>))),</span>
-<span class="src-line" id="L68" data-diff="added"><a class="ln" href="#L68">68</a>            );</span>
-<span class="src-line" id="L69" data-diff="added"><a class="ln" href="#L69">69</a>        } <span class="tok-kw">catch</span> (<span class="tok-id">JsonException</span>) {</span>
-<span class="src-line" id="L70" data-diff="added"><a class="ln" href="#L70">70</a>            <span class="tok-kw">return</span> <span class="tok-id">LiteralReader</span>::<span class="tok-id">UNRESOLVED</span>;</span>
-<span class="src-line" id="L71" data-diff="added"><a class="ln" href="#L71">71</a>        }</span>
-<span class="src-line" id="L72" data-diff="added"><a class="ln" href="#L72">72</a></span>
-<span class="src-line" id="L73" data-diff="added"><a class="ln" href="#L73">73</a>        <span class="tok-var">$result</span> = <span class="tok-var">$session</span>-&gt;<span class="tok-id">derive</span>(<span class="tok-kw">new</span> <span class="tok-id">ReturnQuery</span>(<span class="tok-str">&#039;resolve&#039;</span>, <span class="tok-id">QueryScope</span>::<span class="tok-id">fromEntrypoints</span>([</span>
-<span class="src-line" id="L74" data-diff="added"><a class="ln" href="#L74">74</a>            <span class="tok-kw">new</span> <span class="tok-id">EntryPoint</span>(<span class="tok-str">&#039;resolve&#039;</span>, <span class="tok-var">$arguments</span>),</span>
-<span class="src-line" id="L75" data-diff="added"><a class="ln" href="#L75">75</a>        ])));</span>
+<span class="src-line" id="L27" data-diff="added"><a class="ln" href="#L27">27</a><span class="tok-com"> * Only a complete singleton concrete candidate can become a declaration value.</span></span>
+<span class="src-line" id="L28" data-diff="added"><a class="ln" href="#L28">28</a><span class="tok-com"> * Callers supply admitted expressions or generated alias graphs with explicit</span></span>
+<span class="src-line" id="L29" data-diff="added"><a class="ln" href="#L29">29</a><span class="tok-com"> * inputs. Candidate coverage does not establish application reachability.</span></span>
+<span class="src-line" id="L30" data-diff="added"><a class="ln" href="#L30">30</a><span class="tok-com"> */</span></span>
+<span class="src-line" id="L31" data-diff="added"><a class="ln" href="#L31">31</a><span class="tok-kw">final</span> <span class="tok-kw">readonly</span> <span class="tok-kw">class</span> <span class="tok-id">ExpressionDeriver</span></span>
+<span class="src-line" id="L32" data-diff="added"><a class="ln" href="#L32">32</a>{</span>
+<span class="src-line" id="L33" data-diff="added"><a class="ln" href="#L33">33</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L34" data-diff="added"><a class="ln" href="#L34">34</a><span class="tok-com">     * Shares Deriver&#039;s bounded source caches across expressions read together.</span></span>
+<span class="src-line" id="L35" data-diff="added"><a class="ln" href="#L35">35</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L36" data-diff="added"><a class="ln" href="#L36">36</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">__construct</span>(<span class="tok-kw">private</span> <span class="tok-id">Analyzer</span> <span class="tok-var">$analyzer</span> = <span class="tok-kw">new</span> <span class="tok-id">Analyzer</span>())</span>
+<span class="src-line" id="L37" data-diff="added"><a class="ln" href="#L37">37</a>    {</span>
+<span class="src-line" id="L38" data-diff="added"><a class="ln" href="#L38">38</a>    }</span>
+<span class="src-line" id="L39" data-diff="added"><a class="ln" href="#L39">39</a></span>
+<span class="src-line" id="L40" data-diff="added"><a class="ln" href="#L40">40</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L41" data-diff="added"><a class="ln" href="#L41">41</a><span class="tok-com">     * Evaluates one admitted expression with explicit scalar inputs.</span></span>
+<span class="src-line" id="L42" data-diff="added"><a class="ln" href="#L42">42</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L43" data-diff="added"><a class="ln" href="#L43">43</a><span class="tok-com">     * @param array&lt;string, int|float|string|bool|null&gt; $bindings</span></span>
+<span class="src-line" id="L44" data-diff="added"><a class="ln" href="#L44">44</a><span class="tok-com">     * @return mixed Concrete value, or LiteralReader::UNRESOLVED unless the candidate set is a complete concrete singleton.</span></span>
+<span class="src-line" id="L45" data-diff="added"><a class="ln" href="#L45">45</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L46" data-diff="added"><a class="ln" href="#L46">46</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">value</span>(<span class="tok-id">Expr</span> <span class="tok-var">$expression</span>, <span class="tok-kw">array</span> <span class="tok-var">$bindings</span> = []): <span class="tok-id">mixed</span></span>
+<span class="src-line" id="L47" data-diff="added"><a class="ln" href="#L47">47</a>    {</span>
+<span class="src-line" id="L48" data-diff="added"><a class="ln" href="#L48">48</a>        <span class="tok-var">$parameters</span> = <span class="tok-id">array_map</span>(<span class="tok-kw">static</span> <span class="tok-kw">fn</span> (<span class="tok-id">string</span> <span class="tok-var">$name</span>): <span class="tok-id">Param</span> =&gt; <span class="tok-kw">new</span> <span class="tok-id">Param</span>(<span class="tok-kw">new</span> <span class="tok-id">Variable</span>(<span class="tok-var">$name</span>)), <span class="tok-id">array_keys</span>(<span class="tok-var">$bindings</span>));</span>
+<span class="src-line" id="L49" data-diff="added"><a class="ln" href="#L49">49</a>        <span class="tok-var">$source</span> = (<span class="tok-kw">new</span> <span class="tok-id">Standard</span>())-&gt;<span class="tok-id">prettyPrintFile</span>([<span class="tok-kw">new</span> <span class="tok-id">Function_</span>(<span class="tok-str">&#039;resolve&#039;</span>, [</span>
+<span class="src-line" id="L50" data-diff="added"><a class="ln" href="#L50">50</a>            <span class="tok-str">&#039;params&#039;</span> =&gt; <span class="tok-var">$parameters</span>,</span>
+<span class="src-line" id="L51" data-diff="added"><a class="ln" href="#L51">51</a>            <span class="tok-str">&#039;stmts&#039;</span> =&gt; [<span class="tok-kw">new</span> <span class="tok-id">Return_</span>(<span class="tok-var">$expression</span>)],</span>
+<span class="src-line" id="L52" data-diff="added"><a class="ln" href="#L52">52</a>        ])]);</span>
+<span class="src-line" id="L53" data-diff="added"><a class="ln" href="#L53">53</a></span>
+<span class="src-line" id="L54" data-diff="added"><a class="ln" href="#L54">54</a>        <span class="tok-kw">return</span> <span class="tok-var">$this</span>-&gt;<span class="tok-id">source</span>(<span class="tok-var">$source</span>, <span class="tok-id">array_map</span>(<span class="tok-id">Term</span>::<span class="tok-id">constant</span>(...), <span class="tok-id">array_values</span>(<span class="tok-var">$bindings</span>)));</span>
+<span class="src-line" id="L55" data-diff="added"><a class="ln" href="#L55">55</a>    }</span>
+<span class="src-line" id="L56" data-diff="added"><a class="ln" href="#L56">56</a></span>
+<span class="src-line" id="L57" data-diff="added"><a class="ln" href="#L57">57</a>    <span class="tok-com">/**</span></span>
+<span class="src-line" id="L58" data-diff="added"><a class="ln" href="#L58">58</a><span class="tok-com">     * Reads a concrete return from generated, isolated analysis source.</span></span>
+<span class="src-line" id="L59" data-diff="added"><a class="ln" href="#L59">59</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L60" data-diff="added"><a class="ln" href="#L60">60</a><span class="tok-com">     * This selects value dependencies, not ordered execution of arbitrary PHP.</span></span>
+<span class="src-line" id="L61" data-diff="added"><a class="ln" href="#L61">61</a><span class="tok-com">     * Unrelated calls do not affect the candidate set.</span></span>
+<span class="src-line" id="L62" data-diff="added"><a class="ln" href="#L62">62</a><span class="tok-com">     *</span></span>
+<span class="src-line" id="L63" data-diff="added"><a class="ln" href="#L63">63</a><span class="tok-com">     * @param list&lt;Term&gt; $arguments Explicit inputs; use symbolic terms for unknown inputs, including those with defaults.</span></span>
+<span class="src-line" id="L64" data-diff="added"><a class="ln" href="#L64">64</a><span class="tok-com">     * @return mixed Concrete value, or LiteralReader::UNRESOLVED for partial, exceptional, multiple or non-concrete candidates.</span></span>
+<span class="src-line" id="L65" data-diff="added"><a class="ln" href="#L65">65</a><span class="tok-com">     */</span></span>
+<span class="src-line" id="L66" data-diff="added"><a class="ln" href="#L66">66</a>    <span class="tok-kw">public</span> <span class="tok-kw">function</span> <span class="tok-id">source</span>(<span class="tok-id">string</span> <span class="tok-var">$source</span>, <span class="tok-kw">array</span> <span class="tok-var">$arguments</span> = []): <span class="tok-id">mixed</span></span>
+<span class="src-line" id="L67" data-diff="added"><a class="ln" href="#L67">67</a>    {</span>
+<span class="src-line" id="L68" data-diff="added"><a class="ln" href="#L68">68</a>        <span class="tok-kw">try</span> {</span>
+<span class="src-line" id="L69" data-diff="added"><a class="ln" href="#L69">69</a>            <span class="tok-var">$session</span> = <span class="tok-var">$this</span>-&gt;<span class="tok-id">analyzer</span>-&gt;<span class="tok-id">open</span>(</span>
+<span class="src-line" id="L70" data-diff="added"><a class="ln" href="#L70">70</a>                <span class="tok-kw">new</span> <span class="tok-id">ProjectInput</span>([<span class="tok-kw">new</span> <span class="tok-id">SourceFile</span>(<span class="tok-str">&#039;expression.php&#039;</span>, <span class="tok-var">$source</span>)]),</span>
+<span class="src-line" id="L71" data-diff="added"><a class="ln" href="#L71">71</a>                <span class="tok-kw">new</span> <span class="tok-id">Configuration</span>(<span class="tok-kw">new</span> <span class="tok-id">TargetProfile</span>(<span class="tok-id">floatPrecision</span>: (int) <span class="tok-id">ini_get</span>(<span class="tok-str">&#039;precision&#039;</span>))),</span>
+<span class="src-line" id="L72" data-diff="added"><a class="ln" href="#L72">72</a>            );</span>
+<span class="src-line" id="L73" data-diff="added"><a class="ln" href="#L73">73</a>        } <span class="tok-kw">catch</span> (<span class="tok-id">JsonException</span>) {</span>
+<span class="src-line" id="L74" data-diff="added"><a class="ln" href="#L74">74</a>            <span class="tok-kw">return</span> <span class="tok-id">LiteralReader</span>::<span class="tok-id">UNRESOLVED</span>;</span>
+<span class="src-line" id="L75" data-diff="added"><a class="ln" href="#L75">75</a>        }</span>
 <span class="src-line" id="L76" data-diff="added"><a class="ln" href="#L76">76</a></span>
-<span class="src-line" id="L77" data-diff="added"><a class="ln" href="#L77">77</a>        <span class="tok-kw">if</span> (<span class="tok-var">$result</span>-&gt;<span class="tok-id">assessment</span>-&gt;<span class="tok-id">closure</span> !== <span class="tok-str">&#039;closed&#039;</span></span>
-<span class="src-line" id="L78" data-diff="added"><a class="ln" href="#L78">78</a>            || <span class="tok-var">$result</span>-&gt;<span class="tok-id">assessment</span>-&gt;<span class="tok-id">precision</span> !== <span class="tok-str">&#039;exact-symbolic&#039;</span></span>
-<span class="src-line" id="L79" data-diff="added"><a class="ln" href="#L79">79</a>            || <span class="tok-var">$result</span>-&gt;<span class="tok-id">assessment</span>-&gt;<span class="tok-id">correlation</span> !== <span class="tok-str">&#039;preserved&#039;</span></span>
-<span class="src-line" id="L80" data-diff="added"><a class="ln" href="#L80">80</a>            || <span class="tok-var">$result</span>-&gt;<span class="tok-id">assessment</span>-&gt;<span class="tok-id">enumeration</span> !== <span class="tok-str">&#039;finite-exhaustive&#039;</span></span>
-<span class="src-line" id="L81" data-diff="added"><a class="ln" href="#L81">81</a>            || <span class="tok-var">$result</span>-&gt;<span class="tok-id">assessment</span>-&gt;<span class="tok-id">coverage</span> !== <span class="tok-str">&#039;over-approximation&#039;</span>) {</span>
-<span class="src-line" id="L82" data-diff="added"><a class="ln" href="#L82">82</a>            <span class="tok-kw">return</span> <span class="tok-id">LiteralReader</span>::<span class="tok-id">UNRESOLVED</span>;</span>
-<span class="src-line" id="L83" data-diff="added"><a class="ln" href="#L83">83</a>        }</span>
-<span class="src-line" id="L84" data-diff="added"><a class="ln" href="#L84">84</a></span>
-<span class="src-line" id="L85" data-diff="added"><a class="ln" href="#L85">85</a>        <span class="tok-var">$value</span> = <span class="tok-var">$result</span>-&gt;<span class="tok-id">definite</span>()?-&gt;<span class="tok-id">values</span>[<span class="tok-str">&#039;return&#039;</span>] ?? <span class="tok-id">null</span>;</span>
-<span class="src-line" id="L86" data-diff="added"><a class="ln" href="#L86">86</a></span>
-<span class="src-line" id="L87" data-diff="added"><a class="ln" href="#L87">87</a>        <span class="tok-kw">return</span> <span class="tok-var">$value</span> !== <span class="tok-id">null</span> ? <span class="tok-var">$value</span>-&gt;<span class="tok-id">native</span>() : <span class="tok-id">LiteralReader</span>::<span class="tok-id">UNRESOLVED</span>;</span>
-<span class="src-line" id="L88" data-diff="added"><a class="ln" href="#L88">88</a>    }</span>
-<span class="src-line" id="L89" data-diff="added"><a class="ln" href="#L89">89</a>}</span>
-<span class="src-line" id="L90" data-diff="added"><a class="ln" href="#L90">90</a></span>
+<span class="src-line" id="L77" data-diff="added"><a class="ln" href="#L77">77</a>        <span class="tok-var">$result</span> = <span class="tok-var">$session</span>-&gt;<span class="tok-id">derive</span>(<span class="tok-kw">new</span> <span class="tok-id">ReturnQuery</span>(<span class="tok-str">&#039;resolve&#039;</span>, <span class="tok-id">QueryScope</span>::<span class="tok-id">fromEntrypoints</span>([</span>
+<span class="src-line" id="L78" data-diff="added"><a class="ln" href="#L78">78</a>            <span class="tok-kw">new</span> <span class="tok-id">EntryPoint</span>(<span class="tok-str">&#039;resolve&#039;</span>, <span class="tok-var">$arguments</span>),</span>
+<span class="src-line" id="L79" data-diff="added"><a class="ln" href="#L79">79</a>        ])));</span>
+<span class="src-line" id="L80" data-diff="added"><a class="ln" href="#L80">80</a></span>
+<span class="src-line" id="L81" data-diff="added"><a class="ln" href="#L81">81</a>        <span class="tok-kw">if</span> (<span class="tok-var">$result</span>-&gt;<span class="tok-id">contract</span> !== <span class="tok-str">&#039;candidates&#039;</span></span>
+<span class="src-line" id="L82" data-diff="added"><a class="ln" href="#L82">82</a>            || <span class="tok-var">$result</span>-&gt;<span class="tok-id">assessment</span>-&gt;<span class="tok-id">closure</span> !== <span class="tok-str">&#039;closed&#039;</span></span>
+<span class="src-line" id="L83" data-diff="added"><a class="ln" href="#L83">83</a>            || <span class="tok-var">$result</span>-&gt;<span class="tok-id">assessment</span>-&gt;<span class="tok-id">precision</span> !== <span class="tok-str">&#039;exact-symbolic&#039;</span></span>
+<span class="src-line" id="L84" data-diff="added"><a class="ln" href="#L84">84</a>            || <span class="tok-var">$result</span>-&gt;<span class="tok-id">assessment</span>-&gt;<span class="tok-id">correlation</span> !== <span class="tok-str">&#039;preserved&#039;</span></span>
+<span class="src-line" id="L85" data-diff="added"><a class="ln" href="#L85">85</a>            || <span class="tok-var">$result</span>-&gt;<span class="tok-id">assessment</span>-&gt;<span class="tok-id">enumeration</span> !== <span class="tok-str">&#039;finite-exhaustive&#039;</span></span>
+<span class="src-line" id="L86" data-diff="added"><a class="ln" href="#L86">86</a>            || <span class="tok-var">$result</span>-&gt;<span class="tok-id">assessment</span>-&gt;<span class="tok-id">coverage</span> !== <span class="tok-str">&#039;source-candidates&#039;</span>) {</span>
+<span class="src-line" id="L87" data-diff="added"><a class="ln" href="#L87">87</a>            <span class="tok-kw">return</span> <span class="tok-id">LiteralReader</span>::<span class="tok-id">UNRESOLVED</span>;</span>
+<span class="src-line" id="L88" data-diff="added"><a class="ln" href="#L88">88</a>        }</span>
+<span class="src-line" id="L89" data-diff="added"><a class="ln" href="#L89">89</a></span>
+<span class="src-line" id="L90" data-diff="added"><a class="ln" href="#L90">90</a>        <span class="tok-var">$value</span> = <span class="tok-var">$result</span>-&gt;<span class="tok-id">definite</span>()?-&gt;<span class="tok-id">values</span>[<span class="tok-str">&#039;return&#039;</span>] ?? <span class="tok-id">null</span>;</span>
+<span class="src-line" id="L91" data-diff="added"><a class="ln" href="#L91">91</a></span>
+<span class="src-line" id="L92" data-diff="added"><a class="ln" href="#L92">92</a>        <span class="tok-kw">return</span> <span class="tok-var">$value</span> !== <span class="tok-id">null</span> ? <span class="tok-var">$value</span>-&gt;<span class="tok-id">native</span>() : <span class="tok-id">LiteralReader</span>::<span class="tok-id">UNRESOLVED</span>;</span>
+<span class="src-line" id="L93" data-diff="added"><a class="ln" href="#L93">93</a>    }</span>
+<span class="src-line" id="L94" data-diff="added"><a class="ln" href="#L94">94</a>}</span>
+<span class="src-line" id="L95" data-diff="added"><a class="ln" href="#L95">95</a></span>
 </code></pre>
 </main>
 <footer class="site-footer">Generated by <a href="https://github.com/k-kinzal/php-ai-toolkit">php-ai-toolkit</a> doc-gen</footer>

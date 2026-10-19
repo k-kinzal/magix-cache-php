@@ -1,0 +1,468 @@
+{
+    "roots": [
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Display\\UnverifiedPageQuery::__construct",
+            "kind": "entry-point",
+            "declared": false,
+            "execution": "not-observed",
+            "returnType": null,
+            "parameters": [
+                {
+                    "name": "lookup",
+                    "type": "Tests\\Package\\Cli\\Fixture\\Display\\UnresolvedLookup",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [],
+            "file": "packages/magix-cache-cli/tests/Fixture/Display/UnverifiedPageQuery.php",
+            "line": 21,
+            "policy": null,
+            "key": null,
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unconstrained",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "unconstrained",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "unconstrained",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unconstrained",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Display\\UnverifiedPageQuery::execute",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Display\\UnverifiedPageQuery::cached",
+                    "line": 31,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Display\\UnresolvedLookup::get",
+                    "line": 31,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\Display\\UnresolvedLookup::get"
+                    ],
+                    "resolution": "resolved",
+                    "method": "get"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/Display/UnverifiedPageQuery.php",
+            "line": 28,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "120s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                }
+            ],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 120,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": "inherited from UnresolvedLookup::get",
+                "visibilityUnknown": true,
+                "tagsUnknown": true,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "partial",
+                    "tags": "partial"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [
+                        "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                    ],
+                    "tags": [
+                        "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                    ],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "unknown",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "partial",
+                        "tags": "partial"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [
+                            "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                        ],
+                        "tags": [
+                            "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                        ],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 120,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": true,
+                    "tags": [],
+                    "tagsUnknown": true,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\Display\\UnresolvedLookup::get",
+                    "kind": "uncached",
+                    "declared": false,
+                    "execution": "not-observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Display\\UnresolvedLookup::pick",
+                            "line": 27,
+                            "candidates": [
+                                "Tests\\Package\\Cli\\Fixture\\Display\\UnresolvedLookup::pick"
+                            ],
+                            "resolution": "resolved",
+                            "method": "pick"
+                        },
+                        {
+                            "target": null,
+                            "line": 27,
+                            "candidates": [],
+                            "resolution": "unresolved",
+                            "method": "execute"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/Display/UnresolvedLookup.php",
+                    "line": 25,
+                    "policy": null,
+                    "key": null,
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "returned cache metadata is not analyzed"
+                        },
+                        "visibility": "shared",
+                        "visibilityReason": null,
+                        "visibilityUnknown": true,
+                        "tagsUnknown": true,
+                        "storable": false,
+                        "tags": [],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "partial",
+                            "visibility": "partial",
+                            "tags": "partial"
+                        },
+                        "analysis": {
+                            "ttl": [
+                                "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                            ],
+                            "visibility": [
+                                "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                            ],
+                            "tags": [
+                                "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                            ],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "no",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [],
+                            "analyzed": false,
+                            "certainty": {
+                                "ttl": "partial",
+                                "visibility": "partial",
+                                "tags": "partial"
+                            },
+                            "analysis": {
+                                "ttl": [
+                                    "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                                ],
+                                "visibility": [
+                                    "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                                ],
+                                "tags": [
+                                    "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                                ],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "unknown",
+                                "seconds": null,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": "returned cache metadata is not analyzed"
+                            },
+                            "visibility": "shared",
+                            "visibilityUnknown": true,
+                            "tags": [],
+                            "tagsUnknown": true,
+                            "expirationConstraints": [],
+                            "storable": false,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [
+                        "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816"
+                    ],
+                    "analysisGaps": [],
+                    "dependencies": [
+                        {
+                            "boundary": "Tests\\Package\\Cli\\Fixture\\Display\\UnresolvedLookup::pick",
+                            "kind": "uncached",
+                            "declared": false,
+                            "execution": "not-observed",
+                            "returnType": "Tests\\Package\\Cli\\Fixture\\Project\\ProductQuery",
+                            "parameters": [],
+                            "hasDynamicTtl": false,
+                            "useStrategy": null,
+                            "via": [],
+                            "calls": [],
+                            "file": "packages/magix-cache-cli/tests/Fixture/Display/UnresolvedLookup.php",
+                            "line": 33,
+                            "policy": null,
+                            "key": null,
+                            "strategy": null,
+                            "effective": {
+                                "ttl": {
+                                    "state": "unconstrained",
+                                    "seconds": null,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": null
+                                },
+                                "visibility": "shared",
+                                "visibilityReason": null,
+                                "visibilityUnknown": false,
+                                "tagsUnknown": false,
+                                "storable": false,
+                                "tags": [],
+                                "problems": [],
+                                "certainty": {
+                                    "ttl": "unconstrained",
+                                    "visibility": "known",
+                                    "tags": "known"
+                                },
+                                "analysis": {
+                                    "ttl": [],
+                                    "visibility": [],
+                                    "tags": [],
+                                    "ttlReference": null,
+                                    "visibilityReference": null,
+                                    "tagsReference": null
+                                },
+                                "storage": "no",
+                                "localOverrides": []
+                            },
+                            "composed": null,
+                            "notes": [],
+                            "metadataAlternatives": [
+                                {
+                                    "sources": [],
+                                    "analyzed": true,
+                                    "certainty": {
+                                        "ttl": "unconstrained",
+                                        "visibility": "known",
+                                        "tags": "known"
+                                    },
+                                    "analysis": {
+                                        "ttl": [],
+                                        "visibility": [],
+                                        "tags": [],
+                                        "ttlReference": null,
+                                        "visibilityReference": null,
+                                        "tagsReference": null
+                                    },
+                                    "ttl": {
+                                        "state": "unconstrained",
+                                        "seconds": null,
+                                        "lowerBound": null,
+                                        "upperBound": null,
+                                        "reason": null
+                                    },
+                                    "visibility": "shared",
+                                    "visibilityUnknown": false,
+                                    "tags": [],
+                                    "tagsUnknown": false,
+                                    "expirationConstraints": [],
+                                    "storable": false,
+                                    "problems": []
+                                }
+                            ],
+                            "diagnostics": [],
+                            "analysisGaps": [],
+                            "dependencies": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "diagnostics": [
+        {
+            "id": "12e9bb60a4426fa817cc8e8bb74650ba326f783ec8e681535cce0521a0149816",
+            "kind": "opaque-method",
+            "method": "Tests\\Package\\Cli\\Fixture\\Display\\UnresolvedLookup::get",
+            "file": "packages/magix-cache-cli/tests/Fixture/Display/UnresolvedLookup.php",
+            "line": 27,
+            "message": "Returned metadata could not be followed through opaque-method"
+        }
+    ]
+}

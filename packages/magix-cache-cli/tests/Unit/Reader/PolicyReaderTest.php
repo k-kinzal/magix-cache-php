@@ -30,6 +30,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ConstantCatalog::class)]
 #[UsesClass(LiteralReader::class)]
 #[UsesClass(PolicyDeclaration::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionDeriver::class)]
 final class PolicyReaderTest extends TestCase
 {
     public function testReadUnderstandsEveryPolicyOption(): void

@@ -1,0 +1,602 @@
+{
+    "roots": [
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\ParameterQuery::auto",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "ttl",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": true,
+                    "configuration": {
+                        "ttl": true,
+                        "tags": false,
+                        "visibility": false,
+                        "strategyArgument": null,
+                        "problems": []
+                    }
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\ParameterQuery::cached",
+                    "line": 46,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Magix\\Cache\\Cached::of",
+                    "line": 46,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "of"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/ParameterQuery.php",
+            "line": 42,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "ttl",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": {
+                        "ttl": true,
+                        "tags": false,
+                        "visibility": false,
+                        "strategyArgument": null,
+                        "problems": []
+                    }
+                }
+            ],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": 0,
+                    "upperBound": null,
+                    "reason": "TTL depends on $ttl (non-negative integer seconds)",
+                    "finite": true
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "runtime",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "runtime-dependent",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "runtime",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unknown",
+                        "seconds": null,
+                        "lowerBound": 0,
+                        "upperBound": null,
+                        "reason": "TTL depends on $ttl (non-negative integer seconds)",
+                        "finite": true
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\ParameterQuery::fetch",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "ttl",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": true,
+                    "configuration": {
+                        "ttl": true,
+                        "tags": false,
+                        "visibility": false,
+                        "strategyArgument": null,
+                        "problems": []
+                    }
+                },
+                {
+                    "name": "tags",
+                    "type": "array",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": true,
+                    "configuration": {
+                        "ttl": false,
+                        "tags": true,
+                        "visibility": false,
+                        "strategyArgument": null,
+                        "problems": []
+                    }
+                },
+                {
+                    "name": "visibility",
+                    "type": "Magix\\Cache\\Metadata\\Visibility",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": true,
+                    "configuration": {
+                        "ttl": false,
+                        "tags": false,
+                        "visibility": true,
+                        "strategyArgument": null,
+                        "problems": []
+                    }
+                },
+                {
+                    "name": "min",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": true,
+                    "configuration": {
+                        "ttl": false,
+                        "tags": false,
+                        "visibility": false,
+                        "strategyArgument": "minimum",
+                        "problems": []
+                    }
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": {
+                "strategy": "Tests\\Package\\Cli\\Fixture\\ParameterizedStrategy",
+                "line": 21,
+                "arguments": []
+            },
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\ParameterQuery::cached",
+                    "line": 36,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Magix\\Cache\\Cached::of",
+                    "line": 36,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "of"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/ParameterQuery.php",
+            "line": 30,
+            "policy": {
+                "source": "ClassAttribute",
+                "ttl": "60s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": [
+                    "fixed"
+                ],
+                "visibility": "private",
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "ttl",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": {
+                        "ttl": true,
+                        "tags": false,
+                        "visibility": false,
+                        "strategyArgument": null,
+                        "problems": []
+                    }
+                },
+                {
+                    "name": "tags",
+                    "type": "array",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": {
+                        "ttl": false,
+                        "tags": true,
+                        "visibility": false,
+                        "strategyArgument": null,
+                        "problems": []
+                    }
+                },
+                {
+                    "name": "visibility",
+                    "type": "Magix\\Cache\\Metadata\\Visibility",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": {
+                        "ttl": false,
+                        "tags": false,
+                        "visibility": true,
+                        "strategyArgument": null,
+                        "problems": []
+                    }
+                },
+                {
+                    "name": "min",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": {
+                        "ttl": false,
+                        "tags": false,
+                        "visibility": false,
+                        "strategyArgument": "minimum",
+                        "problems": []
+                    }
+                }
+            ],
+            "strategy": {
+                "declared": "ParameterizedStrategy::create(minimum: $min)",
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": 60,
+                    "reason": null,
+                    "finite": true
+                },
+                "overridesExpiration": true,
+                "steps": [
+                    {
+                        "strategy": "Magix\\Cache\\Strategy\\KeySpreadExpirationStrategy",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": 60,
+                            "reason": null,
+                            "finite": true
+                        },
+                        "assumed": false
+                    }
+                ],
+                "writesMetadata": {
+                    "visibility": false,
+                    "tags": false,
+                    "cacheable": false
+                },
+                "problems": []
+            },
+            "effective": {
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": 60,
+                    "reason": null,
+                    "finite": true
+                },
+                "visibility": "shared",
+                "visibilityReason": "overridden by $visibility",
+                "visibilityUnknown": true,
+                "tagsUnknown": true,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "runtime",
+                    "visibility": "runtime",
+                    "tags": "runtime"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "runtime-dependent",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "runtime",
+                        "visibility": "runtime",
+                        "tags": "runtime"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unknown",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": 60,
+                        "reason": null,
+                        "finite": true
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": true,
+                    "tags": [],
+                    "tagsUnknown": true,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\ParameterQuery::strategy",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "ttl",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": true,
+                    "configuration": {
+                        "ttl": false,
+                        "tags": false,
+                        "visibility": false,
+                        "strategyArgument": "minimum",
+                        "problems": []
+                    }
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": {
+                "strategy": "Tests\\Package\\Cli\\Fixture\\ParameterizedStrategy",
+                "line": 21,
+                "arguments": []
+            },
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\ParameterQuery::cached",
+                    "line": 55,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Magix\\Cache\\Cached::of",
+                    "line": 55,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "of"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/ParameterQuery.php",
+            "line": 52,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "ttl",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": {
+                        "ttl": false,
+                        "tags": false,
+                        "visibility": false,
+                        "strategyArgument": "minimum",
+                        "problems": []
+                    }
+                }
+            ],
+            "strategy": {
+                "declared": "ParameterizedStrategy::create(minimum: $ttl)",
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": 60,
+                    "reason": null,
+                    "finite": true
+                },
+                "overridesExpiration": true,
+                "steps": [
+                    {
+                        "strategy": "Magix\\Cache\\Strategy\\KeySpreadExpirationStrategy",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": 60,
+                            "reason": null,
+                            "finite": true
+                        },
+                        "assumed": false
+                    }
+                ],
+                "writesMetadata": {
+                    "visibility": false,
+                    "tags": false,
+                    "cacheable": false
+                },
+                "problems": []
+            },
+            "effective": {
+                "ttl": {
+                    "state": "unknown",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": 60,
+                    "reason": null,
+                    "finite": true
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "runtime",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "runtime-dependent",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "runtime",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unknown",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": 60,
+                        "reason": null,
+                        "finite": true
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        }
+    ],
+    "diagnostics": []
+}

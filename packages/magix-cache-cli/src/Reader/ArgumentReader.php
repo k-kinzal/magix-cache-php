@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Magix\Cache\Cli\Reader;
 
 use PhpParser\Node\Arg;
+use PhpParser\Node\ArgPlaceholder;
 use PhpParser\Node\VariadicPlaceholder;
 
 /**
@@ -22,7 +23,7 @@ final readonly class ArgumentReader
     /**
      * Returns the value written for each named or positional parameter.
      *
-     * @param array<Arg|VariadicPlaceholder> $arguments
+     * @param array<Arg|ArgPlaceholder|VariadicPlaceholder> $arguments
      * @param list<string> $names
      * @return array<string, mixed>
      */

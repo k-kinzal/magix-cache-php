@@ -1,0 +1,10 @@
+[90;1mTimedPage::__construct[39;22m[90m (uncached)[39m
+[37;1mTimedPage::automatic[39;22m[37m  ttl 30/600-900s  shared[39m
+`-- [37;1mTimedQuery::execute[39;22m[37m  ttl 30/600-900s  shared[39m
+[37;1mTimedPage::fixed[39;22m[37m  ttl [39m[33m300s[39m[37m  shared[39m
+`-- [37;1mTimedQuery::execute[39;22m[37m  ttl 30/600-900s  shared[39m
+[37;1mTimedPage::shorter[39;22m[37m  ttl [39m[33m20s[39m[37m  shared[39m
+`-- [37;1mTimedQuery::execute[39;22m[37m  ttl 30/600-900s  shared[39m
+[90;1mTimedPage::show[39;22m[90m (uncached)  composes ttl 30/600-900s  shared[39m
+`-- [37;1mTimedPage::automatic[39;22m[37m  ttl 30/600-900s  shared[39m
+    `-- [37;1mTimedQuery::execute[39;22m[37m  ttl 30/600-900s  shared[39m

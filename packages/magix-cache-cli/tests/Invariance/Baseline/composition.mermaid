@@ -1,0 +1,46 @@
+flowchart TD
+    n0["Page::__construct<br/>Ttl::Auto [declared]"]
+    style n0 fill:#ffffff,stroke:#495057,color:#212529
+    n1["Page::emptySequence<br/>unconstrained - shared - tags page"]
+    style n1 fill:#e9ecef,stroke:#868e96,color:#495057
+    n2["Page::flatten<br/>20s - private - tags page"]
+    style n2 fill:#ffffff,stroke:#495057,color:#212529
+    n2_0["Inputs::product<br/>20s - shared - tags product"]
+    style n2_0 fill:#ffffff,stroke:#495057,color:#212529
+    n2 --> n2_0
+    n2_1["Inputs::viewer<br/>60s - private - tags viewer"]
+    style n2_1 fill:#ffffff,stroke:#495057,color:#212529
+    n2 --> n2_1
+    n3["Page::sequence<br/>20s - private - tags page"]
+    style n3 fill:#ffffff,stroke:#495057,color:#212529
+    n3_0["Inputs::product<br/>20s - shared - tags product"]
+    style n3_0 fill:#ffffff,stroke:#495057,color:#212529
+    n3 --> n3_0
+    n3_1["Inputs::viewer<br/>60s - private - tags viewer"]
+    style n3_1 fill:#ffffff,stroke:#495057,color:#212529
+    n3 --> n3_1
+    n4["Page::traverse<br/>20s - private - tags page"]
+    style n4 fill:#ffffff,stroke:#495057,color:#212529
+    n4_0["Inputs::product<br/>20s - shared - tags product"]
+    style n4_0 fill:#ffffff,stroke:#495057,color:#212529
+    n4 --> n4_0
+    n4_1["Inputs::viewer<br/>60s - private - tags viewer"]
+    style n4_1 fill:#ffffff,stroke:#495057,color:#212529
+    n4 --> n4_1
+    n5["Page::unzip<br/>20s - private - tags page"]
+    style n5 fill:#ffffff,stroke:#495057,color:#212529
+    n5_0["Inputs::product<br/>20s - shared - tags product"]
+    style n5_0 fill:#ffffff,stroke:#495057,color:#212529
+    n5 --> n5_0
+    n5_1["Inputs::viewer<br/>60s - private - tags viewer"]
+    style n5_1 fill:#ffffff,stroke:#495057,color:#212529
+    n5 --> n5_1
+    n6["Page::zip<br/>20s - private - tags page"]
+    style n6 fill:#ffffff,stroke:#495057,color:#212529
+    n6_0["Inputs::product<br/>20s - shared - tags product"]
+    style n6_0 fill:#ffffff,stroke:#495057,color:#212529
+    n6 --> n6_0
+    n6_1["Inputs::viewer<br/>60s - private - tags viewer"]
+    style n6_1 fill:#ffffff,stroke:#495057,color:#212529
+    n6 --> n6_1
+

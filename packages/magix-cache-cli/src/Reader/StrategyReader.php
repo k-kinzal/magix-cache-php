@@ -27,6 +27,7 @@ use Magix\Cache\Strategy\Contract\Ttl as TtlAttribute;
 use Magix\Cache\Strategy\Contract\WritesMetadata;
 use Magix\Cache\Strategy\StrategyDefinition;
 use PhpParser\Node\Arg;
+use PhpParser\Node\ArgPlaceholder;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\New_;
@@ -271,13 +272,7 @@ final readonly class StrategyReader
      */
     public function bound(Expr $expression, array $bindings, int $budget = 8): Expr
     {
-        if ($budget < 1 || !$expression instanceof Variable || !is_string($expression->name)) {
-            return $expression;
-        }
-
-        $value = $bindings[$expression->name] ?? null;
-
-        return $value === null ? $expression : $this->bound($value, $bindings, $budget - 1);
+        return (new BindingDeriver())->bound($expression, $bindings, $budget);
     }
 
     /**
@@ -405,7 +400,7 @@ final readonly class StrategyReader
     /**
      * Returns written call arguments, or null when their shape is unreadable.
      *
-     * @param array<Arg|VariadicPlaceholder> $arguments
+     * @param array<Arg|ArgPlaceholder|VariadicPlaceholder> $arguments
      * @return list<StrategyArgument>|null
      */
     public function arguments(array $arguments): ?array

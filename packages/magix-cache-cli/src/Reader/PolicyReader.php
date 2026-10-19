@@ -17,6 +17,7 @@ use Magix\Cache\Metadata\Visibility;
 use Magix\Cache\Runtime\CacheRuntimeRegistry;
 use Magix\Cache\Runtime\Policy\Ttl;
 use PhpParser\Node\Arg;
+use PhpParser\Node\ArgPlaceholder;
 use PhpParser\Node\VariadicPlaceholder;
 
 /**
@@ -39,7 +40,7 @@ final readonly class PolicyReader
     /**
      * Returns the policy declared by the given attribute arguments.
      *
-     * @param array<Arg|VariadicPlaceholder> $arguments
+     * @param array<Arg|ArgPlaceholder|VariadicPlaceholder> $arguments
      */
     public function read(array $arguments, PolicySource $source): PolicyDeclaration
     {

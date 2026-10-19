@@ -1,0 +1,12 @@
+[90;1mNoonPage::__construct[39;22m[90m (uncached)[39m
+[37;1mNoonPage::automatic[39;22m[37m  ttl dynamic  shared  expires by daily 12:00-12:15 Asia/Tokyo[39m
+`-- [37;1mNoonQuery::window[39;22m[37m  ttl dynamic  shared  expires by daily 12:00-12:15 Asia/Tokyo[39m
+[37;1mNoonPage::fixed[39;22m[37m  ttl [39m[33m60s[39m[37m  shared[39m
+`-- [37;1mNoonQuery::window[39;22m[37m  ttl dynamic  shared  expires by daily 12:00-12:15 Asia/Tokyo[39m
+[37;1mNoonPage::multipleAutomatic[39;22m[37m  ttl dynamic  shared  expires by earliest of (daily 09:00 Asia/Tokyo; daily 23:55:30-00:10:15 (+1 day) America/New_York; daily 18:00-18:15 Asia/Tokyo)[39m
+`-- [37;1mNoonQuery::multiple[39;22m[37m  ttl dynamic  shared  expires by earliest of (daily 09:00 Asia/Tokyo; daily 23:55:30-00:10:15 (+1 day) America/New_York; daily 18:00-18:15 Asia/Tokyo)[39m
+[37;1mNoonPage::multipleComposed[39;22m[37m  ttl [39m[33m30s[39m[37m  shared[39m
+`-- [37;1mNoonQuery::multipleComposed[39;22m[37m  ttl dynamic  shared  expires by earliest of (daily 09:00 Asia/Tokyo; daily 23:55:30-00:10:15 (+1 day) America/New_York; daily 18:00-18:15 Asia/Tokyo)[39m
+[90;1mNoonPage::show[39;22m[90m (uncached)  composes ttl dynamic  shared  expires by daily 12:00-12:15 Asia/Tokyo[39m
+`-- [37;1mNoonPage::automatic[39;22m[37m  ttl dynamic  shared  expires by daily 12:00-12:15 Asia/Tokyo[39m
+    `-- [37;1mNoonQuery::window[39;22m[37m  ttl dynamic  shared  expires by daily 12:00-12:15 Asia/Tokyo[39m

@@ -121,7 +121,7 @@ final readonly class ContractReader
     /**
      * Maps declared parameters by name and retains remaining positional arguments.
      *
-     * @param array<Arg|\PhpParser\Node\VariadicPlaceholder> $arguments
+     * @param array<Arg|\PhpParser\Node\ArgPlaceholder|\PhpParser\Node\VariadicPlaceholder> $arguments
      * @param list<string> $names
      * @return array<array-key, mixed>
      */

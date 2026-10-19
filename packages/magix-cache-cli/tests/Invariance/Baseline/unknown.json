@@ -1,0 +1,362 @@
+{
+    "roots": [
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\BrokenStrategyQuery::withUnknownArgument",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": {
+                "strategy": "Tests\\Package\\Cli\\Fixture\\Project\\ProductCacheStrategy",
+                "line": 37,
+                "arguments": {
+                    "minimum": {
+                        "state": "known",
+                        "value": 60
+                    }
+                }
+            },
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\BrokenStrategyQuery::cached",
+                    "line": 40,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Magix\\Cache\\Cached::of",
+                    "line": 40,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "of"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/Project/BrokenStrategyQuery.php",
+            "line": 36,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "30s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                }
+            ],
+            "strategy": {
+                "declared": "ProductCacheStrategy::create(minimum: 60)",
+                "ttl": {
+                    "state": "invalid",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "ProductCacheStrategy::create() has no parameter $minimum, so the declared arguments cannot be bound"
+                },
+                "overridesExpiration": true,
+                "steps": [
+                    {
+                        "strategy": "Magix\\Cache\\Strategy\\KeySpreadExpirationStrategy",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": 30,
+                            "upperBound": 60,
+                            "reason": null,
+                            "finite": true
+                        },
+                        "assumed": false
+                    },
+                    {
+                        "strategy": "Tests\\Package\\Cli\\Fixture\\Project\\ProductFreshnessStrategy",
+                        "ttl": {
+                            "state": "unknown",
+                            "seconds": null,
+                            "lowerBound": 30,
+                            "upperBound": null,
+                            "reason": null,
+                            "finite": true
+                        },
+                        "assumed": false
+                    },
+                    {
+                        "strategy": "Magix\\Cache\\Strategy\\StaleIfErrorCacheStrategy",
+                        "ttl": {
+                            "state": "unconstrained",
+                            "seconds": null,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "assumed": false
+                    }
+                ],
+                "writesMetadata": {
+                    "visibility": false,
+                    "tags": false,
+                    "cacheable": false
+                },
+                "problems": [
+                    "ProductCacheStrategy::create() has no parameter $minimum, so the declared arguments cannot be bound"
+                ]
+            },
+            "effective": {
+                "ttl": {
+                    "state": "invalid",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "ProductCacheStrategy::create() has no parameter $minimum, so the declared arguments cannot be bound"
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [
+                    "ProductCacheStrategy::create() has no parameter $minimum, so the declared arguments cannot be bound"
+                ],
+                "certainty": {
+                    "ttl": "invalid",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "invalid",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "invalid",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "ProductCacheStrategy::create() has no parameter $minimum, so the declared arguments cannot be bound"
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": [
+                        "ProductCacheStrategy::create() has no parameter $minimum, so the declared arguments cannot be bound"
+                    ]
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\BrokenStrategyQuery::withoutCreate",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": {
+                "strategy": "Tests\\Package\\Cli\\Fixture\\Project\\ExternalTtlStrategy",
+                "line": 25,
+                "arguments": []
+            },
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\BrokenStrategyQuery::cached",
+                    "line": 28,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Magix\\Cache\\Cached::of",
+                    "line": 28,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "of"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/Project/BrokenStrategyQuery.php",
+            "line": 24,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "30s",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "id",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                }
+            ],
+            "strategy": {
+                "declared": "ExternalTtlStrategy::create()",
+                "ttl": {
+                    "state": "invalid",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "Tests\\Package\\Cli\\Fixture\\Project\\ExternalTtlStrategy declares no public static create(), so resolving the strategy throws a LogicException"
+                },
+                "overridesExpiration": null,
+                "steps": [],
+                "writesMetadata": {
+                    "visibility": false,
+                    "tags": false,
+                    "cacheable": false
+                },
+                "problems": [
+                    "Tests\\Package\\Cli\\Fixture\\Project\\ExternalTtlStrategy declares no public static create(), so resolving the strategy throws a LogicException"
+                ]
+            },
+            "effective": {
+                "ttl": {
+                    "state": "invalid",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "Tests\\Package\\Cli\\Fixture\\Project\\ExternalTtlStrategy declares no public static create(), so resolving the strategy throws a LogicException"
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [
+                    "Tests\\Package\\Cli\\Fixture\\Project\\ExternalTtlStrategy declares no public static create(), so resolving the strategy throws a LogicException"
+                ],
+                "certainty": {
+                    "ttl": "invalid",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "invalid",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "invalid",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "Tests\\Package\\Cli\\Fixture\\Project\\ExternalTtlStrategy declares no public static create(), so resolving the strategy throws a LogicException"
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": [
+                        "Tests\\Package\\Cli\\Fixture\\Project\\ExternalTtlStrategy declares no public static create(), so resolving the strategy throws a LogicException"
+                    ]
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        }
+    ],
+    "diagnostics": []
+}

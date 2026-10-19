@@ -1,0 +1,1838 @@
+{
+    "roots": [
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\BubblingPageQuery::__construct",
+            "kind": "entry-point",
+            "declared": true,
+            "execution": "not-observed",
+            "returnType": null,
+            "parameters": [
+                {
+                    "name": "page",
+                    "type": "Tests\\Package\\Cli\\Fixture\\Project\\ProductPageQuery",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [],
+            "file": "packages/magix-cache-cli/tests/Fixture/Project/BubblingPageQuery.php",
+            "line": 23,
+            "policy": {
+                "source": "ClassAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": null,
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "unconstrained",
+                    "seconds": null,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": null
+                },
+                "visibility": "shared",
+                "visibilityReason": null,
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": false,
+                "tags": [],
+                "problems": [],
+                "certainty": {
+                    "ttl": "unconstrained",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "no",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "unconstrained",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "unconstrained",
+                        "seconds": null,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": null
+                    },
+                    "visibility": "shared",
+                    "visibilityUnknown": false,
+                    "tags": [],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": false,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": []
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\BubblingPageQuery::execute",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "productId",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                },
+                {
+                    "name": "viewerId",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\BubblingPageQuery::cached",
+                    "line": 34,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\ProductPageQuery::execute",
+                    "line": 34,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\Project\\ProductPageQuery::execute"
+                    ],
+                    "resolution": "resolved",
+                    "method": "execute"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/Project/BubblingPageQuery.php",
+            "line": 32,
+            "policy": {
+                "source": "ClassAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "productId",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                },
+                {
+                    "name": "viewerId",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                }
+            ],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 120,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from ProductPageQuery::execute"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from ProductPageQuery::execute",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "page"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "ProductPageQuery::execute"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 120,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from ProductPageQuery::execute"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "page"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\ProductPageQuery::execute",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "productId",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        },
+                        {
+                            "name": "viewerId",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        },
+                        {
+                            "name": "trace",
+                            "type": "string",
+                            "ignored": true,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": true,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Project\\ProductPageQuery::cached",
+                            "line": 41,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Project\\ProductQuery::execute",
+                            "line": 42,
+                            "candidates": [
+                                "Tests\\Package\\Cli\\Fixture\\Project\\ProductQuery::execute"
+                            ],
+                            "resolution": "resolved",
+                            "method": "execute"
+                        },
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Project\\InventoryQuery::execute",
+                            "line": 43,
+                            "candidates": [
+                                "Tests\\Package\\Cli\\Fixture\\Project\\InventoryQuery::execute"
+                            ],
+                            "resolution": "resolved",
+                            "method": "execute"
+                        },
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Project\\ViewerQuery::execute",
+                            "line": 44,
+                            "candidates": [
+                                "Tests\\Package\\Cli\\Fixture\\Project\\ViewerQuery::execute"
+                            ],
+                            "resolution": "resolved",
+                            "method": "execute"
+                        },
+                        {
+                            "target": null,
+                            "line": 46,
+                            "candidates": [],
+                            "resolution": "unresolved",
+                            "method": "map"
+                        },
+                        {
+                            "target": null,
+                            "line": 46,
+                            "candidates": [],
+                            "resolution": "unresolved",
+                            "method": "combine3"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/Project/ProductPageQuery.php",
+                    "line": 34,
+                    "policy": {
+                        "source": "MethodAttribute",
+                        "ttl": "120s",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": [
+                            "page"
+                        ],
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "productId",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        },
+                        {
+                            "name": "viewerId",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        },
+                        {
+                            "name": "trace",
+                            "type": "string",
+                            "ignored": true,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 120,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": null
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "inherited from ViewerQuery::execute",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "page"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": {
+                            "ttl": "local ttl 120s; composed 20s",
+                            "tags": "local tags replace inherited tags"
+                        }
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [
+                                "ProductQuery::execute",
+                                "InventoryQuery::execute",
+                                "ViewerQuery::execute"
+                            ],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 120,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": null
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "page"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": [
+                        {
+                            "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\ProductQuery::execute",
+                            "kind": "boundary",
+                            "declared": true,
+                            "execution": "observed",
+                            "returnType": "Magix\\Cache\\Cached",
+                            "parameters": [
+                                {
+                                    "name": "productId",
+                                    "type": "int",
+                                    "ignored": false,
+                                    "scope": null,
+                                    "reducer": null,
+                                    "variadic": false,
+                                    "optional": false,
+                                    "configuration": null
+                                }
+                            ],
+                            "hasDynamicTtl": false,
+                            "useStrategy": null,
+                            "via": [],
+                            "calls": [
+                                {
+                                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\ProductQuery::cached",
+                                    "line": 26,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "cached"
+                                },
+                                {
+                                    "target": "Magix\\Cache\\Cached::of",
+                                    "line": 26,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "of"
+                                }
+                            ],
+                            "file": "packages/magix-cache-cli/tests/Fixture/Project/ProductQuery.php",
+                            "line": 23,
+                            "policy": {
+                                "source": "MethodAttribute",
+                                "ttl": "20s",
+                                "ttlUnknown": false,
+                                "tagsUnknown": false,
+                                "visibilityUnknown": false,
+                                "tags": [
+                                    "product"
+                                ],
+                                "visibility": null,
+                                "version": "1",
+                                "runtime": "default"
+                            },
+                            "key": [
+                                {
+                                    "name": "productId",
+                                    "type": "int",
+                                    "ignored": false,
+                                    "scope": null,
+                                    "reducer": null,
+                                    "configuration": null
+                                }
+                            ],
+                            "strategy": null,
+                            "effective": {
+                                "ttl": {
+                                    "state": "known",
+                                    "seconds": 20,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": null
+                                },
+                                "visibility": "shared",
+                                "visibilityReason": null,
+                                "visibilityUnknown": false,
+                                "tagsUnknown": false,
+                                "storable": true,
+                                "tags": [
+                                    "product"
+                                ],
+                                "problems": [],
+                                "certainty": {
+                                    "ttl": "known",
+                                    "visibility": "known",
+                                    "tags": "known"
+                                },
+                                "analysis": {
+                                    "ttl": [],
+                                    "visibility": [],
+                                    "tags": [],
+                                    "ttlReference": null,
+                                    "visibilityReference": null,
+                                    "tagsReference": null
+                                },
+                                "storage": "yes",
+                                "localOverrides": []
+                            },
+                            "composed": null,
+                            "notes": [],
+                            "metadataAlternatives": [
+                                {
+                                    "sources": [],
+                                    "analyzed": true,
+                                    "certainty": {
+                                        "ttl": "known",
+                                        "visibility": "known",
+                                        "tags": "known"
+                                    },
+                                    "analysis": {
+                                        "ttl": [],
+                                        "visibility": [],
+                                        "tags": [],
+                                        "ttlReference": null,
+                                        "visibilityReference": null,
+                                        "tagsReference": null
+                                    },
+                                    "ttl": {
+                                        "state": "known",
+                                        "seconds": 20,
+                                        "lowerBound": null,
+                                        "upperBound": null,
+                                        "reason": null
+                                    },
+                                    "visibility": "shared",
+                                    "visibilityUnknown": false,
+                                    "tags": [
+                                        "product"
+                                    ],
+                                    "tagsUnknown": false,
+                                    "expirationConstraints": [],
+                                    "storable": true,
+                                    "problems": []
+                                }
+                            ],
+                            "diagnostics": [],
+                            "analysisGaps": [],
+                            "dependencies": []
+                        },
+                        {
+                            "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\InventoryQuery::execute",
+                            "kind": "boundary",
+                            "declared": true,
+                            "execution": "observed",
+                            "returnType": "Magix\\Cache\\Cached",
+                            "parameters": [
+                                {
+                                    "name": "productId",
+                                    "type": "int",
+                                    "ignored": false,
+                                    "scope": null,
+                                    "reducer": null,
+                                    "variadic": false,
+                                    "optional": false,
+                                    "configuration": null
+                                }
+                            ],
+                            "hasDynamicTtl": false,
+                            "useStrategy": null,
+                            "via": [],
+                            "calls": [
+                                {
+                                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\InventoryQuery::cached",
+                                    "line": 29,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "cached"
+                                },
+                                {
+                                    "target": "Magix\\Cache\\Cached::of",
+                                    "line": 29,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "of"
+                                }
+                            ],
+                            "file": "packages/magix-cache-cli/tests/Fixture/Project/InventoryQuery.php",
+                            "line": 25,
+                            "policy": {
+                                "source": "MethodAttribute",
+                                "ttl": "60s",
+                                "ttlUnknown": false,
+                                "tagsUnknown": false,
+                                "visibilityUnknown": false,
+                                "tags": [
+                                    "inventory"
+                                ],
+                                "visibility": null,
+                                "version": "1",
+                                "runtime": "default"
+                            },
+                            "key": [
+                                {
+                                    "name": "productId",
+                                    "type": "int",
+                                    "ignored": false,
+                                    "scope": null,
+                                    "reducer": null,
+                                    "configuration": null
+                                }
+                            ],
+                            "strategy": null,
+                            "effective": {
+                                "ttl": {
+                                    "state": "known",
+                                    "seconds": 60,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": null
+                                },
+                                "visibility": "shared",
+                                "visibilityReason": null,
+                                "visibilityUnknown": false,
+                                "tagsUnknown": false,
+                                "storable": true,
+                                "tags": [
+                                    "inventory"
+                                ],
+                                "problems": [],
+                                "certainty": {
+                                    "ttl": "known",
+                                    "visibility": "known",
+                                    "tags": "known"
+                                },
+                                "analysis": {
+                                    "ttl": [],
+                                    "visibility": [],
+                                    "tags": [],
+                                    "ttlReference": null,
+                                    "visibilityReference": null,
+                                    "tagsReference": null
+                                },
+                                "storage": "yes",
+                                "localOverrides": []
+                            },
+                            "composed": null,
+                            "notes": [],
+                            "metadataAlternatives": [
+                                {
+                                    "sources": [],
+                                    "analyzed": true,
+                                    "certainty": {
+                                        "ttl": "known",
+                                        "visibility": "known",
+                                        "tags": "known"
+                                    },
+                                    "analysis": {
+                                        "ttl": [],
+                                        "visibility": [],
+                                        "tags": [],
+                                        "ttlReference": null,
+                                        "visibilityReference": null,
+                                        "tagsReference": null
+                                    },
+                                    "ttl": {
+                                        "state": "known",
+                                        "seconds": 60,
+                                        "lowerBound": null,
+                                        "upperBound": null,
+                                        "reason": null
+                                    },
+                                    "visibility": "shared",
+                                    "visibilityUnknown": false,
+                                    "tags": [
+                                        "inventory"
+                                    ],
+                                    "tagsUnknown": false,
+                                    "expirationConstraints": [],
+                                    "storable": true,
+                                    "problems": []
+                                }
+                            ],
+                            "diagnostics": [],
+                            "analysisGaps": [],
+                            "dependencies": []
+                        },
+                        {
+                            "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\ViewerQuery::execute",
+                            "kind": "boundary",
+                            "declared": true,
+                            "execution": "observed",
+                            "returnType": "Magix\\Cache\\Cached",
+                            "parameters": [
+                                {
+                                    "name": "viewerId",
+                                    "type": "int",
+                                    "ignored": false,
+                                    "scope": 1,
+                                    "reducer": null,
+                                    "variadic": false,
+                                    "optional": false,
+                                    "configuration": null
+                                }
+                            ],
+                            "hasDynamicTtl": false,
+                            "useStrategy": null,
+                            "via": [],
+                            "calls": [
+                                {
+                                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\ViewerQuery::cached",
+                                    "line": 30,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "cached"
+                                },
+                                {
+                                    "target": "Magix\\Cache\\Cached::of",
+                                    "line": 30,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "of"
+                                }
+                            ],
+                            "file": "packages/magix-cache-cli/tests/Fixture/Project/ViewerQuery.php",
+                            "line": 25,
+                            "policy": {
+                                "source": "MethodAttribute",
+                                "ttl": "30s",
+                                "ttlUnknown": false,
+                                "tagsUnknown": false,
+                                "visibilityUnknown": false,
+                                "tags": [
+                                    "viewer"
+                                ],
+                                "visibility": null,
+                                "version": "1",
+                                "runtime": "default"
+                            },
+                            "key": [
+                                {
+                                    "name": "viewerId",
+                                    "type": "int",
+                                    "ignored": false,
+                                    "scope": "private",
+                                    "reducer": null,
+                                    "configuration": null
+                                }
+                            ],
+                            "strategy": null,
+                            "effective": {
+                                "ttl": {
+                                    "state": "known",
+                                    "seconds": 30,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": null
+                                },
+                                "visibility": "private",
+                                "visibilityReason": "declared by a scoped parameter",
+                                "visibilityUnknown": false,
+                                "tagsUnknown": false,
+                                "storable": true,
+                                "tags": [
+                                    "viewer"
+                                ],
+                                "problems": [],
+                                "certainty": {
+                                    "ttl": "known",
+                                    "visibility": "known",
+                                    "tags": "known"
+                                },
+                                "analysis": {
+                                    "ttl": [],
+                                    "visibility": [],
+                                    "tags": [],
+                                    "ttlReference": null,
+                                    "visibilityReference": null,
+                                    "tagsReference": null
+                                },
+                                "storage": "yes",
+                                "localOverrides": []
+                            },
+                            "composed": null,
+                            "notes": [],
+                            "metadataAlternatives": [
+                                {
+                                    "sources": [],
+                                    "analyzed": true,
+                                    "certainty": {
+                                        "ttl": "known",
+                                        "visibility": "known",
+                                        "tags": "known"
+                                    },
+                                    "analysis": {
+                                        "ttl": [],
+                                        "visibility": [],
+                                        "tags": [],
+                                        "ttlReference": null,
+                                        "visibilityReference": null,
+                                        "tagsReference": null
+                                    },
+                                    "ttl": {
+                                        "state": "known",
+                                        "seconds": 30,
+                                        "lowerBound": null,
+                                        "upperBound": null,
+                                        "reason": null
+                                    },
+                                    "visibility": "private",
+                                    "visibilityUnknown": false,
+                                    "tags": [
+                                        "viewer"
+                                    ],
+                                    "tagsUnknown": false,
+                                    "expirationConstraints": [],
+                                    "storable": true,
+                                    "problems": []
+                                }
+                            ],
+                            "diagnostics": [],
+                            "analysisGaps": [],
+                            "dependencies": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\BubblingPageQuery::explicit",
+            "kind": "boundary",
+            "declared": true,
+            "execution": "observed",
+            "returnType": "Magix\\Cache\\Cached",
+            "parameters": [
+                {
+                    "name": "productId",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                },
+                {
+                    "name": "viewerId",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "variadic": false,
+                    "optional": false,
+                    "configuration": null
+                }
+            ],
+            "hasDynamicTtl": false,
+            "useStrategy": null,
+            "via": [],
+            "calls": [
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\BubblingPageQuery::cached",
+                    "line": 45,
+                    "candidates": [],
+                    "resolution": "operation",
+                    "method": "cached"
+                },
+                {
+                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\BubblingPageQuery::execute",
+                    "line": 45,
+                    "candidates": [
+                        "Tests\\Package\\Cli\\Fixture\\Project\\BubblingPageQuery::execute"
+                    ],
+                    "resolution": "resolved",
+                    "method": "execute"
+                }
+            ],
+            "file": "packages/magix-cache-cli/tests/Fixture/Project/BubblingPageQuery.php",
+            "line": 42,
+            "policy": {
+                "source": "MethodAttribute",
+                "ttl": "Ttl::Auto",
+                "ttlUnknown": false,
+                "tagsUnknown": false,
+                "visibilityUnknown": false,
+                "tags": null,
+                "visibility": null,
+                "version": "1",
+                "runtime": "default"
+            },
+            "key": [
+                {
+                    "name": "productId",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                },
+                {
+                    "name": "viewerId",
+                    "type": "int",
+                    "ignored": false,
+                    "scope": null,
+                    "reducer": null,
+                    "configuration": null
+                }
+            ],
+            "strategy": null,
+            "effective": {
+                "ttl": {
+                    "state": "known",
+                    "seconds": 120,
+                    "lowerBound": null,
+                    "upperBound": null,
+                    "reason": "inherited from BubblingPageQuery::execute"
+                },
+                "visibility": "private",
+                "visibilityReason": "inherited from BubblingPageQuery::execute",
+                "visibilityUnknown": false,
+                "tagsUnknown": false,
+                "storable": true,
+                "tags": [
+                    "page"
+                ],
+                "problems": [],
+                "certainty": {
+                    "ttl": "known",
+                    "visibility": "known",
+                    "tags": "known"
+                },
+                "analysis": {
+                    "ttl": [],
+                    "visibility": [],
+                    "tags": [],
+                    "ttlReference": null,
+                    "visibilityReference": null,
+                    "tagsReference": null
+                },
+                "storage": "yes",
+                "localOverrides": []
+            },
+            "composed": null,
+            "notes": [],
+            "metadataAlternatives": [
+                {
+                    "sources": [
+                        "BubblingPageQuery::execute"
+                    ],
+                    "analyzed": true,
+                    "certainty": {
+                        "ttl": "known",
+                        "visibility": "known",
+                        "tags": "known"
+                    },
+                    "analysis": {
+                        "ttl": [],
+                        "visibility": [],
+                        "tags": [],
+                        "ttlReference": null,
+                        "visibilityReference": null,
+                        "tagsReference": null
+                    },
+                    "ttl": {
+                        "state": "known",
+                        "seconds": 120,
+                        "lowerBound": null,
+                        "upperBound": null,
+                        "reason": "inherited from BubblingPageQuery::execute"
+                    },
+                    "visibility": "private",
+                    "visibilityUnknown": false,
+                    "tags": [
+                        "page"
+                    ],
+                    "tagsUnknown": false,
+                    "expirationConstraints": [],
+                    "storable": true,
+                    "problems": []
+                }
+            ],
+            "diagnostics": [],
+            "analysisGaps": [],
+            "dependencies": [
+                {
+                    "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\BubblingPageQuery::execute",
+                    "kind": "boundary",
+                    "declared": true,
+                    "execution": "observed",
+                    "returnType": "Magix\\Cache\\Cached",
+                    "parameters": [
+                        {
+                            "name": "productId",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        },
+                        {
+                            "name": "viewerId",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "variadic": false,
+                            "optional": false,
+                            "configuration": null
+                        }
+                    ],
+                    "hasDynamicTtl": false,
+                    "useStrategy": null,
+                    "via": [],
+                    "calls": [
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Project\\BubblingPageQuery::cached",
+                            "line": 34,
+                            "candidates": [],
+                            "resolution": "operation",
+                            "method": "cached"
+                        },
+                        {
+                            "target": "Tests\\Package\\Cli\\Fixture\\Project\\ProductPageQuery::execute",
+                            "line": 34,
+                            "candidates": [
+                                "Tests\\Package\\Cli\\Fixture\\Project\\ProductPageQuery::execute"
+                            ],
+                            "resolution": "resolved",
+                            "method": "execute"
+                        }
+                    ],
+                    "file": "packages/magix-cache-cli/tests/Fixture/Project/BubblingPageQuery.php",
+                    "line": 32,
+                    "policy": {
+                        "source": "ClassAttribute",
+                        "ttl": "Ttl::Auto",
+                        "ttlUnknown": false,
+                        "tagsUnknown": false,
+                        "visibilityUnknown": false,
+                        "tags": null,
+                        "visibility": null,
+                        "version": "1",
+                        "runtime": "default"
+                    },
+                    "key": [
+                        {
+                            "name": "productId",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        },
+                        {
+                            "name": "viewerId",
+                            "type": "int",
+                            "ignored": false,
+                            "scope": null,
+                            "reducer": null,
+                            "configuration": null
+                        }
+                    ],
+                    "strategy": null,
+                    "effective": {
+                        "ttl": {
+                            "state": "known",
+                            "seconds": 120,
+                            "lowerBound": null,
+                            "upperBound": null,
+                            "reason": "inherited from ProductPageQuery::execute"
+                        },
+                        "visibility": "private",
+                        "visibilityReason": "inherited from ProductPageQuery::execute",
+                        "visibilityUnknown": false,
+                        "tagsUnknown": false,
+                        "storable": true,
+                        "tags": [
+                            "page"
+                        ],
+                        "problems": [],
+                        "certainty": {
+                            "ttl": "known",
+                            "visibility": "known",
+                            "tags": "known"
+                        },
+                        "analysis": {
+                            "ttl": [],
+                            "visibility": [],
+                            "tags": [],
+                            "ttlReference": null,
+                            "visibilityReference": null,
+                            "tagsReference": null
+                        },
+                        "storage": "yes",
+                        "localOverrides": []
+                    },
+                    "composed": null,
+                    "notes": [],
+                    "metadataAlternatives": [
+                        {
+                            "sources": [
+                                "ProductPageQuery::execute"
+                            ],
+                            "analyzed": true,
+                            "certainty": {
+                                "ttl": "known",
+                                "visibility": "known",
+                                "tags": "known"
+                            },
+                            "analysis": {
+                                "ttl": [],
+                                "visibility": [],
+                                "tags": [],
+                                "ttlReference": null,
+                                "visibilityReference": null,
+                                "tagsReference": null
+                            },
+                            "ttl": {
+                                "state": "known",
+                                "seconds": 120,
+                                "lowerBound": null,
+                                "upperBound": null,
+                                "reason": "inherited from ProductPageQuery::execute"
+                            },
+                            "visibility": "private",
+                            "visibilityUnknown": false,
+                            "tags": [
+                                "page"
+                            ],
+                            "tagsUnknown": false,
+                            "expirationConstraints": [],
+                            "storable": true,
+                            "problems": []
+                        }
+                    ],
+                    "diagnostics": [],
+                    "analysisGaps": [],
+                    "dependencies": [
+                        {
+                            "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\ProductPageQuery::execute",
+                            "kind": "boundary",
+                            "declared": true,
+                            "execution": "observed",
+                            "returnType": "Magix\\Cache\\Cached",
+                            "parameters": [
+                                {
+                                    "name": "productId",
+                                    "type": "int",
+                                    "ignored": false,
+                                    "scope": null,
+                                    "reducer": null,
+                                    "variadic": false,
+                                    "optional": false,
+                                    "configuration": null
+                                },
+                                {
+                                    "name": "viewerId",
+                                    "type": "int",
+                                    "ignored": false,
+                                    "scope": null,
+                                    "reducer": null,
+                                    "variadic": false,
+                                    "optional": false,
+                                    "configuration": null
+                                },
+                                {
+                                    "name": "trace",
+                                    "type": "string",
+                                    "ignored": true,
+                                    "scope": null,
+                                    "reducer": null,
+                                    "variadic": false,
+                                    "optional": true,
+                                    "configuration": null
+                                }
+                            ],
+                            "hasDynamicTtl": false,
+                            "useStrategy": null,
+                            "via": [],
+                            "calls": [
+                                {
+                                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\ProductPageQuery::cached",
+                                    "line": 41,
+                                    "candidates": [],
+                                    "resolution": "operation",
+                                    "method": "cached"
+                                },
+                                {
+                                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\ProductQuery::execute",
+                                    "line": 42,
+                                    "candidates": [
+                                        "Tests\\Package\\Cli\\Fixture\\Project\\ProductQuery::execute"
+                                    ],
+                                    "resolution": "resolved",
+                                    "method": "execute"
+                                },
+                                {
+                                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\InventoryQuery::execute",
+                                    "line": 43,
+                                    "candidates": [
+                                        "Tests\\Package\\Cli\\Fixture\\Project\\InventoryQuery::execute"
+                                    ],
+                                    "resolution": "resolved",
+                                    "method": "execute"
+                                },
+                                {
+                                    "target": "Tests\\Package\\Cli\\Fixture\\Project\\ViewerQuery::execute",
+                                    "line": 44,
+                                    "candidates": [
+                                        "Tests\\Package\\Cli\\Fixture\\Project\\ViewerQuery::execute"
+                                    ],
+                                    "resolution": "resolved",
+                                    "method": "execute"
+                                },
+                                {
+                                    "target": null,
+                                    "line": 46,
+                                    "candidates": [],
+                                    "resolution": "unresolved",
+                                    "method": "map"
+                                },
+                                {
+                                    "target": null,
+                                    "line": 46,
+                                    "candidates": [],
+                                    "resolution": "unresolved",
+                                    "method": "combine3"
+                                }
+                            ],
+                            "file": "packages/magix-cache-cli/tests/Fixture/Project/ProductPageQuery.php",
+                            "line": 34,
+                            "policy": {
+                                "source": "MethodAttribute",
+                                "ttl": "120s",
+                                "ttlUnknown": false,
+                                "tagsUnknown": false,
+                                "visibilityUnknown": false,
+                                "tags": [
+                                    "page"
+                                ],
+                                "visibility": null,
+                                "version": "1",
+                                "runtime": "default"
+                            },
+                            "key": [
+                                {
+                                    "name": "productId",
+                                    "type": "int",
+                                    "ignored": false,
+                                    "scope": null,
+                                    "reducer": null,
+                                    "configuration": null
+                                },
+                                {
+                                    "name": "viewerId",
+                                    "type": "int",
+                                    "ignored": false,
+                                    "scope": null,
+                                    "reducer": null,
+                                    "configuration": null
+                                },
+                                {
+                                    "name": "trace",
+                                    "type": "string",
+                                    "ignored": true,
+                                    "scope": null,
+                                    "reducer": null,
+                                    "configuration": null
+                                }
+                            ],
+                            "strategy": null,
+                            "effective": {
+                                "ttl": {
+                                    "state": "known",
+                                    "seconds": 120,
+                                    "lowerBound": null,
+                                    "upperBound": null,
+                                    "reason": null
+                                },
+                                "visibility": "private",
+                                "visibilityReason": "inherited from ViewerQuery::execute",
+                                "visibilityUnknown": false,
+                                "tagsUnknown": false,
+                                "storable": true,
+                                "tags": [
+                                    "page"
+                                ],
+                                "problems": [],
+                                "certainty": {
+                                    "ttl": "known",
+                                    "visibility": "known",
+                                    "tags": "known"
+                                },
+                                "analysis": {
+                                    "ttl": [],
+                                    "visibility": [],
+                                    "tags": [],
+                                    "ttlReference": null,
+                                    "visibilityReference": null,
+                                    "tagsReference": null
+                                },
+                                "storage": "yes",
+                                "localOverrides": {
+                                    "ttl": "local ttl 120s; composed 20s",
+                                    "tags": "local tags replace inherited tags"
+                                }
+                            },
+                            "composed": null,
+                            "notes": [],
+                            "metadataAlternatives": [
+                                {
+                                    "sources": [
+                                        "ProductQuery::execute",
+                                        "InventoryQuery::execute",
+                                        "ViewerQuery::execute"
+                                    ],
+                                    "analyzed": true,
+                                    "certainty": {
+                                        "ttl": "known",
+                                        "visibility": "known",
+                                        "tags": "known"
+                                    },
+                                    "analysis": {
+                                        "ttl": [],
+                                        "visibility": [],
+                                        "tags": [],
+                                        "ttlReference": null,
+                                        "visibilityReference": null,
+                                        "tagsReference": null
+                                    },
+                                    "ttl": {
+                                        "state": "known",
+                                        "seconds": 120,
+                                        "lowerBound": null,
+                                        "upperBound": null,
+                                        "reason": null
+                                    },
+                                    "visibility": "private",
+                                    "visibilityUnknown": false,
+                                    "tags": [
+                                        "page"
+                                    ],
+                                    "tagsUnknown": false,
+                                    "expirationConstraints": [],
+                                    "storable": true,
+                                    "problems": []
+                                }
+                            ],
+                            "diagnostics": [],
+                            "analysisGaps": [],
+                            "dependencies": [
+                                {
+                                    "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\ProductQuery::execute",
+                                    "kind": "boundary",
+                                    "declared": true,
+                                    "execution": "observed",
+                                    "returnType": "Magix\\Cache\\Cached",
+                                    "parameters": [
+                                        {
+                                            "name": "productId",
+                                            "type": "int",
+                                            "ignored": false,
+                                            "scope": null,
+                                            "reducer": null,
+                                            "variadic": false,
+                                            "optional": false,
+                                            "configuration": null
+                                        }
+                                    ],
+                                    "hasDynamicTtl": false,
+                                    "useStrategy": null,
+                                    "via": [],
+                                    "calls": [
+                                        {
+                                            "target": "Tests\\Package\\Cli\\Fixture\\Project\\ProductQuery::cached",
+                                            "line": 26,
+                                            "candidates": [],
+                                            "resolution": "operation",
+                                            "method": "cached"
+                                        },
+                                        {
+                                            "target": "Magix\\Cache\\Cached::of",
+                                            "line": 26,
+                                            "candidates": [],
+                                            "resolution": "operation",
+                                            "method": "of"
+                                        }
+                                    ],
+                                    "file": "packages/magix-cache-cli/tests/Fixture/Project/ProductQuery.php",
+                                    "line": 23,
+                                    "policy": {
+                                        "source": "MethodAttribute",
+                                        "ttl": "20s",
+                                        "ttlUnknown": false,
+                                        "tagsUnknown": false,
+                                        "visibilityUnknown": false,
+                                        "tags": [
+                                            "product"
+                                        ],
+                                        "visibility": null,
+                                        "version": "1",
+                                        "runtime": "default"
+                                    },
+                                    "key": [
+                                        {
+                                            "name": "productId",
+                                            "type": "int",
+                                            "ignored": false,
+                                            "scope": null,
+                                            "reducer": null,
+                                            "configuration": null
+                                        }
+                                    ],
+                                    "strategy": null,
+                                    "effective": {
+                                        "ttl": {
+                                            "state": "known",
+                                            "seconds": 20,
+                                            "lowerBound": null,
+                                            "upperBound": null,
+                                            "reason": null
+                                        },
+                                        "visibility": "shared",
+                                        "visibilityReason": null,
+                                        "visibilityUnknown": false,
+                                        "tagsUnknown": false,
+                                        "storable": true,
+                                        "tags": [
+                                            "product"
+                                        ],
+                                        "problems": [],
+                                        "certainty": {
+                                            "ttl": "known",
+                                            "visibility": "known",
+                                            "tags": "known"
+                                        },
+                                        "analysis": {
+                                            "ttl": [],
+                                            "visibility": [],
+                                            "tags": [],
+                                            "ttlReference": null,
+                                            "visibilityReference": null,
+                                            "tagsReference": null
+                                        },
+                                        "storage": "yes",
+                                        "localOverrides": []
+                                    },
+                                    "composed": null,
+                                    "notes": [],
+                                    "metadataAlternatives": [
+                                        {
+                                            "sources": [],
+                                            "analyzed": true,
+                                            "certainty": {
+                                                "ttl": "known",
+                                                "visibility": "known",
+                                                "tags": "known"
+                                            },
+                                            "analysis": {
+                                                "ttl": [],
+                                                "visibility": [],
+                                                "tags": [],
+                                                "ttlReference": null,
+                                                "visibilityReference": null,
+                                                "tagsReference": null
+                                            },
+                                            "ttl": {
+                                                "state": "known",
+                                                "seconds": 20,
+                                                "lowerBound": null,
+                                                "upperBound": null,
+                                                "reason": null
+                                            },
+                                            "visibility": "shared",
+                                            "visibilityUnknown": false,
+                                            "tags": [
+                                                "product"
+                                            ],
+                                            "tagsUnknown": false,
+                                            "expirationConstraints": [],
+                                            "storable": true,
+                                            "problems": []
+                                        }
+                                    ],
+                                    "diagnostics": [],
+                                    "analysisGaps": [],
+                                    "dependencies": []
+                                },
+                                {
+                                    "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\InventoryQuery::execute",
+                                    "kind": "boundary",
+                                    "declared": true,
+                                    "execution": "observed",
+                                    "returnType": "Magix\\Cache\\Cached",
+                                    "parameters": [
+                                        {
+                                            "name": "productId",
+                                            "type": "int",
+                                            "ignored": false,
+                                            "scope": null,
+                                            "reducer": null,
+                                            "variadic": false,
+                                            "optional": false,
+                                            "configuration": null
+                                        }
+                                    ],
+                                    "hasDynamicTtl": false,
+                                    "useStrategy": null,
+                                    "via": [],
+                                    "calls": [
+                                        {
+                                            "target": "Tests\\Package\\Cli\\Fixture\\Project\\InventoryQuery::cached",
+                                            "line": 29,
+                                            "candidates": [],
+                                            "resolution": "operation",
+                                            "method": "cached"
+                                        },
+                                        {
+                                            "target": "Magix\\Cache\\Cached::of",
+                                            "line": 29,
+                                            "candidates": [],
+                                            "resolution": "operation",
+                                            "method": "of"
+                                        }
+                                    ],
+                                    "file": "packages/magix-cache-cli/tests/Fixture/Project/InventoryQuery.php",
+                                    "line": 25,
+                                    "policy": {
+                                        "source": "MethodAttribute",
+                                        "ttl": "60s",
+                                        "ttlUnknown": false,
+                                        "tagsUnknown": false,
+                                        "visibilityUnknown": false,
+                                        "tags": [
+                                            "inventory"
+                                        ],
+                                        "visibility": null,
+                                        "version": "1",
+                                        "runtime": "default"
+                                    },
+                                    "key": [
+                                        {
+                                            "name": "productId",
+                                            "type": "int",
+                                            "ignored": false,
+                                            "scope": null,
+                                            "reducer": null,
+                                            "configuration": null
+                                        }
+                                    ],
+                                    "strategy": null,
+                                    "effective": {
+                                        "ttl": {
+                                            "state": "known",
+                                            "seconds": 60,
+                                            "lowerBound": null,
+                                            "upperBound": null,
+                                            "reason": null
+                                        },
+                                        "visibility": "shared",
+                                        "visibilityReason": null,
+                                        "visibilityUnknown": false,
+                                        "tagsUnknown": false,
+                                        "storable": true,
+                                        "tags": [
+                                            "inventory"
+                                        ],
+                                        "problems": [],
+                                        "certainty": {
+                                            "ttl": "known",
+                                            "visibility": "known",
+                                            "tags": "known"
+                                        },
+                                        "analysis": {
+                                            "ttl": [],
+                                            "visibility": [],
+                                            "tags": [],
+                                            "ttlReference": null,
+                                            "visibilityReference": null,
+                                            "tagsReference": null
+                                        },
+                                        "storage": "yes",
+                                        "localOverrides": []
+                                    },
+                                    "composed": null,
+                                    "notes": [],
+                                    "metadataAlternatives": [
+                                        {
+                                            "sources": [],
+                                            "analyzed": true,
+                                            "certainty": {
+                                                "ttl": "known",
+                                                "visibility": "known",
+                                                "tags": "known"
+                                            },
+                                            "analysis": {
+                                                "ttl": [],
+                                                "visibility": [],
+                                                "tags": [],
+                                                "ttlReference": null,
+                                                "visibilityReference": null,
+                                                "tagsReference": null
+                                            },
+                                            "ttl": {
+                                                "state": "known",
+                                                "seconds": 60,
+                                                "lowerBound": null,
+                                                "upperBound": null,
+                                                "reason": null
+                                            },
+                                            "visibility": "shared",
+                                            "visibilityUnknown": false,
+                                            "tags": [
+                                                "inventory"
+                                            ],
+                                            "tagsUnknown": false,
+                                            "expirationConstraints": [],
+                                            "storable": true,
+                                            "problems": []
+                                        }
+                                    ],
+                                    "diagnostics": [],
+                                    "analysisGaps": [],
+                                    "dependencies": []
+                                },
+                                {
+                                    "boundary": "Tests\\Package\\Cli\\Fixture\\Project\\ViewerQuery::execute",
+                                    "kind": "boundary",
+                                    "declared": true,
+                                    "execution": "observed",
+                                    "returnType": "Magix\\Cache\\Cached",
+                                    "parameters": [
+                                        {
+                                            "name": "viewerId",
+                                            "type": "int",
+                                            "ignored": false,
+                                            "scope": 1,
+                                            "reducer": null,
+                                            "variadic": false,
+                                            "optional": false,
+                                            "configuration": null
+                                        }
+                                    ],
+                                    "hasDynamicTtl": false,
+                                    "useStrategy": null,
+                                    "via": [],
+                                    "calls": [
+                                        {
+                                            "target": "Tests\\Package\\Cli\\Fixture\\Project\\ViewerQuery::cached",
+                                            "line": 30,
+                                            "candidates": [],
+                                            "resolution": "operation",
+                                            "method": "cached"
+                                        },
+                                        {
+                                            "target": "Magix\\Cache\\Cached::of",
+                                            "line": 30,
+                                            "candidates": [],
+                                            "resolution": "operation",
+                                            "method": "of"
+                                        }
+                                    ],
+                                    "file": "packages/magix-cache-cli/tests/Fixture/Project/ViewerQuery.php",
+                                    "line": 25,
+                                    "policy": {
+                                        "source": "MethodAttribute",
+                                        "ttl": "30s",
+                                        "ttlUnknown": false,
+                                        "tagsUnknown": false,
+                                        "visibilityUnknown": false,
+                                        "tags": [
+                                            "viewer"
+                                        ],
+                                        "visibility": null,
+                                        "version": "1",
+                                        "runtime": "default"
+                                    },
+                                    "key": [
+                                        {
+                                            "name": "viewerId",
+                                            "type": "int",
+                                            "ignored": false,
+                                            "scope": "private",
+                                            "reducer": null,
+                                            "configuration": null
+                                        }
+                                    ],
+                                    "strategy": null,
+                                    "effective": {
+                                        "ttl": {
+                                            "state": "known",
+                                            "seconds": 30,
+                                            "lowerBound": null,
+                                            "upperBound": null,
+                                            "reason": null
+                                        },
+                                        "visibility": "private",
+                                        "visibilityReason": "declared by a scoped parameter",
+                                        "visibilityUnknown": false,
+                                        "tagsUnknown": false,
+                                        "storable": true,
+                                        "tags": [
+                                            "viewer"
+                                        ],
+                                        "problems": [],
+                                        "certainty": {
+                                            "ttl": "known",
+                                            "visibility": "known",
+                                            "tags": "known"
+                                        },
+                                        "analysis": {
+                                            "ttl": [],
+                                            "visibility": [],
+                                            "tags": [],
+                                            "ttlReference": null,
+                                            "visibilityReference": null,
+                                            "tagsReference": null
+                                        },
+                                        "storage": "yes",
+                                        "localOverrides": []
+                                    },
+                                    "composed": null,
+                                    "notes": [],
+                                    "metadataAlternatives": [
+                                        {
+                                            "sources": [],
+                                            "analyzed": true,
+                                            "certainty": {
+                                                "ttl": "known",
+                                                "visibility": "known",
+                                                "tags": "known"
+                                            },
+                                            "analysis": {
+                                                "ttl": [],
+                                                "visibility": [],
+                                                "tags": [],
+                                                "ttlReference": null,
+                                                "visibilityReference": null,
+                                                "tagsReference": null
+                                            },
+                                            "ttl": {
+                                                "state": "known",
+                                                "seconds": 30,
+                                                "lowerBound": null,
+                                                "upperBound": null,
+                                                "reason": null
+                                            },
+                                            "visibility": "private",
+                                            "visibilityUnknown": false,
+                                            "tags": [
+                                                "viewer"
+                                            ],
+                                            "tagsUnknown": false,
+                                            "expirationConstraints": [],
+                                            "storable": true,
+                                            "problems": []
+                                        }
+                                    ],
+                                    "diagnostics": [],
+                                    "analysisGaps": [],
+                                    "dependencies": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "diagnostics": []
+}

@@ -1,0 +1,12 @@
+[90;1mProductController::__construct[39;22m[90m (uncached)[39m
+[90;1mProductController::index[39;22m[90m (uncached)  composes ttl 20s  private  tags inventory,product,viewer[39m
+|-- [37;1mProductQuery::execute[39;22m[37m  ttl 20s  shared  tags product[39m
+|-- [37;1mInventoryQuery::execute[39;22m[37m  ttl 60s  shared  tags inventory[39m
+`-- [37;1mViewerQuery::execute[39;22m[37m  ttl 30s  private  tags viewer[39m
+[90;1mProductController::injected[39;22m[90m (uncached)  composes ttl 20s  shared  tags inventory,product[39m
+|-- [37;1mProductQuery::execute[39;22m[37m  ttl 20s  shared  tags product[39m
+`-- [37;1mInventoryQuery::execute[39;22m[37m  ttl 60s  shared  tags inventory[39m
+[90;1mProductController::show[39;22m[90m (uncached)  composes ttl 20s  private  tags inventory,product,viewer[39m
+|-- [37;1mProductQuery::execute[39;22m[37m  ttl 20s  shared  tags product[39m
+|-- [37;1mInventoryQuery::execute[39;22m[37m  ttl 60s  shared  tags inventory[39m
+`-- [37;1mViewerQuery::execute[39;22m[37m  ttl 30s  private  tags viewer[39m

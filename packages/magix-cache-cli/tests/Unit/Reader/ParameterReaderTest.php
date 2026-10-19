@@ -37,6 +37,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(LiteralReader::class)]
 #[UsesClass(TypeReader::class)]
 #[UsesClass(\Magix\Cache\Cli\Reader\ParameterConfigurationReader::class)]
+#[UsesClass(\Magix\Cache\Cli\Reader\ExpressionDeriver::class)]
 final class ParameterReaderTest extends TestCase
 {
     public function testReadDescribesEveryParameterOfABoundary(): void

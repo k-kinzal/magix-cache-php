@@ -1,0 +1,139 @@
+diff --git a/packages/magix-cache-cli/src/Reader/ExpressionDeriver.php b/packages/magix-cache-cli/src/Reader/ExpressionDeriver.php
+index 0b0f3a2e..ee0326ba 100644
+--- a/packages/magix-cache-cli/src/Reader/ExpressionDeriver.php
++++ b/packages/magix-cache-cli/src/Reader/ExpressionDeriver.php
+@@ -4,16 +4,14 @@ declare(strict_types=1);
+
+ namespace Magix\Cache\Cli\Reader;
+
+-use Deriver\Analyzer;
+-use Deriver\Project\Configuration;
+-use Deriver\Project\EntryPoint;
+-use Deriver\Project\ProjectInput;
+-use Deriver\Project\SourceFile;
+-use Deriver\Project\TargetProfile;
+-use Deriver\Query\QueryScope;
+-use Deriver\Query\ReturnQuery;
+-use Deriver\Value\Term;
+-use JsonException;
++use Deriver\Deriver;
++use Deriver\Deriver\BranchEvaluators;
++use Deriver\Deriver\Candidate\CandidateStatus;
++use Deriver\Deriver\DeriverConfig;
++use Deriver\Deriver\EvaluationOperation;
++use Deriver\Deriver\Evaluator\Term;
++use Deriver\Deriver\MicroEvaluator;
++use Deriver\Exception\CollectorException;
+ use PhpParser\Node\Expr;
+ use PhpParser\Node\Expr\Variable;
+ use PhpParser\Node\Param;
+@@ -22,26 +20,14 @@ use PhpParser\Node\Stmt\Return_;
+ use PhpParser\PrettyPrinter\Standard;
+
+ /**
+- * Derives values in an explicit source world without running application code.
+- *
+- * Only a complete singleton concrete candidate can become a declaration value.
+- * Callers supply admitted expressions or generated alias graphs with explicit
+- * inputs. Candidate coverage does not establish application reachability.
++ * Migration experiment using the latest public source-candidate API.
++ * This is evaluated in isolation; the official dependency constraints conflict.
+  */
+ final readonly class ExpressionDeriver
+ {
+     /**
+-     * Shares Deriver's bounded source caches across expressions read together.
+-     */
+-    public function __construct(private Analyzer $analyzer = new Analyzer())
+-    {
+-    }
+-
+-    /**
+-     * Evaluates one admitted expression with explicit scalar inputs.
+-     *
++     * Derives an admitted expression with explicit immutable scalar inputs.
+      * @param array<string, int|float|string|bool|null> $bindings
+-     * @return mixed Concrete value, or LiteralReader::UNRESOLVED unless the candidate set is a complete concrete singleton.
+      */
+     public function value(Expr $expression, array $bindings = []): mixed
+     {
+@@ -55,40 +41,38 @@ final readonly class ExpressionDeriver
+     }
+
+     /**
+-     * Reads a concrete return from generated, isolated analysis source.
+-     *
+-     * This selects value dependencies, not ordered execution of arbitrary PHP.
+-     * Unrelated calls do not affect the candidate set.
+-     *
+-     * @param list<Term> $arguments Explicit inputs; use symbolic terms for unknown inputs, including those with defaults.
+-     * @return mixed Concrete value, or LiteralReader::UNRESOLVED for partial, exceptional, multiple or non-concrete candidates.
++     * Selects a complete singleton candidate from generated source.
++     * @param list<Term> $arguments Explicit inputs, including symbolic terms.
+      */
+     public function source(string $source, array $arguments = []): mixed
+     {
+-        try {
+-            $session = $this->analyzer->open(
+-                new ProjectInput([new SourceFile('expression.php', $source)]),
+-                new Configuration(new TargetProfile(floatPrecision: (int) ini_get('precision'))),
+-            );
+-        } catch (JsonException) {
++        $evaluators = BranchEvaluators::truth();
++        $inputs = [];
++        foreach ($arguments as $index => $argument) {
++            $name = '__magix_input'.$index;
++            $source .= ' function '.$name.'() {}';
++            $inputs[] = $name.'()';
++            $evaluators[] = new MicroEvaluator('magix.input.'.$index, '1', EvaluationOperation::Function, $name, static fn (): Term => $argument);
++        }
++        $source .= ' function __magix_entry() { return resolve('.implode(', ', $inputs).'); }';
++        $path = tempnam(sys_get_temp_dir(), 'magix-deriver-');
++        if ($path === false) {
+             return LiteralReader::UNRESOLVED;
+         }
+-
+-        $result = $session->derive(new ReturnQuery('resolve', QueryScope::fromEntrypoints([
+-            new EntryPoint('resolve', $arguments),
+-        ])));
+-
+-        if ($result->contract !== 'candidates'
+-            || $result->assessment->closure !== 'closed'
+-            || $result->assessment->precision !== 'exact-symbolic'
+-            || $result->assessment->correlation !== 'preserved'
+-            || $result->assessment->enumeration !== 'finite-exhaustive'
+-            || $result->assessment->coverage !== 'source-candidates') {
++        try {
++            if (file_put_contents($path, $source) === false) {
++                return LiteralReader::UNRESOLVED;
++            }
++            $deriver = Deriver::prepare([$path], new DeriverConfig(floatPrecision: (int) ini_get('precision'), evaluators: $evaluators));
++            $result = $deriver->derive('__magix_entry -> resolve#return');
++            if ($result->interrupted || count($result) !== 1 || $result[0]->type !== CandidateStatus::Analyzed) {
++                return LiteralReader::UNRESOLVED;
++            }
++            return $result[0]->result;
++        } catch (CollectorException) {
+             return LiteralReader::UNRESOLVED;
++        } finally {
++            unlink($path);
+         }
+-
+-        $value = $result->definite()?->values['return'] ?? null;
+-
+-        return $value !== null ? $value->native() : LiteralReader::UNRESOLVED;
+     }
+ }
+diff --git a/packages/magix-cache-cli/tests/Unit/Reader/ExpressionDeriverTest.php b/packages/magix-cache-cli/tests/Unit/Reader/ExpressionDeriverTest.php
+index 21b45296..264ae532 100644
+--- a/packages/magix-cache-cli/tests/Unit/Reader/ExpressionDeriverTest.php
++++ b/packages/magix-cache-cli/tests/Unit/Reader/ExpressionDeriverTest.php
+@@ -4,7 +4,7 @@ declare(strict_types=1);
+
+ namespace Tests\Package\Cli\Unit\Reader;
+
+-use Deriver\Value\Term;
++use Deriver\Deriver\Evaluator\Term;
+ use Magix\Cache\Cli\Reader\ExpressionDeriver;
+ use Magix\Cache\Cli\Reader\LiteralReader;
+ use PhpParser\Node\Expr\BinaryOp\Plus;

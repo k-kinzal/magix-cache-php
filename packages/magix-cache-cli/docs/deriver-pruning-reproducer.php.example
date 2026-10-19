@@ -1,0 +1,146 @@
+<?php
+
+declare(strict_types=1);
+
+use Composer\InstalledVersions;
+use Deriver\Deriver;
+use Deriver\Deriver\BranchEvaluators;
+use Deriver\Deriver\Candidate\CandidateCollection;
+use Deriver\Deriver\DeriverConfig;
+use Deriver\Deriver\EvaluationOperation;
+use Deriver\Deriver\Evaluator\Term;
+use Deriver\Deriver\MicroEvaluator;
+use Deriver\Reporter\JsonReporter;
+
+// Supply the isolated installation's autoloader; the host project may use an older API.
+require $argv[1];
+
+/**
+ * Keeps public report data and work counters for a reproducible query.
+ * @return array<string, mixed>
+ */
+function report(CandidateCollection $result): array
+{
+    $raw = json_decode((new JsonReporter())->report($result), true, flags: JSON_THROW_ON_ERROR);
+    return ['statistics' => $result->statistics, ...$raw];
+}
+
+$cases = [
+    'literal' => '<?php function resolve(){return 30;}',
+    'dynamic-branch' => '<?php function resolve(bool $flag){return $flag ? 30 : 60;}',
+    'same-branch' => '<?php function resolve(bool $flag){return $flag ? 30 : 30;}',
+    'throw-branch' => '<?php function resolve(bool $flag){if($flag){throw new RuntimeException();}return 30;}',
+    'throw-expression' => '<?php function resolve(bool $flag){return $flag ? throw new RuntimeException() : 30;}',
+    'only-throw' => '<?php function resolve(){throw new RuntimeException();}',
+    'unrelated-call' => '<?php function resolve(){unknown();return 30;}',
+    'dependent-call' => '<?php function resolve(){return unknown();}',
+    'missing-variable' => '<?php function resolve(){return $missing;}',
+    'dynamic-array' => '<?php function resolve($input){return ["head", $input, "tail"] ;}',
+    'dynamic-addition' => '<?php function resolve(int $input){return 5+$input;}',
+    'input-default' => '<?php function resolve(int $input=30){return $input;}',
+    'request-input' => '<?php function resolve(){return "id:".$_GET["id"] ;}',
+    'environment-input' => '<?php function resolve(){return getenv("TTL");}',
+    'known-callers' => '<?php function resolve(int $input){return $input+5;} function a(){return resolve(30);}function b(){return resolve(60);}',
+    'property-origins' => '<?php class Repo {private $table="users";function archive(){$this->table="archive";}function sql(){return $this->table;}}function resolve(){return (new Repo)->sql();}',
+    'branch-correlation' => '<?php function resolve($flag){if($flag){$ttl=30;$tag="a";}else{$ttl=60;$tag="b";}return [$ttl,$tag];}',
+    'alias-correlation' => '<?php function resolve($flag){$ttl=$flag?30:60;$same=$ttl;return $ttl-$same;}',
+    'dead-branch' => '<?php function resolve(){if(false){return unknown();}return 30;}',
+    'finite-loop' => '<?php function resolve(){$sum=0;for($i=0;$i<10;$i++){$sum+=$i;}return $sum;}',
+    'finite-recursion' => '<?php function countDown($n){if($n===0){return 0;}$n-=1;return 1+countDown($n);}function resolve(){return countDown(8);}',
+    'integer-shift' => '<?php function resolve(){return 1<<-1;}',
+    'divide-zero' => '<?php function resolve(){return 1/0;}',
+    'static-helper' => '<?php function helper(){return 30;}function resolve(){return helper()+5;}',
+    'catch-statement' => '<?php function resolve(){try{throw new RuntimeException();}catch(RuntimeException $e){return 60;}}',
+    'catch-expression' => '<?php function resolve(){try{return throw new RuntimeException();}catch(RuntimeException $e){return 60;}}',
+    'catch-arithmetic' => '<?php function resolve(){try{return 1/0;}catch(DivisionByZeroError $e){return 60;}}',
+    'try-followed-by-return' => '<?php function resolve(){try{$ttl=30;}catch(RuntimeException $e){$ttl=60;}return $ttl;}',
+    'finally-followed-by-return' => '<?php function resolve(){try{$ttl=30;}finally{}return $ttl;}',
+    'incomplete-branch' => '<?php function resolve($flag,$input){return $flag?30:5+$input;}',
+    'literal-false-branch' => '<?php function resolve(){return false?30:60;}',
+    'unknown-boolean-with-known-alternative' => '<?php function resolve($input){$condition=$input?true:$_GET["flag"];return $condition?30:60;}',
+    'zero-loop' => '<?php function resolve(){$v=0;for($i=0;$i<0;$i++){$v=$i===0?11:27;}return $v;}',
+    'one-loop' => '<?php function resolve(){$v=0;for($i=0;$i<1;$i++){$v=$i===0?11:27;}return $v;}',
+    'two-loop' => '<?php function resolve(){$v=0;for($i=0;$i<2;$i++){$v=$i===0?11:27;}return $v;}',
+    'many-loop' => '<?php function resolve(){$v=0;for($i=0;$i<10000;$i++){$v=$i===0?11:27;}return $v;}',
+];
+$report = [
+    'deriver' => InstalledVersions::getReference('k-kinzal/deriver'),
+    'console' => InstalledVersions::getPrettyVersion('symfony/console'),
+    'php' => PHP_VERSION,
+    'cases' => [],
+    'paths' => [],
+];
+foreach ($cases as $name => $source) {
+    $path = tempnam(sys_get_temp_dir(), 'deriver-source-');
+    file_put_contents($path, $source);
+    try {
+        $report['cases'][$name]['source'] = $source;
+        foreach ([false, true] as $pruning) {
+            $deriver = Deriver::prepare([$path], new DeriverConfig(floatPrecision: 14, evaluators: $pruning ? BranchEvaluators::truth() : []));
+            $report['cases'][$name][$pruning ? 'pruned' : 'structural'] = report($deriver->derive('resolve#return'));
+        }
+    } finally {
+        unlink($path);
+    }
+}
+
+$source = <<<'PHP'
+<?php
+function ttl($flag, $unused) { return $flag ? 30 : 60; }
+function bridge($flag) { return ttl($flag, expensive()); }
+function page() { return bridge(true); }
+function other() { return bridge(false); }
+function unrelated() { return 0; }
+function constantTtl() { return 7; }
+function hidden() { if (false) { constantTtl(); } }
+function dynamic($callee) { return $callee(true, expensive()); }
+function pair($left, $right) { return $left . $right; }
+function pairs() { pair('a', 'b'); pair('c', 'd'); }
+function foreign() { pair(expensive(), expensive()); }
+final class CacheQuery {
+    public function execute($ttl, $tag) { return [$ttl, $tag]; }
+}
+final class Endpoint {
+    public function show() { return (new CacheQuery())->execute(30, 'product'); }
+    public function preview() { return (new CacheQuery())->execute(60, 'draft'); }
+}
+PHP;
+$path = tempnam(sys_get_temp_dir(), 'deriver-path-');
+file_put_contents($path, $source);
+try {
+    $report['pathSource'] = $source;
+    foreach ([false, true] as $pruning) {
+        $opened = 0;
+        $expensive = new MicroEvaluator('probe.expensive', '1', EvaluationOperation::Function, 'expensive', static function () use (&$opened): Term {
+            ++$opened;
+            return Term::constant('costly');
+        });
+        $deriver = Deriver::prepare([$path], new DeriverConfig(evaluators: [...($pruning ? BranchEvaluators::truth() : []), $expensive]));
+        foreach ([
+            'ttl#return',
+            'page -> bridge -> ttl#return',
+            'other -> ... -> ttl#return',
+            'page -> ... -> ttl#parameter(flag)',
+            'bridge -> ttl#return',
+            'page -> ttl#return',
+            'unrelated -> constantTtl#return',
+            'hidden -> constantTtl#return',
+            'dynamic -> ttl#return',
+            'pairs -> pair#return',
+            'pair#return',
+            'Endpoint::show -> CacheQuery::execute#return',
+            'Endpoint::preview -> CacheQuery::execute#return',
+            '\\endpoint::SHOW -> \\CacheQuery::EXECUTE#return',
+            'page -> bridge -> ttl#return',
+        ] as $index => $query) {
+            $opened = 0;
+            $result = $deriver->derive($query);
+            $report['paths'][$pruning ? 'pruned' : 'structural'][] = ['query' => $query, 'openedExpensive' => $opened, 'reference' => $result->reference, ...report($result)];
+        }
+        $result = $deriver->derive('constantTtl#return');
+        $report['postFilter'][$pruning ? 'pruned' : 'structural'] = report($result->forCaller('unrelated'));
+    }
+} finally {
+    unlink($path);
+}
+echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR).PHP_EOL;

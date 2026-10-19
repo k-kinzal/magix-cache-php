@@ -1,0 +1,6541 @@
+{
+  "evaluatedOn": "2026-10-19",
+  "latestEvaluatedRevision": "afc98516f758f78c6c43d96e084c040d684b3fb3",
+  "productionLockedRevision": "e59f993c3d84d23066772b85e1226a66a2d16ae6",
+  "originalMagixRevision": "688356c3",
+  "decision": "Caller pruning and exception fixes verified; latest production adoption blocked by Console constraints. API-only migration is behaviorally consistent in the characterized domain but slower.",
+  "environment": {
+    "php": "8.5.8",
+    "targetPhp": "8.3",
+    "phpParser": "5.9.0",
+    "xdebug": "disabled for measurements",
+    "cliOpcache": "disabled for Magix measurements",
+    "memoryLimit": "1G for Magix measurements",
+    "raisedDeriverBudgets": false,
+    "standalone": {
+      "deriver": "afc98516f758f78c6c43d96e084c040d684b3fb3",
+      "console": "v6.4.48",
+      "yaml": "6.4.48",
+      "upstreamModified": false
+    },
+    "apiOnlyOverlay": {
+      "console": "7.4.18",
+      "composerInstallable": false,
+      "source": "Latest Deriver PSR-4 prefix over existing Magix dependencies, plus experimental migration patch",
+      "metadataCaveat": "Raw Magix benchmark InstalledVersions output still names the retained e59f993 lock. The actual latest-mode classes are afc9851 through the recorded overlay."
+    }
+  },
+  "composerConflict": {
+    "magixConsole": "^7.4 || ^8.0",
+    "latestDeriverConsole": "^6.4",
+    "latestDeriverYaml": "^6.4",
+    "normalUpdateSucceeded": false,
+    "console6MigrationErrors": "33 frozen report cases: undefined Application::addCommand()"
+  },
+  "apiOnlyValidation": {
+    "fullTests": 3497,
+    "assertions": 22874,
+    "focusedTests": 107,
+    "focusedAssertions": 315,
+    "frozenReports": 33,
+    "literalCases": 61,
+    "numericDifferential": {
+      "cases": 3072,
+      "differences": []
+    },
+    "largeOutputs": {
+      "large-tags": {
+        "entries": 8192,
+        "fullJsonEqual": true,
+        "sha256": "908004b001638fe2f6baa879ad53e5edb8db5ff2b06f54d8ba3384dfe10921f5"
+      },
+      "negative-map": {
+        "entries": 8192,
+        "fullJsonEqual": true,
+        "sha256": "9a61c674d20ce2f651aeed0eb25ce94e580ef06ac2b38e905499f97b495984ee"
+      }
+    }
+  },
+  "sourceCases": {
+    "literal": {
+      "source": "<?php function resolve(){return 30;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.0062749385833740234,
+          "peakMemoryBytes": 6291456,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.0002281665802001953,
+          "peakMemoryBytes": 6291456,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "dynamic-branch": {
+      "source": "<?php function resolve(bool $flag){return $flag ? 30 : 60;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0008881092071533203,
+          "peakMemoryBytes": 6291456,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 0,
+          "seconds": 0.003219127655029297,
+          "peakMemoryBytes": 6291456,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$flag": 1
+          }
+        }
+      }
+    },
+    "same-branch": {
+      "source": "<?php function resolve(bool $flag){return $flag ? 30 : 30;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.00036597251892089844,
+          "peakMemoryBytes": 6291456,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 0,
+          "seconds": 0.0007040500640869141,
+          "peakMemoryBytes": 6291456,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$flag": 1
+          }
+        }
+      }
+    },
+    "throw-branch": {
+      "source": "<?php function resolve(bool $flag){if($flag){throw new RuntimeException();}return 30;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "NO_VALUE_DEFINITION"
+            ],
+            "termNodeCount": 3
+          },
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.002328157424926758,
+          "peakMemoryBytes": 6291456,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "NO_VALUE_DEFINITION"
+            ],
+            "termNodeCount": 3
+          },
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 0,
+          "seconds": 0.0007040500640869141,
+          "peakMemoryBytes": 6291456,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$flag": 1
+          }
+        }
+      }
+    },
+    "throw-expression": {
+      "source": "<?php function resolve(bool $flag){return $flag ? throw new RuntimeException() : 30;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "NO_VALUE_DEFINITION"
+            ],
+            "termNodeCount": 3
+          },
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 0,
+          "seconds": 0.00044608116149902344,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "NO_VALUE_DEFINITION"
+            ],
+            "termNodeCount": 3
+          },
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 5,
+          "graphs": 0,
+          "seconds": 0.0006380081176757812,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 5,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$flag": 1
+          }
+        }
+      }
+    },
+    "only-throw": {
+      "source": "<?php function resolve(){throw new RuntimeException();}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "NO_VALUE_DEFINITION"
+            ],
+            "termNodeCount": 3
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 2,
+          "graphs": 0,
+          "seconds": 0.0003628730773925781,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 2,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "NO_VALUE_DEFINITION"
+            ],
+            "termNodeCount": 3
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 2,
+          "graphs": 0,
+          "seconds": 0.00028204917907714844,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 2,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "unrelated-call": {
+      "source": "<?php function resolve(){unknown();return 30;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.00015783309936523438,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.00014901161193847656,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "dependent-call": {
+      "source": "<?php function resolve(){return unknown();}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "MISSING_SOURCE"
+            ],
+            "termNodeCount": 1
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.0008790493011474609,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "MISSING_SOURCE"
+            ],
+            "termNodeCount": 1
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.000186920166015625,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "missing-variable": {
+      "source": "<?php function resolve(){return $missing;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "UNRESOLVED_LOCAL"
+            ],
+            "termNodeCount": 1
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.0002009868621826172,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$missing": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "UNRESOLVED_LOCAL"
+            ],
+            "termNodeCount": 1
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.0001919269561767578,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$missing": 1
+          }
+        }
+      }
+    },
+    "dynamic-array": {
+      "source": "<?php function resolve($input){return [\"head\", $input, \"tail\"] ;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 4
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 5,
+          "graphs": 0,
+          "seconds": 0.0010449886322021484,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 5,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$input": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 4
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 5,
+          "graphs": 0,
+          "seconds": 0.00037789344787597656,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 5,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$input": 1
+          }
+        }
+      }
+    },
+    "dynamic-addition": {
+      "source": "<?php function resolve(int $input){return 5+$input;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 3
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0003190040588378906,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$input": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 3
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0002980232238769531,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$input": 1
+          }
+        }
+      }
+    },
+    "input-default": {
+      "source": "<?php function resolve(int $input=30){return $input;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 1
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.00019097328186035156,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$input": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 1
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.00019598007202148438,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$input": 1
+          }
+        }
+      }
+    },
+    "request-input": {
+      "source": "<?php function resolve(){return \"id:\".$_GET[\"id\"] ;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 6
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 0,
+          "seconds": 0.00045108795166015625,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:element-address:r3": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 6
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 0,
+          "seconds": 0.0004107952117919922,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:element-address:r3": 1
+          }
+        }
+      }
+    },
+    "environment-input": {
+      "source": "<?php function resolve(){return getenv(\"TTL\");}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 3
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 7,
+          "graphs": 0,
+          "seconds": 0.0076291561126708984,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 7,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "getenv:$name": 1,
+            "getenv:$local_only": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 3
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 7,
+          "graphs": 0,
+          "seconds": 0.0007870197296142578,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 7,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "getenv:$name": 1,
+            "getenv:$local_only": 1
+          }
+        }
+      }
+    },
+    "known-callers": {
+      "source": "<?php function resolve(int $input){return $input+5;} function a(){return resolve(30);}function b(){return resolve(60);}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 35
+          },
+          {
+            "type": "analyzed",
+            "result": 65
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 7,
+          "graphs": 0,
+          "seconds": 0.0011069774627685547,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 7,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$input": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 35
+          },
+          {
+            "type": "analyzed",
+            "result": 65
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 7,
+          "graphs": 0,
+          "seconds": 0.0006990432739257812,
+          "peakMemoryBytes": 8388608,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 7,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$input": 1
+          }
+        }
+      }
+    },
+    "property-origins": {
+      "source": "<?php class Repo {private $table=\"users\";function archive(){$this->table=\"archive\";}function sql(){return $this->table;}}function resolve(){return (new Repo)->sql();}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": "users"
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 7,
+          "graphs": 1,
+          "seconds": 0.003158092498779297,
+          "peakMemoryBytes": 10485760,
+          "referenceExpansions": 4,
+          "bodyExpansions": 1,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 2,
+          "constructedNodes": 7,
+          "expandedBodies": {
+            "Repo::sql": 1
+          },
+          "expandedReferences": {
+            "Repo::sql:field-address:r3": 1,
+            "Repo::sql:$this": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": "users"
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 7,
+          "graphs": 1,
+          "seconds": 0.0007228851318359375,
+          "peakMemoryBytes": 10485760,
+          "referenceExpansions": 4,
+          "bodyExpansions": 1,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 2,
+          "constructedNodes": 7,
+          "expandedBodies": {
+            "Repo::sql": 1
+          },
+          "expandedReferences": {
+            "Repo::sql:field-address:r3": 1,
+            "Repo::sql:$this": 1
+          }
+        }
+      }
+    },
+    "branch-correlation": {
+      "source": "<?php function resolve($flag){if($flag){$ttl=30;$tag=\"a\";}else{$ttl=60;$tag=\"b\";}return [$ttl,$tag];}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": [
+              30,
+              "a"
+            ]
+          },
+          {
+            "type": "analyzed",
+            "result": [
+              60,
+              "b"
+            ]
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 12,
+          "graphs": 0,
+          "seconds": 0.001558065414428711,
+          "peakMemoryBytes": 10485760,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 12,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$ttl": 1,
+            "resolve:$tag": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": [
+              30,
+              "a"
+            ]
+          },
+          {
+            "type": "analyzed",
+            "result": [
+              60,
+              "b"
+            ]
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 13,
+          "graphs": 0,
+          "seconds": 0.0012290477752685547,
+          "peakMemoryBytes": 10485760,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 13,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$ttl": 1,
+            "resolve:$flag": 1,
+            "resolve:$tag": 1
+          }
+        }
+      }
+    },
+    "alias-correlation": {
+      "source": "<?php function resolve($flag){$ttl=$flag?30:60;$same=$ttl;return $ttl-$same;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 0
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 9,
+          "graphs": 0,
+          "seconds": 0.0006918907165527344,
+          "peakMemoryBytes": 10485760,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 9,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$ttl": 2,
+            "resolve:$same": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 0
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 10,
+          "graphs": 0,
+          "seconds": 0.000982046127319336,
+          "peakMemoryBytes": 10485760,
+          "referenceExpansions": 4,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 10,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$ttl": 2,
+            "resolve:$same": 1,
+            "resolve:$flag": 1
+          }
+        }
+      }
+    },
+    "dead-branch": {
+      "source": "<?php function resolve(){if(false){return unknown();}return 30;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "MISSING_SOURCE"
+            ],
+            "termNodeCount": 1
+          },
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 2,
+          "graphs": 0,
+          "seconds": 0.00034499168395996094,
+          "peakMemoryBytes": 10485760,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 2,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 2,
+          "graphs": 0,
+          "seconds": 0.0004980564117431641,
+          "peakMemoryBytes": 10485760,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 2,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "finite-loop": {
+      "source": "<?php function resolve(){$sum=0;for($i=0;$i<10;$i++){$sum+=$i;}return $sum;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "CYCLE",
+              "LOOP_DEPENDENCY"
+            ],
+            "termNodeCount": 13
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 8,
+          "graphs": 0,
+          "seconds": 0.0026731491088867188,
+          "peakMemoryBytes": 10485760,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 8,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$sum": 1,
+            "resolve:$i": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "CYCLE",
+              "LOOP_DEPENDENCY"
+            ],
+            "termNodeCount": 6
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 15,
+          "graphs": 0,
+          "seconds": 0.0020148754119873047,
+          "peakMemoryBytes": 10485760,
+          "referenceExpansions": 4,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 2,
+          "sharedNodeHits": 1,
+          "constructedNodes": 15,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$sum": 1,
+            "resolve:$i": 3
+          }
+        }
+      }
+    },
+    "finite-recursion": {
+      "source": "<?php function countDown($n){if($n===0){return 0;}$n-=1;return 1+countDown($n);}function resolve(){return countDown(8);}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "DEPTH_LIMIT",
+              "ENUMERATION_LIMIT"
+            ],
+            "termNodeCount": 276
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 257,
+          "graphs": 64,
+          "seconds": 0.10091090202331543,
+          "peakMemoryBytes": 23068672,
+          "referenceExpansions": 64,
+          "bodyExpansions": 64,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 257,
+          "expandedBodies": {
+            "countDown": 64
+          },
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 8
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 79,
+          "graphs": 9,
+          "seconds": 0.008161067962646484,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 26,
+          "bodyExpansions": 9,
+          "evaluatorApplications": 9,
+          "sharedNodeHits": 8,
+          "constructedNodes": 79,
+          "expandedBodies": {
+            "countDown": 9
+          },
+          "expandedReferences": {
+            "countDown:$n": 17
+          }
+        }
+      }
+    },
+    "integer-shift": {
+      "source": "<?php function resolve(){return 1<<-1;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "NO_VALUE_DEFINITION"
+            ],
+            "termNodeCount": 2
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 0,
+          "seconds": 0.0003609657287597656,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "NO_VALUE_DEFINITION"
+            ],
+            "termNodeCount": 2
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 0,
+          "seconds": 0.0003139972686767578,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "divide-zero": {
+      "source": "<?php function resolve(){return 1/0;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "NO_VALUE_DEFINITION"
+            ],
+            "termNodeCount": 2
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.00024700164794921875,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "NO_VALUE_DEFINITION"
+            ],
+            "termNodeCount": 2
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.00024199485778808594,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "static-helper": {
+      "source": "<?php function helper(){return 30;}function resolve(){return helper()+5;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 35
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 1,
+          "seconds": 0.0003590583801269531,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 1,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": {
+            "helper": 1
+          },
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 35
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 1,
+          "seconds": 0.0003349781036376953,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 1,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": {
+            "helper": 1
+          },
+          "expandedReferences": []
+        }
+      }
+    },
+    "catch-statement": {
+      "source": "<?php function resolve(){try{throw new RuntimeException();}catch(RuntimeException $e){return 60;}}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0003819465637207031,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0003540515899658203,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "catch-expression": {
+      "source": "<?php function resolve(){try{return throw new RuntimeException();}catch(RuntimeException $e){return 60;}}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0003437995910644531,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0006020069122314453,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "catch-arithmetic": {
+      "source": "<?php function resolve(){try{return 1/0;}catch(DivisionByZeroError $e){return 60;}}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 0,
+          "seconds": 0.00038814544677734375,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 4,
+          "graphs": 0,
+          "seconds": 0.0003788471221923828,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 4,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "try-followed-by-return": {
+      "source": "<?php function resolve(){try{$ttl=30;}catch(RuntimeException $e){$ttl=60;}return $ttl;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 5,
+          "graphs": 0,
+          "seconds": 0.0004360675811767578,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 5,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$ttl": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 5,
+          "graphs": 0,
+          "seconds": 0.0005331039428710938,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 5,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$ttl": 1
+          }
+        }
+      }
+    },
+    "finally-followed-by-return": {
+      "source": "<?php function resolve(){try{$ttl=30;}finally{}return $ttl;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0002970695495605469,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$ttl": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0003478527069091797,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$ttl": 1
+          }
+        }
+      }
+    },
+    "incomplete-branch": {
+      "source": "<?php function resolve($flag,$input){return $flag?30:5+$input;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 3
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 5,
+          "graphs": 0,
+          "seconds": 0.0005249977111816406,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 5,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$input": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "partials",
+            "reasons": [
+              "EXTERNAL_INPUT"
+            ],
+            "termNodeCount": 3
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 6,
+          "graphs": 0,
+          "seconds": 0.0007131099700927734,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 6,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$flag": 1,
+            "resolve:$input": 1
+          }
+        }
+      }
+    },
+    "literal-false-branch": {
+      "source": "<?php function resolve(){return false?30:60;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.00042891502380371094,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0004210472106933594,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    },
+    "unknown-boolean-with-known-alternative": {
+      "source": "<?php function resolve($input){$condition=$input?true:$_GET[\"flag\"];return $condition?30:60;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0003581047058105469,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 10,
+          "graphs": 0,
+          "seconds": 0.0012271404266357422,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 2,
+          "sharedNodeHits": 0,
+          "constructedNodes": 10,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$condition": 1,
+            "resolve:$input": 1,
+            "resolve:element-address:r5": 1
+          }
+        }
+      }
+    },
+    "zero-loop": {
+      "source": "<?php function resolve(){$v=0;for($i=0;$i<0;$i++){$v=$i===0?11:27;}return $v;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 0
+          },
+          {
+            "type": "analyzed",
+            "result": 11
+          },
+          {
+            "type": "analyzed",
+            "result": 27
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 7,
+          "graphs": 0,
+          "seconds": 0.0009908676147460938,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 7,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$v": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 0
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 8,
+          "graphs": 0,
+          "seconds": 0.0007610321044921875,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 8,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$v": 1,
+            "resolve:$i": 1
+          }
+        }
+      }
+    },
+    "one-loop": {
+      "source": "<?php function resolve(){$v=0;for($i=0;$i<1;$i++){$v=$i===0?11:27;}return $v;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 0
+          },
+          {
+            "type": "analyzed",
+            "result": 11
+          },
+          {
+            "type": "analyzed",
+            "result": 27
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 7,
+          "graphs": 0,
+          "seconds": 0.0007658004760742188,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 7,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$v": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 11
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 16,
+          "graphs": 0,
+          "seconds": 0.0016331672668457031,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 4,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 3,
+          "sharedNodeHits": 1,
+          "constructedNodes": 16,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$v": 1,
+            "resolve:$i": 3
+          }
+        }
+      }
+    },
+    "two-loop": {
+      "source": "<?php function resolve(){$v=0;for($i=0;$i<2;$i++){$v=$i===0?11:27;}return $v;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 0
+          },
+          {
+            "type": "analyzed",
+            "result": 11
+          },
+          {
+            "type": "analyzed",
+            "result": 27
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 7,
+          "graphs": 0,
+          "seconds": 0.0007579326629638672,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 7,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$v": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 11
+          },
+          {
+            "type": "analyzed",
+            "result": 27
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 23,
+          "graphs": 0,
+          "seconds": 0.0025708675384521484,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 5,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 4,
+          "sharedNodeHits": 1,
+          "constructedNodes": 23,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$v": 1,
+            "resolve:$i": 4
+          }
+        }
+      }
+    },
+    "many-loop": {
+      "source": "<?php function resolve(){$v=0;for($i=0;$i<10000;$i++){$v=$i===0?11:27;}return $v;}",
+      "structural": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 0
+          },
+          {
+            "type": "analyzed",
+            "result": 11
+          },
+          {
+            "type": "analyzed",
+            "result": 27
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 7,
+          "graphs": 0,
+          "seconds": 0.000823974609375,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 7,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$v": 1
+          }
+        }
+      },
+      "pruned": {
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 11
+          },
+          {
+            "type": "analyzed",
+            "result": 27
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 23,
+          "graphs": 0,
+          "seconds": 0.0023720264434814453,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 5,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 4,
+          "sharedNodeHits": 1,
+          "constructedNodes": 23,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "resolve:$v": 1,
+            "resolve:$i": 4
+          }
+        }
+      }
+    }
+  },
+  "pathSource": "<?php\nfunction ttl($flag, $unused) { return $flag ? 30 : 60; }\nfunction bridge($flag) { return ttl($flag, expensive()); }\nfunction page() { return bridge(true); }\nfunction other() { return bridge(false); }\nfunction unrelated() { return 0; }\nfunction constantTtl() { return 7; }\nfunction hidden() { if (false) { constantTtl(); } }\nfunction dynamic($callee) { return $callee(true, expensive()); }\nfunction pair($left, $right) { return $left . $right; }\nfunction pairs() { pair('a', 'b'); pair('c', 'd'); }\nfunction foreign() { pair(expensive(), expensive()); }\nfinal class CacheQuery {\n    public function execute($ttl, $tag) { return [$ttl, $tag]; }\n}\nfinal class Endpoint {\n    public function show() { return (new CacheQuery())->execute(30, 'product'); }\n    public function preview() { return (new CacheQuery())->execute(60, 'draft'); }\n}",
+  "pathQueries": {
+    "structural": [
+      {
+        "query": "ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.00034308433532714844,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      {
+        "query": "page -> bridge -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.001255035400390625,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      {
+        "query": "other -> ... -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0012500286102294922,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      {
+        "query": "page -> ... -> ttl#parameter(flag)",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": true
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0006580352783203125,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "bridge:$flag": 1
+          }
+        }
+      },
+      {
+        "query": "bridge -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0004248619079589844,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      {
+        "query": "page -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 0,
+          "graphs": 0,
+          "seconds": 6.29425048828125e-05,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 0,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      {
+        "query": "unrelated -> constantTtl#return",
+        "openedExpensive": 0,
+        "candidates": [],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 0,
+          "graphs": 0,
+          "seconds": 4.506111145019531e-05,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 0,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      {
+        "query": "hidden -> constantTtl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 7
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.00027108192443847656,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      {
+        "query": "dynamic -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "UNRESOLVED_DISPATCH"
+            ],
+            "termNodeCount": 1
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.00024008750915527344,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "dynamic:$callee": 1
+          }
+        }
+      },
+      {
+        "query": "pairs -> pair#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": "ab"
+          },
+          {
+            "type": "analyzed",
+            "result": "cd"
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 14,
+          "graphs": 0,
+          "seconds": 0.0010449886322021484,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 4,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 14,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "pair:$left": 2,
+            "pair:$right": 2
+          }
+        }
+      },
+      {
+        "query": "pair#return",
+        "openedExpensive": 2,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": "costlycostly"
+          },
+          {
+            "type": "analyzed",
+            "result": "ab"
+          },
+          {
+            "type": "analyzed",
+            "result": "cd"
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 15,
+          "graphs": 0,
+          "seconds": 0.0012600421905517578,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 4,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 2,
+          "sharedNodeHits": 0,
+          "constructedNodes": 15,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "pair:$left": 1,
+            "pair:$right": 1
+          }
+        }
+      },
+      {
+        "query": "Endpoint::show -> CacheQuery::execute#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": [
+              30,
+              "product"
+            ]
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 10,
+          "graphs": 0,
+          "seconds": 0.000759124755859375,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 10,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "CacheQuery::execute:$ttl": 1,
+            "CacheQuery::execute:$tag": 1
+          }
+        }
+      },
+      {
+        "query": "Endpoint::preview -> CacheQuery::execute#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": [
+              60,
+              "draft"
+            ]
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 10,
+          "graphs": 0,
+          "seconds": 0.0006220340728759766,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 10,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "CacheQuery::execute:$ttl": 1,
+            "CacheQuery::execute:$tag": 1
+          }
+        }
+      },
+      {
+        "query": "\\endpoint::SHOW -> \\CacheQuery::EXECUTE#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": [
+              30,
+              "product"
+            ]
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 10,
+          "graphs": 0,
+          "seconds": 0.0006198883056640625,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 10,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "CacheQuery::execute:$ttl": 1,
+            "CacheQuery::execute:$tag": 1
+          }
+        }
+      },
+      {
+        "query": "page -> bridge -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0004971027374267578,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      }
+    ],
+    "pruned": [
+      {
+        "query": "ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 60
+          },
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 9,
+          "graphs": 0,
+          "seconds": 0.0011188983917236328,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 9,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "ttl:$flag": 1,
+            "bridge:$flag": 1
+          }
+        }
+      },
+      {
+        "query": "page -> bridge -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 6,
+          "graphs": 0,
+          "seconds": 0.0006601810455322266,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 6,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "ttl:$flag": 1,
+            "bridge:$flag": 1
+          }
+        }
+      },
+      {
+        "query": "other -> ... -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 60
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 6,
+          "graphs": 0,
+          "seconds": 0.0009291172027587891,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 6,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "ttl:$flag": 1,
+            "bridge:$flag": 1
+          }
+        }
+      },
+      {
+        "query": "page -> ... -> ttl#parameter(flag)",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": true
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 3,
+          "graphs": 0,
+          "seconds": 0.0005638599395751953,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 3,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "bridge:$flag": 1
+          }
+        }
+      },
+      {
+        "query": "bridge -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 60
+          },
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 9,
+          "graphs": 0,
+          "seconds": 0.0009660720825195312,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 9,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "ttl:$flag": 1,
+            "bridge:$flag": 1
+          }
+        }
+      },
+      {
+        "query": "page -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 0,
+          "graphs": 0,
+          "seconds": 4.696846008300781e-05,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 0,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      {
+        "query": "unrelated -> constantTtl#return",
+        "openedExpensive": 0,
+        "candidates": [],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 0,
+          "graphs": 0,
+          "seconds": 4.291534423828125e-05,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 0,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      {
+        "query": "hidden -> constantTtl#return",
+        "openedExpensive": 0,
+        "candidates": [],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.00020813941955566406,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 0,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": []
+        }
+      },
+      {
+        "query": "dynamic -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "partials",
+            "reasons": [
+              "UNRESOLVED_DISPATCH"
+            ],
+            "termNodeCount": 1
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 1,
+          "graphs": 0,
+          "seconds": 0.000225067138671875,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 1,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 1,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "dynamic:$callee": 1
+          }
+        }
+      },
+      {
+        "query": "pairs -> pair#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": "ab"
+          },
+          {
+            "type": "analyzed",
+            "result": "cd"
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 14,
+          "graphs": 0,
+          "seconds": 0.0011930465698242188,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 4,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 14,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "pair:$left": 2,
+            "pair:$right": 2
+          }
+        }
+      },
+      {
+        "query": "pair#return",
+        "openedExpensive": 2,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": "costlycostly"
+          },
+          {
+            "type": "analyzed",
+            "result": "ab"
+          },
+          {
+            "type": "analyzed",
+            "result": "cd"
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 15,
+          "graphs": 0,
+          "seconds": 0.001302957534790039,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 4,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 2,
+          "sharedNodeHits": 0,
+          "constructedNodes": 15,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "pair:$left": 1,
+            "pair:$right": 1
+          }
+        }
+      },
+      {
+        "query": "Endpoint::show -> CacheQuery::execute#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": [
+              30,
+              "product"
+            ]
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 10,
+          "graphs": 0,
+          "seconds": 0.000640869140625,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 10,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "CacheQuery::execute:$ttl": 1,
+            "CacheQuery::execute:$tag": 1
+          }
+        }
+      },
+      {
+        "query": "Endpoint::preview -> CacheQuery::execute#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": [
+              60,
+              "draft"
+            ]
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 10,
+          "graphs": 0,
+          "seconds": 0.0006630420684814453,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 10,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "CacheQuery::execute:$ttl": 1,
+            "CacheQuery::execute:$tag": 1
+          }
+        }
+      },
+      {
+        "query": "\\endpoint::SHOW -> \\CacheQuery::EXECUTE#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": [
+              30,
+              "product"
+            ]
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 10,
+          "graphs": 0,
+          "seconds": 0.0008518695831298828,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 3,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 0,
+          "sharedNodeHits": 0,
+          "constructedNodes": 10,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "CacheQuery::execute:$ttl": 1,
+            "CacheQuery::execute:$tag": 1
+          }
+        }
+      },
+      {
+        "query": "page -> bridge -> ttl#return",
+        "openedExpensive": 0,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "result": 30
+          }
+        ],
+        "interrupted": false,
+        "statistics": {
+          "transfers": 6,
+          "graphs": 0,
+          "seconds": 0.0009899139404296875,
+          "peakMemoryBytes": 45531136,
+          "referenceExpansions": 2,
+          "bodyExpansions": 0,
+          "evaluatorApplications": 1,
+          "sharedNodeHits": 0,
+          "constructedNodes": 6,
+          "expandedBodies": [],
+          "expandedReferences": {
+            "ttl:$flag": 1,
+            "bridge:$flag": 1
+          }
+        }
+      }
+    ]
+  },
+  "postFilter": {
+    "structural": {
+      "candidates": [
+        {
+          "type": "analyzed",
+          "result": 7
+        }
+      ],
+      "interrupted": false,
+      "statistics": {
+        "transfers": 1,
+        "graphs": 0,
+        "seconds": 0.0001418590545654297,
+        "peakMemoryBytes": 45531136,
+        "referenceExpansions": 0,
+        "bodyExpansions": 0,
+        "evaluatorApplications": 0,
+        "sharedNodeHits": 0,
+        "constructedNodes": 1,
+        "expandedBodies": [],
+        "expandedReferences": []
+      }
+    },
+    "pruned": {
+      "candidates": [
+        {
+          "type": "analyzed",
+          "result": 7
+        }
+      ],
+      "interrupted": false,
+      "statistics": {
+        "transfers": 1,
+        "graphs": 0,
+        "seconds": 0.00016379356384277344,
+        "peakMemoryBytes": 45531136,
+        "referenceExpansions": 0,
+        "bodyExpansions": 0,
+        "evaluatorApplications": 0,
+        "sharedNodeHits": 0,
+        "constructedNodes": 1,
+        "expandedBodies": [],
+        "expandedReferences": []
+      }
+    }
+  },
+  "semanticChecks": [
+    {
+      "name": "structural:finally-followed-by-return",
+      "passed": true
+    },
+    {
+      "name": "structural:catch-statement",
+      "passed": true
+    },
+    {
+      "name": "structural:catch-expression",
+      "passed": true
+    },
+    {
+      "name": "structural:catch-arithmetic",
+      "passed": true
+    },
+    {
+      "name": "structural:branch-correlation",
+      "passed": true
+    },
+    {
+      "name": "structural:alias-correlation",
+      "passed": true
+    },
+    {
+      "name": "structural:dynamic-branch",
+      "passed": true
+    },
+    {
+      "name": "structural:unknown-boolean-with-known-alternative",
+      "passed": true
+    },
+    {
+      "name": "structural:throw has no concrete null",
+      "passed": true
+    },
+    {
+      "name": "structural:dynamic-array stays dynamic",
+      "passed": true
+    },
+    {
+      "name": "structural:dynamic-addition stays dynamic",
+      "passed": true
+    },
+    {
+      "name": "structural:input-default stays dynamic",
+      "passed": true
+    },
+    {
+      "name": "structural:request-input stays dynamic",
+      "passed": true
+    },
+    {
+      "name": "structural:environment-input stays dynamic",
+      "passed": true
+    },
+    {
+      "name": "structural:page -> bridge -> ttl#return",
+      "passed": true
+    },
+    {
+      "name": "structural:other -> ... -> ttl#return",
+      "passed": true
+    },
+    {
+      "name": "structural:page -> ttl#return",
+      "passed": true
+    },
+    {
+      "name": "structural:unrelated -> constantTtl#return",
+      "passed": true
+    },
+    {
+      "name": "structural:hidden -> constantTtl#return",
+      "passed": true
+    },
+    {
+      "name": "structural:pairs -> pair#return",
+      "passed": true
+    },
+    {
+      "name": "structural:Endpoint::show -> CacheQuery::execute#return",
+      "passed": true
+    },
+    {
+      "name": "structural:Endpoint::preview -> CacheQuery::execute#return",
+      "passed": true
+    },
+    {
+      "name": "structural:\\endpoint::SHOW -> \\CacheQuery::EXECUTE#return",
+      "passed": true
+    },
+    {
+      "name": "structural:dynamic dispatch stays partial",
+      "passed": true
+    },
+    {
+      "name": "structural:repeated query stable",
+      "passed": true
+    },
+    {
+      "name": "structural:post-filter does not prove invocation",
+      "passed": true
+    },
+    {
+      "name": "pruned:finally-followed-by-return",
+      "passed": true
+    },
+    {
+      "name": "pruned:catch-statement",
+      "passed": true
+    },
+    {
+      "name": "pruned:catch-expression",
+      "passed": true
+    },
+    {
+      "name": "pruned:catch-arithmetic",
+      "passed": true
+    },
+    {
+      "name": "pruned:branch-correlation",
+      "passed": true
+    },
+    {
+      "name": "pruned:alias-correlation",
+      "passed": true
+    },
+    {
+      "name": "pruned:dynamic-branch",
+      "passed": true
+    },
+    {
+      "name": "pruned:unknown-boolean-with-known-alternative",
+      "passed": true
+    },
+    {
+      "name": "pruned:throw has no concrete null",
+      "passed": true
+    },
+    {
+      "name": "pruned:dynamic-array stays dynamic",
+      "passed": true
+    },
+    {
+      "name": "pruned:dynamic-addition stays dynamic",
+      "passed": true
+    },
+    {
+      "name": "pruned:input-default stays dynamic",
+      "passed": true
+    },
+    {
+      "name": "pruned:request-input stays dynamic",
+      "passed": true
+    },
+    {
+      "name": "pruned:environment-input stays dynamic",
+      "passed": true
+    },
+    {
+      "name": "pruned:page -> bridge -> ttl#return",
+      "passed": true
+    },
+    {
+      "name": "pruned:other -> ... -> ttl#return",
+      "passed": true
+    },
+    {
+      "name": "pruned:page -> ttl#return",
+      "passed": true
+    },
+    {
+      "name": "pruned:unrelated -> constantTtl#return",
+      "passed": true
+    },
+    {
+      "name": "pruned:hidden -> constantTtl#return",
+      "passed": true
+    },
+    {
+      "name": "pruned:pairs -> pair#return",
+      "passed": true
+    },
+    {
+      "name": "pruned:Endpoint::show -> CacheQuery::execute#return",
+      "passed": true
+    },
+    {
+      "name": "pruned:Endpoint::preview -> CacheQuery::execute#return",
+      "passed": true
+    },
+    {
+      "name": "pruned:\\endpoint::SHOW -> \\CacheQuery::EXECUTE#return",
+      "passed": true
+    },
+    {
+      "name": "pruned:dynamic dispatch stays partial",
+      "passed": true
+    },
+    {
+      "name": "pruned:repeated query stable",
+      "passed": true
+    },
+    {
+      "name": "pruned:post-filter does not prove invocation",
+      "passed": true
+    },
+    {
+      "name": "literal false is structural by default",
+      "passed": true
+    },
+    {
+      "name": "truth evaluator prunes literal false",
+      "passed": true
+    },
+    {
+      "name": "zero-loop pruning",
+      "passed": true
+    },
+    {
+      "name": "one-loop pruning",
+      "passed": true
+    },
+    {
+      "name": "two-loop pruning",
+      "passed": true
+    },
+    {
+      "name": "many-loop pruning",
+      "passed": true
+    },
+    {
+      "name": "loop cost does not follow iteration count",
+      "passed": true
+    }
+  ],
+  "pruningBenchmarks": {
+    "16": {
+      "prepareMs": 12.352375,
+      "warmups": 3,
+      "samples": 10,
+      "modes": {
+        "path": {
+          "medianMs": 0.202687,
+          "evaluationCounts": [
+            0
+          ],
+          "result": [
+            30
+          ],
+          "interrupted": false,
+          "samples": [
+            {
+              "milliseconds": 0.1925,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00018405914306640625,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.203791,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00019407272338867188,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.186458,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00017881393432617188,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.201583,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00019288063049316406,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.197166,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0001888275146484375,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.292667,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0002720355987548828,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.228208,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0002181529998779297,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.228625,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00021719932556152344,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.188542,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0001811981201171875,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.246167,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0002269744873046875,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            }
+          ]
+        },
+        "postFilter": {
+          "medianMs": 1.8156664999999998,
+          "evaluationCounts": [
+            16
+          ],
+          "result": [
+            30
+          ],
+          "interrupted": false,
+          "samples": [
+            {
+              "milliseconds": 1.801125,
+              "opened": 16,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0017650127410888672,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.808625,
+              "opened": 16,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0017650127410888672,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.823875,
+              "opened": 16,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.001786947250366211,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.808584,
+              "opened": 16,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.001764059066772461,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.813458,
+              "opened": 16,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0017781257629394531,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.925125,
+              "opened": 16,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0018610954284667969,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.876667,
+              "opened": 16,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.001837015151977539,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.817875,
+              "opened": 16,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.00177001953125,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.77925,
+              "opened": 16,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.001744985580444336,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 2.068625,
+              "opened": 16,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0020139217376708984,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            }
+          ]
+        },
+        "full": {
+          "medianMs": 1.8155835,
+          "evaluationCounts": [
+            16
+          ],
+          "result": [
+            999,
+            30
+          ],
+          "interrupted": false,
+          "samples": [
+            {
+              "milliseconds": 1.794417,
+              "opened": 16,
+              "values": [
+                999,
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0017740726470947266,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.894583,
+              "opened": 16,
+              "values": [
+                999,
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0018641948699951172,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.8735,
+              "opened": 16,
+              "values": [
+                999,
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.001851797103881836,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.82325,
+              "opened": 16,
+              "values": [
+                999,
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0017931461334228516,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.844791,
+              "opened": 16,
+              "values": [
+                999,
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0018248558044433594,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.786625,
+              "opened": 16,
+              "values": [
+                999,
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0017571449279785156,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.816417,
+              "opened": 16,
+              "values": [
+                999,
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.001795053482055664,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.769959,
+              "opened": 16,
+              "values": [
+                999,
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0017361640930175781,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.773042,
+              "opened": 16,
+              "values": [
+                999,
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.001753091812133789,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 1.81475,
+              "opened": 16,
+              "values": [
+                999,
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 35,
+                "graphs": 0,
+                "seconds": 0.0017850399017333984,
+                "peakMemoryBytes": 8388608,
+                "referenceExpansions": 17,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 16,
+                "sharedNodeHits": 0,
+                "constructedNodes": 35,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "100": {
+      "prepareMs": 19.533167,
+      "warmups": 3,
+      "samples": 10,
+      "modes": {
+        "path": {
+          "medianMs": 0.358125,
+          "evaluationCounts": [
+            0
+          ],
+          "result": [
+            30
+          ],
+          "interrupted": false,
+          "samples": [
+            {
+              "milliseconds": 0.362875,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00033402442932128906,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.385583,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0002880096435546875,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.221667,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00021004676818847656,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.408792,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0003101825714111328,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.26275,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00024700164794921875,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.389125,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00028705596923828125,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.261666,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0002491474151611328,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.382583,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00028395652770996094,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.245917,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00023412704467773438,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.353375,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00026607513427734375,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            }
+          ]
+        },
+        "postFilter": {
+          "medianMs": 12.5019375,
+          "evaluationCounts": [
+            100
+          ],
+          "result": [
+            {
+              "partialKind": "operation",
+              "reason": "ENUMERATION_LIMIT"
+            }
+          ],
+          "interrupted": false,
+          "samples": [
+            {
+              "milliseconds": 12.726959,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.01260685920715332,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 12.027,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.011774063110351562,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 11.781792,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.011652946472167969,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 13.720625,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.013473987579345703,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 12.448,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.012253046035766602,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 13.291833,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.013046979904174805,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 13.189,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.013031005859375,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 12.555875,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.012305021286010742,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 11.946709,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.011783123016357422,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 12.329833,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.012101173400878906,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            }
+          ]
+        },
+        "full": {
+          "medianMs": 12.5849165,
+          "evaluationCounts": [
+            100
+          ],
+          "result": [
+            {
+              "partialKind": "operation",
+              "reason": "ENUMERATION_LIMIT"
+            }
+          ],
+          "interrupted": false,
+          "samples": [
+            {
+              "milliseconds": 13.430083,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.01312112808227539,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 14.732875,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.014390945434570312,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 13.681375,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.013357877731323242,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 14.919709,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.014601945877075195,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 12.293292,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.011901140213012695,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 12.632125,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.012323856353759766,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 12.532458,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.012283802032470703,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 12.537708,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.012312173843383789,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 11.770792,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.011564016342163086,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 11.98775,
+              "opened": 100,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 203,
+                "graphs": 0,
+                "seconds": 0.011765003204345703,
+                "peakMemoryBytes": 16777216,
+                "referenceExpansions": 101,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 100,
+                "sharedNodeHits": 0,
+                "constructedNodes": 203,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "200": {
+      "prepareMs": 27.929125,
+      "warmups": 3,
+      "samples": 10,
+      "modes": {
+        "path": {
+          "medianMs": 0.433125,
+          "evaluationCounts": [
+            0
+          ],
+          "result": [
+            30
+          ],
+          "interrupted": false,
+          "samples": [
+            {
+              "milliseconds": 0.271209,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0002560615539550781,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.623333,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0003628730773925781,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.275,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0002579689025878906,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.544875,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00032806396484375,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.258292,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0002429485321044922,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.809584,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.0005049705505371094,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.309084,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00029397010803222656,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.71025,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00041985511779785156,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.321375,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00030303001403808594,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 0.799583,
+              "opened": 0,
+              "values": [
+                30
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 3,
+                "graphs": 0,
+                "seconds": 0.00042700767517089844,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 1,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 0,
+                "sharedNodeHits": 0,
+                "constructedNodes": 3,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            }
+          ]
+        },
+        "postFilter": {
+          "medianMs": 29.2891455,
+          "evaluationCounts": [
+            200
+          ],
+          "result": [
+            {
+              "partialKind": "operation",
+              "reason": "ENUMERATION_LIMIT"
+            }
+          ],
+          "interrupted": false,
+          "samples": [
+            {
+              "milliseconds": 27.339583,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.02705097198486328,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 26.914709,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.02632904052734375,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 26.768833,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.02645087242126465,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 26.70425,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.02609705924987793,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 26.132041,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.02576303482055664,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 31.328542,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.030276060104370117,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 31.238708,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.030798912048339844,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 32.739541,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.03191399574279785,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 32.934209,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.032531023025512695,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 33.247042,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.03244209289550781,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            }
+          ]
+        },
+        "full": {
+          "medianMs": 28.6314165,
+          "evaluationCounts": [
+            200
+          ],
+          "result": [
+            {
+              "partialKind": "operation",
+              "reason": "ENUMERATION_LIMIT"
+            }
+          ],
+          "interrupted": false,
+          "samples": [
+            {
+              "milliseconds": 26.783292,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.026010990142822266,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 26.510375,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.025781869888305664,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 26.5985,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.026000022888183594,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 26.777333,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.026153087615966797,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 27.541375,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.026543855667114258,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 29.721458,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.0289919376373291,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 32.400667,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.03161811828613281,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 32.224375,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.03144383430480957,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 31.810292,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.03109884262084961,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            },
+            {
+              "milliseconds": 32.565625,
+              "opened": 200,
+              "values": [
+                {
+                  "partialKind": "operation",
+                  "reason": "ENUMERATION_LIMIT"
+                }
+              ],
+              "interrupted": false,
+              "statistics": {
+                "transfers": 403,
+                "graphs": 0,
+                "seconds": 0.03181099891662598,
+                "peakMemoryBytes": 27262976,
+                "referenceExpansions": 201,
+                "bodyExpansions": 0,
+                "evaluatorApplications": 200,
+                "sharedNodeHits": 0,
+                "constructedNodes": 403,
+                "expandedBodies": [],
+                "expandedReferences": {
+                  "value:$x": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "magixPerformance": {
+    "measurementOrder": [
+      [
+        "original",
+        "previous",
+        "latest"
+      ],
+      [
+        "latest",
+        "previous",
+        "original"
+      ],
+      [
+        "previous",
+        "original",
+        "latest"
+      ]
+    ],
+    "modeMeaning": {
+      "original": "Original readers at 688356c3; no Deriver use",
+      "previous": "Current e59f993 integration",
+      "latest": "afc9851 API-only prototype overlay, not a production lock update"
+    },
+    "commandWarmupsPerRound": 3,
+    "commandSamplesPerRound": 20,
+    "commandRounds": 3,
+    "commands": {
+      "project-controller": {
+        "outputSha256": "2aa2df9c48c6a5f30d148a0ce49610e8980abd4cbb40355e61a903452e9d7891",
+        "modes": {
+          "original": {
+            "samplesMs": [
+              21.176458,
+              20.48075,
+              20.995166,
+              21.753666,
+              22.015667,
+              22.495167,
+              22.725334,
+              23.837333,
+              24.666834,
+              23.744958,
+              25.918333,
+              26.08125,
+              24.735916,
+              24.653083,
+              27.282167,
+              25.650334,
+              26.306792,
+              27.633875,
+              25.707833,
+              27.2465,
+              27.987125,
+              28.385125,
+              28.369625,
+              28.448792,
+              28.646709,
+              28.092875,
+              28.275208,
+              27.314792,
+              28.485916,
+              28.312958,
+              27.747042,
+              28.392334,
+              27.7215,
+              27.354916,
+              27.892459,
+              28.260125,
+              27.846042,
+              28.770375,
+              28.221709,
+              28.743458,
+              23.488333,
+              20.817,
+              21.36575,
+              23.755792,
+              23.55225,
+              21.305792,
+              22.576417,
+              22.672083,
+              20.33975,
+              23.097667,
+              24.173167,
+              25.539083,
+              29.024958,
+              24.393667,
+              23.744417,
+              23.468125,
+              22.371792,
+              23.806875,
+              23.720709,
+              21.530209
+            ],
+            "medianMs": 25.1374995
+          },
+          "previous": {
+            "samplesMs": [
+              27.282541,
+              28.0675,
+              27.615,
+              26.972208,
+              28.770375,
+              29.764125,
+              27.216875,
+              27.969875,
+              27.796375,
+              27.221833,
+              25.245,
+              27.417333,
+              26.769583,
+              24.807209,
+              25.471833,
+              27.744166,
+              25.381333,
+              24.849875,
+              26.984125,
+              25.011334,
+              23.771209,
+              23.891208,
+              23.668833,
+              23.527542,
+              23.356709,
+              23.653542,
+              25.164417,
+              23.246125,
+              23.722291,
+              25.450125,
+              23.163708,
+              23.598,
+              24.345917,
+              24.828375,
+              24.318916,
+              26.3935,
+              27.716959,
+              29.537292,
+              32.04775,
+              30.915792,
+              23.78525,
+              23.33175,
+              23.908541,
+              27.179041,
+              24.510542,
+              23.494291,
+              24.168042,
+              23.014667,
+              23.56625,
+              24.929041,
+              24.76275,
+              23.465417,
+              24.067292,
+              24.49875,
+              23.464083,
+              23.897125,
+              23.199334,
+              28.989625,
+              29.792208,
+              50.873209
+            ],
+            "medianMs": 24.889458
+          },
+          "latest": {
+            "samplesMs": [
+              39.545458,
+              37.768167,
+              41.2145,
+              39.965,
+              41.273917,
+              46.035291,
+              44.764208,
+              43.784291,
+              38.880917,
+              39.143958,
+              40.564334,
+              39.411458,
+              41.168917,
+              40.782708,
+              43.582459,
+              40.527458,
+              40.680334,
+              38.885208,
+              38.185833,
+              33.492416,
+              41.358042,
+              36.433084,
+              36.4765,
+              35.376375,
+              33.469208,
+              36.478833,
+              33.812125,
+              33.823375,
+              33.733625,
+              32.631584,
+              33.0845,
+              32.653333,
+              30.954041,
+              33.398667,
+              33.73525,
+              33.766334,
+              38.683792,
+              38.43925,
+              38.940417,
+              34.901667,
+              33.583084,
+              33.543333,
+              34.398959,
+              36.551083,
+              33.980292,
+              36.041667,
+              31.960292,
+              38.404708,
+              39.572833,
+              35.352417,
+              34.523,
+              33.125875,
+              33.568458,
+              33.23575,
+              36.186625,
+              30.814,
+              33.130583,
+              34.188333,
+              33.665416,
+              38.419458
+            ],
+            "medianMs": 36.3098545
+          }
+        }
+      },
+      "functional-composition": {
+        "outputSha256": "56707e8f23b26440a0474f7e47c3334a2def1f9b8f10457859ae220f56b93087",
+        "modes": {
+          "original": {
+            "samplesMs": [
+              9.8505,
+              10.392292,
+              12.579917,
+              9.116916,
+              8.315167,
+              9.04625,
+              10.183416,
+              9.200833,
+              9.51025,
+              9.566125,
+              9.111584,
+              9.757792,
+              8.560458,
+              8.510167,
+              9.989666,
+              11.487041,
+              9.967959,
+              9.3905,
+              9.151167,
+              8.874542,
+              9.782375,
+              9.749958,
+              12.095833,
+              9.779625,
+              9.168958,
+              8.904541,
+              9.389792,
+              8.792083,
+              9.787375,
+              9.149542,
+              9.034917,
+              9.033667,
+              8.925583,
+              8.509042,
+              7.6025,
+              9.589,
+              9.405666,
+              9.689625,
+              9.796875,
+              10.151,
+              7.179917,
+              7.828209,
+              12.283375,
+              9.978625,
+              9.116084,
+              9.236083,
+              9.408584,
+              9.98125,
+              10.149917,
+              9.660292,
+              9.785709,
+              9.258375,
+              9.490792,
+              9.401041,
+              8.677291,
+              9.9635,
+              8.079625,
+              9.496333,
+              8.905333,
+              7.618333
+            ],
+            "medianMs": 9.4033535
+          },
+          "previous": {
+            "samplesMs": [
+              8.562041,
+              11.303417,
+              10.869584,
+              7.51,
+              7.810666,
+              8.514875,
+              9.596,
+              9.83425,
+              9.567916,
+              8.728208,
+              8.29925,
+              8.965625,
+              8.91125,
+              9.171459,
+              7.238166,
+              10.193209,
+              9.741333,
+              9.845958,
+              9.116333,
+              8.865792,
+              11.035084,
+              14.345917,
+              11.280542,
+              10.720875,
+              8.964709,
+              10.575833,
+              9.634208,
+              8.967042,
+              9.287917,
+              8.7275,
+              9.441541,
+              9.036875,
+              9.453916,
+              9.5295,
+              8.240042,
+              9.951125,
+              8.062709,
+              9.133084,
+              8.90975,
+              9.248625,
+              9.077459,
+              12.1435,
+              10.037,
+              8.849083,
+              8.692625,
+              7.385584,
+              7.878042,
+              7.536875,
+              7.56925,
+              8.2775,
+              8.835959,
+              8.260375,
+              8.246958,
+              7.387833,
+              7.952583,
+              9.018875,
+              9.127167,
+              7.401208,
+              8.4685,
+              8.932833
+            ],
+            "medianMs": 8.9663335
+          },
+          "latest": {
+            "samplesMs": [
+              13.617334,
+              11.493375,
+              11.091584,
+              13.013416,
+              12.557666,
+              13.872583,
+              13.272,
+              12.634125,
+              13.659709,
+              13.556334,
+              14.031208,
+              17.133125,
+              14.334125,
+              13.053542,
+              14.486375,
+              13.66875,
+              15.398792,
+              14.046042,
+              12.808958,
+              14.782333,
+              13.925875,
+              11.634959,
+              11.894,
+              12.45975,
+              11.541875,
+              10.981458,
+              11.991542,
+              10.74,
+              10.589375,
+              10.874958,
+              11.181166,
+              14.130208,
+              10.338875,
+              10.958458,
+              11.366459,
+              10.024334,
+              10.873541,
+              11.547792,
+              10.317291,
+              11.18,
+              15.223833,
+              14.054709,
+              13.71775,
+              14.302542,
+              14.6235,
+              14.062875,
+              14.59925,
+              13.576,
+              14.469833,
+              14.09475,
+              14.07425,
+              16.480791,
+              13.772,
+              14.312084,
+              14.376125,
+              13.83925,
+              13.256333,
+              13.766583,
+              14.371791,
+              15.153625
+            ],
+            "medianMs": 13.6385215
+          }
+        }
+      },
+      "expiration": {
+        "outputSha256": "430e153b5af4a82e4d2297eaa0230249c8e9cda2018284204abbadf0861e78d6",
+        "modes": {
+          "original": {
+            "samplesMs": [
+              15.559333,
+              15.920958,
+              15.432583,
+              16.51825,
+              15.563417,
+              18.208166,
+              15.662375,
+              15.412083,
+              16.428834,
+              16.305292,
+              16.427542,
+              17.043167,
+              15.880166,
+              16.214292,
+              16.187375,
+              16.207166,
+              16.401375,
+              18.355125,
+              16.856917,
+              16.617042,
+              18.005833,
+              15.538167,
+              15.544875,
+              15.739625,
+              14.226209,
+              17.948333,
+              14.217625,
+              13.685042,
+              13.145708,
+              12.9745,
+              13.046,
+              12.723541,
+              13.063083,
+              12.813917,
+              12.224291,
+              13.476958,
+              12.774333,
+              14.775584,
+              12.828958,
+              13.1385,
+              12.767,
+              13.114084,
+              13.086375,
+              13.536375,
+              13.288334,
+              15.09525,
+              13.00975,
+              13.114416,
+              12.998583,
+              13.519041,
+              12.897042,
+              13.331833,
+              12.961958,
+              13.155166,
+              12.662792,
+              12.878208,
+              12.512041,
+              12.705375,
+              13.296958,
+              12.80375
+            ],
+            "medianMs": 13.6107085
+          },
+          "previous": {
+            "samplesMs": [
+              11.489041,
+              13.765875,
+              13.295667,
+              13.213583,
+              12.863208,
+              13.927958,
+              11.154625,
+              12.474042,
+              13.54275,
+              13.133958,
+              11.748042,
+              12.181875,
+              12.579583,
+              12.373666,
+              12.674458,
+              13.004959,
+              12.101417,
+              12.677541,
+              11.172458,
+              10.593334,
+              15.596792,
+              16.015625,
+              15.668,
+              14.234417,
+              14.636166,
+              17.473459,
+              14.778459,
+              13.317417,
+              13.447416,
+              13.025375,
+              13.2025,
+              13.142917,
+              12.76825,
+              13.01625,
+              13.189583,
+              11.463875,
+              11.086667,
+              12.987291,
+              12.407833,
+              12.710916,
+              11.611041,
+              10.916708,
+              11.418125,
+              11.466958,
+              11.018458,
+              12.439958,
+              11.631,
+              11.184792,
+              10.682875,
+              11.853667,
+              11.889875,
+              12.129375,
+              12.602709,
+              12.978833,
+              12.791584,
+              12.957167,
+              12.999375,
+              14.974167,
+              12.683791,
+              13.110625
+            ],
+            "medianMs": 12.739583
+          },
+          "latest": {
+            "samplesMs": [
+              15.592834,
+              16.381125,
+              15.599542,
+              17.32525,
+              14.630667,
+              16.594667,
+              14.810833,
+              19.283667,
+              17.024917,
+              17.535292,
+              18.863708,
+              15.603917,
+              15.78575,
+              16.781958,
+              16.372666,
+              15.098125,
+              15.315334,
+              17.239375,
+              17.015875,
+              16.773375,
+              11.453,
+              12.775459,
+              12.581833,
+              13.014,
+              12.981917,
+              11.988541,
+              11.679167,
+              13.200958,
+              13.603709,
+              11.645542,
+              13.028042,
+              13.741625,
+              11.736042,
+              11.90225,
+              12.759792,
+              13.037833,
+              11.32075,
+              11.085125,
+              10.700542,
+              11.289375,
+              15.669916,
+              14.437,
+              13.481875,
+              13.71325,
+              13.173042,
+              13.133042,
+              15.788542,
+              16.0315,
+              14.654625,
+              13.898709,
+              15.281125,
+              13.096416,
+              13.34,
+              13.800375,
+              13.224666,
+              12.680917,
+              13.342542,
+              12.960209,
+              13.299334,
+              12.808541
+            ],
+            "medianMs": 13.6584795
+          }
+        }
+      },
+      "async-composition": {
+        "outputSha256": "690e0d5dc56a63e8be238f00395fe588246970020a5f0d7faedfe22ae6eab4ae",
+        "modes": {
+          "original": {
+            "samplesMs": [
+              8.552708,
+              9.132791,
+              8.573416,
+              8.892833,
+              8.872083,
+              8.585583,
+              10.605084,
+              9.434042,
+              8.2135,
+              9.418083,
+              8.686792,
+              9.335417,
+              8.406083,
+              9.069792,
+              9.439875,
+              8.24375,
+              9.422709,
+              8.810125,
+              11.069167,
+              10.036125,
+              6.425209,
+              7.334042,
+              7.254042,
+              7.264125,
+              6.245709,
+              6.1935,
+              8.05725,
+              6.669833,
+              7.395416,
+              6.369333,
+              6.8575,
+              7.080084,
+              7.077834,
+              6.271,
+              6.062041,
+              7.381375,
+              5.908292,
+              5.8685,
+              6.964083,
+              6.126625,
+              6.663208,
+              6.881667,
+              6.540625,
+              7.2315,
+              6.573666,
+              7.3125,
+              8.405542,
+              7.449833,
+              6.772542,
+              6.874708,
+              6.657041,
+              6.840459,
+              6.361208,
+              5.829083,
+              6.361,
+              5.7585,
+              6.153959,
+              7.033709,
+              7.367166,
+              6.3445
+            ],
+            "medianMs": 7.242770999999999
+          },
+          "previous": {
+            "samplesMs": [
+              7.988958,
+              8.388458,
+              7.768833,
+              8.180375,
+              7.637167,
+              8.278625,
+              9.230667,
+              9.882917,
+              10.479125,
+              9.457542,
+              10.087625,
+              8.716,
+              8.842458,
+              9.529584,
+              8.27375,
+              9.828875,
+              9.448875,
+              9.570125,
+              11.474833,
+              9.275667,
+              7.502458,
+              8.603958,
+              9.46875,
+              9.628667,
+              9.941083,
+              9.296167,
+              10.47625,
+              9.710208,
+              10.093667,
+              9.895125,
+              9.157416,
+              8.148792,
+              9.260333,
+              9.552,
+              10.007625,
+              9.539417,
+              9.712208,
+              8.16,
+              11.242584,
+              9.797083,
+              7.472958,
+              8.69625,
+              8.0545,
+              8.060708,
+              6.917083,
+              8.587375,
+              8.96775,
+              7.419833,
+              6.743458,
+              6.849208,
+              7.01625,
+              7.661875,
+              7.996292,
+              8.38025,
+              7.40525,
+              6.9595,
+              7.655667,
+              7.160833,
+              8.895708,
+              7.512
+            ],
+            "medianMs": 8.779229
+          },
+          "latest": {
+            "samplesMs": [
+              14.2205,
+              12.512166,
+              12.723875,
+              14.002625,
+              14.016042,
+              12.436375,
+              13.850125,
+              16.410042,
+              14.248916,
+              12.633209,
+              13.566333,
+              15.09525,
+              14.873584,
+              12.287792,
+              14.249792,
+              13.756542,
+              13.822541,
+              15.4305,
+              14.130208,
+              14.196542,
+              10.073542,
+              9.427375,
+              9.608833,
+              9.113875,
+              9.091875,
+              9.50275,
+              10.517125,
+              11.913958,
+              9.594917,
+              9.203,
+              10.849417,
+              9.293792,
+              9.298083,
+              10.080458,
+              11.099333,
+              10.734667,
+              9.585917,
+              11.15625,
+              9.934166,
+              10.118417,
+              10.491125,
+              10.190541,
+              11.055125,
+              10.353792,
+              11.063292,
+              10.340375,
+              10.363583,
+              11.642083,
+              12.297875,
+              10.452792,
+              10.625958,
+              10.6895,
+              10.446208,
+              10.471,
+              10.433291,
+              9.099542,
+              10.190542,
+              13.914625,
+              12.758834,
+              10.446209
+            ],
+            "medianMs": 10.792042
+          }
+        }
+      }
+    },
+    "project200": {
+      "original": {
+        "medianMs": 233.893708,
+        "runs": [
+          {
+            "milliseconds": 366.148458,
+            "sha256": "6db6531c7da6b197deea09037ae83d8693c0b66079e251c2e0d872685a882381",
+            "roots": 1
+          },
+          {
+            "milliseconds": 233.893708,
+            "sha256": "6db6531c7da6b197deea09037ae83d8693c0b66079e251c2e0d872685a882381",
+            "roots": 1
+          },
+          {
+            "milliseconds": 197.654167,
+            "sha256": "6db6531c7da6b197deea09037ae83d8693c0b66079e251c2e0d872685a882381",
+            "roots": 1
+          }
+        ]
+      },
+      "previous": {
+        "medianMs": 409.328459,
+        "runs": [
+          {
+            "milliseconds": 450.423458,
+            "sha256": "6db6531c7da6b197deea09037ae83d8693c0b66079e251c2e0d872685a882381",
+            "roots": 1
+          },
+          {
+            "milliseconds": 409.328459,
+            "sha256": "6db6531c7da6b197deea09037ae83d8693c0b66079e251c2e0d872685a882381",
+            "roots": 1
+          },
+          {
+            "milliseconds": 293.653875,
+            "sha256": "6db6531c7da6b197deea09037ae83d8693c0b66079e251c2e0d872685a882381",
+            "roots": 1
+          }
+        ]
+      },
+      "latest": {
+        "medianMs": 908.641708,
+        "runs": [
+          {
+            "milliseconds": 926.896167,
+            "sha256": "6db6531c7da6b197deea09037ae83d8693c0b66079e251c2e0d872685a882381",
+            "roots": 1
+          },
+          {
+            "milliseconds": 908.641708,
+            "sha256": "6db6531c7da6b197deea09037ae83d8693c0b66079e251c2e0d872685a882381",
+            "roots": 1
+          },
+          {
+            "milliseconds": 629.143416,
+            "sha256": "6db6531c7da6b197deea09037ae83d8693c0b66079e251c2e0d872685a882381",
+            "roots": 1
+          }
+        ]
+      }
+    },
+    "arrays": {
+      "original": {
+        "array-128": {
+          "milliseconds": 0.015959,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 128
+        },
+        "array-1024": {
+          "milliseconds": 0.090542,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 1024
+        },
+        "array-4096": {
+          "milliseconds": 0.299583,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 4096
+        },
+        "array-8192": {
+          "milliseconds": 0.575125,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 8192
+        }
+      },
+      "previous": {
+        "array-128": {
+          "milliseconds": 2.985041,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 128
+        },
+        "array-1024": {
+          "milliseconds": 20.811583,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 1024
+        },
+        "array-4096": {
+          "milliseconds": 79.140916,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 4096
+        },
+        "array-8192": {
+          "milliseconds": 178.960792,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 8192
+        }
+      },
+      "latest": {
+        "array-128": {
+          "milliseconds": 6.329125,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 128
+        },
+        "array-1024": {
+          "milliseconds": 40.484375,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 1024
+        },
+        "array-4096": {
+          "milliseconds": 165.039875,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 4096
+        },
+        "array-8192": {
+          "milliseconds": 469.213167,
+          "matchesOriginalValue": true,
+          "resolved": true,
+          "count": 8192
+        }
+      }
+    }
+  },
+  "productionValidation": {
+    "deriver": "e59f993",
+    "tests": 3497,
+    "assertions": 22874,
+    "checks": [
+      "composer config:validate",
+      "composer packages:validate",
+      "composer security:audit",
+      "composer lint",
+      "composer test"
+    ],
+    "allPassed": true,
+    "separateSecurityUpdate": {
+      "package": "symfony/http-foundation",
+      "from": "7.4.18",
+      "to": "7.4.21",
+      "advisory": "CVE-2026-108082"
+    }
+  },
+  "artifacts": {
+    "rawArchive": "build/deriver-evaluation/afc9851.tar.gz (local, ignored)",
+    "migrationPatch": "deriver-afc9851-migration.patch",
+    "reproducer": "deriver-pruning-reproducer.php.example",
+    "checker": "deriver-pruning-checks.py",
+    "benchmark": "deriver-call-path-benchmark.php.example"
+  }
+}

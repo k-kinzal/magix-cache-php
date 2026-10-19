@@ -1,6 +1,36 @@
 # Deriver integration and upstream feedback
 
-## Current assessment (2026-10-05, Deriver e59f993)
+## Current assessment (2026-10-19, latest evaluated: Deriver afc9851)
+
+Latest `afc98516f758f78c6c43d96e084c040d684b3fb3` adds effective caller-path
+pruning and replaces the public preparation/evaluation API. The tested paths
+preserve invocation arguments and avoid unrelated evaluation: 16 irrelevant
+argument evaluations become zero, with query median 1.816 ms becoming 0.203 ms.
+The previously reported exception continuation and throw-only gaps are fixed
+in the new candidate probes. Dynamic dependencies remain explicit.
+
+**Production adoption is blocked by dependency constraints.** Latest requires
+Symfony Console `^6.4`, while Magix requires `^7.4 || ^8.0`. The production lock
+therefore remains on `e59f993`. A standalone installation tests the official
+latest package, and a separate API-only Magix overlay tests a migration patch
+while retaining Console 7.4. That overlay passes all 33 frozen reports, 3,072
+numeric comparisons and 3,497 tests, but is not a supported Composer installation.
+
+The migration prototype is also slower in the current per-expression adapter:
+a 200-declaration scan median rises from 409 to 909 ms in the same run. Caller
+pruning helps a larger shared source world; the current isolated generated
+sources have little irrelevant caller work to remove. Efficient source/input
+preparation is a separate integration concern. The PR is draft while latest
+adoption remains unresolved.
+
+See the [latest evaluation](deriver-evaluation-afc9851.md),
+[machine-readable evidence](deriver-evaluation-afc9851.json),
+[standalone reproducer](deriver-pruning-reproducer.php.example),
+[caller benchmark](deriver-call-path-benchmark.php.example), and
+[experimental migration patch](deriver-afc9851-migration.patch).
+Earlier assessments below retain their original revisions and observations.
+
+## Previous assessment (2026-10-05, Deriver e59f993)
 
 Updated to `e59f993c3d84d23066772b85e1226a66a2d16ae6` and adopted the default
 source-candidate contract. Magix accepts a complete singleton concrete candidate

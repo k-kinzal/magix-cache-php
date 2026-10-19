@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+use Deriver\Deriver;
+use Deriver\Deriver\DeriverConfig;
+use Deriver\Deriver\EvaluationOperation;
+use Deriver\Deriver\Evaluator\Term;
+use Deriver\Deriver\MicroEvaluator;
+
+// Run against the isolated latest installation, not the host project's lockfile.
+require $argv[1];
+
+$callers = isset($argv[2]) ? max(1, (int) $argv[2]) : 16;
+$source = '<?php function value($x){return $x;} function page(){return value(30);}';
+for ($i = 0; $i < $callers; $i++) {
+    $source .= 'function other'.$i.'(){return value(expensive());}';
+}
+$path = tempnam(sys_get_temp_dir(), 'pruning-bench-');
+file_put_contents($path, $source);
+$opened = 0;
+$evaluator = new MicroEvaluator('probe.expensive', '1', EvaluationOperation::Function, 'expensive', static function () use (&$opened): Term {
+    ++$opened;
+    return Term::constant(999);
+});
+$start = hrtime(true);
+$deriver = Deriver::prepare([$path], new DeriverConfig(evaluators: [$evaluator]));
+$prepare = (hrtime(true) - $start) / 1e6;
+unlink($path);
+$report = ['otherCallers' => $callers, 'prepareMs' => $prepare, 'runs' => []];
+for ($i = 0; $i < 13; $i++) {
+    foreach ($i % 2 === 0 ? ['full', 'postFilter', 'path'] : ['path', 'postFilter', 'full'] as $mode) {
+        $opened = 0;
+        $start = hrtime(true);
+        $result = $deriver->derive($mode === 'path' ? 'page -> value#return' : 'value#return');
+        if ($mode === 'postFilter') {
+            $result = $result->forCaller('page');
+        }
+        $elapsed = (hrtime(true) - $start) / 1e6;
+        if ($i >= 3) {
+            $report['runs'][$mode][] = [
+                'milliseconds' => $elapsed,
+                'opened' => $opened,
+                'values' => array_map(
+                    static fn ($candidate) => $candidate->result instanceof Term
+                        ? ['partialKind' => $candidate->result->kind->value, 'reason' => $candidate->result->attributes['reason'] ?? null]
+                        : $candidate->result,
+                    iterator_to_array($result),
+                ),
+                'interrupted' => $result->interrupted,
+                'statistics' => $result->statistics,
+            ];
+        }
+    }
+}
+echo json_encode($report, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR)."\n";

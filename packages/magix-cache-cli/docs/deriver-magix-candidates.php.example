@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+use Composer\InstalledVersions;
+use Deriver\Deriver;
+use Deriver\Deriver\BranchEvaluators;
+use Deriver\Deriver\DeriverConfig;
+use Deriver\Reporter\JsonReporter;
+
+// Supply the isolated latest autoloader, then the independent expectation manifest.
+require $argv[1];
+$manifest = json_decode(file_get_contents($argv[2]), true, flags: JSON_THROW_ON_ERROR);
+$report = [
+    'deriver' => InstalledVersions::getReference('k-kinzal/deriver'),
+    'php' => PHP_VERSION,
+    'oracle' => $manifest['purpose'],
+    'cases' => [],
+];
+foreach ($manifest['cases'] as $case) {
+    $path = tempnam(sys_get_temp_dir(), 'magix-candidates-');
+    file_put_contents($path, $case['source']);
+    try {
+        $result = ['id' => $case['id'], 'query' => $case['query']];
+        foreach (['structural', 'optionalTruthPruning'] as $mode) {
+            $deriver = Deriver::prepare([$path], new DeriverConfig(
+                evaluators: $mode === 'structural' ? [] : BranchEvaluators::truth(),
+            ));
+            $candidates = $deriver->derive(str_replace('{file}', $path, $case['query']));
+            $result[$mode] = [
+                'statistics' => $candidates->statistics,
+                ...json_decode((new JsonReporter())->report($candidates), true, flags: JSON_THROW_ON_ERROR),
+            ];
+        }
+        $report['cases'][] = $result;
+    } finally {
+        unlink($path);
+    }
+}
+echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR).PHP_EOL;

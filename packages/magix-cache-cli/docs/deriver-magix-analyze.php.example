@@ -1,0 +1,77 @@
+<?php
+
+declare(strict_types=1);
+
+use Deriver\Value\Term;
+use Magix\Cache\Cli\Declaration\Catalog;
+use Magix\Cache\Cli\Graph\CacheTree;
+use Magix\Cache\Cli\Reader\ExpressionDeriver;
+use Magix\Cache\Cli\Render\JsonRenderer;
+use Magix\Cache\Cli\Render\ValuePresentation;
+use Magix\Cache\Cli\Source\SourceParser;
+
+// This observes Magix's current implementation; its output is not the oracle.
+require $argv[1];
+$template = <<<'PHP'
+<?php
+use Magix\Cache\Attribute\Cache;
+use Magix\Cache\Attribute\CacheTtl;
+use Magix\Cache\Cacheable;
+use Magix\Cache\Cached;
+use Magix\Cache\Metadata\Visibility;
+class Sources {
+    use Cacheable;
+    #[Cache(ttl: 30, tags: ['common', 'a'])]
+    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }
+    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]
+    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }
+    #[Cache(ttl: 0, tags: ['common'])]
+    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }
+    #[Cache]
+    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }
+}
+class Root {
+    use Cacheable;
+    public function __construct(private Sources $sources) {}
+    POLICY
+    public function run(PARAMETERS): Cached {
+        return $this->cached(function () use (CAPTURES) { BODY });
+    }
+}
+PHP;
+$cases = [
+    'request-boolean' => ['return $flag ? $this->sources->short() : $this->sources->long();'],
+    'literal-true' => ['return true ? $this->sources->short() : $this->sources->long();'],
+    'literal-false' => ['return false ? $this->sources->short() : $this->sources->long();'],
+    'request-superglobal' => ['return $_GET["enabled"] ? $this->sources->short() : $this->sources->long();'],
+    'same-metadata' => ['return $flag ? $this->sources->short() : $this->sources->short();'],
+    'ttl-override' => ['return $flag ? $this->sources->short() : $this->sources->long();', '#[Cache(ttl: 90)]'],
+    'zero-alternative' => ['return $flag ? $this->sources->short() : $this->sources->zero();'],
+    'no-expiration-alternative' => ['return $flag ? $this->sources->short() : $this->sources->unlimited();'],
+    'known-and-opaque' => ['return $flag ? $this->sources->short() : opaque($this->sources->long());'],
+    'loop-updates' => ['$selected = $this->sources->short(); foreach ([0, 1] as $i) { $selected = $this->sources->long(); } return $selected;'],
+    'request-ttl-parameter' => ['return Cached::of("payload");', "#[Cache(tags: ['common'], visibility: Visibility::Private)]", '#[CacheTtl] int $ttl = 30', '$ttl'],
+    'explicit-metadata-with-dynamic-ttl' => ['return Cached::of("payload", new \\Magix\\Cache\\Metadata\\CacheMetadata(expiresAt: 1000.0 + $offset, tags: ["common"], visibility: Visibility::Private));', '#[Cache]', 'int $offset', '$offset'],
+];
+$report = ['cases' => []];
+foreach ($cases as $id => $configuration) {
+    $body = $configuration[0];
+    $policy = $configuration[1] ?? '#[Cache]';
+    $parameters = $configuration[2] ?? 'bool $flag';
+    $captures = $configuration[3] ?? '$flag';
+    $source = str_replace(['POLICY', 'PARAMETERS', 'CAPTURES', 'BODY'], [$policy, $parameters, $captures, $body], $template);
+    $catalog = new Catalog((new SourceParser())->parse('data:text/plain;base64,'.base64_encode($source), $id.'.php'));
+    $node = (new CacheTree($catalog))->build($catalog->search('Root::run')[0]);
+    $report['cases'][$id] = [
+        'source' => $source,
+        'ttlLabel' => $node->effect->ttl->label(),
+        'ttlDisplay' => (new ValuePresentation())->ttl($node),
+        ...json_decode((new JsonRenderer())->render([$node]), true, flags: JSON_THROW_ON_ERROR),
+    ];
+}
+$reader = new ExpressionDeriver();
+$report['existingScalarAdapter'] = [
+    'twoCandidates' => $reader->source('<?php function resolve(bool $flag) { return $flag ? 30 : 60; }', [Term::parameter('flag', 'bool')]),
+    'partialOffset' => $reader->source('<?php function resolve(int $offset) { return 30 + $offset; }', [Term::parameter('offset', 'int')]),
+];
+echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR).PHP_EOL;

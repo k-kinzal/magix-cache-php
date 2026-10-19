@@ -1,5 +1,10 @@
 # Deriver afc9851 caller-pruning evaluation
 
+The follow-up [Magix candidate-contract evaluation](deriver-magix-candidate-contract.md)
+replaces output equivalence as the semantic assessment criterion. This earlier
+report remains the record of the installation, API migration and timing
+experiment. Its singleton adapter is not the proposed general Analyze domain.
+
 Evaluated on 2026-10-19 against upstream main
 `afc98516f758f78c6c43d96e084c040d684b3fb3` (rechecked before publishing).
 The package is `k-kinzal/deriver`; its CLI is named `deliver`.

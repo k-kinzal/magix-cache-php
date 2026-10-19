@@ -1,0 +1,6483 @@
+{
+  "evaluatedOn": "2026-10-19",
+  "deriver": "afc98516f758f78c6c43d96e084c040d684b3fb3",
+  "php": "8.5.8",
+  "magixRevision": "431ba5a0",
+  "productionDeriver": "e59f993c3d84d23066772b85e1226a66a2d16ae6",
+  "oracle": "Source candidate obligations and Magix metadata semantics; current Magix output and PHP execution are not the oracle.",
+  "interpretation": "No missing required candidate in these authored examples. Retained dynamic expressions are usable information, not failed concrete evaluation. The two min calls need the explicit Magix projection implemented by the checker.",
+  "limitations": [
+    "52 authored cases, not whole-project or exhaustive PHP coverage",
+    "Normalized metadata records are not a completed CacheMetadata/Strategy integration",
+    "Candidate collection completeness is scoped to selected source and invocation context",
+    "Production dependency update remains blocked by Console constraints"
+  ],
+  "checks": [
+    {
+      "id": "boolean-input-both",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        true,
+        false
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-metadata-both",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        {
+          "ttl": 30,
+          "visibility": "shared",
+          "tags": [
+            "common",
+            "a"
+          ]
+        },
+        {
+          "ttl": 60,
+          "visibility": "private",
+          "tags": [
+            "common",
+            "b"
+          ]
+        }
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-input-true",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        true
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-metadata-true",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        {
+          "ttl": 30,
+          "visibility": "shared",
+          "tags": [
+            "common",
+            "a"
+          ]
+        },
+        {
+          "ttl": 60,
+          "visibility": "private",
+          "tags": [
+            "common",
+            "b"
+          ]
+        }
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-input-false",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        false
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-metadata-false",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        {
+          "ttl": 30,
+          "visibility": "shared",
+          "tags": [
+            "common",
+            "a"
+          ]
+        },
+        {
+          "ttl": 60,
+          "visibility": "private",
+          "tags": [
+            "common",
+            "b"
+          ]
+        }
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-input-unknown",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-metadata-unknown",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        {
+          "ttl": 30,
+          "visibility": "shared",
+          "tags": [
+            "common",
+            "a"
+          ]
+        },
+        {
+          "ttl": 60,
+          "visibility": "private",
+          "tags": [
+            "common",
+            "b"
+          ]
+        }
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-input-true-and-unknown",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "knownAlternativesRetained": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true
+      },
+      "concreteValues": [
+        true
+      ],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-metadata-true-and-unknown",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        {
+          "ttl": 30,
+          "visibility": "shared",
+          "tags": [
+            "common",
+            "a"
+          ]
+        },
+        {
+          "ttl": 60,
+          "visibility": "private",
+          "tags": [
+            "common",
+            "b"
+          ]
+        }
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "literal-true-if",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        30,
+        60
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "same-metadata-both-branches",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        [
+          30,
+          "private",
+          [
+            "common"
+          ]
+        ]
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "request-condition",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        30,
+        60
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "request-payload-only",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        {
+          "ttl": 30,
+          "visibility": "private",
+          "tags": [
+            "common"
+          ]
+        }
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "int-finite-offset",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        30,
+        60
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "int-single-offset",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        42
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "int-dynamic-offset",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true,
+        "partialOperationsRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "binary",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "int-known-and-dynamic-offset",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "knownAlternativesRetained": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true,
+        "partialOperationsRetained": true
+      },
+      "concreteValues": [
+        30
+      ],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "binary",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "int-negative-candidate",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        -30,
+        30
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "int-zero-and-positive",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        0,
+        30
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "int-null-and-positive",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        null,
+        30
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "metadata-tuple-alias",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        [
+          30,
+          "shared",
+          [
+            "a"
+          ]
+        ],
+        [
+          60,
+          "private",
+          [
+            "b"
+          ]
+        ]
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "metadata-one-if",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        [
+          30,
+          "a"
+        ],
+        [
+          60,
+          "b"
+        ]
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "metadata-independent-choices",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        [
+          30,
+          "a"
+        ],
+        [
+          60,
+          "a"
+        ],
+        [
+          30,
+          "b"
+        ],
+        [
+          60,
+          "b"
+        ]
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "compose-ttl-alternatives",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true,
+        "retainedOperandCorrelation": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "MISSING_SOURCE"
+      ],
+      "partialKinds": [
+        "alternative",
+        "call",
+        "choice",
+        "constant"
+      ],
+      "consumerProjectedValues": [
+        10,
+        30,
+        60
+      ],
+      "retainedArgumentPairs": [
+        [
+          30,
+          10
+        ],
+        [
+          30,
+          90
+        ],
+        [
+          60,
+          10
+        ],
+        [
+          60,
+          90
+        ]
+      ]
+    },
+    {
+      "id": "compose-alias",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true,
+        "retainedOperandCorrelation": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "MISSING_SOURCE"
+      ],
+      "partialKinds": [
+        "alternative",
+        "call",
+        "choice",
+        "constant"
+      ],
+      "consumerProjectedValues": [
+        30,
+        60
+      ],
+      "retainedArgumentPairs": [
+        [
+          30,
+          30
+        ],
+        [
+          60,
+          60
+        ]
+      ]
+    },
+    {
+      "id": "partial-record",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true,
+        "partialOperationsRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "array",
+        "binary",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "partial-record-visibility",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        "private"
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "partial-record-ttl",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "binary",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "partial-record-tags",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "array",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "partial-record-overridden",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "array",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "partial-record-override-ttl",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        60
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "partial-record-override-tags",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "array",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "known-plus-opaque-ttl",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "knownAlternativesRetained": true,
+        "noInventedConcreteValues": true,
+        "unresolvedAlternativeRetained": true
+      },
+      "concreteValues": [
+        30
+      ],
+      "partialReasons": [
+        "MISSING_SOURCE"
+      ],
+      "partialKinds": [
+        "call"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "request-tag",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "array",
+        "cast",
+        "concat",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "fixed-loop-updates",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        10,
+        30,
+        60
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "foreach-literal-offsets",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        30,
+        40,
+        60
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "foreach-dynamic-offsets",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "knownAlternativesRetained": true,
+        "noInventedConcreteValues": true,
+        "unresolvedAlternativeRetained": true,
+        "knownPartialOperandsRetained": true
+      },
+      "concreteValues": [
+        30
+      ],
+      "partialReasons": [
+        "EXTERNAL_INPUT",
+        "UNRESOLVED_ITERABLE"
+      ],
+      "partialKinds": [
+        "binary",
+        "constant",
+        "iterator-value",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "loop-recurrence",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "LOOP_DEPENDENCY"
+      ],
+      "partialKinds": [
+        "binary",
+        "constant",
+        "recurrence",
+        "recursive"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "caller-selected-finite",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        30,
+        60
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "caller-open-project",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "knownAlternativesRetained": true,
+        "noInventedConcreteValues": true,
+        "dynamicDependenciesRetained": true
+      },
+      "concreteValues": [
+        30,
+        60
+      ],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "binary",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "empty-selected-context",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-nullable-input",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "dynamicDependenciesRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-field-both",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        {
+          "ttl": 30,
+          "visibility": "private",
+          "cacheable": true
+        },
+        {
+          "ttl": 30,
+          "visibility": "private",
+          "cacheable": false
+        }
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-field-true",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        {
+          "ttl": 30,
+          "visibility": "private",
+          "cacheable": true
+        }
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-field-false",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        {
+          "ttl": 30,
+          "visibility": "private",
+          "cacheable": false
+        }
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-field-unknown",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "array",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "boolean-field-true-and-unknown",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "knownAlternativesRetained": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true
+      },
+      "concreteValues": [
+        {
+          "ttl": 30,
+          "visibility": "private",
+          "cacheable": true
+        }
+      ],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "array",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "factory-finite-ttl-argument",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        30,
+        60
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "factory-dynamic-ttl-argument",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "partialFieldDependencies": true,
+        "dynamicDependenciesRetained": true,
+        "knownPartialOperandsRetained": true,
+        "partialOperationsRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "binary",
+        "constant",
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "factory-default-is-not-input",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "noInventedConcreteValues": true,
+        "dynamicDependenciesRetained": true
+      },
+      "concreteValues": [],
+      "partialReasons": [
+        "EXTERNAL_INPUT"
+      ],
+      "partialKinds": [
+        "reference"
+      ],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    },
+    {
+      "id": "factory-caller-boolean",
+      "passed": true,
+      "checks": {
+        "notInterrupted": true,
+        "requiredCandidateValues": true
+      },
+      "concreteValues": [
+        true
+      ],
+      "partialReasons": [],
+      "partialKinds": [],
+      "consumerProjectedValues": [],
+      "retainedArgumentPairs": []
+    }
+  ],
+  "deriverCases": [
+    {
+      "id": "boolean-input-both",
+      "query": "input#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": true
+          },
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": false
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": true
+          },
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-metadata-both",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "shared",
+              "tags": [
+                "common",
+                "a"
+              ]
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 60,
+              "visibility": "private",
+              "tags": [
+                "common",
+                "b"
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "shared",
+              "tags": [
+                "common",
+                "a"
+              ]
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 60,
+              "visibility": "private",
+              "tags": [
+                "common",
+                "b"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-input-true",
+      "query": "input#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": true
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-metadata-true",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "shared",
+              "tags": [
+                "common",
+                "a"
+              ]
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 60,
+              "visibility": "private",
+              "tags": [
+                "common",
+                "b"
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "shared",
+              "tags": [
+                "common",
+                "a"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-input-false",
+      "query": "input#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": false
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-metadata-false",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "shared",
+              "tags": [
+                "common",
+                "a"
+              ]
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 60,
+              "visibility": "private",
+              "tags": [
+                "common",
+                "b"
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 60,
+              "visibility": "private",
+              "tags": [
+                "common",
+                "b"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-input-unknown",
+      "query": "input#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "bool",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "reference",
+                  "literal": "$request",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$request:94",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 94,
+                    "end": 107,
+                    "type": "bool",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "bool",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "reference",
+                  "literal": "$request",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$request:94",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 94,
+                    "end": 107,
+                    "type": "bool",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-metadata-unknown",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "shared",
+              "tags": [
+                "common",
+                "a"
+              ]
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 60,
+              "visibility": "private",
+              "tags": [
+                "common",
+                "b"
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "shared",
+              "tags": [
+                "common",
+                "a"
+              ]
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 60,
+              "visibility": "private",
+              "tags": [
+                "common",
+                "b"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-input-true-and-unknown",
+      "query": "input#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": true
+          },
+          {
+            "type": "partials",
+            "type_name": "bool",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "reference",
+                  "literal": "$request",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$request:111",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 111,
+                    "end": 124,
+                    "type": "bool",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": true
+          },
+          {
+            "type": "partials",
+            "type_name": "bool",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "reference",
+                  "literal": "$request",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$request:111",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 111,
+                    "end": 124,
+                    "type": "bool",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-metadata-true-and-unknown",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "shared",
+              "tags": [
+                "common",
+                "a"
+              ]
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 60,
+              "visibility": "private",
+              "tags": [
+                "common",
+                "b"
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "shared",
+              "tags": [
+                "common",
+                "a"
+              ]
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 60,
+              "visibility": "private",
+              "tags": [
+                "common",
+                "b"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "literal-true-if",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          }
+        ]
+      }
+    },
+    {
+      "id": "same-metadata-both-branches",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              30,
+              "private",
+              [
+                "common"
+              ]
+            ]
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              30,
+              "private",
+              [
+                "common"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "request-condition",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      }
+    },
+    {
+      "id": "request-payload-only",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "tags": [
+                "common"
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "tags": [
+                "common"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "int-finite-offset",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      }
+    },
+    {
+      "id": "int-single-offset",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 42
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 42
+          }
+        ]
+      }
+    },
+    {
+      "id": "int-dynamic-offset",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$offset:23",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 23,
+                    "end": 34,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$offset:23",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 23,
+                    "end": 34,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "int-known-and-dynamic-offset",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$offset:35",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 35,
+                    "end": 46,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$offset:35",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 35,
+                    "end": 46,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "int-negative-candidate",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": -30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": -30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          }
+        ]
+      }
+    },
+    {
+      "id": "int-zero-and-positive",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 0
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 0
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          }
+        ]
+      }
+    },
+    {
+      "id": "int-null-and-positive",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "null",
+            "result": null
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "null",
+            "result": null
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          }
+        ]
+      }
+    },
+    {
+      "id": "metadata-tuple-alias",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              30,
+              "shared",
+              [
+                "a"
+              ]
+            ]
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              60,
+              "private",
+              [
+                "b"
+              ]
+            ]
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              30,
+              "shared",
+              [
+                "a"
+              ]
+            ]
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              60,
+              "private",
+              [
+                "b"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "metadata-one-if",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              30,
+              "a"
+            ]
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              60,
+              "b"
+            ]
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              30,
+              "a"
+            ]
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              60,
+              "b"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "metadata-independent-choices",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              30,
+              "a"
+            ]
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              60,
+              "a"
+            ]
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              30,
+              "b"
+            ]
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              60,
+              "b"
+            ]
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              30,
+              "a"
+            ]
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              60,
+              "a"
+            ]
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              30,
+              "b"
+            ]
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": [
+              60,
+              "b"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "compose-ttl-alternatives",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "mixed",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "call",
+                  "literal": "min",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "source": "{source}",
+                    "start": 90,
+                    "reason": "MISSING_SOURCE"
+                  }
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    3,
+                    4
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    5,
+                    6
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    7
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    8
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    9
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    10
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": false
+                  }
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    11
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    12
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 10,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 90,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    13
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    14
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": false
+                  }
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    15
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    16
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    17
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    18
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    19
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    20
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    21
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    22
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": false
+                  }
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    23,
+                    24
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    25,
+                    26
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    27
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    28
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": false
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    29
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    30
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": false
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 60,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 60,
+                  "operands": [],
+                  "attributes": []
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "mixed",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "call",
+                  "literal": "min",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "source": "{source}",
+                    "start": 90,
+                    "reason": "MISSING_SOURCE"
+                  }
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    3,
+                    4
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    5,
+                    6
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    7
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    8
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    9
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    10
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": false
+                  }
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    11,
+                    12
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    13,
+                    14
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 10,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 90,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    15
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": true,
+                    "guard:source:resolve:condition:r1": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    16
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": true,
+                    "guard:source:resolve:condition:r1": false
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    17
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": false,
+                    "guard:source:resolve:condition:r1": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    18
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r9": false,
+                    "guard:source:resolve:condition:r1": false
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 60,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 60,
+                  "operands": [],
+                  "attributes": []
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "compose-alias",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "mixed",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "call",
+                  "literal": "min",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "source": "{source}",
+                    "start": 72,
+                    "reason": "MISSING_SOURCE"
+                  }
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    3,
+                    4
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    5,
+                    6
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    7
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    8
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": false
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    9
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    10
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": false
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 60,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 60,
+                  "operands": [],
+                  "attributes": []
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "mixed",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "call",
+                  "literal": "min",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "source": "{source}",
+                    "start": 72,
+                    "reason": "MISSING_SOURCE"
+                  }
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    3,
+                    4
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "choice",
+                  "literal": null,
+                  "operands": [
+                    5,
+                    6
+                  ],
+                  "attributes": []
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    7
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    8
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": false
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    9
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": true
+                  }
+                },
+                {
+                  "kind": "alternative",
+                  "literal": null,
+                  "operands": [
+                    10
+                  ],
+                  "attributes": {
+                    "guard:source:resolve:condition:r1": false
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 60,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": 60,
+                  "operands": [],
+                  "attributes": []
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "partial-record",
+      "query": "record#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": {
+                    "ttl": 1,
+                    "visibility": 2,
+                    "tags": 3
+                  },
+                  "attributes": {
+                    "open": false,
+                    "next": 0
+                  }
+                },
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    4,
+                    5
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "private",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": [
+                    6,
+                    7
+                  ],
+                  "attributes": {
+                    "open": false,
+                    "next": 2
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:record:$offset:22",
+                    "scope": "record",
+                    "context": "source:record",
+                    "source": "{source}",
+                    "start": 22,
+                    "end": 33,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "base",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$tag",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:record:$tag:35",
+                    "scope": "record",
+                    "context": "source:record",
+                    "source": "{source}",
+                    "start": 35,
+                    "end": 46,
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": {
+                    "ttl": 1,
+                    "visibility": 2,
+                    "tags": 3
+                  },
+                  "attributes": {
+                    "open": false,
+                    "next": 0
+                  }
+                },
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    4,
+                    5
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "private",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": [
+                    6,
+                    7
+                  ],
+                  "attributes": {
+                    "open": false,
+                    "next": 2
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:record:$offset:22",
+                    "scope": "record",
+                    "context": "source:record",
+                    "source": "{source}",
+                    "start": 22,
+                    "end": 33,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "base",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$tag",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:record:$tag:35",
+                    "scope": "record",
+                    "context": "source:record",
+                    "source": "{source}",
+                    "start": 35,
+                    "end": 46,
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "partial-record-visibility",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "string",
+            "result": "private"
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "string",
+            "result": "private"
+          }
+        ]
+      }
+    },
+    {
+      "id": "partial-record-ttl",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$offset:143",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 143,
+                    "end": 154,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$offset:143",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 143,
+                    "end": 154,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "partial-record-tags",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "open": false,
+                    "next": 2
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "base",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$tag",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$tag:155",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 155,
+                    "end": 166,
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "open": false,
+                    "next": 2
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "base",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$tag",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$tag:155",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 155,
+                    "end": 166,
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "partial-record-overridden",
+      "query": "overridden#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": {
+                    "ttl": 1,
+                    "visibility": 2,
+                    "tags": 3
+                  },
+                  "attributes": {
+                    "open": false,
+                    "next": 0
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 60,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": "private",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": [
+                    4,
+                    5
+                  ],
+                  "attributes": {
+                    "open": false,
+                    "next": 2
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "base",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$tag",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:overridden:$tag:158",
+                    "scope": "overridden",
+                    "context": "source:overridden",
+                    "source": "{source}",
+                    "start": 158,
+                    "end": 169,
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": {
+                    "ttl": 1,
+                    "visibility": 2,
+                    "tags": 3
+                  },
+                  "attributes": {
+                    "open": false,
+                    "next": 0
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 60,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": "private",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": [
+                    4,
+                    5
+                  ],
+                  "attributes": {
+                    "open": false,
+                    "next": 2
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "base",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$tag",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:overridden:$tag:158",
+                    "scope": "overridden",
+                    "context": "source:overridden",
+                    "source": "{source}",
+                    "start": 158,
+                    "end": 169,
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "partial-record-override-ttl",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      }
+    },
+    {
+      "id": "partial-record-override-tags",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "open": false,
+                    "next": 2
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "base",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$tag",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$tag:254",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 254,
+                    "end": 265,
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "open": false,
+                    "next": 2
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "base",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$tag",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$tag:254",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 254,
+                    "end": 265,
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "known-plus-opaque-ttl",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "partials",
+            "type_name": "mixed",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "call",
+                  "literal": "externalTtl",
+                  "operands": [],
+                  "attributes": {
+                    "source": "{source}",
+                    "start": 57,
+                    "reason": "MISSING_SOURCE"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "partials",
+            "type_name": "mixed",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "call",
+                  "literal": "externalTtl",
+                  "operands": [],
+                  "attributes": {
+                    "source": "{source}",
+                    "start": 57,
+                    "reason": "MISSING_SOURCE"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "request-tag",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "open": false,
+                    "next": 2
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "catalog",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "concat",
+                  "literal": null,
+                  "operands": [
+                    3,
+                    4
+                  ],
+                  "attributes": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "product:",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "cast",
+                  "literal": "string",
+                  "operands": [
+                    5
+                  ],
+                  "attributes": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$id",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$id:23",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 23,
+                    "end": 33,
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "open": false,
+                    "next": 2
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "catalog",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "concat",
+                  "literal": null,
+                  "operands": [
+                    3,
+                    4
+                  ],
+                  "attributes": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": "product:",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "cast",
+                  "literal": "string",
+                  "operands": [
+                    5
+                  ],
+                  "attributes": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$id",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$id:23",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 23,
+                    "end": 33,
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "fixed-loop-updates",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 10
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 10
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      }
+    },
+    {
+      "id": "foreach-literal-offsets",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 40
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 40
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      }
+    },
+    {
+      "id": "foreach-dynamic-offsets",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "iterator-value",
+                  "literal": null,
+                  "operands": [
+                    3
+                  ],
+                  "attributes": {
+                    "reason": "UNRESOLVED_ITERABLE"
+                  }
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offsets",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:recurrence:1:loops:a:1:{i:1;i:0;}:$offsets:23",
+                    "scope": "resolve",
+                    "context": "source:resolve:recurrence:1:loops:a:1:{i:1;i:0;}",
+                    "source": "{source}",
+                    "start": 23,
+                    "end": 37,
+                    "type": "array",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "iterator-value",
+                  "literal": null,
+                  "operands": [
+                    3
+                  ],
+                  "attributes": {
+                    "reason": "UNRESOLVED_ITERABLE"
+                  }
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offsets",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:recurrence:1:loops:a:1:{i:1;i:0;}:$offsets:23",
+                    "scope": "resolve",
+                    "context": "source:resolve:recurrence:1:loops:a:1:{i:1;i:0;}",
+                    "source": "{source}",
+                    "start": 23,
+                    "end": 37,
+                    "type": "array",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "loop-recurrence",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "mixed",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "recurrence",
+                  "literal": null,
+                  "operands": [
+                    1,
+                    2,
+                    3
+                  ],
+                  "attributes": {
+                    "reason": "LOOP_DEPENDENCY",
+                    "header": 1
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    3,
+                    4
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "recursive",
+                  "literal": "local:ttl",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:recurrence:1:local:ttl:6",
+                    "scope": "resolve",
+                    "context": "source:resolve:recurrence:1",
+                    "source": "{source}",
+                    "start": 6,
+                    "end": 98,
+                    "type": "mixed",
+                    "reason": "LOOP_DEPENDENCY"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 10,
+                  "operands": [],
+                  "attributes": []
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "mixed",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "recurrence",
+                  "literal": null,
+                  "operands": [
+                    1,
+                    2,
+                    3
+                  ],
+                  "attributes": {
+                    "reason": "LOOP_DEPENDENCY",
+                    "header": 1
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    3,
+                    4
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "recursive",
+                  "literal": "local:ttl",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:recurrence:1:local:ttl:6",
+                    "scope": "resolve",
+                    "context": "source:resolve:recurrence:1",
+                    "source": "{source}",
+                    "start": 6,
+                    "end": 98,
+                    "type": "mixed",
+                    "reason": "LOOP_DEPENDENCY"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 10,
+                  "operands": [],
+                  "attributes": []
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "caller-selected-finite",
+      "query": "page -> value#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      }
+    },
+    {
+      "id": "caller-open-project",
+      "query": "value#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:foreign:$offset:134",
+                    "scope": "foreign",
+                    "context": "source:foreign",
+                    "source": "{source}",
+                    "start": 134,
+                    "end": 145,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:foreign:$offset:134",
+                    "scope": "foreign",
+                    "context": "source:foreign",
+                    "source": "{source}",
+                    "start": 134,
+                    "end": 145,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty-selected-context",
+      "query": "other -> resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": []
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": []
+      }
+    },
+    {
+      "id": "boolean-nullable-input",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "bool|null",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "reference",
+                  "literal": "$request",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$request:23",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 23,
+                    "end": 37,
+                    "type": "bool|null",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "bool|null",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "reference",
+                  "literal": "$request",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$request:23",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 23,
+                    "end": 37,
+                    "type": "bool|null",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-field-both",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "cacheable": true
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "cacheable": false
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "cacheable": true
+            }
+          },
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "cacheable": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-field-true",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "cacheable": true
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "cacheable": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-field-false",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "cacheable": false
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "cacheable": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-field-unknown",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": {
+                    "ttl": 1,
+                    "visibility": 2,
+                    "cacheable": 3
+                  },
+                  "attributes": {
+                    "open": false,
+                    "next": 0
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": "private",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$request",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$request:94",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 94,
+                    "end": 107,
+                    "type": "bool",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": {
+                    "ttl": 1,
+                    "visibility": 2,
+                    "cacheable": 3
+                  },
+                  "attributes": {
+                    "open": false,
+                    "next": 0
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": "private",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$request",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$request:94",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 94,
+                    "end": 107,
+                    "type": "bool",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-field-true-and-unknown",
+      "query": "resolve#return",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "cacheable": true
+            }
+          },
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": {
+                    "ttl": 1,
+                    "visibility": 2,
+                    "cacheable": 3
+                  },
+                  "attributes": {
+                    "open": false,
+                    "next": 0
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": "private",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$request",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$request:111",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 111,
+                    "end": 124,
+                    "type": "bool",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "array",
+            "result": {
+              "ttl": 30,
+              "visibility": "private",
+              "cacheable": true
+            }
+          },
+          {
+            "type": "partials",
+            "type_name": "array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "array",
+                  "literal": null,
+                  "operands": {
+                    "ttl": 1,
+                    "visibility": 2,
+                    "cacheable": 3
+                  },
+                  "attributes": {
+                    "open": false,
+                    "next": 0
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "constant",
+                  "literal": "private",
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$request",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:resolve:$request:111",
+                    "scope": "resolve",
+                    "context": "source:resolve",
+                    "source": "{source}",
+                    "start": 111,
+                    "end": 124,
+                    "type": "bool",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "factory-finite-ttl-argument",
+      "query": "{file}:1:103#argument(ttl)",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 30
+          },
+          {
+            "type": "analyzed",
+            "type_name": "int",
+            "result": 60
+          }
+        ]
+      }
+    },
+    {
+      "id": "factory-dynamic-ttl-argument",
+      "query": "{file}:1:103#argument(ttl)",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:factory:$offset:80",
+                    "scope": "factory",
+                    "context": "source:factory",
+                    "source": "{source}",
+                    "start": 80,
+                    "end": 91,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "int|float|array",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "binary",
+                  "literal": "+",
+                  "operands": [
+                    1,
+                    2
+                  ],
+                  "attributes": {
+                    "type": "int|float|array"
+                  }
+                },
+                {
+                  "kind": "constant",
+                  "literal": 30,
+                  "operands": [],
+                  "attributes": []
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:factory:$offset:80",
+                    "scope": "factory",
+                    "context": "source:factory",
+                    "source": "{source}",
+                    "start": 80,
+                    "end": 91,
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "factory-default-is-not-input",
+      "query": "factory#parameter(enabled)",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "bool",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "reference",
+                  "literal": "$enabled",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:factory:$enabled:23",
+                    "scope": "factory",
+                    "context": "source:factory",
+                    "source": "{source}",
+                    "start": 23,
+                    "end": 41,
+                    "type": "bool",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "partials",
+            "type_name": "bool",
+            "result": {
+              "root": 0,
+              "nodes": [
+                {
+                  "kind": "reference",
+                  "literal": "$enabled",
+                  "operands": [],
+                  "attributes": {
+                    "identity": "source:factory:$enabled:23",
+                    "scope": "factory",
+                    "context": "source:factory",
+                    "source": "{source}",
+                    "start": 23,
+                    "end": 41,
+                    "type": "bool",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "factory-caller-boolean",
+      "query": "selected -> factory#parameter(enabled)",
+      "structural": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": true
+          }
+        ]
+      },
+      "optionalTruthPruning": {
+        "interrupted": false,
+        "candidates": [
+          {
+            "type": "analyzed",
+            "type_name": "bool",
+            "result": true
+          }
+        ]
+      }
+    }
+  ],
+  "magixObservations": {
+    "request-boolean": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache]\n    public function run(bool $flag): Cached {\n        return $this->cached(function () use ($flag) { return $flag ? $this->sources->short() : $this->sources->long(); });\n    }\n}",
+      "ttlLabel": "30/60s",
+      "effective": {
+        "ttl": {
+          "state": "unknown",
+          "seconds": null,
+          "lowerBound": 30,
+          "upperBound": 60,
+          "reason": null,
+          "ranges": [
+            {
+              "min": 30,
+              "max": 30
+            },
+            {
+              "min": 60,
+              "max": 60
+            }
+          ],
+          "finite": true
+        },
+        "visibility": "shared",
+        "visibilityReason": null,
+        "visibilityUnknown": true,
+        "tagsUnknown": true,
+        "storable": true,
+        "tags": [
+          "common"
+        ],
+        "problems": [],
+        "certainty": {
+          "ttl": "runtime",
+          "visibility": "runtime",
+          "tags": "runtime"
+        },
+        "analysis": {
+          "ttl": [],
+          "visibility": [],
+          "tags": [],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "yes",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [
+            "Sources::short"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 30,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::short"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "a",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        },
+        {
+          "sources": [
+            "Sources::long"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 60,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::long"
+          },
+          "visibility": "private",
+          "visibilityUnknown": false,
+          "tags": [
+            "b",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        }
+      ],
+      "diagnostics": [],
+      "ttlDisplay": "30/60s"
+    },
+    "literal-true": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache]\n    public function run(bool $flag): Cached {\n        return $this->cached(function () use ($flag) { return true ? $this->sources->short() : $this->sources->long(); });\n    }\n}",
+      "ttlLabel": "30/60s",
+      "effective": {
+        "ttl": {
+          "state": "unknown",
+          "seconds": null,
+          "lowerBound": 30,
+          "upperBound": 60,
+          "reason": null,
+          "ranges": [
+            {
+              "min": 30,
+              "max": 30
+            },
+            {
+              "min": 60,
+              "max": 60
+            }
+          ],
+          "finite": true
+        },
+        "visibility": "shared",
+        "visibilityReason": null,
+        "visibilityUnknown": true,
+        "tagsUnknown": true,
+        "storable": true,
+        "tags": [
+          "common"
+        ],
+        "problems": [],
+        "certainty": {
+          "ttl": "runtime",
+          "visibility": "runtime",
+          "tags": "runtime"
+        },
+        "analysis": {
+          "ttl": [],
+          "visibility": [],
+          "tags": [],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "yes",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [
+            "Sources::short"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 30,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::short"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "a",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        },
+        {
+          "sources": [
+            "Sources::long"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 60,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::long"
+          },
+          "visibility": "private",
+          "visibilityUnknown": false,
+          "tags": [
+            "b",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        }
+      ],
+      "diagnostics": [],
+      "ttlDisplay": "30/60s"
+    },
+    "literal-false": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache]\n    public function run(bool $flag): Cached {\n        return $this->cached(function () use ($flag) { return false ? $this->sources->short() : $this->sources->long(); });\n    }\n}",
+      "ttlLabel": "30/60s",
+      "effective": {
+        "ttl": {
+          "state": "unknown",
+          "seconds": null,
+          "lowerBound": 30,
+          "upperBound": 60,
+          "reason": null,
+          "ranges": [
+            {
+              "min": 30,
+              "max": 30
+            },
+            {
+              "min": 60,
+              "max": 60
+            }
+          ],
+          "finite": true
+        },
+        "visibility": "shared",
+        "visibilityReason": null,
+        "visibilityUnknown": true,
+        "tagsUnknown": true,
+        "storable": true,
+        "tags": [
+          "common"
+        ],
+        "problems": [],
+        "certainty": {
+          "ttl": "runtime",
+          "visibility": "runtime",
+          "tags": "runtime"
+        },
+        "analysis": {
+          "ttl": [],
+          "visibility": [],
+          "tags": [],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "yes",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [
+            "Sources::short"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 30,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::short"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "a",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        },
+        {
+          "sources": [
+            "Sources::long"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 60,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::long"
+          },
+          "visibility": "private",
+          "visibilityUnknown": false,
+          "tags": [
+            "b",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        }
+      ],
+      "diagnostics": [],
+      "ttlDisplay": "30/60s"
+    },
+    "request-superglobal": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache]\n    public function run(bool $flag): Cached {\n        return $this->cached(function () use ($flag) { return $_GET[\"enabled\"] ? $this->sources->short() : $this->sources->long(); });\n    }\n}",
+      "ttlLabel": "30/60s",
+      "effective": {
+        "ttl": {
+          "state": "unknown",
+          "seconds": null,
+          "lowerBound": 30,
+          "upperBound": 60,
+          "reason": null,
+          "ranges": [
+            {
+              "min": 30,
+              "max": 30
+            },
+            {
+              "min": 60,
+              "max": 60
+            }
+          ],
+          "finite": true
+        },
+        "visibility": "shared",
+        "visibilityReason": null,
+        "visibilityUnknown": true,
+        "tagsUnknown": true,
+        "storable": true,
+        "tags": [
+          "common"
+        ],
+        "problems": [],
+        "certainty": {
+          "ttl": "runtime",
+          "visibility": "runtime",
+          "tags": "runtime"
+        },
+        "analysis": {
+          "ttl": [],
+          "visibility": [],
+          "tags": [],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "yes",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [
+            "Sources::short"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 30,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::short"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "a",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        },
+        {
+          "sources": [
+            "Sources::long"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 60,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::long"
+          },
+          "visibility": "private",
+          "visibilityUnknown": false,
+          "tags": [
+            "b",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        }
+      ],
+      "diagnostics": [],
+      "ttlDisplay": "30/60s"
+    },
+    "same-metadata": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache]\n    public function run(bool $flag): Cached {\n        return $this->cached(function () use ($flag) { return $flag ? $this->sources->short() : $this->sources->short(); });\n    }\n}",
+      "ttlLabel": "30s",
+      "effective": {
+        "ttl": {
+          "state": "known",
+          "seconds": 30,
+          "lowerBound": null,
+          "upperBound": null,
+          "reason": "inherited from Sources::short"
+        },
+        "visibility": "shared",
+        "visibilityReason": "inherited from Sources::short",
+        "visibilityUnknown": false,
+        "tagsUnknown": false,
+        "storable": true,
+        "tags": [
+          "a",
+          "common"
+        ],
+        "problems": [],
+        "certainty": {
+          "ttl": "known",
+          "visibility": "known",
+          "tags": "known"
+        },
+        "analysis": {
+          "ttl": [],
+          "visibility": [],
+          "tags": [],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "yes",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [
+            "Sources::short"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 30,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::short"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "a",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        }
+      ],
+      "diagnostics": [],
+      "ttlDisplay": "30s"
+    },
+    "ttl-override": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache(ttl: 90)]\n    public function run(bool $flag): Cached {\n        return $this->cached(function () use ($flag) { return $flag ? $this->sources->short() : $this->sources->long(); });\n    }\n}",
+      "ttlLabel": "90s",
+      "effective": {
+        "ttl": {
+          "state": "known",
+          "seconds": 90,
+          "lowerBound": null,
+          "upperBound": null,
+          "reason": null
+        },
+        "visibility": "shared",
+        "visibilityReason": null,
+        "visibilityUnknown": true,
+        "tagsUnknown": true,
+        "storable": true,
+        "tags": [
+          "common"
+        ],
+        "problems": [],
+        "certainty": {
+          "ttl": "known",
+          "visibility": "runtime",
+          "tags": "runtime"
+        },
+        "analysis": {
+          "ttl": [],
+          "visibility": [],
+          "tags": [],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "yes",
+        "localOverrides": {
+          "ttl": "local ttl 90s; composed 30s"
+        }
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [
+            "Sources::short"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 90,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": null
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "a",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        },
+        {
+          "sources": [
+            "Sources::long"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 90,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": null
+          },
+          "visibility": "private",
+          "visibilityUnknown": false,
+          "tags": [
+            "b",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        }
+      ],
+      "diagnostics": [],
+      "ttlDisplay": "90s"
+    },
+    "zero-alternative": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache]\n    public function run(bool $flag): Cached {\n        return $this->cached(function () use ($flag) { return $flag ? $this->sources->short() : $this->sources->zero(); });\n    }\n}",
+      "ttlLabel": "0/30s",
+      "effective": {
+        "ttl": {
+          "state": "unknown",
+          "seconds": null,
+          "lowerBound": 0,
+          "upperBound": 30,
+          "reason": null,
+          "ranges": [
+            {
+              "min": 0,
+              "max": 0
+            },
+            {
+              "min": 30,
+              "max": 30
+            }
+          ],
+          "finite": true
+        },
+        "visibility": "shared",
+        "visibilityReason": null,
+        "visibilityUnknown": false,
+        "tagsUnknown": true,
+        "storable": false,
+        "tags": [
+          "common"
+        ],
+        "problems": [],
+        "certainty": {
+          "ttl": "runtime",
+          "visibility": "known",
+          "tags": "runtime"
+        },
+        "analysis": {
+          "ttl": [],
+          "visibility": [],
+          "tags": [],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "runtime-dependent",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [
+            "Sources::short"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 30,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::short"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "a",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        },
+        {
+          "sources": [
+            "Sources::zero"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 0,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::zero"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": false,
+          "problems": []
+        }
+      ],
+      "diagnostics": [],
+      "ttlDisplay": "0/30s"
+    },
+    "no-expiration-alternative": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache]\n    public function run(bool $flag): Cached {\n        return $this->cached(function () use ($flag) { return $flag ? $this->sources->short() : $this->sources->unlimited(); });\n    }\n}",
+      "ttlLabel": "unknown",
+      "effective": {
+        "ttl": {
+          "state": "unknown",
+          "seconds": null,
+          "lowerBound": null,
+          "upperBound": null,
+          "reason": "a branch supplies no expiration"
+        },
+        "visibility": "shared",
+        "visibilityReason": null,
+        "visibilityUnknown": false,
+        "tagsUnknown": true,
+        "storable": false,
+        "tags": [],
+        "problems": [],
+        "certainty": {
+          "ttl": "runtime",
+          "visibility": "known",
+          "tags": "runtime"
+        },
+        "analysis": {
+          "ttl": [],
+          "visibility": [],
+          "tags": [],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "runtime-dependent",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [
+            "Sources::short"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 30,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::short"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "a",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        },
+        {
+          "sources": [
+            "Sources::unlimited"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "unconstrained",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "unconstrained",
+            "seconds": null,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": null
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": false,
+          "problems": []
+        }
+      ],
+      "diagnostics": [],
+      "ttlDisplay": "?"
+    },
+    "known-and-opaque": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache]\n    public function run(bool $flag): Cached {\n        return $this->cached(function () use ($flag) { return $flag ? $this->sources->short() : opaque($this->sources->long()); });\n    }\n}",
+      "ttlLabel": "unknown",
+      "effective": {
+        "ttl": {
+          "state": "unknown",
+          "seconds": null,
+          "lowerBound": null,
+          "upperBound": null,
+          "reason": "returned cache metadata is not analyzed"
+        },
+        "visibility": "shared",
+        "visibilityReason": null,
+        "visibilityUnknown": true,
+        "tagsUnknown": true,
+        "storable": false,
+        "tags": [],
+        "problems": [],
+        "certainty": {
+          "ttl": "partial",
+          "visibility": "partial",
+          "tags": "partial"
+        },
+        "analysis": {
+          "ttl": [
+            "813048cf08c2352eed53625dbb36fe07d11ccdffd6a2ac8e7abfd5ecce1864ac"
+          ],
+          "visibility": [
+            "813048cf08c2352eed53625dbb36fe07d11ccdffd6a2ac8e7abfd5ecce1864ac"
+          ],
+          "tags": [
+            "813048cf08c2352eed53625dbb36fe07d11ccdffd6a2ac8e7abfd5ecce1864ac"
+          ],
+          "ttlReference": {
+            "seconds": 60,
+            "sources": [
+              "Sources::long"
+            ],
+            "basis": "known input before an unverified operation"
+          },
+          "visibilityReference": {
+            "value": null,
+            "candidates": [
+              "shared",
+              "private"
+            ],
+            "sources": [
+              "Sources::short",
+              "Sources::long"
+            ],
+            "basis": "input metadata before an unverified operation"
+          },
+          "tagsReference": {
+            "value": null,
+            "candidates": [
+              [
+                "a",
+                "common"
+              ],
+              [
+                "b",
+                "common"
+              ]
+            ],
+            "sources": [
+              "Sources::short",
+              "Sources::long"
+            ],
+            "basis": "input metadata before an unverified operation"
+          }
+        },
+        "storage": "unknown",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [
+            "Sources::short"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 30,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::short"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "a",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        },
+        {
+          "sources": [],
+          "analyzed": false,
+          "certainty": {
+            "ttl": "partial",
+            "visibility": "partial",
+            "tags": "partial"
+          },
+          "analysis": {
+            "ttl": [
+              "813048cf08c2352eed53625dbb36fe07d11ccdffd6a2ac8e7abfd5ecce1864ac"
+            ],
+            "visibility": [
+              "813048cf08c2352eed53625dbb36fe07d11ccdffd6a2ac8e7abfd5ecce1864ac"
+            ],
+            "tags": [
+              "813048cf08c2352eed53625dbb36fe07d11ccdffd6a2ac8e7abfd5ecce1864ac"
+            ],
+            "ttlReference": {
+              "seconds": 60,
+              "sources": [
+                "Sources::long"
+              ],
+              "basis": "known input before an unverified operation"
+            },
+            "visibilityReference": {
+              "value": "private",
+              "candidates": [
+                "private"
+              ],
+              "sources": [
+                "Sources::long"
+              ],
+              "basis": "input metadata before an unverified operation"
+            },
+            "tagsReference": {
+              "value": [
+                "b",
+                "common"
+              ],
+              "candidates": [
+                [
+                  "b",
+                  "common"
+                ]
+              ],
+              "sources": [
+                "Sources::long"
+              ],
+              "basis": "input metadata before an unverified operation"
+            }
+          },
+          "ttl": {
+            "state": "unknown",
+            "seconds": null,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "returned cache metadata is not analyzed"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": true,
+          "tags": [],
+          "tagsUnknown": true,
+          "expirationConstraints": [],
+          "storable": false,
+          "problems": []
+        }
+      ],
+      "diagnostics": [
+        {
+          "id": "813048cf08c2352eed53625dbb36fe07d11ccdffd6a2ac8e7abfd5ecce1864ac",
+          "kind": "opaque-call",
+          "method": "Root::run",
+          "file": "known-and-opaque.php",
+          "line": 23,
+          "message": "Returned metadata could not be followed through opaque-call"
+        }
+      ],
+      "ttlDisplay": "60s?"
+    },
+    "loop-updates": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache]\n    public function run(bool $flag): Cached {\n        return $this->cached(function () use ($flag) { $selected = $this->sources->short(); foreach ([0, 1] as $i) { $selected = $this->sources->long(); } return $selected; });\n    }\n}",
+      "ttlLabel": "30/60s",
+      "effective": {
+        "ttl": {
+          "state": "unknown",
+          "seconds": null,
+          "lowerBound": 30,
+          "upperBound": 60,
+          "reason": null,
+          "ranges": [
+            {
+              "min": 30,
+              "max": 30
+            },
+            {
+              "min": 60,
+              "max": 60
+            }
+          ],
+          "finite": true
+        },
+        "visibility": "shared",
+        "visibilityReason": null,
+        "visibilityUnknown": true,
+        "tagsUnknown": true,
+        "storable": true,
+        "tags": [
+          "common"
+        ],
+        "problems": [],
+        "certainty": {
+          "ttl": "runtime",
+          "visibility": "runtime",
+          "tags": "runtime"
+        },
+        "analysis": {
+          "ttl": [],
+          "visibility": [],
+          "tags": [],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "yes",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [
+            "Sources::long"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 60,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::long"
+          },
+          "visibility": "private",
+          "visibilityUnknown": false,
+          "tags": [
+            "b",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        },
+        {
+          "sources": [
+            "Sources::short"
+          ],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "known",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "known",
+            "seconds": 30,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "inherited from Sources::short"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": false,
+          "tags": [
+            "a",
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": true,
+          "problems": []
+        }
+      ],
+      "diagnostics": [],
+      "ttlDisplay": "30/60s"
+    },
+    "request-ttl-parameter": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache(tags: ['common'], visibility: Visibility::Private)]\n    public function run(#[CacheTtl] int $ttl = 30): Cached {\n        return $this->cached(function () use ($ttl) { return Cached::of(\"payload\"); });\n    }\n}",
+      "ttlLabel": "0-?s",
+      "effective": {
+        "ttl": {
+          "state": "unknown",
+          "seconds": null,
+          "lowerBound": 0,
+          "upperBound": null,
+          "reason": "TTL depends on $ttl (non-negative integer seconds)",
+          "finite": true
+        },
+        "visibility": "private",
+        "visibilityReason": "declared by the policy",
+        "visibilityUnknown": false,
+        "tagsUnknown": false,
+        "storable": false,
+        "tags": [
+          "common"
+        ],
+        "problems": [],
+        "certainty": {
+          "ttl": "runtime",
+          "visibility": "known",
+          "tags": "known"
+        },
+        "analysis": {
+          "ttl": [],
+          "visibility": [],
+          "tags": [],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "runtime-dependent",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [],
+          "analyzed": true,
+          "certainty": {
+            "ttl": "runtime",
+            "visibility": "known",
+            "tags": "known"
+          },
+          "analysis": {
+            "ttl": [],
+            "visibility": [],
+            "tags": [],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "unknown",
+            "seconds": null,
+            "lowerBound": 0,
+            "upperBound": null,
+            "reason": "TTL depends on $ttl (non-negative integer seconds)",
+            "finite": true
+          },
+          "visibility": "private",
+          "visibilityUnknown": false,
+          "tags": [
+            "common"
+          ],
+          "tagsUnknown": false,
+          "expirationConstraints": [],
+          "storable": false,
+          "problems": []
+        }
+      ],
+      "diagnostics": [],
+      "ttlDisplay": "dynamic"
+    },
+    "explicit-metadata-with-dynamic-ttl": {
+      "source": "<?php\nuse Magix\\Cache\\Attribute\\Cache;\nuse Magix\\Cache\\Attribute\\CacheTtl;\nuse Magix\\Cache\\Cacheable;\nuse Magix\\Cache\\Cached;\nuse Magix\\Cache\\Metadata\\Visibility;\nclass Sources {\n    use Cacheable;\n    #[Cache(ttl: 30, tags: ['common', 'a'])]\n    public function short(): Cached { return $this->cached(fn () => Cached::of(1)); }\n    #[Cache(ttl: 60, visibility: Visibility::Private, tags: ['common', 'b'])]\n    public function long(): Cached { return $this->cached(fn () => Cached::of(2)); }\n    #[Cache(ttl: 0, tags: ['common'])]\n    public function zero(): Cached { return $this->cached(fn () => Cached::of(3)); }\n    #[Cache]\n    public function unlimited(): Cached { return $this->cached(fn () => Cached::of(4)); }\n}\nclass Root {\n    use Cacheable;\n    public function __construct(private Sources $sources) {}\n    #[Cache]\n    public function run(int $offset): Cached {\n        return $this->cached(function () use ($offset) { return Cached::of(\"payload\", new \\Magix\\Cache\\Metadata\\CacheMetadata(expiresAt: 1000.0 + $offset, tags: [\"common\"], visibility: Visibility::Private)); });\n    }\n}",
+      "ttlLabel": "unknown",
+      "effective": {
+        "ttl": {
+          "state": "unknown",
+          "seconds": null,
+          "lowerBound": null,
+          "upperBound": null,
+          "reason": "returned cache metadata is not analyzed"
+        },
+        "visibility": "shared",
+        "visibilityReason": null,
+        "visibilityUnknown": true,
+        "tagsUnknown": true,
+        "storable": false,
+        "tags": [],
+        "problems": [],
+        "certainty": {
+          "ttl": "partial",
+          "visibility": "partial",
+          "tags": "partial"
+        },
+        "analysis": {
+          "ttl": [
+            "e7493485a96487c61ed8339461ce2017505fc24c248f9c37d4f2b97f2958d72c"
+          ],
+          "visibility": [
+            "e7493485a96487c61ed8339461ce2017505fc24c248f9c37d4f2b97f2958d72c"
+          ],
+          "tags": [
+            "e7493485a96487c61ed8339461ce2017505fc24c248f9c37d4f2b97f2958d72c"
+          ],
+          "ttlReference": null,
+          "visibilityReference": null,
+          "tagsReference": null
+        },
+        "storage": "unknown",
+        "localOverrides": []
+      },
+      "metadataAlternatives": [
+        {
+          "sources": [],
+          "analyzed": false,
+          "certainty": {
+            "ttl": "partial",
+            "visibility": "partial",
+            "tags": "partial"
+          },
+          "analysis": {
+            "ttl": [
+              "e7493485a96487c61ed8339461ce2017505fc24c248f9c37d4f2b97f2958d72c"
+            ],
+            "visibility": [
+              "e7493485a96487c61ed8339461ce2017505fc24c248f9c37d4f2b97f2958d72c"
+            ],
+            "tags": [
+              "e7493485a96487c61ed8339461ce2017505fc24c248f9c37d4f2b97f2958d72c"
+            ],
+            "ttlReference": null,
+            "visibilityReference": null,
+            "tagsReference": null
+          },
+          "ttl": {
+            "state": "unknown",
+            "seconds": null,
+            "lowerBound": null,
+            "upperBound": null,
+            "reason": "returned cache metadata is not analyzed"
+          },
+          "visibility": "shared",
+          "visibilityUnknown": true,
+          "tags": [],
+          "tagsUnknown": true,
+          "expirationConstraints": [],
+          "storable": false,
+          "problems": []
+        }
+      ],
+      "diagnostics": [
+        {
+          "id": "e7493485a96487c61ed8339461ce2017505fc24c248f9c37d4f2b97f2958d72c",
+          "kind": "opaque-return",
+          "method": "Root::run",
+          "file": "explicit-metadata-with-dynamic-ttl.php",
+          "line": 21,
+          "message": "Returned metadata could not be followed through opaque-return"
+        }
+      ],
+      "ttlDisplay": "?"
+    }
+  },
+  "existingScalarAdapter": {
+    "twoCandidates": "\u0000magix-unresolved",
+    "partialOffset": "\u0000magix-unresolved"
+  },
+  "files": {
+    "expectations": "deriver-magix-candidates.json",
+    "runner": "deriver-magix-candidates.php.example",
+    "checker": "deriver-magix-candidates-check.py",
+    "magixObserver": "deriver-magix-analyze.php.example",
+    "rawArchive": "build/deriver-evaluation/magix-candidate-contract-20261019.tar.gz (local, ignored)"
+  },
+  "repositoryValidation": {
+    "config": "passed",
+    "packages": "passed",
+    "security": "passed",
+    "lint": "passed",
+    "initialTestRun": "Two existing StrategyAnalysis tests hit the one-second limit with eight workers. No production source changed.",
+    "focusedRecheck": {
+      "tests": 3,
+      "assertions": 16,
+      "passed": true
+    },
+    "finalTestRun": {
+      "command": "composer test -- --processes=2",
+      "tests": 3497,
+      "assertions": 22874,
+      "passed": true,
+      "timeLimitsChanged": false
+    }
+  }
+}

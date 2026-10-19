@@ -1,6 +1,36 @@
 # Deriver integration and upstream feedback
 
-## Current assessment (2026-10-19, latest evaluated: Deriver afc9851)
+## Current semantic assessment (2026-10-19, Deriver afc9851)
+
+The follow-up evaluation starts from the source candidates and dependencies
+Magix needs, rather than using existing Magix outputs as the correctness oracle.
+Request-dependent selection does not imply missing metadata information: an
+unknown boolean can select a closed set of TTLs 30 and 60, and a symbolic TTL
+can coexist with known visibility and tags. A concrete singleton is not the
+appropriate general result domain for Analyze.
+
+The [candidate-contract report](deriver-magix-candidate-contract.md) specifies
+boolean input/value/condition distinctions, finite and dynamic integer offsets,
+field projection, alternative union, composition, correlations and scope. It
+includes [independent expectations](deriver-magix-candidates.json),
+[a reproducer](deriver-magix-candidates.php.example),
+[a checker](deriver-magix-candidates-check.py), and
+[results](deriver-magix-candidate-results.json).
+
+No required candidate loss was found in the authored cases. Retained expressions
+are accepted as useful information. Two min calls remain symbolic with complete
+operands; the checker applies Magix's meet instead of pretending Deriver returned
+concrete values. This is focused evidence, not a general completeness claim.
+Twelve actual Magix examples also show both useful alternative handling and a
+reader limitation: explicit metadata construction with dynamic expiration loses
+otherwise fixed visibility/tags. That loss is not attributed to Deriver.
+
+The broader candidate-preserving adapter is not implemented. The earlier
+singleton migration patch, deployment conflict and performance measurements
+remain separate from this semantic assessment. The production lock stays on
+e59f993, and the PR remains draft.
+
+## Previous deployment evaluation (2026-10-19, Deriver afc9851)
 
 Latest `afc98516f758f78c6c43d96e084c040d684b3fb3` adds effective caller-path
 pruning and replaces the public preparation/evaluation API. The tested paths

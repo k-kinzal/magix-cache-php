@@ -1,0 +1,1145 @@
+{
+  "schema": "magix-candidate-contract/1",
+  "upstream": "afc98516f758f78c6c43d96e084c040d684b3fb3",
+  "purpose": "Independent source-candidate obligations for Magix Analyze; neither PHP execution nor current Magix output is the oracle. Required operation results may be concrete or retained with sufficient operands for the named Magix projection; retained min is checked explicitly, not executed as application PHP.",
+  "cases": [
+    {
+      "id": "boolean-input-both",
+      "source": "<?php function input(bool $request, bool $choice): bool { return $request ? true : false; } function resolve(bool $request, bool $choice) { return input($request, $choice) ? [\"ttl\"=>30,\"visibility\"=>\"shared\",\"tags\"=>[\"common\",\"a\"]] : [\"ttl\"=>60,\"visibility\"=>\"private\",\"tags\"=>[\"common\",\"b\"]]; }",
+      "query": "input#return",
+      "expect": {
+        "projection": "Input candidates are not an observed request value. A bool annotation does not create source witnesses.",
+        "requiredValues": [],
+        "values": [
+          true,
+          false
+        ]
+      }
+    },
+    {
+      "id": "boolean-metadata-both",
+      "source": "<?php function input(bool $request, bool $choice): bool { return $request ? true : false; } function resolve(bool $request, bool $choice) { return input($request, $choice) ? [\"ttl\"=>30,\"visibility\"=>\"shared\",\"tags\"=>[\"common\",\"a\"]] : [\"ttl\"=>60,\"visibility\"=>\"private\",\"tags\"=>[\"common\",\"b\"]]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Structural metadata alternatives 30/shared/common,a and 60/private/common,b. Selection is runtime-dependent; the candidate set and common tag are known.",
+        "values": [
+          {
+            "ttl": 30,
+            "visibility": "shared",
+            "tags": [
+              "common",
+              "a"
+            ]
+          },
+          {
+            "ttl": 60,
+            "visibility": "private",
+            "tags": [
+              "common",
+              "b"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-input-true",
+      "source": "<?php function input(bool $request, bool $choice): bool { return true; } function resolve(bool $request, bool $choice) { return input($request, $choice) ? [\"ttl\"=>30,\"visibility\"=>\"shared\",\"tags\"=>[\"common\",\"a\"]] : [\"ttl\"=>60,\"visibility\"=>\"private\",\"tags\"=>[\"common\",\"b\"]]; }",
+      "query": "input#return",
+      "expect": {
+        "projection": "Input candidates are not an observed request value. A bool annotation does not create source witnesses.",
+        "requiredValues": [],
+        "values": [
+          true
+        ]
+      }
+    },
+    {
+      "id": "boolean-metadata-true",
+      "source": "<?php function input(bool $request, bool $choice): bool { return true; } function resolve(bool $request, bool $choice) { return input($request, $choice) ? [\"ttl\"=>30,\"visibility\"=>\"shared\",\"tags\"=>[\"common\",\"a\"]] : [\"ttl\"=>60,\"visibility\"=>\"private\",\"tags\"=>[\"common\",\"b\"]]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Structural metadata alternatives 30/shared/common,a and 60/private/common,b. Selection is runtime-dependent; the candidate set and common tag are known.",
+        "values": [
+          {
+            "ttl": 30,
+            "visibility": "shared",
+            "tags": [
+              "common",
+              "a"
+            ]
+          },
+          {
+            "ttl": 60,
+            "visibility": "private",
+            "tags": [
+              "common",
+              "b"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-input-false",
+      "source": "<?php function input(bool $request, bool $choice): bool { return false; } function resolve(bool $request, bool $choice) { return input($request, $choice) ? [\"ttl\"=>30,\"visibility\"=>\"shared\",\"tags\"=>[\"common\",\"a\"]] : [\"ttl\"=>60,\"visibility\"=>\"private\",\"tags\"=>[\"common\",\"b\"]]; }",
+      "query": "input#return",
+      "expect": {
+        "projection": "Input candidates are not an observed request value. A bool annotation does not create source witnesses.",
+        "requiredValues": [],
+        "values": [
+          false
+        ]
+      }
+    },
+    {
+      "id": "boolean-metadata-false",
+      "source": "<?php function input(bool $request, bool $choice): bool { return false; } function resolve(bool $request, bool $choice) { return input($request, $choice) ? [\"ttl\"=>30,\"visibility\"=>\"shared\",\"tags\"=>[\"common\",\"a\"]] : [\"ttl\"=>60,\"visibility\"=>\"private\",\"tags\"=>[\"common\",\"b\"]]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Structural metadata alternatives 30/shared/common,a and 60/private/common,b. Selection is runtime-dependent; the candidate set and common tag are known.",
+        "values": [
+          {
+            "ttl": 30,
+            "visibility": "shared",
+            "tags": [
+              "common",
+              "a"
+            ]
+          },
+          {
+            "ttl": 60,
+            "visibility": "private",
+            "tags": [
+              "common",
+              "b"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-input-unknown",
+      "source": "<?php function input(bool $request, bool $choice): bool { return $request; } function resolve(bool $request, bool $choice) { return input($request, $choice) ? [\"ttl\"=>30,\"visibility\"=>\"shared\",\"tags\"=>[\"common\",\"a\"]] : [\"ttl\"=>60,\"visibility\"=>\"private\",\"tags\"=>[\"common\",\"b\"]]; }",
+      "query": "input#return",
+      "expect": {
+        "projection": "Input candidates are not an observed request value. A bool annotation does not create source witnesses.",
+        "requiredValues": [],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": [],
+        "partialRoot": {
+          "kind": "reference",
+          "literal": "$request",
+          "attributes": {
+            "type": "bool",
+            "reason": "EXTERNAL_INPUT"
+          }
+        }
+      }
+    },
+    {
+      "id": "boolean-metadata-unknown",
+      "source": "<?php function input(bool $request, bool $choice): bool { return $request; } function resolve(bool $request, bool $choice) { return input($request, $choice) ? [\"ttl\"=>30,\"visibility\"=>\"shared\",\"tags\"=>[\"common\",\"a\"]] : [\"ttl\"=>60,\"visibility\"=>\"private\",\"tags\"=>[\"common\",\"b\"]]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Structural metadata alternatives 30/shared/common,a and 60/private/common,b. Selection is runtime-dependent; the candidate set and common tag are known.",
+        "values": [
+          {
+            "ttl": 30,
+            "visibility": "shared",
+            "tags": [
+              "common",
+              "a"
+            ]
+          },
+          {
+            "ttl": 60,
+            "visibility": "private",
+            "tags": [
+              "common",
+              "b"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-input-true-and-unknown",
+      "source": "<?php function input(bool $request, bool $choice): bool { return $choice ? true : $request; } function resolve(bool $request, bool $choice) { return input($request, $choice) ? [\"ttl\"=>30,\"visibility\"=>\"shared\",\"tags\"=>[\"common\",\"a\"]] : [\"ttl\"=>60,\"visibility\"=>\"private\",\"tags\"=>[\"common\",\"b\"]]; }",
+      "query": "input#return",
+      "expect": {
+        "projection": "Input candidates are not an observed request value. A bool annotation does not create source witnesses.",
+        "requiredValues": [
+          true
+        ],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": [
+          true
+        ],
+        "partialRoot": {
+          "kind": "reference",
+          "literal": "$request",
+          "attributes": {
+            "type": "bool",
+            "reason": "EXTERNAL_INPUT"
+          }
+        }
+      }
+    },
+    {
+      "id": "boolean-metadata-true-and-unknown",
+      "source": "<?php function input(bool $request, bool $choice): bool { return $choice ? true : $request; } function resolve(bool $request, bool $choice) { return input($request, $choice) ? [\"ttl\"=>30,\"visibility\"=>\"shared\",\"tags\"=>[\"common\",\"a\"]] : [\"ttl\"=>60,\"visibility\"=>\"private\",\"tags\"=>[\"common\",\"b\"]]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Structural metadata alternatives 30/shared/common,a and 60/private/common,b. Selection is runtime-dependent; the candidate set and common tag are known.",
+        "values": [
+          {
+            "ttl": 30,
+            "visibility": "shared",
+            "tags": [
+              "common",
+              "a"
+            ]
+          },
+          {
+            "ttl": 60,
+            "visibility": "private",
+            "tags": [
+              "common",
+              "b"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "literal-true-if",
+      "source": "<?php function resolve() { if(true) { return 30; } else { return 60; } }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Keep both source TTL candidates, including the syntactically present else branch.",
+        "values": [
+          30,
+          60
+        ]
+      }
+    },
+    {
+      "id": "same-metadata-both-branches",
+      "source": "<?php function resolve(bool $flag) { return $flag ? [30,\"private\",[\"common\"]] : [30,\"private\",[\"common\"]]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Request selection is unknown but metadata is a singleton; no metadata gap is needed.",
+        "values": [
+          [
+            30,
+            "private",
+            [
+              "common"
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "request-condition",
+      "source": "<?php function resolve() { return $_GET[\"enabled\"] ? 30 : 60; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Unknown request condition does not prevent deriving both static TTL candidates.",
+        "values": [
+          30,
+          60
+        ]
+      }
+    },
+    {
+      "id": "request-payload-only",
+      "source": "<?php function record($payload) { return [\"payload\"=>$payload,\"metadata\"=>[\"ttl\"=>30,\"visibility\"=>\"private\",\"tags\"=>[\"common\"]]]; } function resolve($payload) { return record($payload)[\"metadata\"]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "A dynamic payload must not contaminate the selected metadata.",
+        "values": [
+          {
+            "ttl": 30,
+            "visibility": "private",
+            "tags": [
+              "common"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "int-finite-offset",
+      "source": "<?php function offset(bool $flag) { return $flag ? 0 : 30; } function resolve(bool $flag) { return 30 + offset($flag); }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Closed TTL alternatives 30/60; not a convex 30-60 interval and not one chosen TTL.",
+        "values": [
+          30,
+          60
+        ]
+      }
+    },
+    {
+      "id": "int-single-offset",
+      "source": "<?php function resolve() { $offset=12; return 30+$offset; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "A singleton finite offset permits exact 42.",
+        "values": [
+          42
+        ]
+      }
+    },
+    {
+      "id": "int-dynamic-offset",
+      "source": "<?php function resolve(int $offset) { return 30+$offset; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Keep 30 + offset. No 30-second lower bound, exact TTL or finite-expiration proof follows from this expression alone.",
+        "constants": [
+          30
+        ],
+        "kinds": [
+          "binary"
+        ],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": [],
+        "partialRoot": {
+          "kind": "binary",
+          "literal": "+",
+          "operands": [
+            {
+              "kind": "constant",
+              "literal": 30
+            },
+            {
+              "kind": "reference",
+              "literal": "$offset",
+              "attributes": {
+                "type": "int",
+                "reason": "EXTERNAL_INPUT"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "int-known-and-dynamic-offset",
+      "source": "<?php function resolve(bool $flag, int $offset) { return 30+($flag ? 0 : $offset); }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Keep concrete 30 alongside symbolic 30 + offset; do not drop either alternative.",
+        "requiredValues": [
+          30
+        ],
+        "constants": [
+          30
+        ],
+        "kinds": [
+          "binary"
+        ],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": [
+          30
+        ],
+        "partialRoot": {
+          "kind": "binary",
+          "literal": "+",
+          "operands": [
+            {
+              "kind": "constant",
+              "literal": 30
+            },
+            {
+              "kind": "reference",
+              "literal": "$offset",
+              "attributes": {
+                "type": "int",
+                "reason": "EXTERNAL_INPUT"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "int-negative-candidate",
+      "source": "<?php function resolve(bool $flag) { return 30+($flag ? -60 : 0); }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Negative TTL is a declaration-validation issue at the Magix boundary; preserve the candidate so the problem can be reported.",
+        "values": [
+          -30,
+          30
+        ]
+      }
+    },
+    {
+      "id": "int-zero-and-positive",
+      "source": "<?php function resolve(bool $flag) { return $flag ? 0 : 30; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Both durations are finite, but zero means no storage; do not claim all candidates permit storage.",
+        "values": [
+          0,
+          30
+        ]
+      }
+    },
+    {
+      "id": "int-null-and-positive",
+      "source": "<?php function resolve(bool $flag) { return $flag ? null : 30; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "In a normalized expiration descriptor, null means no expiration. Preserve it separately from unknown and from zero.",
+        "values": [
+          null,
+          30
+        ]
+      }
+    },
+    {
+      "id": "metadata-tuple-alias",
+      "source": "<?php function resolve(bool $flag) { $m=$flag ? [30,\"shared\",[\"a\"]] : [60,\"private\",[\"b\"]]; $alias=$m; return [$m[0],$alias[1],$alias[2]]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "One selected record and its alias must keep TTL/visibility/tags together.",
+        "values": [
+          [
+            30,
+            "shared",
+            [
+              "a"
+            ]
+          ],
+          [
+            60,
+            "private",
+            [
+              "b"
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "metadata-one-if",
+      "source": "<?php function resolve(bool $flag) { if($flag) { $ttl=30; $tag=\"a\"; } else { $ttl=60; $tag=\"b\"; } return [$ttl,$tag]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Fields assigned by one source choice retain their common selection.",
+        "values": [
+          [
+            30,
+            "a"
+          ],
+          [
+            60,
+            "b"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "metadata-independent-choices",
+      "source": "<?php function resolve(bool $flag) { $ttl=$flag ? 30 : 60; $tag=$flag ? \"a\" : \"b\"; return [$ttl,$tag]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Two separate source choices permit four structural combinations, even with the same request predicate; do not request execution-path solving.",
+        "values": [
+          [
+            30,
+            "a"
+          ],
+          [
+            30,
+            "b"
+          ],
+          [
+            60,
+            "a"
+          ],
+          [
+            60,
+            "b"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "compose-ttl-alternatives",
+      "source": "<?php function resolve(bool $a,bool $b) { $left=$a ? 30 : 60; $right=$b ? 10 : 90; return min($left,$right); }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Dependency meet takes the image of each pair: {10,30,60}, neither set intersection nor the single minimum 10. A retained min call with complete correlated operands also meets the candidate requirement; Magix owns the metadata meet law.",
+        "values": [
+          10,
+          30,
+          60
+        ],
+        "allowedRetainedOperation": "min",
+        "retainedArgumentPairs": [
+          [
+            30,
+            10
+          ],
+          [
+            30,
+            90
+          ],
+          [
+            60,
+            10
+          ],
+          [
+            60,
+            90
+          ]
+        ]
+      }
+    },
+    {
+      "id": "compose-alias",
+      "source": "<?php function resolve(bool $a) { $ttl=$a ? 30 : 60; $same=$ttl; return min($ttl,$same); }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Composing one selected value with its alias preserves its alternatives. A retained min call with complete correlated operands also meets the candidate requirement; Magix owns the metadata meet law.",
+        "values": [
+          30,
+          60
+        ],
+        "allowedRetainedOperation": "min",
+        "retainedArgumentPairs": [
+          [
+            30,
+            30
+          ],
+          [
+            60,
+            60
+          ]
+        ]
+      }
+    },
+    {
+      "id": "partial-record",
+      "source": "<?php function record(int $offset, string $tag) { return [\"ttl\"=>30+$offset,\"visibility\"=>\"private\",\"tags\"=>[\"base\",$tag]]; } ",
+      "query": "record#return",
+      "expect": {
+        "projection": "Open TTL and tags, with known Private and guaranteed base tag. Preserve field structure rather than rejecting the whole record.",
+        "constants": [
+          30,
+          "private",
+          "base"
+        ],
+        "kinds": [
+          "array",
+          "binary"
+        ],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": [],
+        "partialRoot": {
+          "kind": "array",
+          "operands": {
+            "ttl": {
+              "kind": "binary",
+              "literal": "+",
+              "operands": [
+                {
+                  "kind": "constant",
+                  "literal": 30
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$offset",
+                  "attributes": {
+                    "type": "int",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            },
+            "visibility": {
+              "kind": "constant",
+              "literal": "private"
+            },
+            "tags": {
+              "kind": "array",
+              "operands": [
+                {
+                  "kind": "constant",
+                  "literal": "base"
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$tag",
+                  "attributes": {
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "partial-record-visibility",
+      "source": "<?php function record(int $offset, string $tag) { return [\"ttl\"=>30+$offset,\"visibility\"=>\"private\",\"tags\"=>[\"base\",$tag]]; } function resolve(int $offset,string $tag) { return record($offset,$tag)[\"visibility\"]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Query the visibility field without requiring unrelated fields to become concrete.",
+        "constants": [],
+        "values": [
+          "private"
+        ]
+      }
+    },
+    {
+      "id": "partial-record-ttl",
+      "source": "<?php function record(int $offset, string $tag) { return [\"ttl\"=>30+$offset,\"visibility\"=>\"private\",\"tags\"=>[\"base\",$tag]]; } function resolve(int $offset,string $tag) { return record($offset,$tag)[\"ttl\"]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Query the ttl field without requiring unrelated fields to become concrete.",
+        "constants": [
+          30
+        ],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": [],
+        "partialRoot": {
+          "kind": "binary",
+          "literal": "+",
+          "operands": [
+            {
+              "kind": "constant",
+              "literal": 30
+            },
+            {
+              "kind": "reference",
+              "literal": "$offset",
+              "attributes": {
+                "type": "int",
+                "reason": "EXTERNAL_INPUT"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "partial-record-tags",
+      "source": "<?php function record(int $offset, string $tag) { return [\"ttl\"=>30+$offset,\"visibility\"=>\"private\",\"tags\"=>[\"base\",$tag]]; } function resolve(int $offset,string $tag) { return record($offset,$tag)[\"tags\"]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Query the tags field without requiring unrelated fields to become concrete.",
+        "constants": [
+          "base"
+        ],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": [],
+        "partialRoot": {
+          "kind": "array",
+          "operands": [
+            {
+              "kind": "constant",
+              "literal": "base"
+            },
+            {
+              "kind": "reference",
+              "literal": "$tag",
+              "attributes": {
+                "type": "string",
+                "reason": "EXTERNAL_INPUT"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "partial-record-overridden",
+      "source": "<?php function record(int $offset, string $tag) { return [\"ttl\"=>30+$offset,\"visibility\"=>\"private\",\"tags\"=>[\"base\",$tag]]; } function overridden(int $offset,string $tag) { $m=record($offset,$tag); $m[\"ttl\"]=60; return $m; } ",
+      "query": "overridden#return",
+      "expect": {
+        "projection": "TTL replacement clears offset dependence for TTL only; dynamic tags survive.",
+        "constants": [
+          60,
+          "private",
+          "base"
+        ],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": [],
+        "partialRoot": {
+          "kind": "array",
+          "operands": {
+            "ttl": {
+              "kind": "constant",
+              "literal": 60
+            },
+            "visibility": {
+              "kind": "constant",
+              "literal": "private"
+            },
+            "tags": {
+              "kind": "array",
+              "operands": [
+                {
+                  "kind": "constant",
+                  "literal": "base"
+                },
+                {
+                  "kind": "reference",
+                  "literal": "$tag",
+                  "attributes": {
+                    "type": "string",
+                    "reason": "EXTERNAL_INPUT"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "partial-record-override-ttl",
+      "source": "<?php function record(int $offset, string $tag) { return [\"ttl\"=>30+$offset,\"visibility\"=>\"private\",\"tags\"=>[\"base\",$tag]]; } function overridden(int $offset,string $tag) { $m=record($offset,$tag); $m[\"ttl\"]=60; return $m; } function resolve(int $offset,string $tag) { return overridden($offset,$tag)[\"ttl\"]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "A known field override can determine TTL without solving the original offset or dynamic tag.",
+        "values": [
+          60
+        ]
+      }
+    },
+    {
+      "id": "partial-record-override-tags",
+      "source": "<?php function record(int $offset, string $tag) { return [\"ttl\"=>30+$offset,\"visibility\"=>\"private\",\"tags\"=>[\"base\",$tag]]; } function overridden(int $offset,string $tag) { $m=record($offset,$tag); $m[\"ttl\"]=60; return $m; } function resolve(int $offset,string $tag) { return overridden($offset,$tag)[\"tags\"]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Replacing TTL does not erase unrelated tag dependence.",
+        "constants": [
+          "base"
+        ],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": [],
+        "partialRoot": {
+          "kind": "array",
+          "operands": [
+            {
+              "kind": "constant",
+              "literal": "base"
+            },
+            {
+              "kind": "reference",
+              "literal": "$tag",
+              "attributes": {
+                "type": "string",
+                "reason": "EXTERNAL_INPUT"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "known-plus-opaque-ttl",
+      "source": "<?php function resolve(bool $flag) { return $flag ? 30 : externalTtl(); }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Keep a concrete 30 and an unresolved external producer. This is an open candidate set, not an exact 30.",
+        "requiredValues": [
+          30
+        ],
+        "requirePartial": true,
+        "knownValues": [
+          30
+        ]
+      }
+    },
+    {
+      "id": "request-tag",
+      "source": "<?php function resolve(string $id) { return [\"catalog\",\"product:\".$id]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "catalog is guaranteed; product prefix is a pattern/reference, not a concrete guaranteed product tag.",
+        "constants": [
+          "catalog",
+          "product:"
+        ],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": []
+      }
+    },
+    {
+      "id": "fixed-loop-updates",
+      "source": "<?php function resolve(int $count) { $ttl=10; for($i=0;$i<$count;$i++){ $ttl=$i ? 30 : 60; } return $ttl; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Keep entry and body value candidates without computing the last iteration.",
+        "values": [
+          10,
+          30,
+          60
+        ]
+      }
+    },
+    {
+      "id": "foreach-literal-offsets",
+      "source": "<?php function resolve() { $ttl=30; foreach([0,10,30] as $offset){$ttl=30+$offset;} return $ttl; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Literal iterator alternatives suffice to derive update candidates; do not require the final TTL 60 only.",
+        "values": [
+          30,
+          40,
+          60
+        ]
+      }
+    },
+    {
+      "id": "foreach-dynamic-offsets",
+      "source": "<?php function resolve(array $offsets) { $ttl=30; foreach($offsets as $offset){$ttl=30+$offset;} return $ttl; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Preserve initial 30 and the dependent update from unknown iterator elements.",
+        "requiredValues": [
+          30
+        ],
+        "requirePartial": true,
+        "constants": [
+          30
+        ],
+        "knownValues": [
+          30
+        ]
+      }
+    },
+    {
+      "id": "loop-recurrence",
+      "source": "<?php function resolve(int $count) { $ttl=30; for($i=0;$i<$count;$i++){ $ttl+=10; } return $ttl; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "A recurrence retaining initial 30, update +10 and loop dependence is useful. No demand to enumerate the final execution value.",
+        "constants": [
+          30,
+          10
+        ],
+        "reasons": [
+          "LOOP_DEPENDENCY"
+        ],
+        "knownValues": [],
+        "partialRoot": {
+          "kind": "recurrence",
+          "operands": [
+            {
+              "kind": "constant",
+              "literal": 30
+            },
+            {
+              "kind": "binary",
+              "literal": "+",
+              "operands": [
+                {
+                  "kind": "recursive"
+                },
+                {
+                  "kind": "constant",
+                  "literal": 10
+                }
+              ]
+            },
+            {
+              "kind": "recursive"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "caller-selected-finite",
+      "source": "<?php function value(int $offset) { return 30+$offset; } function page(bool $flag) { return value($flag ? 0 : 30); } function foreign(int $offset) { return value($offset); }",
+      "query": "page -> value#return",
+      "expect": {
+        "projection": "A selected caller retains its complete finite alternatives and excludes unrelated callers.",
+        "values": [
+          30,
+          60
+        ]
+      }
+    },
+    {
+      "id": "caller-open-project",
+      "source": "<?php function value(int $offset) { return 30+$offset; } function page(bool $flag) { return value($flag ? 0 : 30); } function foreign(int $offset) { return value($offset); }",
+      "query": "value#return",
+      "expect": {
+        "projection": "Without a caller restriction retain finite callers and unknown caller input; do not claim the finite set is exhaustive.",
+        "requiredValues": [
+          30,
+          60
+        ],
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": [
+          30,
+          60
+        ]
+      }
+    },
+    {
+      "id": "empty-selected-context",
+      "source": "<?php function resolve(){return 30;} function other(){return 60;}",
+      "query": "other -> resolve#return",
+      "expect": {
+        "projection": "No matching invocation is not TTL zero, no expiration, or an analysis failure. Keep empty context distinct.",
+        "values": []
+      }
+    },
+    {
+      "id": "boolean-nullable-input",
+      "source": "<?php function resolve(?bool $request) { return $request; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Nullable boolean input remains an external dependency; type domain alone is not witnessed concrete candidates.",
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": []
+      }
+    },
+    {
+      "id": "boolean-field-both",
+      "source": "<?php function input(bool $request, bool $choice): bool { return $request ? true : false; } function resolve(bool $request,bool $choice) { return [\"ttl\"=>30,\"visibility\"=>\"private\",\"cacheable\"=>input($request,$choice)]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Boolean used as a metadata value: finite true/false alternatives remain explicit; an unknown boolean affects cacheability, not TTL or visibility.",
+        "values": [
+          {
+            "ttl": 30,
+            "visibility": "private",
+            "cacheable": true
+          },
+          {
+            "ttl": 30,
+            "visibility": "private",
+            "cacheable": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-field-true",
+      "source": "<?php function input(bool $request, bool $choice): bool { return true; } function resolve(bool $request,bool $choice) { return [\"ttl\"=>30,\"visibility\"=>\"private\",\"cacheable\"=>input($request,$choice)]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Boolean used as a metadata value: finite true/false alternatives remain explicit; an unknown boolean affects cacheability, not TTL or visibility.",
+        "values": [
+          {
+            "ttl": 30,
+            "visibility": "private",
+            "cacheable": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-field-false",
+      "source": "<?php function input(bool $request, bool $choice): bool { return false; } function resolve(bool $request,bool $choice) { return [\"ttl\"=>30,\"visibility\"=>\"private\",\"cacheable\"=>input($request,$choice)]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Boolean used as a metadata value: finite true/false alternatives remain explicit; an unknown boolean affects cacheability, not TTL or visibility.",
+        "values": [
+          {
+            "ttl": 30,
+            "visibility": "private",
+            "cacheable": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "boolean-field-unknown",
+      "source": "<?php function input(bool $request, bool $choice): bool { return $request; } function resolve(bool $request,bool $choice) { return [\"ttl\"=>30,\"visibility\"=>\"private\",\"cacheable\"=>input($request,$choice)]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Boolean used as a metadata value: finite true/false alternatives remain explicit; an unknown boolean affects cacheability, not TTL or visibility.",
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "constants": [
+          30,
+          "private"
+        ],
+        "knownValues": [],
+        "partialRoot": {
+          "kind": "array",
+          "operands": {
+            "ttl": {
+              "kind": "constant",
+              "literal": 30
+            },
+            "visibility": {
+              "kind": "constant",
+              "literal": "private"
+            },
+            "cacheable": {
+              "kind": "reference",
+              "literal": "$request",
+              "attributes": {
+                "type": "bool",
+                "reason": "EXTERNAL_INPUT"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "boolean-field-true-and-unknown",
+      "source": "<?php function input(bool $request, bool $choice): bool { return $choice ? true : $request; } function resolve(bool $request,bool $choice) { return [\"ttl\"=>30,\"visibility\"=>\"private\",\"cacheable\"=>input($request,$choice)]; }",
+      "query": "resolve#return",
+      "expect": {
+        "projection": "Boolean used as a metadata value: finite true/false alternatives remain explicit; an unknown boolean affects cacheability, not TTL or visibility.",
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "constants": [
+          30,
+          "private"
+        ],
+        "requiredValues": [
+          {
+            "ttl": 30,
+            "visibility": "private",
+            "cacheable": true
+          }
+        ],
+        "knownValues": [
+          {
+            "ttl": 30,
+            "visibility": "private",
+            "cacheable": true
+          }
+        ],
+        "partialRoot": {
+          "kind": "array",
+          "operands": {
+            "ttl": {
+              "kind": "constant",
+              "literal": 30
+            },
+            "visibility": {
+              "kind": "constant",
+              "literal": "private"
+            },
+            "cacheable": {
+              "kind": "reference",
+              "literal": "$request",
+              "attributes": {
+                "type": "bool",
+                "reason": "EXTERNAL_INPUT"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "factory-finite-ttl-argument",
+      "source": "<?php use Magix\\Cache\\Strategy\\StrategyDefinition; function factory(bool $flag, int $offset) { return StrategyDefinition::of(\"Acme\\\\ExampleStrategy\", ttl: $flag ? 30 : 60); }",
+      "query": "{file}:1:103#argument(ttl)",
+      "expect": {
+        "projection": "Read the actual StrategyDefinition named TTL argument without executing the factory, constructing a strategy, or resolving the entire recipe object.",
+        "values": [
+          30,
+          60
+        ]
+      }
+    },
+    {
+      "id": "factory-dynamic-ttl-argument",
+      "source": "<?php use Magix\\Cache\\Strategy\\StrategyDefinition; function factory(bool $flag, int $offset) { return StrategyDefinition::of(\"Acme\\\\ExampleStrategy\", ttl: 30 + $offset); }",
+      "query": "{file}:1:103#argument(ttl)",
+      "expect": {
+        "projection": "Read the actual StrategyDefinition named TTL argument without executing the factory, constructing a strategy, or resolving the entire recipe object.",
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "constants": [
+          30
+        ],
+        "kinds": [
+          "binary"
+        ],
+        "knownValues": [],
+        "partialRoot": {
+          "kind": "binary",
+          "literal": "+",
+          "operands": [
+            {
+              "kind": "constant",
+              "literal": 30
+            },
+            {
+              "kind": "reference",
+              "literal": "$offset",
+              "attributes": {
+                "type": "int",
+                "reason": "EXTERNAL_INPUT"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "factory-default-is-not-input",
+      "source": "<?php function factory(bool $enabled=true) { return $enabled; }",
+      "query": "factory#parameter(enabled)",
+      "expect": {
+        "projection": "A declared boolean default is not the value of an open invocation. Keep its external input dependency.",
+        "reasons": [
+          "EXTERNAL_INPUT"
+        ],
+        "knownValues": []
+      }
+    },
+    {
+      "id": "factory-caller-boolean",
+      "source": "<?php function factory(bool $enabled) { return $enabled; } function selected(){return factory(true);} function foreign(bool $enabled){return factory($enabled);}",
+      "query": "selected -> factory#parameter(enabled)",
+      "expect": {
+        "projection": "The explicit selected caller has true. This scope-specific fact is not a guarantee about unselected application requests.",
+        "values": [
+          true
+        ]
+      }
+    }
+  ]
+}
